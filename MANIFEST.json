@@ -1,0 +1,33 @@
+{
+  "project": "tiltrotor_forward_model_v2",
+  "language": "MATLAB",
+  "state_dimension": 9,
+  "control_dimension": 7,
+  "nacelle_angle_definition": "0 deg helicopter, 90 deg airplane",
+  "files": [
+    "README.md",
+    "analysis/linearize_numeric.m",
+    "analysis/stability_report.m",
+    "analysis/trim_symmetric.m",
+    "docs/PAPER_MAPPING.md",
+    "docs/VALIDATION_STATUS.md",
+    "docs/代码与论文对应详解.md",
+    "examples/demo_single_hover.m",
+    "examples/demo_time_response.m",
+    "model/aero_force_body.m",
+    "model/fuselage_model.m",
+    "model/horizontal_tail_model.m",
+    "model/mass_properties.m",
+    "model/rotor_model_bemt.m",
+    "model/tiltrotor_eom.m",
+    "model/total_forces_moments.m",
+    "model/validate_inputs.m",
+    "model/vertical_tail_model.m",
+    "model/wing_model.m",
+    "params_nominal.m",
+    "run_demo.m",
+    "startup.m",
+    "tests/check_article_trends.m",
+    "tests/run_all_checks.m"
+  ]
+}
