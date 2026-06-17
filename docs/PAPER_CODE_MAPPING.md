@@ -802,3 +802,98 @@ tests\check_article_trends.m
 - 旋翼诱导速度迭代是否在默认网格和典型工况下收敛。
 - 低速、零速、接近 Euler 奇异姿态、近法向机翼流动下的数值稳定性。
 - NASA 参数替换后的质量、惯量、几何和气动量级是否仍保持模型可计算。
+
+---
+
+## 25. 2026-06-17 趋势诊断程序修订记录
+
+### 25.1 本轮范围和修改限制
+
+- 本轮阶段：趋势诊断程序修订。
+- 允许修改文件：`tests\check_article_trends.m`、`docs\PAPER_CODE_MAPPING.md`。
+- 实际修改文件：`tests\check_article_trends.m`、`docs\PAPER_CODE_MAPPING.md`。
+- 未修改：`params_nominal.m`、`model\` 目录、`analysis\` 目录、`tests\run_all_checks.m`、`run_demo.m`。
+- 未修改任何模型参数。
+- 未修改任何函数接口；`check_article_trends` 入口仍为 `trendReport = check_article_trends`。
+- 当前没有证据支持修改 `model\rotor_model_bemt.m`；`diffCyclic` 对 `Fy` 的零导数首先记录为当前模型结构限制，而不是通过修改旋翼模型来提高趋势匹配。
+
+### 25.2 MATLAB 运行环境记录
+
+- MATLAB 可执行文件：`F:\matlab\R2021a\bin\matlab.exe`。
+- MATLAB 版本：`9.10.0.1602886 (R2021a)`。
+- 用户普通 CMD 烟雾测试：返回退出码 `0`。
+- Codex 捕获 MATLAB `-batch` 输出时：命令主体完成后，可能在 `shutdown.cpp` 退出阶段出现 `mwboost::archive::archive_exception` / `output stream error` 断言。
+- 记录方式：日志中数值计算结果在 shutdown 断言前已完整输出；该计算结果和退出阶段断言必须分开记录。
+- 不能把 Codex 输出捕获阶段的 shutdown 断言等同于模型计算失败；也不能忽略该断言。
+
+### 25.3 基础检查和配平结果
+
+- MATLAB 基础检查：`run_all_checks` 中 7 项内部检查均通过。
+- 已通过项目内部检查项：
+  - 参数和惯量检查；
+  - 短舱端点推力方向；
+  - 总距-推力单调性；
+  - 左右对称性；
+  - 机翼 `V^2` 规律；
+  - 旋翼网格收敛；
+  - 线性化有限性。
+- 真实悬停配平点：`V=0 m/s`，`betaM=0 rad`，`trim exitflag=1`，`trim residualNorm=1.612633507884e-08`，完整 9 状态 `norm(f0)=1.612633507884e-08`。
+- 真实 `V=20 m/s` 配平点：`betaM=0 rad`，`trim exitflag=1`，`trim residualNorm=3.903537374755e-08`，完整 9 状态 `norm(f0)=3.903537374755e-08`。
+- 原 `check_article_trends.m` 使用的 `V=20 m/s` 手工基准点不是配平点，旧诊断中 `norm(f0)=3.071181`，不能作为正式趋势比较基准。
+
+### 25.4 NUAA Table 2 参考数据状态
+
+- 文献：`references\NUAA_main_paper.pdf`。
+- PDF 页码：13。
+- 原文页码：13 of 18。
+- 表号：Table 2。
+- Table 2 标题：Linearized input matrix B in helicopter mode。
+- Table 2 行标签：`Fx/Fy/Fz/Mx/My/Mz` 等。
+- Table 2 控制列：`δc/δcc/δe/δec/δail/δele/δrud`。
+- 工况完整性：`UNVERIFIED`。
+- 控制单位：`UNVERIFIED`。
+- 机体系方向：`UNVERIFIED`；Figure 2 仍需人工视觉确认。
+- 行标签物理含义：`UNVERIFIED`；不能在未确认含义时把 Table 2 的 `Mx/Mz` 行直接等同于代码 B 矩阵的 `pdot/rdot` 行。
+- 当前 `check_article_trends` 顶层字段 `formalComparable=false`。只有论文工况、控制单位、坐标方向和行标签含义全部确认后，才允许改为 `true`。
+
+### 25.5 状态导数与原始载荷导数必须分开
+
+- `analysis\linearize_numeric.m` 输出的 `B` 矩阵行含义是状态导数：
+  `udot/vdot/wdot/pdot/qdot/rdot/phidot/thetadot/psidot`。
+- `model\total_forces_moments.m` 输出的原始广义载荷行含义是：
+  `Fx/Fy/Fz/Mx/My/Mz`。
+- 因此 `Mx` 不得直接写成 `pdot`，`Mz` 不得直接写成 `rdot`。
+- 本轮修订后的 `check_article_trends` 分别输出：
+  - `linearize_numeric` 的 `B(:,2)` 和 `B(:,4)`；
+  - `total_forces_moments` 中心差分得到的 `dFx/dudiff`、`dFy/dudiff`、`dFz/dudiff`、`dMx/dudiff`、`dMy/dudiff`、`dMz/dudiff`。
+- 其中 `dudiff` 在程序中对应 `diffCollective` 或 `diffCyclic`，不是飞行速度 `u`。
+
+### 25.6 悬停配平点趋势诊断结论
+
+- 在真实悬停配平点，`dvdot/ddiffCollective` 为负，NUAA Table 2 中 `Fy/δcc` 为正；该项保持 `UNRESOLVED`，倾向原因是低阶盘内侧向力模型差异或坐标/定义差异，仍需人工核对坐标和控制正方向。
+- 在真实悬停配平点，`rdot/ddiffCollective` 为正，与 NUAA Table 2 中 `Mz/δcc` 同号；这只是诊断同号，不是正式复现证明。
+- 在真实悬停配平点，`pdot/ddiffCyclic` 为负，与 NUAA Table 2 中 `Mx/δec` 同号；但 `pdot` 来自完整惯量矩阵求解，不等同于原始 `Mx`。
+- 在真实悬停配平点，`dvdot/ddiffCyclic=0`，而 NUAA Table 2 中 `Fy/δec` 为正；当前代码结构中 `diffCyclic` 只进入 `cyclicLong` 和纵向挥舞 `a1`，不进入横向挥舞 `b1`，因此该项标记为 `MODEL_STRUCTURE_ZERO`。
+- 悬停时 `pdot/ddiffCyclic` 主要来自负 `Mz` 通过非对角惯量 `Ixz` 的耦合；原始 `dMx/ddiffCyclic` 近零，不能把这一项解释为原始 `Mx` 与论文完全一致。
+- 原三个旧诊断不匹配项中，换成真实悬停配平点后有两个与论文同号：`rdot/ddiffCollective`、`pdot/ddiffCyclic`；`dvdot/ddiffCollective` 仍未解决。
+
+### 25.7 差分步长敏感性记录
+
+在真实悬停配平点，使用 `linearize_numeric` 并分别设置控制差分步长 `1e-3`、`1e-4`、`1e-5`，重点状态导数符号稳定：
+
+| 控制差分步长 | `dvdot/ddiffCollective` | `rdot/ddiffCollective` | `pdot/ddiffCyclic` | `dvdot/ddiffCyclic` |
+|---:|---:|---:|---:|---:|
+| `1e-3` | `-2.033745817091e+00` | `+1.525354631665e+00` | `-3.720510688974e-01` | `0.000000000000e+00` |
+| `1e-4` | `-2.033757284506e+00` | `+1.525368415917e+00` | `-3.720511573000e-01` | `0.000000000000e+00` |
+| `1e-5` | `-2.033757399178e+00` | `+1.525368553744e+00` | `-3.720511582972e-01` | `0.000000000000e+00` |
+
+该表只能说明这些导数在当前模型和当前配平点附近对差分步长不敏感，不能说明模型已经复现 NUAA Table 2。
+
+### 25.8 诊断状态规则
+
+- `check_article_trends` 不再输出正式 `PASS/FAIL`。
+- 每个比较项只能使用：
+  `MATCH`、`MISMATCH`、`NOT_COMPARABLE`、`MODEL_STRUCTURE_ZERO`、`UNVERIFIED`。
+- `matchFraction` 保留为兼容旧调用者的别名，但其含义已降级为 `diagnosticMatchFraction`。
+- `diagnosticMatchFraction` 只统计可比较的 `MATCH/MISMATCH` 诊断项，不能代表模型正确率、复现程度或验证通过率。
+- 当配平失败、`norm(f0)` 超过容差、或出现 NaN/Inf/复数时，程序必须停止 Table 2 趋势比较并标记 `NOT_COMPARABLE`，不得继续给出“通过”。
