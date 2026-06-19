@@ -1,177 +1,131 @@
 # CODEX_TASK.md
 
-## Closeout status (2026-06-20)
-
-The prescribed representative run was executed once and returned **FAIL**.
-All five trim points succeeded, but the existing significant-sign-flip test
-flagged `cyclicLong` over 5--10 m/s and 15--20 m/s. The raw values and runtime
-are preserved in `docs/REPRESENTATIVE_TRIM_CONTINUATION.md`. No threshold,
-parameter, solver behavior, additional point, rescue initial, multistart,
-Jacobian, or full linearization was used to change the outcome.
-
-STATUS: FAILED — representative `cyclicLong` sign-flip criteria not met
+STATUS: ACTIVE / LOCAL DIAGNOSIS REQUIRED
 
 Branch: `audit/representative-trim-continuation`
 
 Base branch: `main`
 
-Current phase: lightweight representative helicopter-mode trim continuation.
+Current phase: focused diagnosis of the failed five-point representative helicopter-mode trim continuation screen.
 
-## Goal
+## Preserved representative result
 
-Refactor the existing helicopter trim sweep so Jacobian and full-linearization diagnostics can be disabled without changing default behavior, then run a five-point representative continuation screen at `V = [0, 5, 10, 15, 20] m/s`.
+The prescribed five-point run at `V = [0, 5, 10, 15, 20] m/s` completed in 41.8 seconds.
 
-This phase checks convergence, residuals, limits, continuation seed handoff, adjacent changes, deterministic bookkeeping, and runtime. It is a representative screen only. It does not establish dense branch continuity, uniqueness, a flight envelope, transition/airplane trim validity, handling qualities, or XV-15 fidelity.
+- all five single-start trims succeeded;
+- all outputs were finite and real;
+- no rescue initial was used;
+- each point had one attempt and one candidate;
+- no trim variable or applied control reached a limit;
+- continuation seeds were handed forward exactly;
+- residual-Jacobian calls: 0;
+- full-linearization calls: 0;
+- objective evaluations: 1025;
+- the configured significant-sign-flip screen failed for `cyclicLong` over 5--10 m/s and 15--20 m/s.
 
-## Read first
+This is a HIGH representative-screen finding and a PR merge blocker. It is not yet classified as a HIGH production-equation bug. The present evidence cannot distinguish a continuous zero crossing, sparse-sampling aliasing, multiple roots, or path-dependent branch selection.
 
-- `AGENTS.md`
-- `CODEX_TASK.md`
-- `params_nominal.m`
-- `analysis/trim_symmetric.m`
-- `analysis/trim_sweep_helicopter.m`
-- `analysis/trim_residual_jacobian.m`
-- `analysis/linearize_numeric.m`
-- `tests/check_trim_equations.m`
-- `tests/check_trim_continuity.m`
-- `tests/run_all_checks.m`
-- `docs/TRIM_EQUATIONS_CONTINUATION_AUDIT.md`
-- `docs/AERODYNAMIC_COMPONENTS_AUDIT.md`
+## Immediate goal
 
-## Required implementation
+Diagnose the larger 5--10 m/s event with the smallest useful calculation. Do not investigate the 15--20 m/s event in this pass.
 
-### Optional expensive diagnostics
-
-Add two validated options to `trim_sweep_helicopter`:
+At `V = 7.5 m/s`, perform exactly two independent single-start trim solves:
 
 ```text
-computeResidualJacobian
-computeLinearization
+low-side seed  = the recorded 5 m/s solution
+high-side seed = the recorded 10 m/s solution
 ```
 
-Requirements:
+Use the exact full-precision values stored in the five-point sweep report or audit document. Do not round the seeds to the display table when higher precision is available.
 
-- both default to `true`, preserving all existing caller behavior;
-- accept logical scalars or numeric scalar `0/1`, normalized to logical;
-- use stable error identifiers for invalid values;
-- when disabled, do not call `trim_residual_jacobian` or `linearize_numeric`;
-- point reports must explicitly state whether each diagnostic was requested and computed;
-- skipped diagnostics must remain distinguishable from failed diagnostics;
-- `sweepReport.allPassed` must require a diagnostic to pass only when that diagnostic was requested;
-- existing default diagnostic behavior must remain unchanged.
+Common settings:
 
-Do not hide a failed requested diagnostic by marking it skipped.
+```text
+betaM = 0 rad
+gamma = 0 rad
+useMultiStart = false
+alwaysMultiStart = false
+no rescue initial
+```
 
-### Representative continuation check
+## Required implementation
 
 Create:
 
 ```text
-tests/check_representative_trim_continuation.m
+tests/diagnose_trim_midpoint_7p5.m
+docs/TRIM_MIDPOINT_7P5_DIAGNOSIS.md
 ```
 
-Use exactly:
+The diagnostic must:
 
-```text
-speeds = [0, 5, 10, 15, 20] m/s
-betaM = 0 rad
-gamma = 0 rad
-useContinuation = true
-useTrimMultiStart = false
-allowRescueInitials = false
-failOnRescueInitial = true
-computeResidualJacobian = false
-computeLinearization = false
-```
+1. execute exactly two high-level trim solves at 7.5 m/s;
+2. use the recorded 5 m/s and 10 m/s solutions as the two requested seeds;
+3. preserve and report each requested seed, actual candidate seed, final solution, exit flag, reduced residual, full residual, objective cost, objective-evaluation count, limits, and applied controls;
+4. prove each solve used one candidate and no multistart/rescue behavior;
+5. compare the two final `[theta, collective, cyclicLong]` vectors without changing either result;
+6. report the raw componentwise difference and Euclidean difference in degrees;
+7. state whether the two solves converged to numerically indistinguishable or materially different roots, while showing the exact comparison tolerance and its rationale;
+8. call `tiltrotor_eom` once at each final solution and record existing component diagnostics only;
+9. record wing free/slip-region forces, moments, local angles, normal-flow ratios, blend weights/branch diagnostics, and rotor wake quantities already available in the returned structures;
+10. report whether either solution lies in or near a wing normal-flow blend region;
+11. use zero residual-Jacobian calls and zero full-linearization calls;
+12. make no production-model, parameter, solver, threshold, objective, penalty, tolerance, limit, or seed-default changes.
 
-Use the existing initial seed `[0, 18, 0] deg`.
+If the two midpoint seeds converge to different valid roots, stop after documenting the evidence. Do not add more speeds or starts.
 
-The check must verify:
+If they converge to the same valid root, stop after documenting the common root and its `cyclicLong` sign. Do not immediately search for the zero crossing.
 
-1. exactly five requested and returned points;
-2. all five high-level trims succeed;
-3. no rescue initial is used;
-4. one candidate/attempt per speed under the single-start configuration;
-5. every point is finite and real;
-6. reduced residual and full residual satisfy their documented tolerances;
-7. no trim variable or applied control is at/over a limit;
-8. each successful point seeds the next point exactly;
-9. requested/computed diagnostic flags prove zero Jacobian and zero linearization calls;
-10. adjacent theta, collective, and longitudinal-cyclic changes are finite and reported;
-11. no adjacent sign-flip or configured jump is reported;
-12. repeated execution is not required in the first pass; deterministic bookkeeping is checked structurally from one run;
-13. output clearly states this is a five-point representative screen and cannot exclude unsampled local branch changes.
+## Runtime budget
 
-Do not use rescue initials to obtain a passing result. If any point fails, preserve the failure evidence and stop before adding extra starts or intermediate speeds.
+Estimate before execution:
 
-## Threshold policy
-
-Use the current `trim_sweep_helicopter` default representative-screen thresholds unless a code-level inconsistency is found:
-
-```text
-maxDeltaThetaDeg = 10
-maxDeltaControlDeg = 10
-signFlipThresholdDeg = 0.25
-```
-
-Record observed adjacent deltas. Do not tighten or tune thresholds to manufacture a conclusion. Do not claim smoothness between the five sampled points.
-
-## Allowed changes
-
-- modify `analysis/trim_sweep_helicopter.m` only to support optional diagnostics, explicit requested/computed flags, and behavior-neutral reporting;
-- create `tests/check_representative_trim_continuation.m`;
-- create `docs/REPRESENTATIVE_TRIM_CONTINUATION.md`;
-- update `CODEX_TASK.md` at closeout;
-- add lightweight diagnostic counters that do not trigger extra model evaluations.
-
-Do not add this new check to `run_all_checks` in the first pass.
-
-## Forbidden
-
-- changing any numeric parameter in `params_nominal.m`;
-- changing the trim variable set, objective, penalties, tolerances, limits, default seeds, or solver algorithms;
-- enabling multistart or rescue initials;
-- adding intermediate speed points after a failure without review;
-- running the existing 21-point `check_trim_continuity`;
-- running Jacobian or full linearization at any of the five points;
-- reverse sweeps, dense scans, nacelle-angle sweeps, Monte Carlo, optimization grids, or flight-envelope work;
-- transition/airplane trim conclusions;
-- XV-15 fidelity claims.
-
-## Runtime discipline
-
-Before MATLAB execution, estimate:
-
-- five high-level trim solves;
-- expected objective-evaluation order of magnitude using the previous 563 evaluations for three points;
-- zero Jacobian residual evaluations;
-- zero full linearizations;
-- expected runtime.
+- high-level trim solves: 2;
+- expected objective evaluations: approximately 350--600 total, based on the five-point run;
+- direct post-trim EOM evaluations: 2;
+- residual Jacobians: 0;
+- full linearizations: 0;
+- expected runtime: below 60 seconds.
 
 Run only:
 
 ```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_representative_trim_continuation; disp(r); assert(r.allPassed);"
+& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = diagnose_trim_midpoint_7p5; disp(r); assert(r.executionCompleted);"
 ```
 
-If this command exceeds about 3 minutes, stop and report. Do not run `run_all_checks` or the 21-point continuity test afterward.
+The assertion must confirm execution and evidence capture, not force the two roots to match.
 
-Record the known MATLAB R2021a shutdown-stage `output stream error` separately from test-body results.
+If the command exceeds about 2 minutes, stop and report.
 
-## Deliverables
+## Forbidden
 
-- exact modified files;
-- `docs/REPRESENTATIVE_TRIM_CONTINUATION.md`;
-- test-body PASS/FAIL summary;
-- actual runtime;
-- actual high-level trim-solve and objective-evaluation counts;
-- proof of zero Jacobian and zero full-linearization calls;
-- per-point theta, collective, cyclic, reduced/full residuals, limit status, and initial source;
-- adjacent changes and any sign-flip/jump flags;
-- explicit statement that this is representative screening only;
-- explicit statement that parameters and valid-input trim behavior changed or did not change;
+- modifying the five-point result or its FAIL conclusion;
+- changing `signFlipThresholdDeg`;
+- changing any numeric parameter;
+- changing the trim model, variable set, solver, objective, penalties, tolerances, limits, or defaults;
+- multistart or rescue initials;
+- extra speeds such as 6, 7, 8, or 9 m/s;
+- diagnosing 15--20 m/s in this pass;
+- reverse sweeps;
+- Jacobians or full linearizations;
+- running `check_trim_continuity` or `run_all_checks`;
+- claiming a physical bifurcation, hysteresis, or unique branch without evidence.
+
+## Closeout
+
+Update `docs/TRIM_MIDPOINT_7P5_DIAGNOSIS.md` and this task file with:
+
+- exact two seeds and two final roots;
+- all residual, limit, cost, and evaluation evidence;
+- component diagnostics relevant to the midpoint difference;
+- actual runtime and call counts;
+- conclusion limited to one of:
+  - same midpoint root from both seeds;
+  - distinct midpoint roots from the two seeds;
+  - one or both midpoint solves failed;
+- explicit next-step recommendation, without executing it;
 - commit SHA and clean working-tree status.
 
 Commit and push to `audit/representative-trim-continuation`.
 
-Do not merge the PR and do not begin dense continuation, reverse sweeps, linearization maps, transition/airplane trim work, or flight-envelope analysis after completion.
+Do not merge Draft PR #6 and do not begin broader continuation or linearization work.
