@@ -1,6 +1,28 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / LOCAL DIAGNOSIS REQUIRED
+STATUS: MIDPOINT DIAGNOSIS COMPLETE / PR HOLD REMAINS
+
+## Midpoint closeout (2026-06-20)
+
+The authorized two-seed diagnosis at `V = 7.5 m/s` completed. Both independent
+single-start solves converged to the same numerical root within the declared
+`1.0e-4 deg` Euclidean tolerance:
+
+```text
+low-seed result  = [0.097205105181, 16.809576878591, -0.169175072447] deg
+high-seed result = [0.097205096202, 16.809576878806, -0.169175072991] deg
+difference norm  = 8.998006127586e-09 deg
+```
+
+Both solutions place the slipstream wing regions inside the current
+normal-flow blend interval (`ratio = 0.282863080`, `weight = 0.133065419`).
+The common root has negative `cyclicLong`. This does not locate or classify
+the sign change between 7.5 and 10 m/s. Full evidence is recorded in
+`docs/TRIM_MIDPOINT_7P5_DIAGNOSIS.md`.
+
+Execution used 2 high-level trims, 448 objective evaluations, 2 direct
+post-trim EOM calls, zero residual Jacobians, and zero full linearizations.
+No production code or parameter changed. Draft PR #6 remains on hold.
 
 Branch: `audit/representative-trim-continuation`
 
