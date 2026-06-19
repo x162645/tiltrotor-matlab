@@ -1,220 +1,203 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / HOLD
+STATUS: ACTIVE
 
-Branch: `audit/aero-components`
+Branch: `audit/trim-equations-continuation`
 
 Base branch: `main`
 
-Current phase: wing, fuselage, horizontal-tail, vertical-tail, and aerodynamic force-transform audit.
-
-## Completed scope
-
-- aerodynamic component audit completed;
-- `check_aerodynamic_components`: 10/10 PASS;
-- `check_wing_normal_flow_blend`: PASS;
-- `check_control_architecture`: PASS;
-- `run_all_checks`: 13/13 PASS;
-- focused top-level call count: 29;
-- numeric parameters unchanged;
-- aerodynamic derivatives unchanged;
-- slipstream, downwash, transform, force, and moment equations unchanged;
-- slipstream direction, downwash sign, control-effectiveness signs, and fuselage rate damping verified as internally consistent in covered canonical cases;
-- no CRITICAL/HIGH/MEDIUM production-code bug found;
-- LOW test-interpretation limitation recorded for finite-amplitude aileron/rudder mirror checks;
-- Draft PR #4 awaits final review and user authorization;
-- do not merge PR #4;
-- do not begin trim-equation, continuation, or flight-envelope work.
+Current phase: symmetric trim equations, solver contract, limits, residuals, and continuation audit.
 
 ## Goal
 
-Verify that the non-rotor aerodynamic component chain is internally correct in coordinate transforms, force and moment signs, local-flow construction, control-effectiveness signs, damping behavior, slipstream coupling, branch continuity, symmetry, units, and diagnostics.
+Verify that the current symmetric trim formulation is internally correct, dimensionally coherent, deterministic in representative cases, explicit about its applicability limits, and safe for later continuation work.
 
-This is an internal-consistency and broad-physics audit for the current conceptual model. Exact XV-15 identification remains outside this phase. Preserve all production parameter values during the first pass and do not tune coefficients to make tests pass.
+This phase audits the existing conceptual helicopter-mode trim closure. It does not establish a full transition/airplane trim formulation, a flight envelope, or XV-15 fidelity. Preserve all production parameter values during the first pass. Do not tune parameters or broaden the trim variable set to make cases converge.
 
 ## Read first
 
 - `AGENTS.md`
 - `CODEX_TASK.md`
 - `params_nominal.m`
-- `model/aero_force_body.m`
-- `model/wing_model.m`
-- `model/fuselage_model.m`
-- `model/horizontal_tail_model.m`
-- `model/vertical_tail_model.m`
+- `analysis/trim_symmetric.m`
+- `analysis/trim_sweep_helicopter.m`
+- `analysis/trim_residual_jacobian.m`
+- `analysis/linearize_numeric.m`
+- `model/tiltrotor_eom.m`
 - `model/total_forces_moments.m`
-- `model/mass_properties.m`
-- `model/rotor_model_bemt.m`
-- `tests/check_wing_normal_flow_blend.m`
-- `tests/check_control_architecture.m`
-- `tests/check_mass_inertia_geometry.m`
+- `tests/check_trim_continuity.m`
+- `tests/check_physical_sanity.m`
 - `tests/run_all_checks.m`
 - `docs/CONTROL_CONVENTIONS.md`
 - `docs/PHYSICS_AND_CODE_AUDIT.md`
-- `docs/MASS_INERTIA_GEOMETRY_AUDIT.md`
+- `docs/ROTOR_FORCE_MOMENT_AUDIT.md`
+- `docs/AERODYNAMIC_COMPONENTS_AUDIT.md`
 
 Search all callers and uses of:
 
 ```text
-aero_force_body
-wing_model
-fuselage_model
-horizontal_tail_model
-vertical_tail_model
-wakeFactor
-normalFlowRatio
-normalFlowBlendHalfWidth
-downwashAlpha
-CLaileron
-CLelevator
-CYrudder
+trim_symmetric
+trim_sweep_helicopter
+trim_residual_jacobian
+residualTolerance
+variableScale
+initialDeg
+useMultiStart
+alwaysMultiStart
+allowRescueInitials
+fullResidualTolerance
 ```
 
 ## Audit questions
 
-### Aerodynamic force transform
+### Trim-state and flight-path mapping
 
-- Verify the wind-axis basis used by `aero_force_body` is unit length, mutually orthogonal, right-handed, and consistent with body axes x-forward, y-right, z-down.
-- Verify canonical cases at zero angle, positive angle of attack, positive sideslip, pure drag, pure side force, and pure lift.
-- Confirm positive drag opposes the local velocity representation used by each component.
-- Confirm lift and side-force directions are perpendicular to the wind-axis velocity direction.
-- Confirm the transform is deterministic and finite near small velocity and moderate angles.
+- Verify the relation `alpha = theta - gamma` and the mapping `u = V*cos(alpha)`, `w = V*sin(alpha)` under body axes x-forward, z-down.
+- Verify the exact-hover special case and the thresholds `1e-9` and `1e-10` used by search selection and state construction.
+- Verify all fixed symmetric states and controls are documented and consistent with the current 9-state model.
+- Confirm the formulation is a three-variable helicopter-mode closure: `theta`, collective, and longitudinal cyclic with elevator fixed at zero.
+- Identify any use at transition or airplane nacelle angles as an applicability issue unless the repository explicitly justifies the same closure.
 
-### Wing model
+### Residual definition
 
-- Verify `SfreeHalf + SslipHalf = S/2`, nonnegative areas, and left/right region symmetry.
-- Verify local velocity uses `Vbody + cross(omega,rAC)` with current-CG-relative arms.
-- Verify the meaning of the velocity variable in slipstream and whether `Vlocal += wakeVelocity*rotor.eT` has the correct sign under the model’s relative-air convention. Do not assume the answer; reproduce canonical hover and forward-flight cases and inspect force direction.
-- Verify wake velocity is applied only to slipstream regions and remains finite and nonnegative.
-- Verify the near-normal and lift-line branch outputs, smootherstep weight, first derivative continuity, and region diagnostics.
-- Verify aileron antisymmetry, rolling-moment sign, and left/right load exchange under sign reversal.
-- Verify lift saturation and induced-drag formulas remain finite and broadly monotonic over a small interior range.
-- Classify `muFactor`, `orientationFactor`, `SslipMaxHalf`, `wakeFactor`, `normalFlowRatio`, and blend width as model assumptions unless already sourced in repository documents.
+- Verify the solved residual is exactly `[udot; wdot; qdot]` from `tiltrotor_eom`.
+- Verify all remaining state derivatives are near zero at accepted representative symmetric trims.
+- Distinguish reduced residual norm, full 9-state derivative norm, objective cost, and penalty in reports and tests.
+- Verify the residual scaling `[g; g; 1]` and variable scaling units and semantics.
+- Confirm objective penalties do not silently turn an out-of-limit point into an accepted trim.
 
-### Fuselage model
+### Solver and candidate selection
 
-- Verify drag coefficient is nonnegative and even in alpha/beta contributions.
-- Verify `CLalpha`, `CYbeta`, and static moment derivative signs under the documented convention.
-- Verify positive p, q, and r produce damping contributions from `Clp`, `Cmq`, and `Cnr` in the expected opposing directions.
-- Verify force/moment decomposition exactly matches `cross(rAC,Fbody) + Maero`.
-- Verify zero/small-speed behavior and finite normalized-rate calculations.
+- Verify exact-hover `fminbnd` behavior and the fixed `theta=0`, `cyclicLong=0` assumption.
+- Verify forward-flight `fminsearch` dimensionless mapping and initial-simplex physical step.
+- Verify primary and multi-start candidate generation, early stopping, tie breaking, invalid-evaluation handling, and candidate reports.
+- Verify `report.converged`, `solverConverged`, `atLimit`, and `withinLimits` semantics.
+- Check input validation for `V`, `betaM`, `gamma`, initial guesses, angle limits, and option types. If missing validation can produce a focused unsafe or misleading result, document the exact case and stop before changing solver behavior.
 
-### Horizontal tail
+### Limits and controls
 
-- Verify local alpha, CG alpha, downwash, incidence, elevator contribution, lift saturation, drag, and pitching-moment decomposition.
-- Inspect `alphaCG = atan2(w,max(abs(u),...))`; record reverse-flow limitations and confirm it does not create a covered-case sign inconsistency.
-- Verify elevator sign and resulting tail-force/pitch-moment response using the repository’s control convention.
-- Verify downwash reduces effective angle of attack for a positive forward-flight alpha under the implemented sign convention.
+- Verify collective, cyclic, and theta limits use radians consistently.
+- Verify `make_limit_report` and sweep control-limit reporting agree for common controls.
+- Verify equality-at-limit policy is explicit: a point exactly at a limit is currently rejected as converged.
+- Verify applied controls used by the model agree with reported trim controls.
 
-### Vertical tails
+### Jacobian and conditioning
 
-- Verify twin-fin left/right mirror symmetry and summation.
-- Verify sideslip and rudder responses, drag increase, side-force direction, and resulting yaw/roll moments.
-- Verify rudder sign reversal produces the expected odd response and symmetric fins do not introduce unintended even lateral loads at zero sideslip/rudder.
+- Verify `trim_residual_jacobian` matches the same state/control mapping as `trim_symmetric`.
+- At one representative successful forward-flight point only, compare central-difference Jacobians at `1e-3`, `1e-4`, and `1e-5` rad.
+- Report raw and scaled conditioning separately. Do not compute Jacobians at every speed.
+- Verify rank and condition-number diagnostics remain finite or explicitly report singularity.
 
-### Parameter provenance and applicability
+### Continuation and rescue logic
 
-Create a table classifying aerodynamic geometry, coefficients, interaction factors, saturation limits, and numerical thresholds as:
-
-```text
-DERIVED
-ASSUMED_CONCEPT
-DOCUMENTED_SOURCE
-REFERENCE_PENDING
-NUMERICAL
-```
-
-Do not invent sources. Repository comments and existing documents are the only accepted provenance in this phase.
+- Verify a successful point is passed forward as the next initial guess exactly once.
+- Verify failed points do not overwrite the continuation seed.
+- Verify rescue initials are opt-in and reported clearly.
+- Verify attempt selection, `initialSource`, `usedRescueInitial`, and best-failed-attempt bookkeeping.
+- Verify continuity and sign-flip checks use only adjacent successful points and documented thresholds.
+- Do not run the default five-speed sweep during the first pass.
 
 ## Allowed changes
 
 Allowed without further approval:
 
-- create `docs/AERODYNAMIC_COMPONENTS_AUDIT.md`;
-- create `tests/check_aerodynamic_components.m`;
-- add diagnostic fields that expose already-computed values and do not alter forces, moments, controls, parameters, or branch logic;
-- update `tests/run_all_checks.m` to include the new lightweight check;
-- clarify comments and parameter semantics without changing numeric values;
+- create `docs/TRIM_EQUATIONS_CONTINUATION_AUDIT.md`;
+- create `tests/check_trim_equations.m`;
+- add diagnostic/report fields exposing already-computed quantities without changing the trim solution;
+- update `tests/run_all_checks.m` to include a lightweight trim-contract check only if runtime remains acceptable;
+- clarify comments and input semantics without changing numeric values;
 - update this task file.
 
 Potential diagnostics include:
 
 ```text
-qbar
-Maero
-Marm
-windBasisOrthogonalityError
-forcePowerDot
-SfreeHalf
-SslipHalf
+residualScale
+scaledResidual
+objectiveResidualCost
+penaltyBreakdown
+requestedInitialDeg
+actualInitialDeg
+candidateAcceptance
+fullResidualLabels
 ```
-
-Do not add diagnostics that require a second component or rotor solve.
 
 Forbidden:
 
-- changing any numeric value in `params_nominal.m`;
-- tuning aerodynamic derivatives;
-- replacing the wing branch model;
-- changing slipstream, downwash, force-transform, force, or moment equations before a focused failing case is documented and reviewed;
-- adding lookup tables, dynamic stall, nonuniform wake, ground effect, or interference models;
-- changing coordinate or control conventions;
-- broad speed/angle sweeps, Monte Carlo, optimization, multi-start, or full trim-envelope work;
+- changing numeric values in `params_nominal.m`;
+- changing the trim variable set;
+- adding elevator or other controls to the closure;
+- changing objective weights, penalties, tolerances, limits, initial seeds, or solver algorithms before a focused failing case is documented and reviewed;
+- broad speed sweeps, reverse sweeps, dense nacelle-angle sweeps, multi-start grids, Monte Carlo, or optimization studies;
+- running point-by-point Jacobians or linearizations over a sweep;
+- entering flight-envelope or handling-quality conclusions;
 - claiming XV-15 fidelity.
 
-If a possible force/sign/interaction production bug is found, document the exact canonical failing case and stop before changing the equation. Purely diagnostic changes may continue.
+If a possible production-code bug is found, document the exact inputs, expected contract, actual output, severity, and minimal reproduction. Stop before changing solver behavior. Purely diagnostic additions may continue.
 
 ## Required lightweight checks
 
-Create `check_aerodynamic_components` with named PASS/FAIL cases. Keep the initial run deterministic and below roughly 30 total component/model evaluations.
+Create `check_trim_equations` with named PASS/FAIL cases. Keep the first execution small.
 
 At minimum cover:
 
-1. aerodynamic wind basis orthonormality and canonical force directions;
-2. positive drag opposes the component local-velocity representation;
-3. wing area partition bounds and exact half-area identity;
-4. wing left/right symmetry at zero lateral input;
-5. aileron sign-reversal mirror relation and rolling response;
-6. near-normal blend continuity and diagnostic consistency;
-7. slipstream applied only to slip regions and canonical hover wake/force-direction check;
-8. fuselage force/moment decomposition and nonnegative drag;
-9. fuselage p/q/r damping derivative sign checks;
-10. horizontal-tail downwash and elevator response identities;
-11. twin-vertical-tail symmetry, sideslip response, and rudder sign reversal;
-12. finite real deterministic outputs at one hover-like, one transition, and one airplane-mode representative condition.
+1. state/flight-path mapping identity for one positive `gamma` and one zero-`gamma` case;
+2. exact residual extraction `[udot;wdot;qdot]` from the full EOM output;
+3. exact-hover closure and full-state derivative consistency;
+4. one representative forward-flight single-start trim with finite outputs and no active limits;
+5. a second forward-flight point seeded from the first, verifying continuation handoff;
+6. reduced residual and full residual acceptance semantics;
+7. trim-variable and applied-control limit-report consistency;
+8. deterministic repeat of one single-start case;
+9. objective/report scaling and penalty diagnostic identity when available;
+10. one-point Jacobian step comparison at `1e-3`, `1e-4`, and `1e-5` rad;
+11. static or synthetic verification that a failed point cannot replace a successful continuation seed;
+12. explicit applicability result for transition/airplane nacelle angles with elevator fixed at zero.
 
-Use a small set of canonical direct component calls. Reuse cached rotor/total-model results where rotor diagnostics are needed. Do not use dense alpha, beta, speed, or nacelle-angle sweeps.
+First-pass solver budget:
 
-## Runtime order
+- maximum 3 successful high-level trim solves;
+- `useMultiStart=false` for all first-pass solves;
+- no rescue initials;
+- one Jacobian location only;
+- no full linearization calls in the new target check.
 
-Run in this order:
+Use representative helicopter-mode speeds only: exact hover plus at most two forward speeds selected from `10` and `20 m/s`. Reuse earlier solutions as seeds.
+
+## Runtime discipline
+
+Before running MATLAB, estimate the expected number of high-level trim solves, residual evaluations, and Jacobian evaluations. Print the estimate in the final report.
+
+Run in stages:
 
 ```text
-new target check -> existing wing blend/control checks -> run_all_checks once
+static audit
+-> check_trim_equations
+-> existing check_trim_continuity only if the target check passes and estimated runtime is acceptable
+-> run_all_checks once only if the added check does not make the suite unreasonably long
 ```
+
+Do not run `trim_sweep_helicopter` with its default five speeds in the first pass. A three-point `[0,10,20]` continuation check is optional only after the direct target check passes. If estimated or observed runtime exceeds about 3 minutes for one command, stop and report before expanding.
 
 Suggested target command:
 
 ```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_aerodynamic_components; disp(r); assert(r.allPassed);"
+& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_trim_equations; disp(r); assert(r.allPassed);"
 ```
-
-Then run the existing wing normal-flow blend check and control-architecture check. Run `run_all_checks` once only after the focused checks pass.
 
 Record the MATLAB R2021a shutdown-stage `output stream error` separately from test-body results.
 
 ## Deliverables
 
-- `docs/AERODYNAMIC_COMPONENTS_AUDIT.md` with findings classified as `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, or `INFO`;
-- focused test results and actual MATLAB output summary;
-- exact component/model call count;
-- aerodynamic parameter provenance table;
-- explicit conclusion on slipstream direction, downwash sign, control-effectiveness signs, and rate damping;
-- unsupported operating regimes and model assumptions;
+- `docs/TRIM_EQUATIONS_CONTINUATION_AUDIT.md` with findings classified as `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, or `INFO`;
+- focused test results and actual runtime;
+- estimated and actual high-level trim-solve count;
+- exact residual/Jacobian evaluation count where practical;
+- explicit conclusions on state mapping, residual closure, bounds, candidate selection, hover assumptions, and continuation behavior;
+- clear applicability statement for transition/airplane nacelle angles;
 - exact modified files;
-- explicit statement that numeric parameters changed or did not change;
+- explicit statement that parameters and solver behavior changed or did not change;
 - commit SHA and clean working-tree status.
 
-Commit and push to `audit/aero-components`.
+Commit and push to `audit/trim-equations-continuation`.
 
-Do not merge the PR and do not begin trim-equation, continuation, or flight-envelope work after completion.
+Do not merge the PR and do not begin dense continuation, reverse sweeps, linearization maps, or flight-envelope work after completion.
