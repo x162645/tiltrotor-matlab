@@ -1,6 +1,27 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / SECOND MIDPOINT DIAGNOSIS REQUIRED
+STATUS: SECOND MIDPOINT DIAGNOSIS COMPLETE / PR HOLD REMAINS
+
+## 17.5 m/s midpoint closeout (2026-06-20)
+
+The authorized two-seed single-start diagnosis at `V = 17.5 m/s` completed.
+Both seeds converged to the same numerical root within the unchanged
+`1.0e-4 deg` Euclidean tolerance:
+
+```text
+low-seed result  = [3.774686179733, 15.368703848185, -0.416693326063] deg
+high-seed result = [3.774686185574, 15.368703844841, -0.416693331459] deg
+difference norm  = 8.626264725850e-09 deg
+```
+
+The common `cyclicLong` is negative. No wing free-stream or slipstream region
+was in or near the normal-flow blend interval; the slipstream ratio was
+`0.664290521` with blend weight `1.0`.
+
+Execution used 2 high-level trims, 479 objective evaluations, 2 direct
+post-trim EOM calls, zero residual Jacobians, and zero full linearizations.
+No production code or parameter changed. Full evidence is in
+`docs/TRIM_MIDPOINT_17P5_DIAGNOSIS.md`. Draft PR #6 remains on hold.
 
 Branch: `audit/representative-trim-continuation`
 
