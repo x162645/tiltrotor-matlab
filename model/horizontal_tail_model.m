@@ -39,16 +39,22 @@ D = qbar*P.htail.S*CD;
 
 Fbody = aero_force_body(D, 0, L, alphaLocal, beta);
 Maero = [0; qbar*P.htail.S*P.htail.c*Cm; 0];
-Mbody = cross(rAC, Fbody) + Maero;
+Marm = cross(rAC, Fbody);
+Mbody = Marm + Maero;
 
 out.rAC = rAC;
 out.Vlocal = Vlocal;
 out.V = V;
 out.alphaLocal = alphaLocal;
+out.alphaCG = alphaCG;
 out.alphaEff = alphaEff;
+out.beta = beta;
+out.qbar = qbar;
 out.CL = CL;
 out.CD = CD;
 out.Cm = Cm;
+out.Maero = Maero;
+out.Marm = Marm;
 out.F = Fbody;
 out.M = Mbody;
 end

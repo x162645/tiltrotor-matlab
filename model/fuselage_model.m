@@ -54,19 +54,26 @@ Maero = qbar*P.fuselage.S * ...
      P.fuselage.c*Cm;
      P.fuselage.b*Cn];
 
-Mbody = cross(rAC, Fbody) + Maero;
+Marm = cross(rAC, Fbody);
+Mbody = Marm + Maero;
 
 out.rAC = rAC;
 out.Vlocal = Vlocal;
 out.V = V;
 out.alpha = alpha;
 out.beta = beta;
+out.qbar = qbar;
+out.pHat = pHat;
+out.qHat = qHat;
+out.rHat = rHat;
 out.CD = CD;
 out.CL = CL;
 out.CY = CY;
 out.Cl = Cl;
 out.Cm = Cm;
 out.Cn = Cn;
+out.Maero = Maero;
+out.Marm = Marm;
 out.F = Fbody;
 out.M = Mbody;
 end

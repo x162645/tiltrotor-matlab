@@ -82,7 +82,9 @@ out.M = Mbody;
         if V < 1e-8
             Freg = zeros(3,1);
             Mreg = zeros(3,1);
-            data = struct('area',Sreg,'V',V,'F',Freg,'M',Mreg);
+            data = struct('area',Sreg,'side',side, ...
+                'inSlipstream',inSlipstream,'wakeVelocity',wakeVelocity, ...
+                'rAC',rAC,'Vlocal',Vlocal,'V',V,'F',Freg,'M',Mreg);
             return;
         end
 
@@ -137,7 +139,8 @@ out.M = Mbody;
         CD = (1 - branchWeight)*CDn + branchWeight*CDLift;
         Cm = branchWeight*CmLift;
 
-        Mreg = cross(rAC, Freg) + Maero;
+        Marm = cross(rAC, Freg);
+        Mreg = Marm + Maero;
         MNear = cross(rAC, FNear) + MaeroNear;
         MLiftLine = cross(rAC, FLiftLine) + MaeroLiftLine;
 
@@ -150,6 +153,7 @@ out.M = Mbody;
         data.V = V;
         data.alpha = alpha;
         data.beta = beta;
+        data.qbar = qbar;
         data.CL = CL;
         data.CD = CD;
         data.Cm = Cm;
@@ -164,6 +168,8 @@ out.M = Mbody;
         data.FLiftLine = FLiftLine;
         data.MaeroNear = MaeroNear;
         data.MaeroLiftLine = MaeroLiftLine;
+        data.Maero = Maero;
+        data.Marm = Marm;
         data.MNear = MNear;
         data.MLiftLine = MLiftLine;
         data.CLLiftLine = CLLift;
