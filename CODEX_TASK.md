@@ -1,12 +1,25 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE
+STATUS: COMPLETE / HOLD
 
 Branch: `audit/rotor-force-moment-chain`
 
 Base branch: `main`
 
 Current phase: rotor model and force/moment call-chain audit.
+
+## Completed scope
+
+- rotor force/moment call-chain audit completed;
+- `check_rotor_force_moment_chain`: 12/12 PASS;
+- `check_flapping_model`: 14/14 PASS;
+- `run_all_checks`: 11/11 PASS;
+- production parameters unchanged;
+- no CRITICAL/HIGH/MEDIUM production-code issue found;
+- reverse-flow and windmill/reverse-thrust remain INFO applicability boundaries;
+- Draft PR #2 awaits ChatGPT final review and user authorization;
+- do not merge PR #2;
+- do not begin the next phase.
 
 ## Goal
 
