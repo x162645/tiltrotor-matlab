@@ -54,7 +54,10 @@ Current interpretation:
   CG-shift formula.
 - `P.mass.RH`: equivalent distance from the nacelle tilt axis to the moving
   mass center. The same scalar is also used in the current rotor hub tilt
-  geometry.
+  geometry. This shared use couples CG shift with rotor moment-arm geometry
+  and is a conceptual assumption, not a sourced equality. Future sourced data
+  should split this into `RH_mass` and `RH_hub` while initially preserving the
+  same numeric value.
 
 The implemented CG shift is:
 
@@ -132,7 +135,7 @@ Broad geometry checks cover:
 |Parameter|Code variable|Classification|Notes|
 |-|-|-|-|
 |Total mass|`P.mass.m`|`ASSUMED_CONCEPT`|Concept-scale mass in `params_nominal`; not identified as XV-15 measured data.|
-|Moving nacelle/rotor mass total|`P.mass.mNac`|`ASSUMED_CONCEPT`|Interpreted as total moving mass for both tilt assemblies from existing repo docs.|
+|Moving nacelle/rotor mass total|`P.mass.mNac`|`ASSUMED_CONCEPT / REFERENCE_PENDING`|Interpreted as total moving mass for both tilt assemblies from existing repo docs; not confirmed by literature.|
 |Moving-mass lever arm|`P.mass.RH`|`ASSUMED_CONCEPT`|Equivalent moving-mass CG distance from tilt axis; also used by rotor hub geometry.|
 |Nominal inertia matrix|`P.mass.I0`|`ASSUMED_CONCEPT`|Concept nominal inertia at `betaM=0`; NASA mapping remains unverified.|
 |Inertia slope per radian|`P.mass.KI`|`ASSUMED_CONCEPT`|Current comment and implementation interpret this as per radian.|
@@ -156,9 +159,12 @@ configuration.
 |INFO|Parameter provenance|Mass, inertia, and geometry parameters remain conceptual assumptions or derived values unless explicitly traced in a later literature pass.|Do not describe these values as XV-15 measured data.|
 |INFO|Model limitation|`I(betaM)=I0-betaM*KI` is a low-order inertia law and omits a detailed moving-mass build-up and tilt-dependent cross-inertia model.|Accept for this phase; revisit only with sourced mass-property data.|
 |INFO|Model semantics|`mNac` is interpreted as total moving nacelle/rotor mass for both sides, not per-side mass.|Keep this interpretation explicit in reports and future parameter tables.|
+|MEDIUM|Conceptual parameter coupling|`RH` is shared by the moving-mass CG lever arm and rotor-hub geometry. This assumes equal equivalent radii and couples CG shift with rotor moment-arm geometry. No sourced evidence currently supports that equality.|Future action: split into `RH_mass` and `RH_hub` while initially preserving the same numeric value.|
 
-No `CRITICAL`, `HIGH`, or `MEDIUM` production-code issue was identified in the
-static audit scope before running the lightweight tests.
+No `CRITICAL`, `HIGH`, or `MEDIUM` production-code bug was identified in the
+static audit scope before running the lightweight tests. The `MEDIUM`
+conceptual parameter coupling above is a model parameter-structure and
+provenance issue, not a program error.
 
 ## Test Plan
 

@@ -1,12 +1,26 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE
+STATUS: COMPLETE / HOLD
 
 Branch: `audit/mass-inertia-cg-geometry`
 
 Base branch: `main`
 
 Current phase: mass, inertia, CG-shift, and component-geometry audit.
+
+## Completed scope
+
+- mass/inertia/CG/geometry audit completed;
+- `check_mass_inertia_geometry`: 12/12 PASS;
+- `check_physical_sanity`: 7/7 PASS;
+- `run_all_checks`: 12/12 PASS;
+- numeric parameters unchanged;
+- `mNac` interpreted as combined left/right moving mass;
+- `RH` dual-use recorded as MEDIUM conceptual parameter coupling;
+- no CRITICAL/HIGH/MEDIUM production-code bug found;
+- Draft PR #3 awaits final review and user authorization;
+- do not merge PR #3;
+- do not begin aerodynamic-component or trim-envelope work.
 
 ## Goal
 
