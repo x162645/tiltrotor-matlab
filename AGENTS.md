@@ -876,6 +876,67 @@ Codex 不得：
 
 \---
 
+## 25.1 当前控制架构阶段约束
+
+本阶段已确认旋翼控制架构为：
+
+```text
+collective / diffCollective / cyclicLong / diffCyclic
+```
+
+其中：
+
+* `diffCyclic` 是代码接口中的历史名称；
+* 文档中应统一称为 `differentialLongitudinalCyclic`；
+* `differentialLongitudinalCyclic` 表示差动纵向周期变距；
+* 当前架构物理自洽，不增加 `cyclicLat`；
+* 在稳态一阶谐波挥舞模型中，外部 `cyclicLong/diffCyclic`
+  先按左右旋翼分配为每侧 `cyclicSide`，旋翼内部再映射为
+  `theta1sSide = -rotDir*cyclicSide`；
+* 正 `cyclicLong` 定义为使左右盘面法向量共同向 `+eD` 倾斜；
+* 正 `diffCyclic` 在当前符号下产生左右相反纵向盘面倾斜和负偏航力矩增量；
+* 旧经验盘面倾角模型中的 `diffCyclic -> Fy=0` 结构性零不再适用于正式计算路径。
+
+在控制架构闭环任务中，除非用户明确授权，允许修改范围仅限：
+
+* `AGENTS.md`
+* `README.md`
+* `docs/CONTROL_CONVENTIONS.md`
+* `tests/check_control_architecture.m`
+* `tests/run_all_checks.m`
+
+禁止修改：
+
+* `model/`
+* `analysis/`
+* `params_nominal.m`
+* `tests/check_article_trends.m`
+
+控制架构测试必须覆盖：
+
+* 对称总距；
+* 差动总距；
+* 对称纵向周期变距；
+* 差动纵向周期变距；
+* `+diff/-diff` 镜像关系；
+* `h = 1e-3, 1e-4, 1e-5` 差分稳定性。
+
+若控制架构测试失败，只能修正测试定义、容差或文档。不得为了通过该测试修改模型、参数、旋翼符号、坐标变换或既有物理项。无法通过的模型行为应记录为未解决项。
+
+\---
+
+## 25.2 当前机翼 near-normal 连续化状态
+
+`model/wing_model.m` 中 near-normal 与 lift-line 仍是两套概念气动模型。
+正式载荷不再使用 `nearNormal` 布尔量硬切换，而是在同一局部来流状态下
+分别计算 `FNear` 与 `FLiftLine`，再用 quintic smootherstep 权重连续混合。
+
+`P.wing.normalFlowRatio = 0.35` 表示过渡中心；
+`P.wing.normalFlowBlendHalfWidth = 0.20` 是
+`ASSUMED_MODEL_PARAMETER`，来自本项目低速配平连续性敏感性，不是文献或试验数据。
+
+该连续化只用于避免人工载荷跳变，不表示机翼气动模型已经完成试验验证。
+
 ## 26\. 完成标准
 
 一个代码任务只有在满足以下条件时才算完成：

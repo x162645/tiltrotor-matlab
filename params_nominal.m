@@ -45,15 +45,37 @@ P.rotor.nAzimuth       = 16;
 P.rotor.inducedMaxIter = 20;
 P.rotor.inducedRelax   = 0.45;
 P.rotor.inducedTol     = 1.0e-4;
+% Deprecated placeholder. The formal flapping/BEMT path uses uniform
+% induced velocity viField=vi; non-uniform inflow is not implemented yet.
 P.rotor.inflowHarmonic = 1.0;
 
-% 一阶谐波准定常挥舞闭合。
+% Deprecated empirical disk-tilt gains. These fields are retained only for
+% structure compatibility and are not read by the formal flapping path.
 P.rotor.flapCyclicGain = 1.20;
 P.rotor.flapMuGain     = 0.10;
 P.rotor.flapLatMuGain  = 0.05;
 P.rotor.flapQGain      = 10.0;
 P.rotor.flapPGain      = 5.0;
 P.rotor.flapMax        = 18.0*d2r;
+
+% Steady first-harmonic flapping model parameters.
+% bladeMass: ASSUMED conceptual single-blade mass, not an XV-15 reference.
+% bladeMassDistribution: ASSUMED uniform distribution over 0 <= r <= R.
+% Ib and Sblade: DERIVED from bladeMass and the uniform distribution.
+P.rotor.bladeMass      = 45.0;
+P.rotor.bladeMassDistribution = 'ASSUMED_UNIFORM_FULL_SPAN';
+P.rotor.Ib             = P.rotor.bladeMass*P.rotor.R^2/3;
+P.rotor.Sblade         = P.rotor.bladeMass*P.rotor.R/2;
+P.rotor.flapInitial    = [0; 0; 0];
+
+% Flapping/induced coupled-solve numerical settings: NUMERICAL.
+P.rotor.flapResidualTol = 1.0e-7;
+P.rotor.flapMaxIter = 40;
+P.rotor.flapJacobianStep = 1.0e-5;
+P.rotor.flapNewtonDamping = 0.5;
+P.rotor.flapNewtonRegularization = 1.0e-8;
+P.rotor.flapLineSearchMaxIter = 18;
+P.rotor.flapDivergenceAngle = 80.0*d2r;
 
 P.rotor.wakeFactor     = 1.60;
 
@@ -85,7 +107,12 @@ P.wing.Cmaileron       = -0.08;
 P.wing.SslipMaxHalf    = 4.0;
 P.wing.muMax           = 0.35;
 P.wing.CDnormal        = 1.10;
+% ASSUMED_MODEL_PARAMETER: transition center for near-normal/lift-line blend.
 P.wing.normalFlowRatio = 0.35;
+% ASSUMED_MODEL_PARAMETER: half-width in abs(Vx)/V ratio space.
+% Width 0.15 is a provisional concept value selected from continuity,
+% blend-coverage and sensitivity checks, not literature or test data.
+P.wing.normalFlowBlendHalfWidth = 0.15;
 
 %% 机身
 P.fuselage.S           = 8.0;
@@ -148,6 +175,11 @@ P.control.rudderLim     = [-30, 30]*d2r;
 P.trim.residualTolerance = 5.0e-3;
 P.trim.maxIterations      = 600;
 P.trim.display            = 'off';
+% NUMERICAL: fminsearch dimensionless variable scales for
+% [theta; collective; cyclicLong], rad. These are solver search scales,
+% not aircraft physical parameters. With fminsearch's 5% nonzero simplex
+% rule, this gives initial physical steps of about [0.1; 0.9; 0.1] deg.
+P.trim.variableScale      = [2; 18; 2]*(pi/180);
 
 %% 线性化差分步长
 P.linear.dx = [0.05; 0.05; 0.05; ...

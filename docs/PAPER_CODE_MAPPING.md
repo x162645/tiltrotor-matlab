@@ -725,14 +725,15 @@ tests\check_article_trends.m
 |---:|---|---:|---|---|---|---|---|---|---|---|---|---|---|---|
 | M-001 | 重心随短舱角变化 | 3 | 3 of 18 | 式(1)(2) | `model\mass_properties.m` | `mass_properties` | `dx,dz,betaM,mNac,RH,m` | `dx=mNac*RH*sin(betaM)/m`；`dz=mNac*RH*(1-cos(betaM))/m` | 代码为机体参考重心偏移；论文 Figure 2 坐标需视觉核对 | 代码 SI；论文公式为长度量纲 | 论文坐标方向未完成视觉核对 | 无 | `UNVERIFIED` | 数学形式可对应，但坐标定义三方核验未完成 |
 | M-002 | 惯量随短舱角变化 | 3 | 3 of 18 | 式(3) | `model\mass_properties.m` | `mass_properties` | `I0,KI,betaM,I` | `I=I0-betaM*KI` 后对称化并正定检查 | 机体系惯量矩阵 | 代码 `kg*m^2`；论文单位未在公式处给出 | `KI` 来源、交叉惯量定义、短舱构型 | 对称化、正定检查 | `UNVERIFIED` | 形式对应，但参数来源和坐标轴未核验 |
-| M-003 | 旋翼挥舞方程 | 4 | 4 of 18 | 式(4) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `a1,b1,flap*Gain` | 代码为代数一阶谐波准定常闭合 | 旋翼局部轴 `eT,eD,eY` | rad | 未实现二阶挥舞微分方程和铰链力矩平衡 | 限幅 `flapMax` 和经验增益 | `DIFFERENT` | 论文给动态方程，代码无挥舞状态且用经验闭合 |
+| M-003 | 旋翼挥舞方程 | 4 | 4 of 18 | 式(4) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `beta0,beta1c,beta1s,Ib,Sblade` | 稳态一阶谐波中心铰残差，求解平均/cos/sin 三个 Fourier 分量 | 旋翼局部轴 `eT,eD,eY` | rad, N*m | 未实现完整非定常挥舞状态；`Ib/Sblade` 当前由假设桨叶质量分布推导 | 小角度 `r*dT` 气动力矩近似；旧 `flap*Gain` 已 deprecated 且正式计算不读取 | `SIMILAR` | 形式来自式(4)，但参数和小角度近似仍需人工复核 |
 | M-004 | 轮毂局部速度 | 4 | 4 of 18 | 式(5) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `Vhub,Vaxial,Vlong,Vlat,rHub` | `Vhub=Vbody+cross(omegaBody,rHub)` 后投影到 `eT/eD/eY` | 机体系到旋翼局部投影 | m/s | 论文矩阵链 `CHW...` 未逐项对应 | 代码直接用轴向量点积 | `UNVERIFIED` | 坐标转换矩阵未完成论文、代码、坐标定义三方核验 |
-| M-005 | 叶素局部速度 | 4 | 4 of 18 | 式(6)(7) | `model\rotor_model_bemt.m` | `blade_loads` | `UT,UP,viField,VtanTrans` | `UT=Omega*r+VtanTrans`；`UP=Vaxial+viField` | 旋翼叶素局部 | m/s | 论文符号 `mu, lambda` 与代码变量未完全映射 | 非均匀入流形状和反向流保护 | `UNVERIFIED` | 叶素坐标和旋向符号未完成三方核验 |
+| M-005 | 叶素局部速度 | 4 | 4 of 18 | 式(6)(7) | `model\rotor_model_bemt.m` | `blade_loads` | `UT,UP,viField,VtanTrans,Vrad,beta,betaDot` | `UT=Omega*r+VtanTrans`；`viField=vi`；`UP=Vaxial+viField-beta*Vrad-r*betaDot` | 旋翼叶素局部 | m/s | 论文 `v1` 与代码 `viField` 符号按当前代码入流约定转换 | 正式路径采用均匀诱导速度；非均匀入流模型尚未实现 | `UNVERIFIED` | 旧固定 `cos(psi)` 入流畸变污染的一阶挥舞数值已废弃，不得继续引用 |
 | M-006 | 叶素升阻力 | 4 | 4 of 18 | 式(8)(9) | `model\rotor_model_bemt.m` | `blade_loads` | `CL,CD,dL,dD` | `dL=q*c*CL*dr`；`dD=q*c*CD*dr` | 旋翼叶素局部 | N | 真实翼型数据缺失 | `tanh` 失速限制、二次阻力极曲线 | `UNVERIFIED` | 叶素局部轴和系数来源未完成三方核验 |
 | M-007 | 叶素力转换与推力/扭矩 | 4 | 4 of 18 | 式(10)(11) | `model\rotor_model_bemt.m` | `blade_loads` | `dT,dH,dQ,Tsum,Qsum,HvecSum` | `dT=dL*cos(phi)-dD*sin(phi)`；`dQ=r*dH` | 旋翼叶素局部 | N, N*m | `Ss/Mk` 等论文符号未全部映射 | 盘内 `Hlong/Hlat` 显式输出 | `UNVERIFIED` | 侧向分量、旋向和符号需人工核对 |
-| M-008 | 诱导速度迭代 | 5 | 5 of 18 | 式(13) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `vi,viTarget,inducedRelax` | 动量闭合迭代，松弛更新 | 旋翼轴向等效入流 | m/s | 未输出收敛标志 | 松弛因子和最小分母保护 | `UNVERIFIED` | 诱导速度符号和轴向定义未完成三方核验 |
-| M-009 | 旋翼力和力矩转换到机体系 | 5 | 5 of 18 | 式(14)(15) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `Fbody,Mbody,Mreaction,rHub` | `F=T*eTeff+Hlong*eD+Hlat*eY`；`M=cross(rHub,F)+Mreaction+Mgyro` | 机体系 | N, N*m | 论文矩阵链和旋向符号需视觉核对 | 陀螺项可选 | `UNVERIFIED` | 抽取矩阵不可靠，旋向定义需人工核对 |
+| M-008 | 诱导速度迭代 | 5 | 5 of 18 | 式(13) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `vi,viTarget,inducedRelax` | 动量闭合迭代，松弛更新；叶素处 `viField=vi` | 旋翼轴向等效入流 | m/s | 非均匀入流模型缺失 | 松弛因子和最小分母保护 | `UNVERIFIED` | 后续非均匀入流必须随前进比或尾迹倾斜变化，并在轴对称悬停趋于零 |
+| M-009 | 旋翼力和力矩转换到机体系 | 5 | 5 of 18 | 式(14)(15) | `model\rotor_model_bemt.m` | `rotor_model_bemt` | `Fbody,Mbody,Mreaction,rHub,nDisk` | `nDisk=normalize(eT-beta1c*eD-beta1s*eY)`；`F=T*nDisk+Hlong*eD+Hlat*eY`；`M=cross(rHub,F)+Mreaction+Mgyro` | 机体系 | N, N*m | 论文矩阵链和旋向符号需视觉核对 | 陀螺项可选 | `UNVERIFIED` | 盘面法向符号已按本项目几何定义修订，仍需与论文图示核对 |
 | M-010 | 机翼滑流区和自由流区 | 5-6 | 5-6 of 18 | Figure 3；式(17)-(22) | `model\wing_model.m` | `wing_model` / `one_region` | `S_slip,S_free,Vlocal,wakeVelocity` | 左右半翼分自由流/滑流，滑流叠加 `wakeVelocity*rotor.eT` | 机体系局部作用点 | m/s, m^2, N | 滑流面积公式和图示边界未按论文逐项实现 | 经验 `muFactor/orientationFactor` | `UNVERIFIED` | 机翼局部坐标、滑流方向和面积定义需人工核对 |
+| M-010A | 机翼 near-normal / lift-line 连续混合 | N/A | N/A | CODE_ONLY | `model\wing_model.m`; `params_nominal.m`; `tests\check_wing_normal_flow_blend.m` | `one_region` | `normalFlowRatio,normalFlowBlendHalfWidth,normalFlowBranchWeight,FNear,FLiftLine` | 两套概念气动分支在同一局部来流下分别计算，并用 quintic smootherstep 混合力和气动力矩 | 机体系局部作用点 | ratio, N, N*m | 无论文数据；用于消除人工硬切换 | `normalFlowRatio=0.35` 为过渡中心，`normalFlowBlendHalfWidth=0.15` 为 `ASSUMED_MODEL_PARAMETER` | `CODE_ONLY` | 连续化不代表机翼气动已被试验验证；0.15 是基于连续性、混合覆盖范围和敏感性分析选取的暂定概念值，无文献或试验依据；相对 0.20 缩小混合影响范围，当前粗扫未恢复原人工跳变，后续仍需局部流动数据、风洞数据或高保真计算校正 |
 | M-011 | 机身气动力和力矩 | 7 | 7 of 18 | 式(23)(24) | `model\fuselage_model.m` | `fuselage_model` | `alpha,beta,D,L,Y,Maero` | 风轴力经 `aero_force_body` 转机体系，`M=cross(rAC,F)+Maero` | 机体系/风轴 | N, N*m | 论文气动系数来源未映射 | 阻尼导数 `Clp,Cmq,Cnr` 等 | `UNVERIFIED` | 风轴到机体系矩阵和力正号需视觉核对 |
 | M-012 | 平尾与升降舵 | 7-8 | 7-8 of 18 | 式(25)(26) | `model\horizontal_tail_model.m` | `horizontal_tail_model` | `alphaEff,elevator,CL,CD,Cm` | 固定翼尾翼模型，`M=cross(rAC,F)+Maero` | 机体系/风轴 | N, N*m | 论文公式文本抽取不完整 | 下洗修正 `downwashAlpha` | `UNVERIFIED` | 平尾局部来流和力矩符号未完成三方核验 |
 | M-013 | 双垂尾与方向舵 | 8 | 8 of 18 | 式(27)-(30) | `model\vertical_tail_model.m` | `vertical_tail_model` | `CY,rudder,Ffin,Mfin` | 左右垂尾分别计算，`Mfin=cross(rAC,Ffin)` | 机体系/风轴 | N, N*m | 垂尾升力方向和论文矩阵需视觉核对 | 诱导阻力 `0.02*CY^2` | `UNVERIFIED` | 垂尾侧力方向和左右符号未完成三方核验 |
@@ -815,7 +816,7 @@ tests\check_article_trends.m
 - 未修改：`params_nominal.m`、`model\` 目录、`analysis\` 目录、`tests\run_all_checks.m`、`run_demo.m`。
 - 未修改任何模型参数。
 - 未修改任何函数接口；`check_article_trends` 入口仍为 `trendReport = check_article_trends`。
-- 当前没有证据支持修改 `model\rotor_model_bemt.m`；`diffCyclic` 对 `Fy` 的零导数首先记录为当前模型结构限制，而不是通过修改旋翼模型来提高趋势匹配。
+- 后续诊断确认旧固定 `cos(psi)` 入流畸变和 `theta1c*cos(psi)` 控制相位会污染稳态一阶挥舞结果；正式路径已改为均匀诱导速度和内部 `theta1sSide=-rotDir*cyclicSide` 映射。
 
 ### 25.2 MATLAB 运行环境记录
 
@@ -873,8 +874,8 @@ tests\check_article_trends.m
 - 在真实悬停配平点，`dvdot/ddiffCollective` 为负，NUAA Table 2 中 `Fy/δcc` 为正；该项保持 `UNRESOLVED`，倾向原因是低阶盘内侧向力模型差异或坐标/定义差异，仍需人工核对坐标和控制正方向。
 - 在真实悬停配平点，`rdot/ddiffCollective` 为正，与 NUAA Table 2 中 `Mz/δcc` 同号；这只是诊断同号，不是正式复现证明。
 - 在真实悬停配平点，`pdot/ddiffCyclic` 为负，与 NUAA Table 2 中 `Mx/δec` 同号；但 `pdot` 来自完整惯量矩阵求解，不等同于原始 `Mx`。
-- 在真实悬停配平点，`dvdot/ddiffCyclic=0`，而 NUAA Table 2 中 `Fy/δec` 为正；当前代码结构中 `diffCyclic` 只进入 `cyclicLong` 和纵向挥舞 `a1`，不进入横向挥舞 `b1`，因此该项标记为 `MODEL_STRUCTURE_ZERO`。
-- 悬停时 `pdot/ddiffCyclic` 主要来自负 `Mz` 通过非对角惯量 `Ixz` 的耦合；原始 `dMx/ddiffCyclic` 近零，不能把这一项解释为原始 `Mx` 与论文完全一致。
+- 在稳态一阶谐波挥舞模型中，`diffCyclic` 仍先按右加左减分配为每侧 `cyclicSide`，但旋翼内部正式路径映射为 `theta1sSide=-rotDir*cyclicSide`；旧 `theta1c*cos(psi)` 正式通道已废弃。
+- 悬停时正 `diffCyclic` 的主导原始广义载荷响应为负偏航力矩；小侧向力和小滚转力矩来自盘内力残差，符号趋势仍只是诊断比较，不能解释为与论文完全一致。
 - 原三个旧诊断不匹配项中，换成真实悬停配平点后有两个与论文同号：`rdot/ddiffCollective`、`pdot/ddiffCyclic`；`dvdot/ddiffCollective` 仍未解决。
 
 ### 25.7 差分步长敏感性记录

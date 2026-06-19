@@ -1,12 +1,12 @@
 function summary = run_all_checks()
-%RUN_ALL_CHECKS 执行模型内部一致性与静态数值检查。
-%
-% 这些检查不能代替真实 XV-15 试验验证。
+%RUN_ALL_CHECKS Execute internal consistency and numerical sanity checks.
+% These checks do not represent XV-15 flight-test validation.
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 addpath(rootDir);
 addpath(fullfile(rootDir,'model'));
 addpath(fullfile(rootDir,'analysis'));
+addpath(fullfile(rootDir,'tests'));
 
 P = params_nominal();
 d2r = pi/180;
@@ -15,13 +15,16 @@ tests = {};
 passed = [];
 messages = {};
 
-run_test('参数和惯量检查', @test_parameters);
-run_test('短舱端点推力方向', @test_nacelle_endpoints);
-run_test('总距—推力单调性', @test_collective_monotonicity);
-run_test('左右对称性', @test_symmetry);
-run_test('机翼 V^2 规律', @test_wing_v2);
-run_test('旋翼网格收敛', @test_grid_convergence);
-run_test('线性化有限性', @test_linearization);
+run_test('parameters and inertia', @test_parameters);
+run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
+run_test('collective thrust monotonicity', @test_collective_monotonicity);
+run_test('left/right symmetry', @test_symmetry);
+run_test('steady first-harmonic flapping', @test_flapping_model);
+run_test('control architecture closure', @test_control_architecture);
+run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
+run_test('wing V^2 scaling', @test_wing_v2);
+run_test('rotor grid convergence', @test_grid_convergence);
+run_test('linearization finite values', @test_linearization);
 
 summary.names = tests;
 summary.passed = passed;
@@ -31,7 +34,7 @@ summary.allPassed = all(passed);
 fprintf('\nInternal checks\n');
 fprintf('===============\n');
 for k = 1:numel(tests)
-    fprintf('%-24s : %s\n',tests{k},ternary(passed(k),'PASS','FAIL'));
+    fprintf('%-36s : %s\n',tests{k},ternary(passed(k),'PASS','FAIL'));
     if ~passed(k)
         fprintf('  %s\n',messages{k});
     end
@@ -68,8 +71,10 @@ fprintf('All passed: %d\n',summary.allPassed);
         [F0,~,~] = total_forces_moments(x0,u0,0,P);
         [F90,~,~] = total_forces_moments(x0,u0,pi/2,P);
 
-        assert(F0(3) < 0, '直升机模式应产生向上推力，即 Fz<0。');
-        assert(F90(1) > 0, '固定翼模式应产生向前推力，即 Fx>0。');
+        assert(F0(3) < 0, ...
+            'Helicopter mode should produce upward thrust, Fz < 0.');
+        assert(F90(1) > 0, ...
+            'Airplane mode should produce forward thrust, Fx > 0.');
     end
 
     function test_collective_monotonicity()
@@ -83,7 +88,7 @@ fprintf('All passed: %d\n',summary.allPassed);
         T1 = o1.rotorLeft.thrust + o1.rotorRight.thrust;
         T2 = o2.rotorLeft.thrust + o2.rotorRight.thrust;
 
-        assert(T2 > T1, '总距增大后总推力没有增大。');
+        assert(T2 > T1, 'Total thrust did not increase with collective.');
     end
 
     function test_symmetry()
@@ -94,9 +99,30 @@ fprintf('All passed: %d\n',summary.allPassed);
         scaleF = max(norm(F),1);
         scaleM = max(norm(M),1);
 
-        assert(abs(F(2))/scaleF < 1e-8, '对称工况 Fy 不接近零。');
-        assert(abs(M(1))/scaleM < 1e-8, '对称工况 Mx 不接近零。');
-        assert(abs(M(3))/scaleM < 1e-8, '对称工况 Mz 不接近零。');
+        assert(abs(F(2))/scaleF < 1e-8, ...
+            'Symmetric condition should keep Fy near zero.');
+        assert(abs(M(1))/scaleM < 1e-8, ...
+            'Symmetric condition should keep Mx near zero.');
+        assert(abs(M(3))/scaleM < 1e-8, ...
+            'Symmetric condition should keep Mz near zero.');
+    end
+
+    function test_control_architecture()
+        controlReport = check_control_architecture();
+        assert(controlReport.allPassed, ...
+            'Control architecture closure has failed items.');
+    end
+
+    function test_flapping_model()
+        flapReport = check_flapping_model();
+        assert(flapReport.allPassed, ...
+            'Steady first-harmonic flapping model has failed items.');
+    end
+
+    function test_wing_normal_flow_blend()
+        wingBlendReport = check_wing_normal_flow_blend();
+        assert(wingBlendReport.allPassed, ...
+            'Wing near-normal blend continuity has failed items.');
     end
 
     function test_wing_v2()
@@ -115,7 +141,7 @@ fprintf('All passed: %d\n',summary.allPassed);
 
         ratio = norm(F60)/max(norm(F30),eps);
         assert(ratio > 3.7 && ratio < 4.3, ...
-            '机翼力未近似满足速度平方规律。');
+            'Wing force does not approximately scale with V^2.');
     end
 
     function test_grid_convergence()
@@ -135,7 +161,8 @@ fprintf('All passed: %d\n',summary.allPassed);
         T2 = o2.rotorLeft.thrust + o2.rotorRight.thrust;
 
         rel = abs(T2-T1)/max(abs(T2),1);
-        assert(rel < 0.05, '默认旋翼网格与加密网格差异超过 5%%。');
+        assert(rel < 0.05, ...
+            'Default rotor grid differs from refined grid by more than 5%.');
     end
 
     function test_linearization()

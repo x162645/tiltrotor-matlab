@@ -1,6 +1,7 @@
 function [Fbody, Mbody, out] = wing_model(x, uCtrl, betaM, cgShift, rotorLeft, rotorRight, P)
-%WING_MODEL 机翼自由流区与旋翼滑流区模型。
-% 对应论文式(16)~(22)的部件化实现。
+%WING_MODEL Wing free-stream and rotor-slipstream aerodynamic model.
+% The near-normal and lift-line conceptual branches are both evaluated at
+% the same local flow state, then blended over a finite normal-flow band.
 
 Vbody = x(1:3);
 omegaBody = x(4:6);
@@ -8,7 +9,6 @@ aileron = uCtrl(5);
 
 S_half = P.wing.S/2;
 
-% 滑流面积在两个端点较大，过渡中部略有收缩；同时考虑前进比。
 muMean = 0.5*(hypot(rotorLeft.muLong, rotorLeft.muLat) + ...
               hypot(rotorRight.muLong, rotorRight.muLat));
 
@@ -32,7 +32,6 @@ for side = [-1, 1]
         rotor = rotorRight;
     end
 
-    % 自由流区域
     rFree0 = [P.wing.xAC;
               side*P.wing.yFreeAC;
               P.wing.zAC];
@@ -44,7 +43,6 @@ for side = [-1, 1]
     Mbody = Mbody + M;
     regionOut{idx} = data;
 
-    % 滑流区域
     rSlip0 = [P.wing.xAC;
               side*P.wing.ySlipAC;
               P.wing.zAC];
@@ -88,40 +86,60 @@ out.M = Mbody;
             return;
         end
 
+        velocityFloor = 1e-8;
         alpha = atan2(Vlocal(3), Vlocal(1));
         beta = asin(min(max(Vlocal(2)/V, -1), 1));
         qbar = 0.5*P.env.rho*V^2;
 
-        % 正副翼使左翼升力增加、右翼升力减小，形成正滚转力矩。
         dCLail = -side*P.wing.CLaileron*aileron;
 
-        nearNormal = abs(Vlocal(1))/V < P.wing.normalFlowRatio;
-
-        if nearNormal
-            % 近法向流动不再使用小迎角升力线和 Cm-alpha。
-            CDn = P.wing.CDnormal;
-            Freg = -qbar*Sreg*CDn*(Vlocal/V);
-            Maero = zeros(3,1);
-            CL = 0;
-            CD = CDn;
-            Cm = 0;
-        else
-            CLraw = P.wing.CL0 + P.wing.CLalpha*alpha + dCLail;
-            CL = P.wing.CLmax*tanh(CLraw/P.wing.CLmax);
-            CD = P.wing.CD0 + P.wing.kInduced*CL^2;
-            CY = P.wing.CYbeta*beta;
-            Cm = P.wing.Cm0 + P.wing.Cmalpha*alpha ...
-               + P.wing.Cmaileron*(-side*aileron);
-
-            L = qbar*Sreg*CL;
-            D = qbar*Sreg*CD;
-            Y = qbar*Sreg*CY;
-
-            Freg = aero_force_body(D, Y, L, alpha, beta);
-            Maero = [0; qbar*Sreg*P.wing.c*Cm; 0];
+        center = P.wing.normalFlowRatio;
+        if ~isfield(P.wing, 'normalFlowBlendHalfWidth')
+            error('P.wing.normalFlowBlendHalfWidth is required.');
+        end
+        halfWidth = P.wing.normalFlowBlendHalfWidth;
+        if ~(isfinite(halfWidth) && halfWidth > 0)
+            error('P.wing.normalFlowBlendHalfWidth must be positive and finite.');
         end
 
+        ratio = abs(Vlocal(1))/max(V, velocityFloor);
+        lower = center - halfWidth;
+        upper = center + halfWidth;
+        xi = (ratio - lower)/(2*halfWidth);
+        xi = min(max(xi, 0), 1);
+        branchWeight = smootherstep(xi);
+        nearNormal = ratio < center;
+        inTransition = ratio > lower && ratio < upper;
+
+        CDn = P.wing.CDnormal;
+        FNear = -qbar*Sreg*CDn*(Vlocal/max(V, velocityFloor));
+        MaeroNear = zeros(3,1);
+
+        CLrawLift = P.wing.CL0 + P.wing.CLalpha*alpha + dCLail;
+        CLLift = P.wing.CLmax*tanh(CLrawLift/P.wing.CLmax);
+        CDLift = P.wing.CD0 + P.wing.kInduced*CLLift^2;
+        CYLift = P.wing.CYbeta*beta;
+        CmLift = P.wing.Cm0 + P.wing.Cmalpha*alpha ...
+               + P.wing.Cmaileron*(-side*aileron);
+
+        LLift = qbar*Sreg*CLLift;
+        DLift = qbar*Sreg*CDLift;
+        YLift = qbar*Sreg*CYLift;
+
+        FLiftLine = aero_force_body(DLift, YLift, LLift, alpha, beta);
+        MaeroLiftLine = [0; qbar*Sreg*P.wing.c*CmLift; 0];
+
+        Freg = (1 - branchWeight)*FNear + branchWeight*FLiftLine;
+        Maero = (1 - branchWeight)*MaeroNear + ...
+            branchWeight*MaeroLiftLine;
+
+        CL = branchWeight*CLLift;
+        CD = (1 - branchWeight)*CDn + branchWeight*CDLift;
+        Cm = branchWeight*CmLift;
+
         Mreg = cross(rAC, Freg) + Maero;
+        MNear = cross(rAC, FNear) + MaeroNear;
+        MLiftLine = cross(rAC, FLiftLine) + MaeroLiftLine;
 
         data.area = Sreg;
         data.side = side;
@@ -135,7 +153,27 @@ out.M = Mbody;
         data.CL = CL;
         data.CD = CD;
         data.Cm = Cm;
+        data.normalFlowRatioActual = ratio;
+        data.normalFlowTransitionCenter = center;
+        data.normalFlowBlendHalfWidth = halfWidth;
+        data.normalFlowMargin = ratio - center;
+        data.normalFlowBranchWeight = branchWeight;
+        data.inNormalFlowTransition = inTransition;
+        data.nearNormal = nearNormal;
+        data.FNear = FNear;
+        data.FLiftLine = FLiftLine;
+        data.MaeroNear = MaeroNear;
+        data.MaeroLiftLine = MaeroLiftLine;
+        data.MNear = MNear;
+        data.MLiftLine = MLiftLine;
+        data.CLLiftLine = CLLift;
+        data.CDLiftLine = CDLift;
+        data.CmLiftLine = CmLift;
         data.F = Freg;
         data.M = Mreg;
+    end
+
+    function w = smootherstep(t)
+        w = 6*t^5 - 15*t^4 + 10*t^3;
     end
 end
