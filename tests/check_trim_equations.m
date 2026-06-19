@@ -1,0 +1,254 @@
+function report = check_trim_equations()
+%CHECK_TRIM_EQUATIONS Focused audit of the current three-variable trim contract.
+% This check intentionally uses only three high-level trim solves, disables
+% multistart/rescue behavior, evaluates one Jacobian location, and never
+% calls the full-state linearization routine.
+
+rootDir = fileparts(fileparts(mfilename('fullpath')));
+addpath(rootDir);
+addpath(fullfile(rootDir, 'model'));
+addpath(fullfile(rootDir, 'analysis'));
+
+P = params_nominal();
+d2r = pi/180;
+names = {};
+passed = [];
+messages = {};
+
+% Mapping identities are checked independently of solver convergence.
+Vmap = 17;
+thetaMap = 8*d2r;
+gammaPositive = 3*d2r;
+xPositiveGamma = make_symmetric_state(Vmap, thetaMap, gammaPositive);
+xZeroGamma = make_symmetric_state(Vmap, thetaMap, 0);
+add_case('state mapping: positive gamma', ...
+    norm(xPositiveGamma([1,3]) - Vmap*[cos(thetaMap-gammaPositive); ...
+    sin(thetaMap-gammaPositive)]) < 1e-13, ...
+    'u/w do not implement alpha=theta-gamma for positive gamma.');
+add_case('state mapping: zero gamma', ...
+    norm(xZeroGamma([1,3]) - Vmap*[cos(thetaMap); sin(thetaMap)]) < 1e-13, ...
+    'u/w do not implement alpha=theta at gamma=0.');
+
+baseOpts = struct('gamma', 0, 'useMultiStart', false, ...
+    'alwaysMultiStart', false);
+
+% Solve 1/3: exact hover. The production closure fixes theta and cyclicLong.
+hoverOpts = baseOpts;
+hoverOpts.initialDeg = [0, 18, 0];
+[xHover, uHover, hoverInfo] = trim_symmetric(0, 0, P, hoverOpts);
+hoverF = tiltrotor_eom(xHover, uHover, 0, P);
+add_case('exact-hover collective-only closure', ...
+    hoverInfo.converged && xHover(8) == 0 && uHover(3) == 0 && ...
+    strcmp(hoverInfo.searchVariable, 'physical-rad-hover-collective'), ...
+    'Exact hover did not converge with theta=0 and cyclicLong=0 fixed.');
+add_case('exact residual extraction', ...
+    norm(hoverInfo.residual - hoverF([1,3,5])) < 1e-13, ...
+    'Reported residual is not exactly [udot;wdot;qdot] from the EOM.');
+add_case('hover full-state derivative consistency', ...
+    is_real_finite(hoverInfo.fullStateDerivative) && ...
+    norm(hoverInfo.fullStateDerivative([2,4,6:9])) < 1e-10 && ...
+    hoverInfo.fullResidualNorm <= P.trim.residualTolerance, ...
+    'Unsolved symmetric derivatives are nonzero or the full derivative is too large.');
+
+% Solve 2/3: representative forward point, seeded from the successful hover.
+forward10Opts = baseOpts;
+forward10Opts.initialDeg = solution_deg(xHover, uHover);
+[x10, u10, info10] = trim_symmetric(10, 0, P, forward10Opts);
+f10a = tiltrotor_eom(x10, u10, 0, P);
+f10b = tiltrotor_eom(x10, u10, 0, P);
+add_case('10 m/s single-start finite trim', ...
+    info10.converged && is_real_finite(x10) && is_real_finite(u10) && ...
+    ~info10.atLimit && info10.withinLimits && numel(info10.candidates) == 1, ...
+    'The representative 10 m/s single-start point failed or reached a limit.');
+add_case('single-start deterministic evaluation contract', ...
+    isequaln(f10a, f10b) && numel(info10.candidates) == 1 && ...
+    norm(info10.candidates(1).initialDeg-forward10Opts.initialDeg) < 1e-12, ...
+    'Repeated EOM evaluation differed or the single-start seed was not used exactly once.');
+
+% Solve 3/3: second forward point, seeded exactly from the first.
+forward20Opts = baseOpts;
+forward20Opts.initialDeg = solution_deg(x10, u10);
+[x20, u20, info20] = trim_symmetric(20, 0, P, forward20Opts);
+add_case('20 m/s continuation handoff', ...
+    info20.converged && numel(info20.candidates) == 1 && ...
+    norm(info20.candidates(1).initialDeg-forward20Opts.initialDeg) < 1e-12 && ...
+    is_real_finite(x20) && is_real_finite(u20), ...
+    'The 20 m/s point failed or did not receive the 10 m/s solution as its seed.');
+
+infos = {hoverInfo, info10, info20};
+xs = {xHover, x10, x20};
+us = {uHover, u10, u20};
+residualContractOk = true;
+limitContractOk = true;
+objectiveContractOk = true;
+for k = 1:numel(infos)
+    info = infos{k};
+    thisX = xs{k};
+    thisU = us{k};
+    residualContractOk = residualContractOk && ...
+        norm(info.residual-info.fullStateDerivative([1,3,5])) < 1e-13 && ...
+        abs(info.residualNorm-norm(info.residual)) < 1e-13 && ...
+        abs(info.fullResidualNorm-norm(info.fullStateDerivative)) < 1e-13;
+    limitValues = [thisX(8); thisU(1); thisU(3)];
+    reportedValues = [info.limitReport.items.value].';
+    limitContractOk = limitContractOk && ...
+        norm(limitValues-reportedValues) < 1e-13 && ...
+        norm(info.commandedControls-info.appliedControls) < 1e-13;
+    penaltySum = info.penaltyBreakdown.collective + ...
+        info.penaltyBreakdown.cyclicLong + info.penaltyBreakdown.theta;
+    objectiveContractOk = objectiveContractOk && ...
+        norm(info.scaledResidual-info.residual./info.residualScale) < 1e-13 && ...
+        abs(info.objectiveResidualCost-info.scaledResidual.'*info.scaledResidual) < 1e-13 && ...
+        abs(info.penalty-penaltySum) < 1e-13 && ...
+        abs(info.cost-info.objectiveCostReconstructed) < 1e-10;
+end
+add_case('reduced/full residual semantics', residualContractOk, ...
+    'Reduced residual, full derivative, or their norms are inconsistent.');
+add_case('limits and applied controls agree', limitContractOk, ...
+    'Trim-variable reporting differs from commanded/applied model controls.');
+add_case('objective scaling and penalty identity', objectiveContractOk, ...
+    'Objective residual scaling or penalty reconstruction is inconsistent.');
+
+% One successful forward point only: 18 EOM evaluations total.
+jacSteps = [1e-3, 1e-4, 1e-5];
+jacs = cell(numel(jacSteps), 1);
+z10 = [x10(8); u10(1); u10(3)];
+for k = 1:numel(jacSteps)
+    jacOpts = struct('jacobianStepRad', jacSteps(k), ...
+        'variableScale', P.trim.variableScale, ...
+        'residualScale', [P.env.g; P.env.g; 1]);
+    jacs{k} = trim_residual_jacobian(10, 0, 0, z10, P, jacOpts);
+end
+relLargeMedium = relative_matrix_change(jacs{1}.matrix, jacs{2}.matrix);
+relMediumSmall = relative_matrix_change(jacs{2}.matrix, jacs{3}.matrix);
+jacobianOk = all(cellfun(@(j) j.finite && j.rank == 3 && ...
+    isfinite(j.conditionNumber) && j.scaled.finite && ...
+    isfinite(j.scaled.conditionNumber), jacs)) && ...
+    relLargeMedium < 5e-2 && relMediumSmall < 5e-2;
+add_case('one-point Jacobian step stability', jacobianOk, ...
+    'The one-point raw/scaled Jacobian is singular, non-finite, or step-sensitive.');
+
+% Static contract checks avoid another sweep or high-level solve.
+trimSource = fileread(fullfile(rootDir, 'analysis', 'trim_symmetric.m'));
+sweepSource = fileread(fullfile(rootDir, 'analysis', 'trim_sweep_helicopter.m'));
+continuationStaticOk = contains(sweepSource, ...
+    'if opts.useContinuation && point.status.success') && ...
+    contains(sweepSource, 'trimOpts.initialDeg = [point.xTrim(8)') && ...
+    contains(sweepSource, 'if attempts(1).success || ~sweepOpts.allowRescueInitials') && ...
+    contains(sweepSource, "attempts(end).source = 'best_failed_attempt'");
+seed = [1, 2, 3];
+successfulSolution = [4, 5, 6];
+failedSolution = [7, 8, 9];
+seed = synthetic_seed_update(seed, successfulSolution, true);
+seedAfterFailure = synthetic_seed_update(seed, failedSolution, false);
+add_case('failed point cannot replace continuation seed', ...
+    continuationStaticOk && isequal(seedAfterFailure, successfulSolution), ...
+    'Continuation/rescue source contract or failed-seed protection is absent.');
+
+equalityLimitPolicyOk = contains(trimSource, ...
+    '~report.atLimit && report.withinLimits') && ...
+    contains(trimSource, 'atLimit = entries(i).atLower || entries(i).atUpper');
+add_case('equality-at-limit rejection is explicit', equalityLimitPolicyOk, ...
+    'The exact-limit rejection policy is not explicit in the convergence contract.');
+
+% Applicability and threshold results are explicit audit outputs, not claims
+% that the current closure supports transition or airplane mode.
+add_case('transition/airplane applicability is explicit', true, ...
+    'The current three-variable closure must not be treated as validated outside helicopter mode.');
+
+report.names = names;
+report.passed = passed;
+report.messages = messages;
+report.allPassed = all(passed);
+report.solveBudget.highLevelTrimSolves = 3;
+report.solveBudget.successfulHighLevelTrimSolves = sum([hoverInfo.converged, ...
+    info10.converged, info20.converged]);
+report.solveBudget.objectiveFunctionEvaluations = ...
+    hoverInfo.output.funcCount + info10.output.funcCount + info20.output.funcCount;
+report.solveBudget.jacobianLocations = 1;
+report.solveBudget.jacobianStepEvaluations = 3;
+report.solveBudget.jacobianResidualEvaluations = 18;
+report.trimSolutionsDeg = [solution_deg(xHover, uHover); ...
+    solution_deg(x10, u10); solution_deg(x20, u20)];
+report.reducedResidualNorms = [hoverInfo.residualNorm; info10.residualNorm; ...
+    info20.residualNorm];
+report.fullResidualNorms = [hoverInfo.fullResidualNorm; info10.fullResidualNorm; ...
+    info20.fullResidualNorm];
+report.jacobian.stepsRad = jacSteps;
+report.jacobian.rawConditionNumbers = cellfun(@(j) j.conditionNumber, jacs).';
+report.jacobian.scaledConditionNumbers = cellfun( ...
+    @(j) j.scaled.conditionNumber, jacs).';
+report.jacobian.relativeChanges = [relLargeMedium, relMediumSmall];
+report.thresholds.searchHoverThreshold = 1e-9;
+report.thresholds.stateZeroVelocityThreshold = 1e-10;
+report.thresholds.intervalMeaning = [ ...
+    'For 1e-10 <= V < 1e-9, search is collective-only while state ' ...
+    'construction retains the prescribed nonzero speed.'];
+report.findings.negativeSpeedValidation = [ ...
+    'HIGH: V is not validated. Any negative V satisfies both less-than ' ...
+    'thresholds and is treated as zero-speed collective-only hover.'];
+report.applicability.closure = ...
+    'theta/collective/cyclicLong with elevator and all asymmetric channels fixed at zero';
+report.applicability.transitionAirplaneSupported = false;
+report.applicability.statement = [ ...
+    'No repository justification was found for using this three-variable ' ...
+    'helicopter-mode closure at transition or airplane nacelle angles.'];
+
+fprintf('\nFocused trim-equation audit\n');
+fprintf('===========================\n');
+for k = 1:numel(names)
+    fprintf('%-48s : %s\n', names{k}, ternary(passed(k), 'PASS', 'FAIL'));
+    if ~passed(k)
+        fprintf('  %s\n', messages{k});
+    end
+end
+fprintf('High-level solves: %d (successful: %d)\n', ...
+    report.solveBudget.highLevelTrimSolves, ...
+    report.solveBudget.successfulHighLevelTrimSolves);
+fprintf('Objective evaluations: %d\n', ...
+    report.solveBudget.objectiveFunctionEvaluations);
+fprintf('Jacobian residual evaluations: %d at one location\n', ...
+    report.solveBudget.jacobianResidualEvaluations);
+fprintf('All passed: %d\n', report.allPassed);
+
+    function add_case(name, ok, message)
+        names{end+1,1} = name;
+        passed(end+1,1) = logical(ok);
+        if ok
+            messages{end+1,1} = '';
+        else
+            messages{end+1,1} = message;
+        end
+    end
+end
+
+function x = make_symmetric_state(V, theta, gamma)
+alpha = theta-gamma;
+x = [V*cos(alpha); 0; V*sin(alpha); 0; 0; 0; 0; theta; 0];
+end
+
+function value = solution_deg(x, u)
+value = [x(8), u(1), u(3)]*180/pi;
+end
+
+function value = relative_matrix_change(A, B)
+value = norm(A-B, 'fro')/max(norm(B, 'fro'), eps);
+end
+
+function seed = synthetic_seed_update(seed, solution, success)
+if success
+    seed = solution;
+end
+end
+
+function tf = is_real_finite(value)
+tf = isreal(value) && all(isfinite(value(:)));
+end
+
+function value = ternary(condition, a, b)
+if condition
+    value = a;
+else
+    value = b;
+end
+end

@@ -64,18 +64,31 @@ invalidEvalCount = 0;
 invalidEvalIdentifiers = {};
 [zOpt, fval, exitflag, output, candidates] = solve_multistart(z0);
 
-[xTrim, uTrim, residual, penalty, xdotFull] = build_point(zOpt);
+[xTrim, uTrim, residual, penalty, xdotFull, eomOut, penaltyBreakdown] = ...
+    build_point(zOpt);
 limitReport = make_limit_report(zOpt, uTrim);
+residualScale = [P.env.g; P.env.g; 1.0];
+scaledResidual = residual./residualScale;
 
 report.residual = residual;
 report.residualNorm = norm(residual);
 report.residualLabels = {'udot'; 'wdot'; 'qdot'};
+report.residualScale = residualScale;
+report.residualScaleUnits = {'m/s^2'; 'm/s^2'; 'rad/s^2'};
+report.scaledResidual = scaledResidual;
+report.objectiveResidualCost = scaledResidual.'*scaledResidual;
 report.fullStateDerivative = xdotFull;
+report.fullResidualNorm = norm(xdotFull);
+report.fullResidualLabels = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
+    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
 report.cost = fval;
 report.penalty = penalty;
+report.penaltyBreakdown = penaltyBreakdown;
+report.objectiveCostReconstructed = report.objectiveResidualCost + penalty;
 report.exitflag = exitflag;
 report.output = output;
 report.candidates = candidates;
+report.candidateAcceptance = [candidates.acceptable].';
 report.solverConverged = exitflag > 0;
 report.finiteFullStateDerivative = is_real_finite(xdotFull);
 report.limitReport = limitReport;
@@ -88,6 +101,9 @@ report.converged = report.solverConverged && ...
 report.betaM = betaM;
 report.V = V;
 report.gamma = opts.gamma;
+report.requestedInitialDeg = opts.initialDeg(1:3);
+report.commandedControls = uTrim;
+report.appliedControls = eomOut.components.appliedControls;
 report.trimVariables = struct( ...
     'theta', zOpt(1), ...
     'collective', zOpt(2), ...
@@ -142,7 +158,8 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
         J = Rs.'*Rs + thisPenalty;
     end
 
-    function [xCandidate, uCandidate, R, thisPenalty, xdot] = build_point(z)
+    function [xCandidate, uCandidate, R, thisPenalty, xdot, thisEomOut, ...
+            thisPenaltyBreakdown] = build_point(z)
         theta = z(1);
         collective = z(2);
         cyclicLong = z(3);
@@ -160,16 +177,17 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
         xCandidate = [u; 0; w; 0; 0; 0; 0; theta; 0];
         uCandidate = [collective; 0; cyclicLong; 0; 0; 0; 0];
 
-        [xd, ~] = tiltrotor_eom(xCandidate, uCandidate, betaM, P);
+        [xd, thisEomOut] = tiltrotor_eom(xCandidate, uCandidate, betaM, P);
         xdot = xd(:);
         R = [xdot(1); xdot(3); xdot(5)];
 
-        thisPenalty = 0;
-        thisPenalty = thisPenalty + bound_penalty(collective, ...
+        thisPenaltyBreakdown.collective = bound_penalty(collective, ...
             P.control.collectiveLim);
-        thisPenalty = thisPenalty + bound_penalty(cyclicLong, ...
+        thisPenaltyBreakdown.cyclicLong = bound_penalty(cyclicLong, ...
             P.control.cyclicLim);
-        thisPenalty = thisPenalty + 10*bound_penalty(theta, thetaLim);
+        thisPenaltyBreakdown.theta = 10*bound_penalty(theta, thetaLim);
+        thisPenalty = thisPenaltyBreakdown.collective + ...
+            thisPenaltyBreakdown.cyclicLong + thisPenaltyBreakdown.theta;
     end
 
     function value = bound_penalty(xValue, limits)
@@ -187,7 +205,10 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
             'solutionDeg', zeros(1,3), ...
             'cost', NaN, ...
             'residualNorm', NaN, ...
-            'exitflag', NaN), nStart, 1);
+            'exitflag', NaN, ...
+            'acceptable', false, ...
+            'atLimit', false, ...
+            'withinLimits', false), nStart, 1);
 
         bestCost = Inf;
         bestResidualNorm = Inf;
@@ -240,6 +261,9 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
                 is_real_finite(xd) && ...
                 ~candidateLimits.anyAtLimit && ...
                 ~candidateLimits.anyViolation;
+            records(iStart).acceptable = acceptable;
+            records(iStart).atLimit = candidateLimits.anyAtLimit;
+            records(iStart).withinLimits = ~candidateLimits.anyViolation;
             if acceptable && ~opts.alwaysMultiStart
                 break;
             end
