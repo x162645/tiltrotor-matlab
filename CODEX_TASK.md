@@ -22,6 +22,7 @@ Execution used 2 high-level trims, 479 objective evaluations, 2 direct
 post-trim EOM calls, zero residual Jacobians, and zero full linearizations.
 No production code or parameter changed. Full evidence is in
 `docs/TRIM_MIDPOINT_17P5_DIAGNOSIS.md`. Draft PR #6 remains on hold.
+Diagnostic evidence commit: `572d42d5b716b566b1f062e9970825ec2dad3bc1`.
 
 Branch: `audit/representative-trim-continuation`
 
