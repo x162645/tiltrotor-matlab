@@ -105,8 +105,9 @@ Mreaction = -rotDir*loads.Q*eT;
 
 Hrot = rotDir*P.rotor.Jpolar*P.rotor.Omega*eT;
 Mgyro = -cross(omegaBody, Hrot);
+Marm = cross(rHub, Fbody);
 
-Mbody = cross(rHub, Fbody) + Mreaction + Mgyro;
+Mbody = Marm + Mreaction + Mgyro;
 
 out.side = side;
 out.rotDir = rotDir;
@@ -126,12 +127,20 @@ out.theta1s = -rotDir*rotorCtrl.cyclicLong;
 out.eT = eT;
 out.eD = eD;
 out.eY = eY;
+out.basisOrthogonalityError = max(max(abs([eT,eD,eY].'*[eT,eD,eY] - eye(3))));
 out.nDisk = nDisk;
 out.eTeff = nDisk;
 out.thrust = loads.T;
 out.torque = loads.Q;
 out.Hlong = loads.Hlong;
 out.Hlat = loads.Hlat;
+out.Marm = Marm;
+out.Mreaction = Mreaction;
+out.Hrot = Hrot;
+out.Mgyro = Mgyro;
+out.minUT = loads.minUT;
+out.maxUT = loads.maxUT;
+out.maxAbsAlphaBlade = loads.maxAbsAlphaBlade;
 out.inducedVelocity = vi;
 out.inducedVelocityError = viError;
 out.iterations = iter;
@@ -340,6 +349,9 @@ out.M = Mbody;
         loads.betaDDot = betaDDot;
         loads.flapMomentByAzimuth = flapMomentByAzimuth;
         loads.maxUPDegenerateError = maxUPDegenerateError;
+        loads.minUT = min(UT(:));
+        loads.maxUT = max(UT(:));
+        loads.maxAbsAlphaBlade = max(abs(alphaBlade(:)));
     end
 
     function psi = azimuth_grid()
