@@ -1,6 +1,15 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE
+## Closeout status (2026-06-20)
+
+The prescribed representative run was executed once and returned **FAIL**.
+All five trim points succeeded, but the existing significant-sign-flip test
+flagged `cyclicLong` over 5--10 m/s and 15--20 m/s. The raw values and runtime
+are preserved in `docs/REPRESENTATIVE_TRIM_CONTINUATION.md`. No threshold,
+parameter, solver behavior, additional point, rescue initial, multistart,
+Jacobian, or full linearization was used to change the outcome.
+
+STATUS: FAILED — representative `cyclicLong` sign-flip criteria not met
 
 Branch: `audit/representative-trim-continuation`
 
