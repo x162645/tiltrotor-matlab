@@ -11,7 +11,13 @@ P.env.g   = 9.80665;
 
 %% 质量、重心和惯量
 P.mass.m     = 6000.0;
+% mNac is the combined moving mass of the left and right tilting
+% nacelle/rotor assemblies. It is not a per-side mass.
 P.mass.mNac  = 900.0;
+% RH is currently shared by the moving-mass equivalent CG radius and the
+% rotor hub tilt radius. This coupling is a conceptual assumption, not a
+% sourced equality. Future sourced data should split it into RH_mass and
+% RH_hub while initially preserving the same numeric value.
 P.mass.RH    = 0.75;
 
 P.mass.I0 = [18000,     0,  -800;

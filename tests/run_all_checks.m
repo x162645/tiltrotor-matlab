@@ -16,6 +16,7 @@ passed = [];
 messages = {};
 
 run_test('parameters and inertia', @test_parameters);
+run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
 run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
 run_test('collective thrust monotonicity', @test_collective_monotonicity);
 run_test('left/right symmetry', @test_symmetry);
@@ -63,6 +64,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         assert(all(eig(mp90.I) > 0));
         assert(norm(mp0.cgShift) < 1e-12);
         assert(all(isfinite(mp90.cgShift)));
+    end
+
+    function test_mass_inertia_geometry()
+        massGeometryReport = check_mass_inertia_geometry();
+        assert(massGeometryReport.allPassed, ...
+            'Mass/inertia/geometry audit has failed items.');
     end
 
     function test_nacelle_endpoints()
