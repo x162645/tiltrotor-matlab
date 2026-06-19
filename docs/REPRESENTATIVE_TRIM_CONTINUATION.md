@@ -8,9 +8,11 @@ This is a representative sampled screen only. It cannot exclude local branch cha
 
 Result: **FAIL**. All five individual trim points converged with acceptable residuals, finite real outputs, one single-start attempt per point, no rescue initial, and no trim-variable or applied-control limit contact/violation. The configured `0.25 deg` significant-sign-flip screen detected `cyclicLong` sign reversals over `5 -> 10 m/s` and `15 -> 20 m/s`.
 
-This is a HIGH representative-screen finding and a merge blocker for Draft PR #6. It is not yet classified as a HIGH production-equation bug. Current evidence cannot distinguish a continuous zero crossing, sparse-sampling aliasing, multiple roots, or path-dependent branch selection.
+The 7.5 m/s two-seed diagnosis subsequently showed that the 5--10 m/s interval's midpoint converges to the same numerical root from both endpoint seeds. The common midpoint root has negative `cyclicLong`. This strongly reduces evidence for midpoint seed dependence in that interval, while leaving the exact zero-crossing location and global branch uniqueness unresolved.
 
-No threshold, parameter, solver setting, initial seed, trim variable, objective, penalty, tolerance, or limit was changed to alter this result. No intermediate speeds, reverse sweep, multistart, rescue initial, residual Jacobian, or full linearization were used.
+The 15--20 m/s interval remains unclassified and is the next authorized focused diagnosis. Draft PR #6 remains on hold.
+
+No threshold, parameter, solver setting, initial seed, trim variable, objective, penalty, tolerance, or limit was changed to alter the representative result. No reverse sweep, multistart, rescue initial, residual Jacobian, or full linearization was used.
 
 ## Configuration
 
@@ -39,7 +41,7 @@ Reduced and full residual tolerances were both `5.0e-3` for this run.
 
 Before execution, the estimate was five high-level trim solves and about `563 * 5 / 3 = 938` objective evaluations, based on the earlier three-point count. Residual-Jacobian and full-linearization calls were estimated as zero. Expected runtime was 50--75 seconds.
 
-Actual results:
+Actual representative-screen results:
 
 - elapsed command time: 41.8 seconds;
 - high-level trim solves: 5;
@@ -70,7 +72,32 @@ The initial seed at 0 m/s was `[0, 18, 0] deg`. For every later point, the test 
 | 10 -> 15 | 0.3439 | -0.6445 | -1.5180 | false | false |
 | 15 -> 20 | -1.4449 | -0.4253 | -2.1610 | false | true |
 
-The theta and control jump limits were not exceeded. The FAIL result comes from the significant-sign-flip criterion only.
+The theta and control jump limits were not exceeded. The representative FAIL result comes from the significant-sign-flip criterion only.
+
+## 7.5 m/s focused diagnosis
+
+Two independent single-start trims at 7.5 m/s used the recorded 5 and 10 m/s endpoint solutions as seeds.
+
+```text
+low-seed result  = [0.097205105181, 16.809576878591, -0.169175072447] deg
+high-seed result = [0.097205096202, 16.809576878806, -0.169175072991] deg
+difference norm  = 8.998006127586e-09 deg
+same-root tolerance = 1.0e-4 deg
+```
+
+Both seeds converged to the same numerical root. The common root has negative `cyclicLong`. The slipstream wing panels were inside the existing normal-flow blend interval with ratio `0.282863080` and blend weight `0.133065419`.
+
+Focused diagnosis accounting:
+
+- high-level trim solves: 2;
+- objective evaluations: 448;
+- direct post-trim EOM calls: 2;
+- residual Jacobians: 0;
+- full linearizations: 0;
+- internal elapsed time: 13.9255 s;
+- command wall time: 32 s.
+
+Full evidence is stored in `docs/TRIM_MIDPOINT_7P5_DIAGNOSIS.md`.
 
 ## Optional diagnostic implementation
 
@@ -83,9 +110,9 @@ computeLinearization
 
 Both default to `true`, preserving existing caller behavior. When disabled, the corresponding routines are not called. Point reports distinguish `NOT_REQUESTED`, `COMPUTED`, and `FAILED`, and `sweepReport.allPassed` requires a diagnostic only when it was requested.
 
-## Immediate diagnosis boundary
+## Next diagnosis boundary
 
-The next authorized calculation is limited to the larger 5--10 m/s event. At 7.5 m/s, run exactly two single-start trims using the full-precision 5 m/s and 10 m/s solutions as independent seeds. Do not diagnose the 15--20 m/s event in the same pass. Do not use extra speeds, multistart, rescue, Jacobians, or full linearizations.
+The next authorized calculation is limited to the 15--20 m/s event. At 17.5 m/s, run exactly two single-start trims using the highest-precision persisted 15 and 20 m/s solutions as independent seeds. Do not add further speed points, multistart, rescue, Jacobians, full linearizations, or zero-crossing searches.
 
 ## Change status
 
@@ -94,4 +121,6 @@ The next authorized calculation is limited to the larger 5--10 m/s event. At 7.5
 - solver, objective, penalties, tolerances, limits, or default seeds changed: no;
 - existing default sweep diagnostic behavior changed: no;
 - representative-screen result: FAIL;
-- Draft PR #6 merge status: HOLD pending focused diagnosis.
+- 5--10 m/s midpoint seed dependence: not observed at 7.5 m/s;
+- 15--20 m/s midpoint classification: pending;
+- Draft PR #6 merge status: HOLD.
