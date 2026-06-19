@@ -22,6 +22,7 @@ run_test('collective thrust monotonicity', @test_collective_monotonicity);
 run_test('left/right symmetry', @test_symmetry);
 run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
+run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
@@ -119,6 +120,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         controlReport = check_control_architecture();
         assert(controlReport.allPassed, ...
             'Control architecture closure has failed items.');
+    end
+
+    function test_aerodynamic_components()
+        aeroReport = check_aerodynamic_components();
+        assert(aeroReport.allPassed, ...
+            'Aerodynamic component audit has failed items.');
     end
 
     function test_rotor_force_moment_chain()

@@ -40,7 +40,8 @@ for k = 1:2
     D = qbar*P.vtail.SEach*CD;
 
     Ffin = aero_force_body(D, Y, 0, alpha, beta);
-    Mfin = cross(rAC, Ffin);
+    Marm = cross(rAC, Ffin);
+    Mfin = Marm;
 
     Fbody = Fbody + Ffin;
     Mbody = Mbody + Mfin;
@@ -51,8 +52,10 @@ for k = 1:2
     finOut{k}.V = V;
     finOut{k}.alpha = alpha;
     finOut{k}.beta = beta;
+    finOut{k}.qbar = qbar;
     finOut{k}.CY = CY;
     finOut{k}.CD = CD;
+    finOut{k}.Marm = Marm;
     finOut{k}.F = Ffin;
     finOut{k}.M = Mfin;
 end
