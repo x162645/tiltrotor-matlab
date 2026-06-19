@@ -1,0 +1,105 @@
+﻿
+# ===== Local cleanup rules =====
+
+# MATLAB temporary files
+*.asv
+*.autosave
+*.slxc
+slprj/
+codegen/
+
+# Generated diagnostic results
+results/*
+!results/.gitkeep
+!results/README.md
+
+# Review bundles
+review_bundle*/
+review_bundle*.zip
+tiltrotor_review_bundles/
+
+# Local backups accidentally created inside repository
+/$backup/
+*_checkpoint_*/
+
+# Cleanup patches
+/checkpoint_before_cleanup.patch
+
+# Temporary directories
+temp/
+tmp/
+cache/
+
+# Operating-system files
+Thumbs.db
+.DS_Store
+
+# ===== Local cleanup rules =====
+
+# MATLAB temporary files
+*.asv
+*.autosave
+*.slxc
+slprj/
+codegen/
+
+# Generated diagnostic results
+results/*
+!results/.gitkeep
+!results/README.md
+
+# Review bundles
+review_bundle*/
+review_bundle*.zip
+tiltrotor_review_bundles/
+
+# Local backups accidentally created inside repository
+/$backup/
+*_checkpoint_*/
+
+# Cleanup patches
+/checkpoint_before_cleanup.patch
+
+# Temporary directories
+temp/
+tmp/
+cache/
+
+# Operating-system files
+Thumbs.db
+.DS_Store
+
+# ===== Local cleanup rules =====
+
+# MATLAB temporary files
+*.asv
+*.autosave
+*.slxc
+slprj/
+codegen/
+
+# Generated diagnostic results
+results/*
+!results/.gitkeep
+!results/README.md
+
+# Review bundles
+review_bundle*/
+review_bundle*.zip
+tiltrotor_review_bundles/
+
+# Local backups accidentally created inside repository
+/$backup/
+*_checkpoint_*/
+
+# Cleanup patches
+/checkpoint_before_cleanup.patch
+
+# Temporary directories
+temp/
+tmp/
+cache/
+
+# Operating-system files
+Thumbs.db
+.DS_Store
