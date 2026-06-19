@@ -109,8 +109,8 @@ variable, or control channel was added.
 
 |Severity|Category|Finding|Reproduction / consequence|
 |-|-|-|-|
-|HIGH|Input validation|`trim_symmetric` does not validate `V`. Any negative finite `V` satisfies both less-than thresholds and is treated as zero-velocity collective-only hover.|For example `V=-1 m/s` makes `V<1e-9` and `V<1e-10` true. The solver therefore fixes theta/cyclic and constructs `u=w=0`, which is misleading for the requested input. Solver behavior was not changed pending review.|
-|MEDIUM|Input validation|`betaM`, `gamma`, option booleans, theta limit, and complete initial-vector finiteness/type are not comprehensively validated at the trim entry.|Malformed inputs can fail downstream or be interpreted inconsistently. No solver-side validation was added in this phase.|
+|HIGH — RESOLVED|Input validation|Negative or otherwise invalid `V` previously entered threshold logic and could be treated as hover.|`trim_symmetric` and `trim_residual_jacobian` now reject non-real, non-finite, nonscalar, or negative `V` before any threshold or solver call.|
+|MEDIUM — RESOLVED|Input validation|`betaM`, `gamma`, option booleans, theta limit, and complete initial-vector validation were incomplete.|Focused guards now validate these inputs. Numeric boolean values are limited to `0/1` and normalized to logical. Sweep speeds, nacelle angle, and gamma are validated before any trim attempt.|
 |LOW|Numerical semantics|The `1e-9` search-selection and `1e-10` state-construction thresholds define a narrow mixed near-hover interval.|Documented above; no numeric threshold was changed.|
 |LOW|Limit reporting|Trim-variable and sweep common-control at-limit tolerances are `1e-8` and `1e-10 rad`, respectively.|Exact limits agree, but values near a limit can receive different at-limit labels.|
 |INFO|Engineering assumption|Exact hover fixes theta and longitudinal cyclic at zero and solves collective only.|Valid only for the current symmetric no-wind conceptual hover assumption.|
@@ -158,12 +158,39 @@ five-speed sweep was also not run. `run_all_checks` was not run because the
 three successful high-level trim solves exhausted the first-pass budget and
 the existing flapping check invokes an additional trim solve.
 
+## Input-Validation Remediation
+
+The focused closeout command was run once after adding the entry guards. Its
+test body completed 34/34 named checks in 43.8 seconds:
+
+- 19/19 invalid-input cases returned the exact expected error identifier
+  before an optimizer or sweep point was entered;
+- three valid high-level trims at 0, 10, and 20 m/s all remained successful;
+- objective evaluations remained exactly 563, unchanged from the pre-fix run;
+- the Jacobian remained limited to the 10 m/s point at three step sizes, using
+  18 residual evaluations;
+- no full linearization was called;
+- no test-body warning, NaN, Inf, or complex result was observed.
+
+The remediation affects invalid inputs only. Valid-input thresholds, solver
+algorithm, objective, penalty, tolerances, limits, default seeds, variable set,
+state/control mapping, and resulting focused-test behavior were not changed.
+The two LOW findings remain open records: the `1e-9`/`1e-10` threshold
+distinction and the `1e-8`/`1e-10 rad` at-limit reporting tolerance distinction
+were intentionally not modified.
+
+MATLAB R2021a again emitted the known shutdown-stage `output stream error`
+after the PASS summary and successful assertion. The nonzero process exit is
+recorded separately from the passing test body.
+
 ## Change Status
 
 - Production parameter values changed: no.
 - `params_nominal.m` changed: no.
 - Solver algorithm, objective, penalties, tolerances, limits, or defaults
   changed: no.
-- Trim solution behavior changed: no.
+- Valid-input trim solution behavior changed: no.
+- Invalid-input behavior changed: yes; invalid inputs now fail explicitly at
+  the public analysis entry before threshold, optimizer, or sweep execution.
 - Diagnostic fields exposing existing calculations added: yes.
 - Full linearization called by the focused test: no.

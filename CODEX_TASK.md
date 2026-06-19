@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / FIX REQUIRED
+STATUS: COMPLETE / HOLD
 
 Branch: `audit/trim-equations-continuation`
 
@@ -8,30 +8,23 @@ Base branch: `main`
 
 Current phase: symmetric trim equations, solver contract, limits, residuals, continuation, and input-validation remediation.
 
-## Audit result
+## Completed scope
 
-- `check_trim_equations`: 15/15 PASS;
-- three successful high-level trim solves completed;
-- 563 objective evaluations versus an 18,000 conservative upper estimate;
-- one 10 m/s Jacobian location checked at `1e-3`, `1e-4`, and `1e-5 rad` using 18 residual evaluations;
+- focused trim, Jacobian, and sweep-entry validation remediation is complete;
+- negative, non-finite, non-real, or nonscalar airspeed is rejected before threshold or solver execution;
+- nacelle angle, flight-path angle, initial trim vector, theta limit, and multistart option validation is complete for the requested scope;
+- sweep speeds, sweep nacelle angle, and sweep flight-path angle are validated before any trim attempt;
+- `check_trim_equations`: 34/34 PASS, including 19/19 exact-identifier invalid-input checks;
+- three successful valid-input high-level trim solves completed at 0, 10, and 20 m/s;
+- valid-input objective evaluations remained 563, unchanged from the pre-fix focused run;
+- one 10 m/s Jacobian location remained checked at `1e-3`, `1e-4`, and `1e-5 rad` using 18 residual evaluations;
 - no full linearization was called;
-- numeric parameters, solver algorithm, objective, penalties, tolerances, limits, seeds, and trim-variable set were unchanged;
-- HIGH input-validation defect remains unresolved: negative `V` enters the collective-only hover path;
-- MEDIUM entry-validation gaps remain for `betaM`, `gamma`, option booleans, theta limit, and initial-vector finiteness/type;
-- Draft PR #5 must not be merged until focused validation guards and regression checks are reviewed;
+- numeric parameters, solver algorithm, objective, penalties, tolerances, limits, seeds, trim-variable set, and valid-input trim behavior were unchanged;
+- Draft PR #5 awaits final review and must not be merged by Codex;
 - do not begin dense continuation, reverse sweeps, linearization maps, or flight-envelope work.
 
-## Required remediation before closeout
+## Hold boundary
 
-Add focused entry validation without changing valid-input trim results:
-
-- `V`: real finite scalar and `V >= 0`;
-- `betaM`: real finite scalar within the supported tilt range `[0, pi/2]`;
-- `opts.gamma`: real finite scalar;
-- `opts.initialDeg`: real finite vector with at least three elements;
-- `opts.thetaLimitDeg`: real finite positive scalar;
-- `opts.useMultiStart` and `opts.alwaysMultiStart`: logical scalar or numeric scalar exactly `0` or `1`, then normalize to logical.
-
-Apply consistent physical-input validation to `trim_residual_jacobian`. Validate `trim_sweep_helicopter` speed vectors as real, finite, and nonnegative before any solve. Preserve current thresholds, solver behavior, objective, penalties, limits, and defaults for valid inputs.
-
-Extend focused tests with no-solve invalid-input cases and rerun `check_trim_equations` once. Do not run the 21-point continuity check or `run_all_checks` in this remediation pass.
+This branch remains in the trim-equation and continuation-audit stage pending
+final Draft PR #5 review. Do not merge the PR and do not enter dense
+continuation, reverse sweeps, linearization maps, or flight-envelope work.

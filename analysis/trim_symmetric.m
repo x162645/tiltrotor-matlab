@@ -22,6 +22,22 @@ if ~isfield(opts, 'gamma')
     opts.gamma = 0;
 end
 
+% Validate physical inputs before any speed-dependent default or solver path.
+if ~(isnumeric(V) && isreal(V) && isscalar(V) && isfinite(V) && V >= 0)
+    error('trim_symmetric:InvalidAirspeed', ...
+        'V must be a finite real scalar with V >= 0 m/s.');
+end
+if ~(isnumeric(betaM) && isreal(betaM) && isscalar(betaM) && ...
+        isfinite(betaM) && betaM >= 0 && betaM <= pi/2)
+    error('trim_symmetric:InvalidNacelleAngle', ...
+        'betaM must be a finite real scalar in [0, pi/2] rad.');
+end
+if ~(isnumeric(opts.gamma) && isreal(opts.gamma) && ...
+        isscalar(opts.gamma) && isfinite(opts.gamma))
+    error('trim_symmetric:InvalidGamma', ...
+        'opts.gamma must be a finite real scalar in rad.');
+end
+
 if ~isfield(opts, 'initialDeg')
     if V < 1
         opts.initialDeg = [0, 18, 0];
@@ -32,9 +48,6 @@ if ~isfield(opts, 'initialDeg')
     end
 end
 
-if numel(opts.initialDeg) < 3
-    error('opts.initialDeg must contain [theta, collective, cyclicLong].');
-end
 if ~isfield(opts, 'thetaLimitDeg')
     opts.thetaLimitDeg = 35;
 end
@@ -44,6 +57,24 @@ end
 if ~isfield(opts, 'alwaysMultiStart')
     opts.alwaysMultiStart = false;
 end
+
+if ~(isnumeric(opts.initialDeg) && isreal(opts.initialDeg) && ...
+        isvector(opts.initialDeg) && numel(opts.initialDeg) >= 3 && ...
+        all(isfinite(opts.initialDeg(:))))
+    error('trim_symmetric:InvalidInitialGuess', ...
+        ['opts.initialDeg must be a finite real vector containing at least ' ...
+        '[theta, collective, cyclicLong].']);
+end
+if ~(isnumeric(opts.thetaLimitDeg) && isreal(opts.thetaLimitDeg) && ...
+        isscalar(opts.thetaLimitDeg) && isfinite(opts.thetaLimitDeg) && ...
+        opts.thetaLimitDeg > 0)
+    error('trim_symmetric:InvalidThetaLimit', ...
+        'opts.thetaLimitDeg must be a finite positive real scalar in deg.');
+end
+opts.useMultiStart = validate_logical_option(opts.useMultiStart, ...
+    'trim_symmetric:InvalidUseMultiStart', 'opts.useMultiStart');
+opts.alwaysMultiStart = validate_logical_option(opts.alwaysMultiStart, ...
+    'trim_symmetric:InvalidAlwaysMultiStart', 'opts.alwaysMultiStart');
 
 d2r = pi/180;
 z0 = opts.initialDeg(1:3).'*d2r;
@@ -339,5 +370,18 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
         if numel(scale) ~= 3 || ~is_real_finite(scale) || any(scale <= 0)
             error('P.trim.variableScale must be a finite positive 3-vector in rad.');
         end
+    end
+
+    function value = validate_logical_option(value, errorId, optionName)
+        if islogical(value) && isscalar(value)
+            return;
+        end
+        if isnumeric(value) && isreal(value) && isscalar(value) && ...
+                isfinite(value) && (value == 0 || value == 1)
+            value = logical(value);
+            return;
+        end
+        error(errorId, ...
+            '%s must be a logical scalar or numeric scalar 0/1.', optionName);
     end
 end
