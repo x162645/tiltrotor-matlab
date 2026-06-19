@@ -23,6 +23,7 @@ the sign change between 7.5 and 10 m/s. Full evidence is recorded in
 Execution used 2 high-level trims, 448 objective evaluations, 2 direct
 post-trim EOM calls, zero residual Jacobians, and zero full linearizations.
 No production code or parameter changed. Draft PR #6 remains on hold.
+Diagnostic evidence commit: `7c327d332ffbffc369e9e80e813a8632f22ae681`.
 
 Branch: `audit/representative-trim-continuation`
 
