@@ -12,11 +12,26 @@ if nx ~= 9 || nu ~= 7
     error('当前模型要求 9 状态、7 控制。');
 end
 
+if ~isreal(xe) || ~isreal(ue) || ...
+        any(~isfinite(xe)) || any(~isfinite(ue))
+    error('线性化基点必须是有限实数。');
+end
+
+if ~(isscalar(betaM) && isreal(betaM) && isfinite(betaM))
+    error('betaM 必须是有限实数标量。');
+end
+
 dx = P.linear.dx(:);
 du = P.linear.du(:);
 
 if numel(dx) ~= nx || numel(du) ~= nu
     error('差分步长尺寸与状态/控制维数不一致。');
+end
+
+if ~isreal(dx) || ~isreal(du) || ...
+        any(~isfinite(dx)) || any(~isfinite(du)) || ...
+        any(dx <= 0) || any(du <= 0)
+    error('线性化差分步长必须为有限正实数。');
 end
 
 A = zeros(nx,nx);
@@ -46,8 +61,11 @@ for j = 1:nu
     B(:,j) = (fp - fm)/(2*du(j));
 end
 
-report.f0 = tiltrotor_eom(xe, ue, betaM, P);
+f0 = tiltrotor_eom(xe, ue, betaM, P);
+
+report.f0 = f0;
 report.dx = dx;
 report.du = du;
-report.finite = all(isfinite(A(:))) && all(isfinite(B(:)));
+report.finite = isreal(A) && isreal(B) && isreal(f0) && ...
+    all(isfinite(A(:))) && all(isfinite(B(:))) && all(isfinite(f0(:)));
 end

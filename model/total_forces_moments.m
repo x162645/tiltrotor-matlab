@@ -19,11 +19,21 @@ ctrlRight.cyclicLong = cyclic + diffCyclic;
 ctrlLeft.collective = collective - diffCollective;
 ctrlLeft.cyclicLong = cyclic - diffCyclic;
 
-% 对操纵量进行物理限幅。
+% 对旋翼侧控制量应用当前模型输入包络。
 ctrlRight.collective = clamp(ctrlRight.collective, P.control.collectiveLim);
 ctrlLeft.collective  = clamp(ctrlLeft.collective,  P.control.collectiveLim);
 ctrlRight.cyclicLong = clamp(ctrlRight.cyclicLong, P.control.cyclicLim);
 ctrlLeft.cyclicLong  = clamp(ctrlLeft.cyclicLong,  P.control.cyclicLim);
+
+% 对常规舵面统一应用当前模型输入包络。保留原始命令用于诊断。
+uApplied = uCtrl;
+uApplied(1) = 0.5*(ctrlRight.collective + ctrlLeft.collective);
+uApplied(2) = 0.5*(ctrlRight.collective - ctrlLeft.collective);
+uApplied(3) = 0.5*(ctrlRight.cyclicLong + ctrlLeft.cyclicLong);
+uApplied(4) = 0.5*(ctrlRight.cyclicLong - ctrlLeft.cyclicLong);
+uApplied(5) = clamp(uApplied(5), P.control.aileronLim);
+uApplied(6) = clamp(uApplied(6), P.control.elevatorLim);
+uApplied(7) = clamp(uApplied(7), P.control.rudderLim);
 
 [FrotL, MrotL, rotL] = rotor_model_bemt( ...
     x, ctrlLeft, betaM, -1, mp.cgShift, P);
@@ -32,18 +42,15 @@ ctrlLeft.cyclicLong  = clamp(ctrlLeft.cyclicLong,  P.control.cyclicLim);
     x, ctrlRight, betaM, +1, mp.cgShift, P);
 
 [Fwing, Mwing, wing] = wing_model( ...
-    x, uCtrl, betaM, mp.cgShift, rotL, rotR, P);
+    x, uApplied, betaM, mp.cgShift, rotL, rotR, P);
 
 [Ffus, Mfus, fus] = fuselage_model(x, mp.cgShift, P);
 
-elevator = clamp(uCtrl(6), P.control.elevatorLim);
-rudder = clamp(uCtrl(7), P.control.rudderLim);
-
 [Fht, Mht, htail] = horizontal_tail_model( ...
-    x, elevator, mp.cgShift, P);
+    x, uApplied(6), mp.cgShift, P);
 
 [Fvt, Mvt, vtail] = vertical_tail_model( ...
-    x, rudder, mp.cgShift, P);
+    x, uApplied(7), mp.cgShift, P);
 
 Ftotal = FrotL + FrotR + Fwing + Ffus + Fht + Fvt;
 Mtotal = MrotL + MrotR + Mwing + Mfus + Mht + Mvt;
@@ -59,6 +66,10 @@ info.components = {
 };
 
 info.massProperties = mp;
+info.commandedControls = uCtrl;
+info.appliedControls = uApplied;
+info.appliedRotorControls.left = ctrlLeft;
+info.appliedRotorControls.right = ctrlRight;
 info.rotorLeft = rotL;
 info.rotorRight = rotR;
 info.wing = wing;

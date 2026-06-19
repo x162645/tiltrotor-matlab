@@ -10,6 +10,7 @@ uCtrl = uCtrl(:);
 
 [Fap, Map, componentInfo] = total_forces_moments(x, uCtrl, betaM, P);
 mp = componentInfo.massProperties;
+mass = mp.mass;
 
 Vbody = x(1:3);
 omega = x(4:6);
@@ -17,7 +18,7 @@ phi = x(7);
 theta = x(8);
 
 % 重力在机体系中的分量。
-Fg = P.mass.m*P.env.g * ...
+Fg = mass*P.env.g * ...
     [-sin(theta);
       sin(phi)*cos(theta);
       cos(phi)*cos(theta)];
@@ -25,19 +26,22 @@ Fg = P.mass.m*P.env.g * ...
 Ftotal = Fap + Fg;
 Mtotal = Map;
 
-Vdot = Ftotal/P.mass.m - cross(omega, Vbody);
+Vdot = Ftotal/mass - cross(omega, Vbody);
 
 omegaDot = mp.I \ ...
     (Mtotal - cross(omega, mp.I*omega));
 
-cosTheta = cos(theta);
-if abs(cosTheta) < 1e-6
-    cosTheta = sign(cosTheta + eps)*1e-6;
+% 3-2-1 欧拉角在 theta=+-90 deg 处存在固有奇异性。这里仅为数值
+% 保护统一限制分母，避免 tan(theta) 绕过 cos(theta) 的保护逻辑。
+cosThetaSafe = cos(theta);
+if abs(cosThetaSafe) < 1e-6
+    cosThetaSafe = sign(cosThetaSafe + eps)*1e-6;
 end
+tanThetaSafe = sin(theta)/cosThetaSafe;
 
-T321 = [1, sin(phi)*tan(theta),  cos(phi)*tan(theta);
-        0, cos(phi),            -sin(phi);
-        0, sin(phi)/cosTheta,    cos(phi)/cosTheta];
+T321 = [1, sin(phi)*tanThetaSafe,  cos(phi)*tanThetaSafe;
+        0, cos(phi),              -sin(phi);
+        0, sin(phi)/cosThetaSafe,  cos(phi)/cosThetaSafe];
 
 eulerDot = T321*omega;
 
