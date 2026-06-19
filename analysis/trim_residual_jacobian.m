@@ -18,12 +18,27 @@ if ~isfield(opts, 'jacobianStepRad')
 end
 
 h = opts.jacobianStepRad;
-z = z(:);
-if numel(z) ~= 3
-    error('z must contain [theta; collective; cyclicLong] in rad.');
+if ~(isnumeric(V) && isreal(V) && isscalar(V) && isfinite(V) && V >= 0)
+    error('trim_residual_jacobian:InvalidAirspeed', ...
+        'V must be a finite real scalar with V >= 0 m/s.');
 end
-if ~(isscalar(h) && isfinite(h) && h > 0)
-    error('opts.jacobianStepRad must be a finite positive scalar in rad.');
+if ~(isnumeric(betaM) && isreal(betaM) && isscalar(betaM) && ...
+        isfinite(betaM) && betaM >= 0 && betaM <= pi/2)
+    error('trim_residual_jacobian:InvalidNacelleAngle', ...
+        'betaM must be a finite real scalar in [0, pi/2] rad.');
+end
+if ~(isnumeric(gamma) && isreal(gamma) && isscalar(gamma) && isfinite(gamma))
+    error('trim_residual_jacobian:InvalidGamma', ...
+        'gamma must be a finite real scalar in rad.');
+end
+if ~(isnumeric(z) && isreal(z) && isvector(z) && numel(z) == 3 && ...
+        all(isfinite(z(:))))
+    error('trim_residual_jacobian:InvalidTrimVariables', ...
+        'z must be a finite real three-vector in rad.');
+end
+z = z(:);
+if ~(isnumeric(h) && isreal(h) && isscalar(h) && isfinite(h) && h > 0)
+    error('opts.jacobianStepRad must be a finite positive real scalar in rad.');
 end
 
 J = zeros(3, 3);

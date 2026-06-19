@@ -22,6 +22,22 @@ if ~isfield(opts, 'gamma')
     opts.gamma = 0;
 end
 
+% Validate physical inputs before any speed-dependent default or solver path.
+if ~(isnumeric(V) && isreal(V) && isscalar(V) && isfinite(V) && V >= 0)
+    error('trim_symmetric:InvalidAirspeed', ...
+        'V must be a finite real scalar with V >= 0 m/s.');
+end
+if ~(isnumeric(betaM) && isreal(betaM) && isscalar(betaM) && ...
+        isfinite(betaM) && betaM >= 0 && betaM <= pi/2)
+    error('trim_symmetric:InvalidNacelleAngle', ...
+        'betaM must be a finite real scalar in [0, pi/2] rad.');
+end
+if ~(isnumeric(opts.gamma) && isreal(opts.gamma) && ...
+        isscalar(opts.gamma) && isfinite(opts.gamma))
+    error('trim_symmetric:InvalidGamma', ...
+        'opts.gamma must be a finite real scalar in rad.');
+end
+
 if ~isfield(opts, 'initialDeg')
     if V < 1
         opts.initialDeg = [0, 18, 0];
@@ -32,9 +48,6 @@ if ~isfield(opts, 'initialDeg')
     end
 end
 
-if numel(opts.initialDeg) < 3
-    error('opts.initialDeg must contain [theta, collective, cyclicLong].');
-end
 if ~isfield(opts, 'thetaLimitDeg')
     opts.thetaLimitDeg = 35;
 end
@@ -44,6 +57,24 @@ end
 if ~isfield(opts, 'alwaysMultiStart')
     opts.alwaysMultiStart = false;
 end
+
+if ~(isnumeric(opts.initialDeg) && isreal(opts.initialDeg) && ...
+        isvector(opts.initialDeg) && numel(opts.initialDeg) >= 3 && ...
+        all(isfinite(opts.initialDeg(:))))
+    error('trim_symmetric:InvalidInitialGuess', ...
+        ['opts.initialDeg must be a finite real vector containing at least ' ...
+        '[theta, collective, cyclicLong].']);
+end
+if ~(isnumeric(opts.thetaLimitDeg) && isreal(opts.thetaLimitDeg) && ...
+        isscalar(opts.thetaLimitDeg) && isfinite(opts.thetaLimitDeg) && ...
+        opts.thetaLimitDeg > 0)
+    error('trim_symmetric:InvalidThetaLimit', ...
+        'opts.thetaLimitDeg must be a finite positive real scalar in deg.');
+end
+opts.useMultiStart = validate_logical_option(opts.useMultiStart, ...
+    'trim_symmetric:InvalidUseMultiStart', 'opts.useMultiStart');
+opts.alwaysMultiStart = validate_logical_option(opts.alwaysMultiStart, ...
+    'trim_symmetric:InvalidAlwaysMultiStart', 'opts.alwaysMultiStart');
 
 d2r = pi/180;
 z0 = opts.initialDeg(1:3).'*d2r;
@@ -64,18 +95,31 @@ invalidEvalCount = 0;
 invalidEvalIdentifiers = {};
 [zOpt, fval, exitflag, output, candidates] = solve_multistart(z0);
 
-[xTrim, uTrim, residual, penalty, xdotFull] = build_point(zOpt);
+[xTrim, uTrim, residual, penalty, xdotFull, eomOut, penaltyBreakdown] = ...
+    build_point(zOpt);
 limitReport = make_limit_report(zOpt, uTrim);
+residualScale = [P.env.g; P.env.g; 1.0];
+scaledResidual = residual./residualScale;
 
 report.residual = residual;
 report.residualNorm = norm(residual);
 report.residualLabels = {'udot'; 'wdot'; 'qdot'};
+report.residualScale = residualScale;
+report.residualScaleUnits = {'m/s^2'; 'm/s^2'; 'rad/s^2'};
+report.scaledResidual = scaledResidual;
+report.objectiveResidualCost = scaledResidual.'*scaledResidual;
 report.fullStateDerivative = xdotFull;
+report.fullResidualNorm = norm(xdotFull);
+report.fullResidualLabels = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
+    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
 report.cost = fval;
 report.penalty = penalty;
+report.penaltyBreakdown = penaltyBreakdown;
+report.objectiveCostReconstructed = report.objectiveResidualCost + penalty;
 report.exitflag = exitflag;
 report.output = output;
 report.candidates = candidates;
+report.candidateAcceptance = [candidates.acceptable].';
 report.solverConverged = exitflag > 0;
 report.finiteFullStateDerivative = is_real_finite(xdotFull);
 report.limitReport = limitReport;
@@ -88,6 +132,9 @@ report.converged = report.solverConverged && ...
 report.betaM = betaM;
 report.V = V;
 report.gamma = opts.gamma;
+report.requestedInitialDeg = opts.initialDeg(1:3);
+report.commandedControls = uTrim;
+report.appliedControls = eomOut.components.appliedControls;
 report.trimVariables = struct( ...
     'theta', zOpt(1), ...
     'collective', zOpt(2), ...
@@ -142,7 +189,8 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
         J = Rs.'*Rs + thisPenalty;
     end
 
-    function [xCandidate, uCandidate, R, thisPenalty, xdot] = build_point(z)
+    function [xCandidate, uCandidate, R, thisPenalty, xdot, thisEomOut, ...
+            thisPenaltyBreakdown] = build_point(z)
         theta = z(1);
         collective = z(2);
         cyclicLong = z(3);
@@ -160,16 +208,17 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
         xCandidate = [u; 0; w; 0; 0; 0; 0; theta; 0];
         uCandidate = [collective; 0; cyclicLong; 0; 0; 0; 0];
 
-        [xd, ~] = tiltrotor_eom(xCandidate, uCandidate, betaM, P);
+        [xd, thisEomOut] = tiltrotor_eom(xCandidate, uCandidate, betaM, P);
         xdot = xd(:);
         R = [xdot(1); xdot(3); xdot(5)];
 
-        thisPenalty = 0;
-        thisPenalty = thisPenalty + bound_penalty(collective, ...
+        thisPenaltyBreakdown.collective = bound_penalty(collective, ...
             P.control.collectiveLim);
-        thisPenalty = thisPenalty + bound_penalty(cyclicLong, ...
+        thisPenaltyBreakdown.cyclicLong = bound_penalty(cyclicLong, ...
             P.control.cyclicLim);
-        thisPenalty = thisPenalty + 10*bound_penalty(theta, thetaLim);
+        thisPenaltyBreakdown.theta = 10*bound_penalty(theta, thetaLim);
+        thisPenalty = thisPenaltyBreakdown.collective + ...
+            thisPenaltyBreakdown.cyclicLong + thisPenaltyBreakdown.theta;
     end
 
     function value = bound_penalty(xValue, limits)
@@ -187,7 +236,10 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
             'solutionDeg', zeros(1,3), ...
             'cost', NaN, ...
             'residualNorm', NaN, ...
-            'exitflag', NaN), nStart, 1);
+            'exitflag', NaN, ...
+            'acceptable', false, ...
+            'atLimit', false, ...
+            'withinLimits', false), nStart, 1);
 
         bestCost = Inf;
         bestResidualNorm = Inf;
@@ -240,6 +292,9 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
                 is_real_finite(xd) && ...
                 ~candidateLimits.anyAtLimit && ...
                 ~candidateLimits.anyViolation;
+            records(iStart).acceptable = acceptable;
+            records(iStart).atLimit = candidateLimits.anyAtLimit;
+            records(iStart).withinLimits = ~candidateLimits.anyViolation;
             if acceptable && ~opts.alwaysMultiStart
                 break;
             end
@@ -315,5 +370,18 @@ report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
         if numel(scale) ~= 3 || ~is_real_finite(scale) || any(scale <= 0)
             error('P.trim.variableScale must be a finite positive 3-vector in rad.');
         end
+    end
+
+    function value = validate_logical_option(value, errorId, optionName)
+        if islogical(value) && isscalar(value)
+            return;
+        end
+        if isnumeric(value) && isreal(value) && isscalar(value) && ...
+                isfinite(value) && (value == 0 || value == 1)
+            value = logical(value);
+            return;
+        end
+        error(errorId, ...
+            '%s must be a logical scalar or numeric scalar 0/1.', optionName);
     end
 end
