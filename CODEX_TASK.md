@@ -1,107 +1,102 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / HOLD
+STATUS: ACTIVE
 
-Branch: `audit/mass-inertia-cg-geometry`
+Branch: `audit/aero-components`
 
 Base branch: `main`
 
-Current phase: mass, inertia, CG-shift, and component-geometry audit.
-
-## Completed scope
-
-- mass/inertia/CG/geometry audit completed;
-- `check_mass_inertia_geometry`: 12/12 PASS;
-- `check_physical_sanity`: 7/7 PASS;
-- `run_all_checks`: 12/12 PASS;
-- numeric parameters unchanged;
-- `mNac` interpreted as combined left/right moving mass;
-- `RH` dual-use recorded as MEDIUM conceptual parameter coupling;
-- no CRITICAL/HIGH/MEDIUM production-code bug found;
-- Draft PR #3 awaits final review and user authorization;
-- do not merge PR #3;
-- do not begin aerodynamic-component or trim-envelope work.
+Current phase: wing, fuselage, horizontal-tail, vertical-tail, and aerodynamic force-transform audit.
 
 ## Goal
 
-Verify that the current conceptual mass-property and geometry chain is internally correct, dimensionally consistent, physically plausible at broad scale, continuous across nacelle tilt, and used consistently by every component model.
+Verify that the non-rotor aerodynamic component chain is internally correct in coordinate transforms, force and moment signs, local-flow construction, control-effectiveness signs, damping behavior, slipstream coupling, branch continuity, symmetry, units, and diagnostics.
 
-Exact XV-15 identification is outside this phase. Preserve all production parameter values during the first pass. Do not tune parameters to make checks pass.
+This is an internal-consistency and broad-physics audit for the current conceptual model. Exact XV-15 identification remains outside this phase. Preserve all production parameter values during the first pass and do not tune coefficients to make tests pass.
 
 ## Read first
 
 - `AGENTS.md`
 - `CODEX_TASK.md`
 - `params_nominal.m`
-- `model/mass_properties.m`
-- `model/rotor_model_bemt.m`
-- `model/total_forces_moments.m`
+- `model/aero_force_body.m`
 - `model/wing_model.m`
 - `model/fuselage_model.m`
 - `model/horizontal_tail_model.m`
 - `model/vertical_tail_model.m`
-- `model/tiltrotor_eom.m`
-- `tests/check_physical_sanity.m`
-- `tests/check_rotor_force_moment_chain.m`
+- `model/total_forces_moments.m`
+- `model/mass_properties.m`
+- `model/rotor_model_bemt.m`
+- `tests/check_wing_normal_flow_blend.m`
+- `tests/check_control_architecture.m`
+- `tests/check_mass_inertia_geometry.m`
 - `tests/run_all_checks.m`
+- `docs/CONTROL_CONVENTIONS.md`
 - `docs/PHYSICS_AND_CODE_AUDIT.md`
-- `docs/ROTOR_FORCE_MOMENT_AUDIT.md`
+- `docs/MASS_INERTIA_GEOMETRY_AUDIT.md`
 
-Search all uses of:
+Search all callers and uses of:
 
 ```text
-P.mass
-cgShift
-mass_properties
-pivotX
-pivotY
-pivotZ
-xAC
-yAC
-zAC
-rAC
-RH
-I0
-KI
+aero_force_body
+wing_model
+fuselage_model
+horizontal_tail_model
+vertical_tail_model
+wakeFactor
+normalFlowRatio
+normalFlowBlendHalfWidth
+downwashAlpha
+CLaileron
+CLelevator
+CYrudder
 ```
 
 ## Audit questions
 
-### Mass and CG semantics
+### Aerodynamic force transform
 
-- Confirm the meaning of `P.mass.m`, `P.mass.mNac`, and `P.mass.RH`.
-- Determine whether `mNac` is interpreted consistently as total moving nacelle/rotor mass or per-side mass.
-- Verify the endpoint and sign of:
+- Verify the wind-axis basis used by `aero_force_body` is unit length, mutually orthogonal, right-handed, and consistent with body axes x-forward, y-right, z-down.
+- Verify canonical cases at zero angle, positive angle of attack, positive sideslip, pure drag, pure side force, and pure lift.
+- Confirm positive drag opposes the local velocity representation used by each component.
+- Confirm lift and side-force directions are perpendicular to the wind-axis velocity direction.
+- Confirm the transform is deterministic and finite near small velocity and moderate angles.
 
-```matlab
-dx = mNac*RH*sin(betaM)/m
-dz = mNac*RH*(1-cos(betaM))/m
-```
+### Wing model
 
-- Check `betaM = 0`, `pi/4`, and `pi/2`, including zero shift at helicopter mode and finite forward/down shift at airplane mode under body axes x-forward, y-right, z-down.
-- Check continuity and finite derivatives across the supported tilt range.
-- Confirm every component position is referenced to the same current CG and that `cgShift` is subtracted exactly once.
+- Verify `SfreeHalf + SslipHalf = S/2`, nonnegative areas, and left/right region symmetry.
+- Verify local velocity uses `Vbody + cross(omega,rAC)` with current-CG-relative arms.
+- Verify the meaning of the velocity variable in slipstream and whether `Vlocal += wakeVelocity*rotor.eT` has the correct sign under the model’s relative-air convention. Do not assume the answer; reproduce canonical hover and forward-flight cases and inspect force direction.
+- Verify wake velocity is applied only to slipstream regions and remains finite and nonnegative.
+- Verify the near-normal and lift-line branch outputs, smootherstep weight, first derivative continuity, and region diagnostics.
+- Verify aileron antisymmetry, rolling-moment sign, and left/right load exchange under sign reversal.
+- Verify lift saturation and induced-drag formulas remain finite and broadly monotonic over a small interior range.
+- Classify `muFactor`, `orientationFactor`, `SslipMaxHalf`, `wakeFactor`, `normalFlowRatio`, and blend width as model assumptions unless already sourced in repository documents.
 
-### Inertia model
+### Fuselage model
 
-- Verify `I0`, `KI`, and `I(betaM) = I0 - betaM*KI` units and code semantics.
-- Confirm symmetry and positive definiteness at representative tilt angles.
-- Compute principal moments and radii of gyration over the three representative tilt angles.
-- Identify the linear-in-angle inertia law as an assumed low-order model unless a source is already documented.
-- Check that no code treats `KI` as per-degree.
-- Inspect the omission of tilt-dependent cross-inertia changes and classify it as a model limitation when appropriate; do not redesign the inertia law in this phase.
+- Verify drag coefficient is nonnegative and even in alpha/beta contributions.
+- Verify `CLalpha`, `CYbeta`, and static moment derivative signs under the documented convention.
+- Verify positive p, q, and r produce damping contributions from `Clp`, `Cmq`, and `Cnr` in the expected opposing directions.
+- Verify force/moment decomposition exactly matches `cross(rAC,Fbody) + Maero`.
+- Verify zero/small-speed behavior and finite normalized-rate calculations.
 
-### Geometry consistency
+### Horizontal tail
 
-- Check left/right mirror symmetry of rotor hubs and twin vertical tails.
-- Check rotor-center separation, disk overlap clearance, rotor radius, wing semispan, and pivot location relationships.
-- Check that tail aerodynamic centers are aft of the reference CG under the body-axis convention.
-- Check broad ordering and scale of wing, fuselage, horizontal-tail, and vertical-tail reference locations.
-- Confirm each component's moment arm uses its current-CG-relative position exactly once.
+- Verify local alpha, CG alpha, downwash, incidence, elevator contribution, lift saturation, drag, and pitching-moment decomposition.
+- Inspect `alphaCG = atan2(w,max(abs(u),...))`; record reverse-flow limitations and confirm it does not create a covered-case sign inconsistency.
+- Verify elevator sign and resulting tail-force/pitch-moment response using the repository’s control convention.
+- Verify downwash reduces effective angle of attack for a positive forward-flight alpha under the implemented sign convention.
 
-### Parameter provenance
+### Vertical tails
 
-Create a table for the mass and geometry parameters classifying each as:
+- Verify twin-fin left/right mirror symmetry and summation.
+- Verify sideslip and rudder responses, drag increase, side-force direction, and resulting yaw/roll moments.
+- Verify rudder sign reversal produces the expected odd response and symmetric fins do not introduce unintended even lateral loads at zero sideslip/rudder.
+
+### Parameter provenance and applicability
+
+Create a table classifying aerodynamic geometry, coefficients, interaction factors, saturation limits, and numerical thresholds as:
 
 ```text
 DERIVED
@@ -111,92 +106,97 @@ REFERENCE_PENDING
 NUMERICAL
 ```
 
-Do not invent a source. Existing comments and repository documents are the only accepted provenance in this phase.
+Do not invent sources. Repository comments and existing documents are the only accepted provenance in this phase.
 
 ## Allowed changes
 
 Allowed without further approval:
 
-- create `docs/MASS_INERTIA_GEOMETRY_AUDIT.md`;
-- create `tests/check_mass_inertia_geometry.m`;
-- add diagnostics to `mass_properties.m` only when they expose already-computed quantities and do not alter `cgShift`, `I`, or `mass`;
-- add diagnostics to component outputs only when they expose already-used current-CG-relative position vectors without changing forces or moments;
+- create `docs/AERODYNAMIC_COMPONENTS_AUDIT.md`;
+- create `tests/check_aerodynamic_components.m`;
+- add diagnostic fields that expose already-computed values and do not alter forces, moments, controls, parameters, or branch logic;
 - update `tests/run_all_checks.m` to include the new lightweight check;
-- clarify comments or parameter semantics without changing numeric values;
+- clarify comments and parameter semantics without changing numeric values;
 - update this task file.
 
-Potential diagnostic fields include:
+Potential diagnostics include:
 
 ```text
-principalMoments
-radiusOfGyration
-betaM
-inertiaSymmetryError
-minInertiaEigenvalue
+qbar
+Maero
+Marm
+windBasisOrthogonalityError
+forcePowerDot
+SfreeHalf
+SslipHalf
 ```
+
+Do not add diagnostics that require a second component or rotor solve.
 
 Forbidden:
 
 - changing any numeric value in `params_nominal.m`;
-- replacing the linear inertia law;
-- adding new moving masses or a detailed mass build-up;
-- changing component force or moment equations;
-- changing coordinates or sign conventions;
-- broad tilt sweeps, speed sweeps, Monte Carlo, optimization, or multi-start runs;
+- tuning aerodynamic derivatives;
+- replacing the wing branch model;
+- changing slipstream, downwash, force-transform, force, or moment equations before a focused failing case is documented and reviewed;
+- adding lookup tables, dynamic stall, nonuniform wake, ground effect, or interference models;
+- changing coordinate or control conventions;
+- broad speed/angle sweeps, Monte Carlo, optimization, multi-start, or full trim-envelope work;
 - claiming XV-15 fidelity.
 
-If a clear production-code bug is found, document a focused failing case and stop before changing mass, inertia, CG, geometry, force, or moment behavior.
+If a possible force/sign/interaction production bug is found, document the exact canonical failing case and stop before changing the equation. Purely diagnostic changes may continue.
 
 ## Required lightweight checks
 
-Create `check_mass_inertia_geometry` with named PASS/FAIL cases. Keep the first run small and deterministic.
+Create `check_aerodynamic_components` with named PASS/FAIL cases. Keep the initial run deterministic and below roughly 30 total component/model evaluations.
 
 At minimum cover:
 
-1. mass is positive and invariant with tilt;
-2. CG shift endpoint identities at `0`, `pi/4`, and `pi/2`;
-3. CG shift continuity and finite central-difference derivatives at one interior angle;
-4. inertia symmetry and positive definiteness at three tilt angles;
-5. principal moments and radii of gyration finite and broadly plausible;
-6. `KI` is interpreted per radian and the implemented endpoint change matches `betaM*KI`;
-7. left/right rotor-hub mirror geometry;
-8. rotor disk non-overlap and positive centerline clearance;
-9. rotor hubs, wing semispan, and nacelle pivot broad geometry relation;
-10. tail locations are aft of the current CG at representative tilt angles;
-11. component current-CG-relative position identity for every component that exposes a position diagnostic;
-12. repeated calls are deterministic and outputs are finite real values.
+1. aerodynamic wind basis orthonormality and canonical force directions;
+2. positive drag opposes the component local-velocity representation;
+3. wing area partition bounds and exact half-area identity;
+4. wing left/right symmetry at zero lateral input;
+5. aileron sign-reversal mirror relation and rolling response;
+6. near-normal blend continuity and diagnostic consistency;
+7. slipstream applied only to slip regions and canonical hover wake/force-direction check;
+8. fuselage force/moment decomposition and nonnegative drag;
+9. fuselage p/q/r damping derivative sign checks;
+10. horizontal-tail downwash and elevator response identities;
+11. twin-vertical-tail symmetry, sideslip response, and rudder sign reversal;
+12. finite real deterministic outputs at one hover-like, one transition, and one airplane-mode representative condition.
 
-Use only `betaM = 0`, `pi/4`, `pi/2`, plus one small central-difference pair around `pi/4`. Avoid a dense tilt scan.
+Use a small set of canonical direct component calls. Reuse cached rotor/total-model results where rotor diagnostics are needed. Do not use dense alpha, beta, speed, or nacelle-angle sweeps.
 
 ## Runtime order
 
-Run:
+Run in this order:
 
 ```text
-new target check -> existing physical sanity check -> run_all_checks once
+new target check -> existing wing blend/control checks -> run_all_checks once
 ```
 
 Suggested target command:
 
 ```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_mass_inertia_geometry; disp(r); assert(r.allPassed);"
+& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_aerodynamic_components; disp(r); assert(r.allPassed);"
 ```
 
-Then run `check_physical_sanity`. Run `run_all_checks` once only after both focused checks pass.
+Then run the existing wing normal-flow blend check and control-architecture check. Run `run_all_checks` once only after the focused checks pass.
 
 Record the MATLAB R2021a shutdown-stage `output stream error` separately from test-body results.
 
 ## Deliverables
 
-- `docs/MASS_INERTIA_GEOMETRY_AUDIT.md`;
+- `docs/AERODYNAMIC_COMPONENTS_AUDIT.md` with findings classified as `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, or `INFO`;
 - focused test results and actual MATLAB output summary;
-- parameter provenance/classification table;
-- explicit interpretation of `mNac` and `RH`;
-- list of assumptions and unsupported claims;
+- exact component/model call count;
+- aerodynamic parameter provenance table;
+- explicit conclusion on slipstream direction, downwash sign, control-effectiveness signs, and rate damping;
+- unsupported operating regimes and model assumptions;
 - exact modified files;
 - explicit statement that numeric parameters changed or did not change;
 - commit SHA and clean working-tree status.
 
-Commit and push to `audit/mass-inertia-cg-geometry`.
+Commit and push to `audit/aero-components`.
 
-Do not merge the PR and do not begin aerodynamic-component or trim-envelope work after completion.
+Do not merge the PR and do not begin trim-equation, continuation, or flight-envelope work after completion.
