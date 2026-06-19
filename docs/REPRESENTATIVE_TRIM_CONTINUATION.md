@@ -8,9 +8,22 @@ This is a representative sampled screen only. It cannot exclude local branch cha
 
 Result: **FAIL**. All five individual trim points converged with acceptable residuals, finite real outputs, one single-start attempt per point, no rescue initial, and no trim-variable or applied-control limit contact/violation. The configured `0.25 deg` significant-sign-flip screen detected `cyclicLong` sign reversals over `5 -> 10 m/s` and `15 -> 20 m/s`.
 
-The 7.5 m/s two-seed diagnosis subsequently showed that the 5--10 m/s interval's midpoint converges to the same numerical root from both endpoint seeds. The common midpoint root has negative `cyclicLong`. This strongly reduces evidence for midpoint seed dependence in that interval, while leaving the exact zero-crossing location and global branch uniqueness unresolved.
+The two focused midpoint diagnoses subsequently showed that both endpoint
+seeds converge to the same numerical root at each tested midpoint:
 
-The 15--20 m/s interval remains unclassified and is the next authorized focused diagnosis. Draft PR #6 remains on hold.
+- at 7.5 m/s, the root difference norm was `8.998006e-09 deg`, the common
+  `cyclicLong` was negative, and the slipstream wing regions were inside the
+  normal-flow blend interval;
+- at 17.5 m/s, the root difference norm was `8.626265e-09 deg`, the common
+  `cyclicLong` was negative, and all wing regions were outside the blend
+  interval.
+
+Neither midpoint showed a different numerical root caused by the tested
+endpoint seeds. The coarse five-point screen nevertheless detected two
+`cyclicLong` zero crossings whose precise locations have not been determined.
+Continuity, monotonicity, and global uniqueness over the intervals remain
+unproved. The current evidence does not support conclusions of bifurcation,
+hysteresis, or physical discontinuity.
 
 No threshold, parameter, solver setting, initial seed, trim variable, objective, penalty, tolerance, or limit was changed to alter the representative result. No reverse sweep, multistart, rescue initial, residual Jacobian, or full linearization was used.
 
@@ -99,6 +112,35 @@ Focused diagnosis accounting:
 
 Full evidence is stored in `docs/TRIM_MIDPOINT_7P5_DIAGNOSIS.md`.
 
+## 17.5 m/s focused diagnosis
+
+Two independent single-start trims at 17.5 m/s used the recorded 15 and
+20 m/s endpoint solutions as seeds.
+
+```text
+low-seed result  = [3.774686179733, 15.368703848185, -0.416693326063] deg
+high-seed result = [3.774686185574, 15.368703844841, -0.416693331459] deg
+difference norm  = 8.626264725850e-09 deg
+same-root tolerance = 1.0e-4 deg
+```
+
+Both seeds converged to the same numerical root. The common root has negative
+`cyclicLong`. All free-stream and slipstream wing regions were outside and not
+near the normal-flow blend interval; the slipstream ratio was `0.664290521`
+with blend weight `1.0`.
+
+Focused diagnosis accounting:
+
+- high-level trim solves: 2;
+- objective evaluations: 479;
+- direct post-trim EOM calls: 2;
+- residual Jacobians: 0;
+- full linearizations: 0;
+- internal elapsed time: 20.9736 s;
+- command wall time: 38 s.
+
+Full evidence is stored in `docs/TRIM_MIDPOINT_17P5_DIAGNOSIS.md`.
+
 ## Optional diagnostic implementation
 
 `trim_sweep_helicopter` now accepts validated options:
@@ -110,9 +152,16 @@ computeLinearization
 
 Both default to `true`, preserving existing caller behavior. When disabled, the corresponding routines are not called. Point reports distinguish `NOT_REQUESTED`, `COMPUTED`, and `FAILED`, and `sweepReport.allPassed` requires a diagnostic only when it was requested.
 
-## Next diagnosis boundary
+## Final classification
 
-The next authorized calculation is limited to the 15--20 m/s event. At 17.5 m/s, run exactly two single-start trims using the highest-precision persisted 15 and 20 m/s solutions as independent seeds. Do not add further speed points, multistart, rescue, Jacobians, full linearizations, or zero-crossing searches.
+- Original five-point screen: **FAIL — preserved**.
+- Production-code defect: **not found**.
+- Midpoint seed dependence: **not observed at either tested midpoint**.
+- Remaining issue: **LOW / INFO** — the zero-crossing locations remain
+  unresolved, and coarse sampling does not prove full-interval continuity.
+
+No further zero-crossing search is part of this task. Draft PR #6 remains on
+hold for final human review, and Codex must not merge it.
 
 ## Change status
 
@@ -122,5 +171,8 @@ The next authorized calculation is limited to the 15--20 m/s event. At 17.5 m/s,
 - existing default sweep diagnostic behavior changed: no;
 - representative-screen result: FAIL;
 - 5--10 m/s midpoint seed dependence: not observed at 7.5 m/s;
-- 15--20 m/s midpoint classification: pending;
+- 15--20 m/s midpoint seed dependence: not observed at 17.5 m/s;
+- production-code defect found: no;
+- remaining unresolved item: LOW / INFO zero-crossing location and coarse
+  full-interval coverage;
 - Draft PR #6 merge status: HOLD.
