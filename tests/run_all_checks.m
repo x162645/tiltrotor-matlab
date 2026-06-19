@@ -19,6 +19,7 @@ run_test('parameters and inertia', @test_parameters);
 run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
 run_test('collective thrust monotonicity', @test_collective_monotonicity);
 run_test('left/right symmetry', @test_symmetry);
+run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('control architecture closure', @test_control_architecture);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
@@ -111,6 +112,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         controlReport = check_control_architecture();
         assert(controlReport.allPassed, ...
             'Control architecture closure has failed items.');
+    end
+
+    function test_rotor_force_moment_chain()
+        rotorChainReport = check_rotor_force_moment_chain();
+        assert(rotorChainReport.allPassed, ...
+            'Rotor force/moment chain audit has failed items.');
     end
 
     function test_flapping_model()
