@@ -1,193 +1,188 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / HOLD
+STATUS: ACTIVE
 
-Branch: `audit/rotor-force-moment-chain`
+Branch: `audit/mass-inertia-cg-geometry`
 
 Base branch: `main`
 
-Current phase: rotor model and force/moment call-chain audit.
-
-## Completed scope
-
-- rotor force/moment call-chain audit completed;
-- `check_rotor_force_moment_chain`: 12/12 PASS;
-- `check_flapping_model`: 14/14 PASS;
-- `run_all_checks`: 11/11 PASS;
-- production parameters unchanged;
-- no CRITICAL/HIGH/MEDIUM production-code issue found;
-- reverse-flow and windmill/reverse-thrust remain INFO applicability boundaries;
-- Draft PR #2 awaits ChatGPT final review and user authorization;
-- do not merge PR #2;
-- do not begin the next phase.
+Current phase: mass, inertia, CG-shift, and component-geometry audit.
 
 ## Goal
 
-Verify that the current conceptual rotor and load-assembly implementation is internally correct in coordinates, signs, units, moment references, control mapping, convergence handling, and diagnostics. Exact XV-15 identification is outside this phase.
+Verify that the current conceptual mass-property and geometry chain is internally correct, dimensionally consistent, physically plausible at broad scale, continuous across nacelle tilt, and used consistently by every component model.
 
-This phase must preserve all production parameters and must not redesign the rotor model. Clear program bugs may be fixed only after a focused reproduction and with a minimal patch.
+Exact XV-15 identification is outside this phase. Preserve all production parameter values during the first pass. Do not tune parameters to make checks pass.
 
-## Primary files
-
-Read first:
+## Read first
 
 - `AGENTS.md`
 - `CODEX_TASK.md`
 - `params_nominal.m`
+- `model/mass_properties.m`
 - `model/rotor_model_bemt.m`
 - `model/total_forces_moments.m`
-- `model/mass_properties.m`
+- `model/wing_model.m`
+- `model/fuselage_model.m`
+- `model/horizontal_tail_model.m`
+- `model/vertical_tail_model.m`
 - `model/tiltrotor_eom.m`
-- `tests/check_control_architecture.m`
-- `tests/check_flapping_model.m`
+- `tests/check_physical_sanity.m`
+- `tests/check_rotor_force_moment_chain.m`
 - `tests/run_all_checks.m`
-- `docs/CONTROL_CONVENTIONS.md`
 - `docs/PHYSICS_AND_CODE_AUDIT.md`
+- `docs/ROTOR_FORCE_MOMENT_AUDIT.md`
 
-Search every caller of:
+Search all uses of:
 
 ```text
-rotor_model_bemt
-total_forces_moments
-out.rotorLeft
-out.rotorRight
-appliedRotorControls
+P.mass
+cgShift
+mass_properties
+pivotX
+pivotY
+pivotZ
+xAC
+yAC
+zAC
+rAC
+RH
+I0
+KI
 ```
 
 ## Audit questions
 
-### Rotor basis and geometry
+### Mass and CG semantics
 
-- Confirm `eT`, `eD`, and `eY` definitions at `betaM = 0`, `pi/4`, and `pi/2`.
-- Verify unit length, mutual orthogonality, sign conventions, and the documented thrust direction.
-- Verify `rHub0`, `rHub`, `cgShift`, and `Vhub = Vbody + cross(omegaBody,rHub)` use one reference point and one body-axis convention.
-- Check that left/right hub positions are mirror images about the x-z plane.
-
-### Blade-element kinematics and loads
-
-- Check azimuth and rotation-direction definitions.
-- Check `UT`, `UP`, `Vrad`, `betaDot`, `betaDDot`, cyclic-pitch phase, twist, inflow angle, angle of attack, lift, drag, thrust, in-plane force, and torque signs.
-- Confirm dimensions and MATLAB implicit-expansion shapes for every blade-element array.
-- Inspect the use of `abs(UT)` in the inflow-angle denominator. Treat reverse-flow behavior as an applicability issue unless a current covered case actually reaches negative `UT`.
-- Inspect the clipping of negative thrust in the induced-velocity update. Record the unsupported windmill/reverse-thrust regime; do not redesign it in this phase.
-
-### Flapping and induced-velocity solve
-
-- Verify residual scaling, Jacobian construction, line search, convergence criteria, and error paths.
-- Confirm that a failed flap or coupled solve cannot silently return apparently valid loads.
-- Check first-harmonic hover symmetry and left/right phase reversal.
-
-### Forces and moments
-
-- Verify:
+- Confirm the meaning of `P.mass.m`, `P.mass.mNac`, and `P.mass.RH`.
+- Determine whether `mNac` is interpreted consistently as total moving nacelle/rotor mass or per-side mass.
+- Verify the endpoint and sign of:
 
 ```matlab
-Fbody = loads.T*nDisk + loads.Hlong*eD + loads.Hlat*eY
-Mbody = cross(rHub,Fbody) + Mreaction + Mgyro
+dx = mNac*RH*sin(betaM)/m
+dz = mNac*RH*(1-cos(betaM))/m
 ```
 
-- Confirm reaction-torque and gyroscopic-moment signs.
-- Confirm `total_forces_moments` sums each component exactly once and does not double-count arm moments.
-- Confirm gravity is added only in `tiltrotor_eom.m`.
-- Confirm output diagnostics correspond to the actual values used in the equations.
+- Check `betaM = 0`, `pi/4`, and `pi/2`, including zero shift at helicopter mode and finite forward/down shift at airplane mode under body axes x-forward, y-right, z-down.
+- Check continuity and finite derivatives across the supported tilt range.
+- Confirm every component position is referenced to the same current CG and that `cgShift` is subtracted exactly once.
+
+### Inertia model
+
+- Verify `I0`, `KI`, and `I(betaM) = I0 - betaM*KI` units and code semantics.
+- Confirm symmetry and positive definiteness at representative tilt angles.
+- Compute principal moments and radii of gyration over the three representative tilt angles.
+- Identify the linear-in-angle inertia law as an assumed low-order model unless a source is already documented.
+- Check that no code treats `KI` as per-degree.
+- Inspect the omission of tilt-dependent cross-inertia changes and classify it as a model limitation when appropriate; do not redesign the inertia law in this phase.
+
+### Geometry consistency
+
+- Check left/right mirror symmetry of rotor hubs and twin vertical tails.
+- Check rotor-center separation, disk overlap clearance, rotor radius, wing semispan, and pivot location relationships.
+- Check that tail aerodynamic centers are aft of the reference CG under the body-axis convention.
+- Check broad ordering and scale of wing, fuselage, horizontal-tail, and vertical-tail reference locations.
+- Confirm each component's moment arm uses its current-CG-relative position exactly once.
+
+### Parameter provenance
+
+Create a table for the mass and geometry parameters classifying each as:
+
+```text
+DERIVED
+ASSUMED_CONCEPT
+DOCUMENTED_SOURCE
+REFERENCE_PENDING
+NUMERICAL
+```
+
+Do not invent a source. Existing comments and repository documents are the only accepted provenance in this phase.
 
 ## Allowed changes
 
-Production behavior should remain unchanged during the first pass.
-
 Allowed without further approval:
 
-- create `docs/ROTOR_FORCE_MOMENT_AUDIT.md`;
-- create `tests/check_rotor_force_moment_chain.m`;
-- add diagnostic output fields to `rotor_model_bemt.m` only when they expose already-computed quantities and do not change forces, moments, iteration, or parameters;
-- update `tests/run_all_checks.m` only to include the new lightweight check;
-- update `CODEX_TASK.md` and the audit document.
+- create `docs/MASS_INERTIA_GEOMETRY_AUDIT.md`;
+- create `tests/check_mass_inertia_geometry.m`;
+- add diagnostics to `mass_properties.m` only when they expose already-computed quantities and do not alter `cgShift`, `I`, or `mass`;
+- add diagnostics to component outputs only when they expose already-used current-CG-relative position vectors without changing forces or moments;
+- update `tests/run_all_checks.m` to include the new lightweight check;
+- clarify comments or parameter semantics without changing numeric values;
+- update this task file.
 
-Examples of acceptable diagnostic fields:
+Potential diagnostic fields include:
 
 ```text
-Marm
-Mreaction
-Mgyro
-Hrot
-basisOrthogonalityError
-minUT
-maxUT
-maxAbsAlphaBlade
+principalMoments
+radiusOfGyration
+betaM
+inertiaSymmetryError
+minInertiaEigenvalue
 ```
 
-Do not add diagnostics that require a second BEMT solve.
+Forbidden:
 
-Forbidden in this phase:
+- changing any numeric value in `params_nominal.m`;
+- replacing the linear inertia law;
+- adding new moving masses or a detailed mass build-up;
+- changing component force or moment equations;
+- changing coordinates or sign conventions;
+- broad tilt sweeps, speed sweeps, Monte Carlo, optimization, or multi-start runs;
+- claiming XV-15 fidelity.
 
-- changing `params_nominal.m` values;
-- replacing the flapping formulation;
-- adding lateral cyclic;
-- adding non-uniform inflow;
-- adding reverse-flow or windmill-brake physics;
-- changing coordinate conventions;
-- changing trim or linearization algorithms;
-- broad speed sweeps, Monte Carlo, large multi-start studies, or point-by-point Jacobian scans.
+If a clear production-code bug is found, document a focused failing case and stop before changing mass, inertia, CG, geometry, force, or moment behavior.
 
-If a clear production-code bug is found, document the exact failing case first. Stop and report before changing a force, moment, sign, or solver equation unless the fix is purely diagnostic.
+## Required lightweight checks
 
-## Required focused tests
-
-Create a lightweight `check_rotor_force_moment_chain` report with named PASS/FAIL cases. Use only a small number of representative calls.
+Create `check_mass_inertia_geometry` with named PASS/FAIL cases. Keep the first run small and deterministic.
 
 At minimum cover:
 
-1. rotor basis unit length and orthogonality at three nacelle angles;
-2. left/right hub mirror geometry;
-3. hub local-velocity identity;
-4. exact rotor moment decomposition;
-5. exact total component force/moment summation;
-6. symmetric-hover force and reaction-torque cancellation relations;
-7. differential-collective mirror/sign relations;
-8. common collective produces monotonic thrust and finite torque over three interior commands;
-9. `Jpolar = 0` gives zero gyroscopic moment;
-10. a synthetic nonzero `Jpolar` case matches `-cross(omegaBody,Hrot)` without changing nominal parameters;
-11. finite real outputs and convergence flags at one helicopter, one transition, and one airplane-mode representative condition;
-12. report minimum `UT` for those cases and issue an informational applicability finding if reverse flow is approached or reached.
+1. mass is positive and invariant with tilt;
+2. CG shift endpoint identities at `0`, `pi/4`, and `pi/2`;
+3. CG shift continuity and finite central-difference derivatives at one interior angle;
+4. inertia symmetry and positive definiteness at three tilt angles;
+5. principal moments and radii of gyration finite and broadly plausible;
+6. `KI` is interpreted per radian and the implemented endpoint change matches `betaM*KI`;
+7. left/right rotor-hub mirror geometry;
+8. rotor disk non-overlap and positive centerline clearance;
+9. rotor hubs, wing semispan, and nacelle pivot broad geometry relation;
+10. tail locations are aft of the current CG at representative tilt angles;
+11. component current-CG-relative position identity for every component that exposes a position diagnostic;
+12. repeated calls are deterministic and outputs are finite real values.
 
-Do not encode exact XV-15 values. Use broad internal identities and symmetry relations.
+Use only `betaM = 0`, `pi/4`, `pi/2`, plus one small central-difference pair around `pi/4`. Avoid a dense tilt scan.
 
-## Runtime control
+## Runtime order
 
-Before running, estimate the number of `total_forces_moments` or `rotor_model_bemt` calls. Keep the first run below roughly 30 model evaluations.
-
-Run in this order:
+Run:
 
 ```text
-single target check -> existing focused rotor checks -> full lightweight suite
+new target check -> existing physical sanity check -> run_all_checks once
 ```
 
-Suggested commands:
+Suggested target command:
 
 ```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_rotor_force_moment_chain; disp(r); assert(r.allPassed);"
+& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_mass_inertia_geometry; disp(r); assert(r.allPassed);"
 ```
 
-Then, only after the target check passes:
+Then run `check_physical_sanity`. Run `run_all_checks` once only after both focused checks pass.
 
-```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); run('startup.m'); r = check_flapping_model; disp(r); assert(r.allPassed);"
-```
-
-Finally run `run_all_checks` once if the estimated runtime remains reasonable.
-
-Record any MATLAB R2021a shutdown-stage `output stream error` separately from test-body results.
+Record the MATLAB R2021a shutdown-stage `output stream error` separately from test-body results.
 
 ## Deliverables
 
-- `docs/ROTOR_FORCE_MOMENT_AUDIT.md` with findings classified as `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, or `INFO`;
-- focused test report and actual MATLAB output summary;
-- exact count of representative model calls;
-- list of modified files;
-- explicit statement on parameter changes;
-- any unsupported operating regimes found;
+- `docs/MASS_INERTIA_GEOMETRY_AUDIT.md`;
+- focused test results and actual MATLAB output summary;
+- parameter provenance/classification table;
+- explicit interpretation of `mNac` and `RH`;
+- list of assumptions and unsupported claims;
+- exact modified files;
+- explicit statement that numeric parameters changed or did not change;
 - commit SHA and clean working-tree status.
 
-Commit and push to `audit/rotor-force-moment-chain`.
+Commit and push to `audit/mass-inertia-cg-geometry`.
 
-Do not merge the PR and do not begin trim-envelope work after completion.
+Do not merge the PR and do not begin aerodynamic-component or trim-envelope work after completion.
