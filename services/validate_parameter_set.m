@@ -27,6 +27,7 @@ check_scalar({'linear','stabilityTolerance'}, ...
     'Stability tolerance P.linear.stabilityTolerance', @(v) v >= 0);
 
 [okI, I0] = lookup_value(P, {'mass','I0'});
+inertiaMatrixValid = false;
 if ~okI
     errors{end+1,1} = 'Missing parameter P.mass.I0.';
 elseif ~(isnumeric(I0) && isreal(I0) && isequal(size(I0), [3,3]) && ...
@@ -36,9 +37,10 @@ else
     symmetryError = norm(I0-I0.', 'fro');
     if symmetryError > 1e-10*max(norm(I0,'fro'),1)
         errors{end+1,1} = 'P.mass.I0 must be symmetric.';
-    end
-    if any(eig(0.5*(I0+I0.')) <= 0)
+    elseif any(eig(0.5*(I0+I0.')) <= 0)
         errors{end+1,1} = 'P.mass.I0 must be positive definite.';
+    else
+        inertiaMatrixValid = true;
     end
 end
 
@@ -50,9 +52,27 @@ check_limits({'control','rudderLim'}, 'P.control.rudderLim');
 check_positive_vector({'linear','dx'}, 'P.linear.dx', 9);
 check_positive_vector({'linear','du'}, 'P.linear.du', 7);
 
+if inertiaMatrixValid
+    try
+        mp0 = mass_properties(0,P);
+        mp90 = mass_properties(pi/2,P);
+        if any(~isfinite(mp0.cgShift)) || any(~isfinite(mp90.cgShift)) || ...
+                any(~isfinite(mp0.I(:))) || any(~isfinite(mp90.I(:)))
+            errors{end+1,1} = ...
+                'Mass properties must remain finite at betaM = 0 and 90 deg.';
+        end
+    catch ME
+        errors{end+1,1} = sprintf( ...
+            'Mass/inertia parameters are invalid over betaM = [0, 90] deg: %s', ...
+            ME.message);
+    end
+end
+
 [okMass, totalMass] = lookup_value(P, {'mass','m'});
 [okNac, nacelleMass] = lookup_value(P, {'mass','mNac'});
-if okMass && okNac && nacelleMass >= totalMass
+if okMass && okNac && isnumeric(totalMass) && isnumeric(nacelleMass) && ...
+        isscalar(totalMass) && isscalar(nacelleMass) && ...
+        isfinite(totalMass) && isfinite(nacelleMass) && nacelleMass >= totalMass
     warnings{end+1,1} = ...
         'P.mass.mNac is greater than or equal to total mass; review its meaning.';
 end
