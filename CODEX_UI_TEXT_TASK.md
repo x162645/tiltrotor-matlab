@@ -1,12 +1,23 @@
 # CODEX_UI_TEXT_TASK.md
 
-STATUS: COMPLETE / GUI USER-FACING TEXT CLEANUP / MATLAB R2021A VERIFIED / HOLD
+STATUS: COMPLETE / GUI TEXT AND INTERACTION FINAL PASS / MATLAB R2021A VERIFIED / HOLD
 
 Branch: `feature/gui-v1.1-trim-diagnostics`
 
 Draft PR: #10
 
 Verified starting head before this task: `10fa98274cdb3afdf0690bdc59edba8c06dd5f6f`
+
+Final correction baseline: `7ddcaf6ffcca4e441a3ea06fff8ac86a1d6e0dea`
+
+Final interaction coverage:
+
+- Chinese workbench title and parameter-source display mapping;
+- complete help popup text and close/reuse path;
+- export cancellation and real temporary MAT export/reload/delete path;
+- all primary and trim-result tab switches;
+- default `1420x860` geometry checks and `1180x720` accessibility checks;
+- trim, linearization, response, copied diagnostic, and export diagnostic callbacks.
 
 ## Goal
 

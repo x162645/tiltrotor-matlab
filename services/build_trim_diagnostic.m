@@ -168,12 +168,12 @@ end
 function summary = make_summary(success, reasonCodes)
 if success
     if any(strcmp(reasonCodes, 'INVALID_MODEL_EVALUATIONS'))
-        summary = '配平已接受，但搜索过程中出现过无效模型评估。';
+        summary = '配平通过，但求解过程中出现过无效计算。';
     else
-        summary = '配平已接受，目标残差、限幅和有限性检查通过。';
+        summary = '配平通过，残差、限幅和有限性检查均满足要求。';
     end
 else
-    summary = '配平未通过接受条件，请查看残差、限幅和候选初值诊断。';
+    summary = '配平未通过，请查看残差、限幅和候选初值。';
 end
 end
 
@@ -193,7 +193,7 @@ if any(strcmp(reasonCodes, 'CONTROL_AT_LIMIT')) || ...
     suggestions{end+1,1} = '查看 theta、collective、cyclicLong 限幅和裕度，不要把触限解当作正式配平。';
 end
 if any(strcmp(reasonCodes, 'INVALID_MODEL_EVALUATIONS'))
-    suggestions{end+1,1} = '保留无效评估标识用于定位模型域或内部迭代失败。';
+    suggestions{end+1,1} = '保留无效计算标识，用于定位模型域或内部迭代失败。';
 end
 if any(strcmp(reasonCodes, 'NO_ACCEPTABLE_CANDIDATE'))
     suggestions{end+1,1} = '检查所有候选初值的最终残差、退出标志和限幅状态。';

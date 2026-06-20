@@ -9,11 +9,18 @@ linearResult = [];
 responseResult = [];
 currentDiagnostic = [];
 parameterRows = make_parameter_rows();
+exportSessionSelection = @export_session_selection;
+helpMessage = sprintf([ ...
+    '推荐顺序：\n1. 检查或修改关键参数；\n2. 运行配平；\n' ...
+    '3. 在收敛配平点运行线性化；\n4. 设置小幅操纵输入并计算响应。\n\n' ...
+    '参数修改只对当前软件会话生效。\n' ...
+    '线性响应适用于当前配平点附近的小扰动。\n' ...
+    '错误和诊断信息显示在窗口底部的当前操作诊断面板。']);
 stateNames = {'u','v','w','p','q','r','phi','theta','psi'};
 controlNames = {'collective','diffCollective','cyclicLong', ...
     'diffCyclic','aileron','elevator','rudder'};
 
-fig = uifigure('Name','Tiltrotor Analysis Workbench', ...
+fig = uifigure('Name','倾转旋翼机分析工作台', ...
     'Position',[80 60 1420 860]);
 root = uigridlayout(fig,[3 1]);
 root.RowHeight = {54,'1x',118};
@@ -22,7 +29,7 @@ root.RowSpacing = 8;
 
 header = uigridlayout(root,[1 8]);
 header.Layout.Row = 1;
-header.ColumnWidth = {270,22,'1x',120,120,120,120,150};
+header.ColumnWidth = {240,22,'1x',100,100,100,100,150};
 header.ColumnSpacing = 8;
 
 uilabel(header,'Text','倾转旋翼机分析工作台', ...
@@ -499,11 +506,16 @@ set_status('已载入默认参数，请先检查参数或运行配平。','warni
     function onExportSession(~,~)
         [fileName,pathName] = uiputfile('*.mat','导出分析工况', ...
             'tiltrotor_analysis_case.mat');
+        exportSessionSelection(fileName,pathName);
+    end
+
+    function exported = export_session_selection(fileName,pathName)
+        exported = false;
         if isequal(fileName,0)
             return;
         end
         session = struct();
-        session.appName = 'Tiltrotor Analysis Workbench';
+        session.appName = '倾转旋翼机分析工作台';
         session.parameters = P;
         session.trim = trimResult;
         session.linearization = linearResult;
@@ -515,6 +527,7 @@ set_status('已载入默认参数，请先检查参数或运行配平。','warni
                 'export','success','EXPORT_COMPLETED', ...
                 '工况导出完成。',sprintf('文件：%s',fullfile(pathName,fileName)), ...
                 {'导出文件包含当前内存参数和已有分析结果。'}));
+            exported = true;
         catch ME
             diagnostic = build_exception_diagnostic(ME,'export', ...
                 struct('filePath', fullfile(pathName,fileName)));
@@ -525,13 +538,19 @@ set_status('已载入默认参数，请先检查参数或运行配平。','warni
     end
 
     function onShowHelp(~,~)
-        uialert(fig,sprintf([ ...
-            '推荐顺序：\n1. 检查或修改关键参数；\n2. 运行配平；\n' ...
-            '3. 在收敛配平点运行线性化；\n4. 设置小幅操纵输入并计算响应。\n\n' ...
-            '参数修改只对当前软件会话生效。\n' ...
-            '线性响应适用于当前配平点附近的小扰动。\n' ...
-            '错误和诊断信息显示在窗口底部的当前操作诊断面板。']), ...
-            '使用说明');
+        mainPosition = fig.Position;
+        helpPosition = [mainPosition(1) + (mainPosition(3)-560)/2, ...
+            mainPosition(2) + (mainPosition(4)-360)/2, 560, 360];
+        helpFig = uifigure('Name','使用说明','Position',helpPosition, ...
+            'Resize','off');
+        helpGrid = uigridlayout(helpFig,[2 1]);
+        helpGrid.RowHeight = {'1x',38};
+        helpGrid.Padding = [12 12 12 10];
+        uitextarea(helpGrid,'Editable','off', ...
+            'Value',text_to_lines(helpMessage));
+        closeButton = uibutton(helpGrid,'Text','关闭', ...
+            'ButtonPushedFcn',@(source,event) close(source.Parent.Parent));
+        closeButton.Layout.Row = 2;
     end
 
     function refresh_parameter_table()
@@ -689,14 +708,14 @@ set_status('已载入默认参数，请先检查参数或运行配平。','warni
             '存在越限', bool_text(ov.hasLimitViolation); ...
             '候选接受/总数', sprintf('%d / %d', ...
                 ov.acceptedCandidateCount, ov.candidateCount); ...
-            '无效模型评估', ov.invalidEvaluationCount; ...
+            '无效计算次数', ov.invalidEvaluationCount; ...
             '原因代码', strjoin(diagnostic.reasonCodes(:).', ', ')};
     end
 
     function lines = diagnostic_overview_lines(diagnostic)
         lines = [{diagnostic.summary}; {'建议：'}; diagnostic.suggestions(:)];
         if ~isempty(diagnostic.invalidEvaluationIdentifiers)
-            lines = [lines; {'无效评估标识：'}; ...
+            lines = [lines; {'无效计算标识：'}; ...
                 diagnostic.invalidEvaluationIdentifiers(:)];
         end
     end
@@ -758,7 +777,7 @@ set_status('已载入默认参数，请先检查参数或运行配平。','warni
                     '摘要：%s\n接受状态：%s\n求解器收敛：%s\n' ...
                     '目标残差范数：%.16g\n目标残差容限：%.16g\n' ...
                     '九状态导数范数：%.16g\n候选通过数：%d/%d\n' ...
-                    '无效模型评估：%d\n建议：\n%s'], ...
+                    '无效计算次数：%d\n建议：\n%s'], ...
                     stage_display('trim'), severity_display(diagnostic.severity), ...
                     strjoin(diagnostic.reasonCodes(:).', ', '), ...
                     diagnostic.summary, bool_text(diagnostic.overview.accepted), ...
@@ -968,7 +987,20 @@ for k = 1:numel(rows)
     data{k,3} = rows(k).key;
     data{k,4} = get_parameter_value(P,rows(k).key);
     data{k,5} = rows(k).unit;
-    data{k,6} = rows(k).source;
+    data{k,6} = parameter_source_display(rows(k).source);
+end
+end
+
+function value = parameter_source_display(source)
+switch char(source)
+    case 'ASSUMED_CONCEPT'
+        value = '设定值';
+    case 'REFERENCE_CONSTANT'
+        value = '参考常数';
+    case 'NUMERICAL'
+        value = '数值设置';
+    otherwise
+        value = char(source);
 end
 end
 
