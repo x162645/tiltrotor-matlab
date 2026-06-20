@@ -354,6 +354,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         catch ME
             trimResult = [];
             clear_trim_dependent_results();
+            trimStateTable.Data = {};
+            trimControlTable.Data = {};
+            trimOverviewTable.Data = {};
+            trimOverviewText.Value = {''};
+            trimFullResidualTable.Data = {};
+            trimLimitTable.Data = {};
+            trimCandidateTable.Data = {};
+            trimStatusLabel.Text = '配平失败：输入或模型计算异常';
             diagnostic = build_exception_diagnostic(ME,'trim',config);
             set_current_diagnostic(diagnostic);
             set_status(diagnostic.summary,'error');
@@ -365,8 +373,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         set_busy(true);
         cleanup = onCleanup(@() set_busy(false));
         try
+            linearResult = [];
             responseResult = [];
             runResponseButton.Enable = 'off';
+            aTable.Data = [];
+            bTable.Data = [];
+            eigenTable.Data = {};
+            cla(eigenAxes);
+            linearStatusLabel.Text = '正在运行线性化...';
             responseSummaryTable.Data = {};
             cla(responseInputAxes);
             cla(responseOutputAxes);
@@ -402,6 +416,8 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             aTable.Data = [];
             bTable.Data = [];
             eigenTable.Data = {};
+            cla(eigenAxes);
+            linearStatusLabel.Text = '线性化失败：输入或模型计算异常';
             diagnostic = build_exception_diagnostic(ME,'linearization',struct());
             set_current_diagnostic(diagnostic);
             set_status(diagnostic.summary,'error');

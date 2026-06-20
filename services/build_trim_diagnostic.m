@@ -123,7 +123,7 @@ residualNorm = get_field(report, 'residualNorm', NaN);
 invalidCount = get_field(report, 'objectiveInvalidEvaluationCount', 0);
 candidates = get_field(report, 'candidates', struct([]));
 
-if success && invalidCount == 0
+if success
     codes{end+1,1} = 'TRIM_ACCEPTED';
 end
 if ~logical(get_field(report, 'solverConverged', false))

@@ -40,8 +40,6 @@ elseif starts_with(identifier, 'linearize_numeric:')
     suggestions{end+1,1} = '该异常来自数值线性化；确认当前配平点有效且扰动步长有限。';
 elseif starts_with(identifier, 'rotor_model_bemt:')
     suggestions{end+1,1} = '该异常来自旋翼 BEMT/挥舞内部求解；保留标识用于定位模型域或迭代失败。';
-elseif contains_text(identifier, 'mwboost') || contains_text(identifier, 'archive')
-    suggestions{end+1,1} = '若该错误只在 batch 断言完成后关机阶段出现，应在测试报告中单独记录，不作为模型计算失败。';
 else
     suggestions{end+1,1} = '保留错误标识和消息，按当前阶段输入逐项复现并定位。';
 end

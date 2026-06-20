@@ -176,6 +176,24 @@ fprintf('All passed: %d\n',report.allPassed);
         assert(any(strcmp(diagnostic.reasonCodes, 'CONTROL_AT_LIMIT')));
 
         synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.finiteFullStateDerivative = false;
+        synthetic.report.converged = false;
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, ...
+            'NONFINITE_FULL_DERIVATIVE')));
+
+        synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.withinLimits = false;
+        synthetic.report.limitReport.anyViolation = true;
+        synthetic.report.limitReport.items(2).violated = true;
+        synthetic.report.converged = false;
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, ...
+            'CONTROL_LIMIT_VIOLATION')));
+
+        synthetic = trimResult;
         synthetic.report.objectiveInvalidEvaluationCount = 2;
         synthetic.report.objectiveInvalidEvaluationIdentifiers = { ...
             'rotor_model_bemt:FlapNotConverged'; ...
@@ -186,6 +204,8 @@ fprintf('All passed: %d\n',report.allPassed);
             synthetic.report.objectiveInvalidEvaluationIdentifiers));
         assert(any(strcmp(diagnostic.reasonCodes, ...
             'INVALID_MODEL_EVALUATIONS')));
+        assert(any(strcmp(diagnostic.reasonCodes, 'TRIM_ACCEPTED')));
+        assert(strcmp(diagnostic.severity, 'warning'));
     end
 
     function check_exception_diagnostics()
