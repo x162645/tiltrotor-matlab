@@ -1,12 +1,12 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / GUI ANALYSIS WORKBENCH / LOCAL MATLAB VERIFICATION REQUIRED
+STATUS: COMPLETE / GUI ANALYSIS WORKBENCH / MATLAB R2021a VERIFIED / HOLD
 
 Branch: `feature/gui-analysis-workbench`
 
 Base branch: `main`
 
-Draft PR: to be created for this branch.
+Draft PR: #9 (`https://github.com/x162645/tiltrotor-matlab/pull/9`)
 
 ## Purpose
 

@@ -28,13 +28,13 @@ uilabel(header,'Text','倾转旋翼机分析工作台', ...
     'FontSize',20,'FontWeight','bold');
 statusLamp = uilamp(header,'Color',[0.93 0.69 0.13]);
 statusLabel = uilabel(header,'Text','已载入名义概念参数');
-validateButton = uibutton(header,'Text','检查参数', ...
+uibutton(header,'Text','检查参数', ...
     'ButtonPushedFcn',@onValidateParameters);
-resetButton = uibutton(header,'Text','恢复默认', ...
+uibutton(header,'Text','恢复默认', ...
     'ButtonPushedFcn',@onResetParameters);
-exportButton = uibutton(header,'Text','导出工况', ...
+uibutton(header,'Text','导出工况', ...
     'ButtonPushedFcn',@onExportSession);
-helpButton = uibutton(header,'Text','使用说明', ...
+uibutton(header,'Text','使用说明', ...
     'ButtonPushedFcn',@onShowHelp);
 uilabel(header,'Text','内部角度：rad｜界面角度：deg', ...
     'HorizontalAlignment','right');
@@ -55,7 +55,7 @@ parameterTable = uitable(parameterLayout, ...
     'ColumnEditable',[false false false true false false], ...
     'ColumnWidth',{100,190,180,110,100,150}, ...
     'CellEditCallback',@onParameterEdited);
-parameterNotes = uitextarea(parameterLayout,'Editable','off', ...
+uitextarea(parameterLayout,'Editable','off', ...
     'Value',{ ...
     '这里仅暴露会直接影响当前概念模型和数值计算的关键参数。'; ...
     '修改参数后，已有配平、线性化和响应结果会自动失效。'; ...
@@ -102,11 +102,14 @@ trimOutputTabs = uitabgroup(trimLayout);
 trimStateTab = uitab(trimOutputTabs,'Title','状态量');
 trimControlTab = uitab(trimOutputTabs,'Title','操纵量');
 trimResidualTab = uitab(trimOutputTabs,'Title','残差与载荷');
-trimStateTable = uitable(trimStateTab, ...
+trimStateGrid = make_fill_grid(trimStateTab);
+trimControlGrid = make_fill_grid(trimControlTab);
+trimResidualGrid = make_fill_grid(trimResidualTab);
+trimStateTable = uitable(trimStateGrid, ...
     'ColumnName',{'状态','数值','单位'},'ColumnWidth',{140,160,120});
-trimControlTable = uitable(trimControlTab, ...
+trimControlTable = uitable(trimControlGrid, ...
     'ColumnName',{'操纵','数值','单位'},'ColumnWidth',{180,160,120});
-trimResidualTable = uitable(trimResidualTab, ...
+trimResidualTable = uitable(trimResidualGrid, ...
     'ColumnName',{'项目','数值','单位'},'ColumnWidth',{210,180,140});
 
 %% Linearization tab
@@ -130,8 +133,10 @@ matrixTabs.Layout.Row = 2;
 matrixTabs.Layout.Column = 1;
 aTab = uitab(matrixTabs,'Title','A 矩阵');
 bTab = uitab(matrixTabs,'Title','B 矩阵');
-aTable = uitable(aTab,'ColumnName',stateNames,'RowName',stateNames);
-bTable = uitable(bTab,'ColumnName',controlNames,'RowName',stateNames);
+aGrid = make_fill_grid(aTab);
+bGrid = make_fill_grid(bTab);
+aTable = uitable(aGrid,'ColumnName',stateNames,'RowName',stateNames);
+bTable = uitable(bGrid,'ColumnName',controlNames,'RowName',stateNames);
 
 modePanel = uipanel(linearLayout,'Title','特征值与稳定性');
 modePanel.Layout.Row = 2;
@@ -152,7 +157,7 @@ responseLayout.ColumnWidth = {345,'1x'};
 responseLayout.Padding = [8 8 8 8];
 responseInputPanel = uipanel(responseLayout,'Title','小扰动输入设置');
 responseInputGrid = uigridlayout(responseInputPanel,[12 2]);
-responseInputGrid.RowHeight = repmat({34},1,12);
+responseInputGrid.RowHeight = [repmat({34},1,11), {'1x'}];
 responseInputGrid.ColumnWidth = {165,'1x'};
 responseInputGrid.Padding = [10 10 10 10];
 
@@ -251,8 +256,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function onRunTrim(~,~)
         set_busy(true);
-        cleanup = onCleanup(@() set_busy(false)); %#ok<NASGU>
+        cleanup = onCleanup(@() set_busy(false));
         try
+            trimResult = [];
+            clear_trim_dependent_results();
+            trimStateTable.Data = {};
+            trimControlTable.Data = {};
+            trimResidualTable.Data = {};
+            trimStatusLabel.Text = '正在运行配平...';
             config = struct( ...
                 'V',trimVField.Value, ...
                 'betaMDeg',trimBetaField.Value, ...
@@ -289,7 +300,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function onRunLinearization(~,~)
         set_busy(true);
-        cleanup = onCleanup(@() set_busy(false)); %#ok<NASGU>
+        cleanup = onCleanup(@() set_busy(false));
         try
             linearResult = run_linearization_case(trimResult,P);
             responseResult = [];
@@ -310,7 +321,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function onRunResponse(~,~)
         set_busy(true);
-        cleanup = onCleanup(@() set_busy(false)); %#ok<NASGU>
+        cleanup = onCleanup(@() set_busy(false));
         try
             config = struct( ...
                 'controlChannel',find(strcmp(controlNames,responseControlDrop.Value),1), ...
@@ -437,15 +448,20 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function invalidate_analysis(message)
         trimResult = [];
+        clear_trim_dependent_results();
+        trimStateTable.Data = {};
+        trimControlTable.Data = {};
+        trimResidualTable.Data = {};
+        trimStatusLabel.Text = '参数已变化，需要重新配平';
+        set_status(message,'warning');
+    end
+
+    function clear_trim_dependent_results()
         linearResult = [];
         responseResult = [];
         runLinearButton.Enable = 'off';
         runResponseButton.Enable = 'off';
-        trimStatusLabel.Text = '参数已变化，需要重新配平';
         linearStatusLabel.Text = '需要先获得新的收敛配平点';
-        trimStateTable.Data = {};
-        trimControlTable.Data = {};
-        trimResidualTable.Data = {};
         aTable.Data = [];
         bTable.Data = [];
         eigenTable.Data = {};
@@ -453,7 +469,6 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         cla(eigenAxes);
         cla(responseInputAxes);
         cla(responseOutputAxes);
-        set_status(message,'warning');
     end
 
     function set_status(message,kind)
@@ -489,6 +504,15 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             end
         end
     end
+end
+
+function grid = make_fill_grid(parent)
+grid = uigridlayout(parent,[1 1]);
+grid.RowHeight = {'1x'};
+grid.ColumnWidth = {'1x'};
+grid.Padding = [0 0 0 0];
+grid.RowSpacing = 0;
+grid.ColumnSpacing = 0;
 end
 
 function rows = make_parameter_rows()
@@ -574,7 +598,10 @@ switch key
     case 'mass.Ixz'
         P.mass.I0(1,3) = value;
         P.mass.I0(3,1) = value;
-    case 'rotor.R', P.rotor.R = value;
+    case 'rotor.R'
+        P.rotor.R = value;
+        P.rotor.Ib = P.rotor.bladeMass*P.rotor.R^2/3;
+        P.rotor.Sblade = P.rotor.bladeMass*P.rotor.R/2;
     case 'rotor.Omega', P.rotor.Omega = value;
     case 'rotor.chord', P.rotor.chord = value;
     case 'rotor.nRadial', P.rotor.nRadial = value;
