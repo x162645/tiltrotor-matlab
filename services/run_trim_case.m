@@ -38,6 +38,7 @@ result.xTrim = xTrim(:);
 result.uTrim = uTrim(:);
 result.xdot = xdot(:);
 result.report = trimReport;
+result.trimResidualTolerance = P.trim.residualTolerance;
 result.parameterValidation = parameterReport;
 result.stateNames = {'u';'v';'w';'p';'q';'r';'phi';'theta';'psi'};
 result.stateUnits = {'m/s';'m/s';'m/s';'rad/s';'rad/s';'rad/s'; ...
@@ -50,6 +51,7 @@ result.loads.Fgravity = eomOut.Fgravity;
 result.loads.Ftotal = eomOut.Ftotal;
 result.loads.Mtotal = eomOut.Mtotal;
 result.loads.components = eomOut.components;
+result.diagnostic = build_trim_diagnostic(result);
 end
 
 function config = apply_defaults(config)

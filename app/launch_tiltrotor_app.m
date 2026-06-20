@@ -7,6 +7,7 @@ P = params_nominal();
 trimResult = [];
 linearResult = [];
 responseResult = [];
+currentDiagnostic = [];
 parameterRows = make_parameter_rows();
 stateNames = {'u','v','w','p','q','r','phi','theta','psi'};
 controlNames = {'collective','diffCollective','cyclicLong', ...
@@ -14,8 +15,8 @@ controlNames = {'collective','diffCollective','cyclicLong', ...
 
 fig = uifigure('Name','Tiltrotor Analysis Workbench', ...
     'Position',[80 60 1420 860]);
-root = uigridlayout(fig,[2 1]);
-root.RowHeight = {54,'1x'};
+root = uigridlayout(fig,[3 1]);
+root.RowHeight = {54,'1x',118};
 root.Padding = [10 8 10 10];
 root.RowSpacing = 8;
 
@@ -45,6 +46,17 @@ parameterTab = uitab(mainTabs,'Title','关键参数');
 trimTab = uitab(mainTabs,'Title','配平');
 linearTab = uitab(mainTabs,'Title','线性化与模态');
 responseTab = uitab(mainTabs,'Title','操纵响应');
+
+diagnosticPanel = uipanel(root,'Title','当前操作诊断');
+diagnosticPanel.Layout.Row = 3;
+diagnosticGrid = uigridlayout(diagnosticPanel,[1 2]);
+diagnosticGrid.ColumnWidth = {'1x',92};
+diagnosticGrid.Padding = [8 6 8 8];
+diagnosticText = uitextarea(diagnosticGrid,'Editable','off', ...
+    'Value',{'stage: startup'; 'severity: warning'; ...
+    'summary: 尚未运行服务操作。'});
+uibutton(diagnosticGrid,'Text','复制诊断', ...
+    'ButtonPushedFcn',@onCopyDiagnostic);
 
 %% Parameter tab
 parameterLayout = uigridlayout(parameterTab,[2 1]);
@@ -99,18 +111,43 @@ trimStatusLabel = uilabel(trimInputGrid,'Text','尚未运行', ...
 trimStatusLabel.Layout.Column = [1 2];
 
 trimOutputTabs = uitabgroup(trimLayout);
-trimStateTab = uitab(trimOutputTabs,'Title','状态量');
-trimControlTab = uitab(trimOutputTabs,'Title','操纵量');
-trimResidualTab = uitab(trimOutputTabs,'Title','残差与载荷');
-trimStateGrid = make_fill_grid(trimStateTab);
-trimControlGrid = make_fill_grid(trimControlTab);
-trimResidualGrid = make_fill_grid(trimResidualTab);
-trimStateTable = uitable(trimStateGrid, ...
+trimOverviewTab = uitab(trimOutputTabs,'Title','总览');
+trimStateControlTab = uitab(trimOutputTabs,'Title','状态与操纵');
+trimResidualLimitTab = uitab(trimOutputTabs,'Title','残差与限幅');
+trimCandidateTab = uitab(trimOutputTabs,'Title','多初值候选');
+
+trimOverviewGrid = uigridlayout(trimOverviewTab,[2 1]);
+trimOverviewGrid.RowHeight = {'1x',95};
+trimOverviewGrid.Padding = [0 0 0 0];
+trimOverviewTable = uitable(trimOverviewGrid, ...
+    'ColumnName',{'项目','数值'},'ColumnWidth',{230,220});
+trimOverviewText = uitextarea(trimOverviewGrid,'Editable','off');
+
+trimStateControlGrid = uigridlayout(trimStateControlTab,[1 2]);
+trimStateControlGrid.ColumnWidth = {'1x','1x'};
+trimStateControlGrid.Padding = [0 0 0 0];
+trimStateTable = uitable(trimStateControlGrid, ...
     'ColumnName',{'状态','数值','单位'},'ColumnWidth',{140,160,120});
-trimControlTable = uitable(trimControlGrid, ...
+trimControlTable = uitable(trimStateControlGrid, ...
     'ColumnName',{'操纵','数值','单位'},'ColumnWidth',{180,160,120});
-trimResidualTable = uitable(trimResidualGrid, ...
-    'ColumnName',{'项目','数值','单位'},'ColumnWidth',{210,180,140});
+
+trimResidualLimitGrid = uigridlayout(trimResidualLimitTab,[2 1]);
+trimResidualLimitGrid.RowHeight = {'1x','1x'};
+trimResidualLimitGrid.Padding = [0 0 0 0];
+trimFullResidualTable = uitable(trimResidualLimitGrid, ...
+    'ColumnName',{'状态导数','数值','单位','分类'}, ...
+    'ColumnWidth',{140,170,110,110});
+trimLimitTable = uitable(trimResidualLimitGrid, ...
+    'ColumnName',{'变量','数值(deg)','下限(deg)','上限(deg)', ...
+    '下裕度(deg)','上裕度(deg)','触限','越限'}, ...
+    'ColumnWidth',{120,95,95,95,105,105,70,70});
+
+trimCandidateGrid = make_fill_grid(trimCandidateTab);
+trimCandidateTable = uitable(trimCandidateGrid, ...
+    'ColumnName',{'初始theta','初始collective','初始cyclicLong', ...
+    '最终theta','最终collective','最终cyclicLong','cost', ...
+    '残差范数','exitflag','接受','触限','限内'}, ...
+    'ColumnWidth',{90,105,115,90,105,115,95,95,75,70,70,70});
 
 %% Linearization tab
 linearLayout = uigridlayout(linearTab,[2 2]);
@@ -223,8 +260,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             P = candidate;
             invalidate_analysis('参数已修改，旧计算结果已失效。');
             refresh_parameter_table();
+            set_current_diagnostic(make_operation_diagnostic( ...
+                'parameter-validation','success','PARAMETER_EDIT_ACCEPTED', ...
+                '参数修改已通过检查。','当前内存参数副本已更新。', ...
+                {'旧配平、线性化和响应结果已失效，需要重新计算。'}));
         catch ME
             refresh_parameter_table();
+            set_current_diagnostic(build_exception_diagnostic(ME, ...
+                'parameter-validation', struct('row', row, 'newValue', newValue)));
             uialert(fig,ME.message,'参数修改无效');
         end
     end
@@ -239,11 +282,13 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             else
                 set_status(message,'success');
             end
+            set_current_diagnostic(make_validation_diagnostic(validation));
             uialert(fig,message,'参数检查');
         else
             message = sprintf('%s\n%s',validation.summary, ...
                 strjoin(validation.errors,newline));
             set_status(message,'error');
+            set_current_diagnostic(make_validation_diagnostic(validation));
             uialert(fig,message,'参数检查失败');
         end
     end
@@ -252,18 +297,31 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         P = params_nominal();
         refresh_parameter_table();
         invalidate_analysis('已恢复名义参数，旧计算结果已失效。');
+        set_current_diagnostic(make_operation_diagnostic( ...
+            'parameter-validation','warning','PARAMETERS_RESET', ...
+            '已恢复名义概念参数。','界面参数副本已恢复为 params_nominal()。', ...
+            {'旧计算结果已清空，需要重新运行配平。'}));
     end
 
     function onRunTrim(~,~)
         set_busy(true);
         cleanup = onCleanup(@() set_busy(false));
+        config = struct();
         try
             trimResult = [];
             clear_trim_dependent_results();
             trimStateTable.Data = {};
             trimControlTable.Data = {};
-            trimResidualTable.Data = {};
+            trimOverviewTable.Data = {};
+            trimOverviewText.Value = {''};
+            trimFullResidualTable.Data = {};
+            trimLimitTable.Data = {};
+            trimCandidateTable.Data = {};
             trimStatusLabel.Text = '正在运行配平...';
+            set_current_diagnostic(make_operation_diagnostic( ...
+                'trim','warning','TRIM_RUNNING', ...
+                '正在运行配平。','旧的线性化和响应结果已清空。', ...
+                {'等待本次配平完成后查看新的诊断。'}));
             config = struct( ...
                 'V',trimVField.Value, ...
                 'betaMDeg',trimBetaField.Value, ...
@@ -278,6 +336,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             linearResult = [];
             responseResult = [];
             update_trim_tables();
+            set_current_diagnostic(trimResult.diagnostic);
             if trimResult.success
                 trimStatusLabel.Text = sprintf('配平收敛：残差范数 %.3e', ...
                     trimResult.report.residualNorm);
@@ -290,10 +349,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                     trimResult.report.residualNorm);
                 runLinearButton.Enable = 'off';
                 runResponseButton.Enable = 'off';
-                set_status('配平未满足收敛、限幅或有限性条件。','error');
+                set_status(trimResult.diagnostic.summary,'error');
             end
         catch ME
-            set_status(ME.message,'error');
+            trimResult = [];
+            clear_trim_dependent_results();
+            diagnostic = build_exception_diagnostic(ME,'trim',config);
+            set_current_diagnostic(diagnostic);
+            set_status(diagnostic.summary,'error');
             uialert(fig,ME.message,'配平失败');
         end
     end
@@ -302,19 +365,46 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         set_busy(true);
         cleanup = onCleanup(@() set_busy(false));
         try
-            linearResult = run_linearization_case(trimResult,P);
             responseResult = [];
+            runResponseButton.Enable = 'off';
+            responseSummaryTable.Data = {};
+            cla(responseInputAxes);
+            cla(responseOutputAxes);
+            set_current_diagnostic(make_operation_diagnostic( ...
+                'linearization','warning','LINEARIZATION_RUNNING', ...
+                '正在运行线性化。','旧响应结果已清空。', ...
+                {'等待线性化完成后查看模态和响应入口状态。'}));
+            newLinearResult = run_linearization_case(trimResult,P);
+            linearResult = newLinearResult;
             update_linearization_views();
             runResponseButton.Enable = 'on';
             if linearResult.hasUnstableMode
                 linearStatusLabel.Text = '线性化完成：存在右半平面特征值';
                 set_status('线性化完成，当前配平点存在不稳定模态。','warning');
+                set_current_diagnostic(make_operation_diagnostic( ...
+                    'linearization','warning','UNSTABLE_MODE_PRESENT', ...
+                    '线性化完成，当前配平点存在不稳定模态。', ...
+                    'A/B 矩阵和特征值已更新。', ...
+                    {'该结论只针对当前配平点和当前概念模型。'}));
             else
                 linearStatusLabel.Text = '线性化完成：未发现右半平面特征值';
                 set_status('线性化与模态计算完成。','success');
+                set_current_diagnostic(make_operation_diagnostic( ...
+                    'linearization','success','LINEARIZATION_COMPLETED', ...
+                    '线性化与模态计算完成。', ...
+                    'A/B 矩阵和特征值已更新。', ...
+                    {'可以继续运行小扰动操纵响应。'}));
             end
         catch ME
-            set_status(ME.message,'error');
+            linearResult = [];
+            responseResult = [];
+            runResponseButton.Enable = 'off';
+            aTable.Data = [];
+            bTable.Data = [];
+            eigenTable.Data = {};
+            diagnostic = build_exception_diagnostic(ME,'linearization',struct());
+            set_current_diagnostic(diagnostic);
+            set_status(diagnostic.summary,'error');
             uialert(fig,ME.message,'线性化失败');
         end
     end
@@ -322,7 +412,16 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     function onRunResponse(~,~)
         set_busy(true);
         cleanup = onCleanup(@() set_busy(false));
+        config = struct();
         try
+            responseResult = [];
+            responseSummaryTable.Data = {};
+            cla(responseInputAxes);
+            cla(responseOutputAxes);
+            set_current_diagnostic(make_operation_diagnostic( ...
+                'response','warning','RESPONSE_RUNNING', ...
+                '正在运行线性响应。','旧响应图和摘要已清空。', ...
+                {'等待响应计算完成后查看最新结果。'}));
             config = struct( ...
                 'controlChannel',find(strcmp(controlNames,responseControlDrop.Value),1), ...
                 'waveform',responseWaveformDrop.Value, ...
@@ -333,15 +432,30 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                 'totalTime',responseTotalTimeField.Value, ...
                 'timeStep',responseStepField.Value, ...
                 'outputState',find(strcmp(stateNames,responseStateDrop.Value),1));
-            responseResult = simulate_linear_response(linearResult,config,P);
+            newResponseResult = simulate_linear_response(linearResult,config,P);
+            responseResult = newResponseResult;
             update_response_views();
             if responseResult.limitWarning
                 set_status('响应完成；实际操纵历史触及或越过当前限幅。','warning');
+                set_current_diagnostic(make_operation_diagnostic( ...
+                    'response','warning','RESPONSE_CONTROL_LIMIT_WARNING', ...
+                    '响应完成；实际操纵历史触及或越过当前限幅。', ...
+                    '线性响应结果已更新，限幅检查仅用于提示。', ...
+                    {'减小输入幅值或检查当前配平操纵量与控制限幅的裕度。'}));
             else
                 set_status('线性小扰动响应计算完成。','success');
+                set_current_diagnostic(make_operation_diagnostic( ...
+                    'response','success','RESPONSE_COMPLETED', ...
+                    '线性小扰动响应计算完成。', ...
+                    '响应图和摘要表已更新。', ...
+                    {'响应是当前配平点附近的小扰动线性结果。'}));
             end
         catch ME
-            set_status(ME.message,'error');
+            responseResult = [];
+            responseSummaryTable.Data = {};
+            diagnostic = build_exception_diagnostic(ME,'response',config);
+            set_current_diagnostic(diagnostic);
+            set_status(diagnostic.summary,'error');
             uialert(fig,ME.message,'响应计算失败');
         end
     end
@@ -349,6 +463,20 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     function onResponseDisplayChanged(~,~)
         if ~isempty(responseResult)
             update_response_views();
+        end
+    end
+
+    function onCopyDiagnostic(~,~)
+        if isempty(currentDiagnostic)
+            return;
+        end
+        try
+            clipboard('copy', diagnostic_to_text(currentDiagnostic));
+            set_status('当前诊断已复制到剪贴板。','success');
+        catch ME
+            diagnostic = build_exception_diagnostic(ME,'copy-diagnostic',struct());
+            set_current_diagnostic(diagnostic);
+            set_status(diagnostic.summary,'error');
         end
     end
 
@@ -367,7 +495,15 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         try
             save_analysis_case(fullfile(pathName,fileName),session);
             set_status(sprintf('已导出：%s',fullfile(pathName,fileName)),'success');
+            set_current_diagnostic(make_operation_diagnostic( ...
+                'export','success','EXPORT_COMPLETED', ...
+                '工况导出完成。',sprintf('文件：%s',fullfile(pathName,fileName)), ...
+                {'导出文件包含当前内存参数和已有分析结果。'}));
         catch ME
+            diagnostic = build_exception_diagnostic(ME,'export', ...
+                struct('filePath', fullfile(pathName,fileName)));
+            set_current_diagnostic(diagnostic);
+            set_status(diagnostic.summary,'error');
             uialert(fig,ME.message,'导出失败');
         end
     end
@@ -387,16 +523,16 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     function update_trim_tables()
         trimStateTable.Data = make_state_display(trimResult.xTrim,stateNames);
         trimControlTable.Data = make_control_display(trimResult.uTrim,controlNames);
-        residual = trimResult.report.residual(:);
-        residualLabels = trimResult.report.residualLabels(:);
-        residualUnits = trimResult.report.residualScaleUnits(:);
-        loadLabels = {'Fx total';'Fy total';'Fz total';'Mx total';'My total';'Mz total'};
-        loadValues = [trimResult.loads.Ftotal(:);trimResult.loads.Mtotal(:)];
-        loadUnits = {'N';'N';'N';'N m';'N m';'N m'};
-        labels = [residualLabels;loadLabels];
-        values = [num2cell(residual);num2cell(loadValues)];
-        units = [residualUnits;loadUnits];
-        trimResidualTable.Data = [labels values units];
+        if ~isfield(trimResult, 'diagnostic')
+            trimResult.diagnostic = build_trim_diagnostic(trimResult);
+        end
+        diagnostic = trimResult.diagnostic;
+        trimOverviewTable.Data = make_trim_overview_display(diagnostic);
+        trimOverviewText.Value = diagnostic_overview_lines(diagnostic);
+        trimFullResidualTable.Data = make_full_residual_display( ...
+            diagnostic.fullResiduals);
+        trimLimitTable.Data = make_limit_display(diagnostic.limitItems);
+        trimCandidateTable.Data = make_candidate_display(diagnostic.candidates);
     end
 
     function update_linearization_views()
@@ -451,7 +587,11 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         clear_trim_dependent_results();
         trimStateTable.Data = {};
         trimControlTable.Data = {};
-        trimResidualTable.Data = {};
+        trimOverviewTable.Data = {};
+        trimOverviewText.Value = {''};
+        trimFullResidualTable.Data = {};
+        trimLimitTable.Data = {};
+        trimCandidateTable.Data = {};
         trimStatusLabel.Text = '参数已变化，需要重新配平';
         set_status(message,'warning');
     end
@@ -469,6 +609,199 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         cla(eigenAxes);
         cla(responseInputAxes);
         cla(responseOutputAxes);
+    end
+
+    function set_current_diagnostic(diagnostic)
+        currentDiagnostic = diagnostic;
+        diagnosticText.Value = text_to_lines(diagnostic_to_text(diagnostic));
+    end
+
+    function diagnostic = make_validation_diagnostic(validation)
+        diagnostic.kind = 'operation-diagnostic';
+        diagnostic.stage = 'parameter-validation';
+        if validation.valid
+            if validation.warningCount > 0
+                diagnostic.severity = 'warning';
+                diagnostic.identifier = 'PARAMETER_VALIDATION_WARNING';
+            else
+                diagnostic.severity = 'success';
+                diagnostic.identifier = 'PARAMETER_VALIDATION_PASSED';
+            end
+        else
+            diagnostic.severity = 'error';
+            diagnostic.identifier = 'PARAMETER_VALIDATION_FAILED';
+        end
+        diagnostic.reasonCodes = {diagnostic.identifier};
+        diagnostic.summary = validation.summary;
+        detailParts = [validation.errors(:); validation.warnings(:)];
+        if isempty(detailParts)
+            diagnostic.details = '无错误或警告。';
+        else
+            diagnostic.details = strjoin(detailParts, newline);
+        end
+        if validation.valid
+            diagnostic.suggestions = {'可以继续运行配平；通过检查不代表型号验证。'};
+        else
+            diagnostic.suggestions = {'按错误列表修正参数后重新检查。'};
+        end
+    end
+
+    function diagnostic = make_operation_diagnostic(stage,severity,identifier, ...
+            summary,details,suggestions)
+        diagnostic.kind = 'operation-diagnostic';
+        diagnostic.stage = stage;
+        diagnostic.severity = severity;
+        diagnostic.identifier = identifier;
+        diagnostic.reasonCodes = {identifier};
+        diagnostic.summary = summary;
+        diagnostic.details = details;
+        diagnostic.suggestions = suggestions(:);
+    end
+
+    function data = make_trim_overview_display(diagnostic)
+        ov = diagnostic.overview;
+        data = { ...
+            '接受状态', bool_text(ov.accepted); ...
+            '诊断级别', diagnostic.severity; ...
+            '求解器收敛', bool_text(ov.solverConverged); ...
+            '目标残差范数', ov.residualNorm; ...
+            '目标残差容限', ov.residualTolerance; ...
+            '九状态导数范数', ov.fullResidualNorm; ...
+            '触及限幅', bool_text(ov.atLimit); ...
+            '存在越限', bool_text(ov.hasLimitViolation); ...
+            '候选接受/总数', sprintf('%d / %d', ...
+                ov.acceptedCandidateCount, ov.candidateCount); ...
+            '无效模型评估', ov.invalidEvaluationCount; ...
+            'reason codes', strjoin(diagnostic.reasonCodes(:).', ', ')};
+    end
+
+    function lines = diagnostic_overview_lines(diagnostic)
+        lines = [{diagnostic.summary}; {'建议：'}; diagnostic.suggestions(:)];
+        if ~isempty(diagnostic.invalidEvaluationIdentifiers)
+            lines = [lines; {'无效评估标识：'}; ...
+                diagnostic.invalidEvaluationIdentifiers(:)];
+        end
+    end
+
+    function data = make_full_residual_display(residuals)
+        data = cell(numel(residuals),4);
+        for k = 1:numel(residuals)
+            data{k,1} = residuals(k).name;
+            data{k,2} = residuals(k).value;
+            data{k,3} = residuals(k).unit;
+            if residuals(k).isObjective
+                data{k,4} = '配平目标';
+            else
+                data{k,4} = '完整导数';
+            end
+        end
+    end
+
+    function data = make_limit_display(items)
+        data = cell(numel(items),8);
+        for k = 1:numel(items)
+            data{k,1} = items(k).name;
+            data{k,2} = items(k).valueDeg;
+            data{k,3} = items(k).lowerDeg;
+            data{k,4} = items(k).upperDeg;
+            data{k,5} = items(k).lowerMarginDeg;
+            data{k,6} = items(k).upperMarginDeg;
+            data{k,7} = items(k).atLimit;
+            data{k,8} = items(k).violated;
+        end
+    end
+
+    function data = make_candidate_display(candidates)
+        data = cell(numel(candidates),12);
+        for k = 1:numel(candidates)
+            data{k,1} = candidates(k).initialThetaDeg;
+            data{k,2} = candidates(k).initialCollectiveDeg;
+            data{k,3} = candidates(k).initialCyclicLongDeg;
+            data{k,4} = candidates(k).finalThetaDeg;
+            data{k,5} = candidates(k).finalCollectiveDeg;
+            data{k,6} = candidates(k).finalCyclicLongDeg;
+            data{k,7} = candidates(k).cost;
+            data{k,8} = candidates(k).residualNorm;
+            data{k,9} = candidates(k).exitflag;
+            data{k,10} = candidates(k).acceptable;
+            data{k,11} = candidates(k).atLimit;
+            data{k,12} = candidates(k).withinLimits;
+        end
+    end
+
+    function text = diagnostic_to_text(diagnostic)
+        if isempty(diagnostic)
+            text = 'stage: none';
+            return;
+        end
+        switch diagnostic.kind
+            case 'trim-diagnostic'
+                text = sprintf(['stage: trim\nseverity: %s\nreasonCodes: %s\n' ...
+                    'summary: %s\naccepted: %s\nsolverConverged: %s\n' ...
+                    'residualNorm: %.16g\nresidualTolerance: %.16g\n' ...
+                    'fullResidualNorm: %.16g\ncandidates: %d/%d accepted\n' ...
+                    'invalidEvaluationCount: %d\nsuggestions:\n%s'], ...
+                    diagnostic.severity, strjoin(diagnostic.reasonCodes(:).', ', '), ...
+                    diagnostic.summary, bool_text(diagnostic.overview.accepted), ...
+                    bool_text(diagnostic.overview.solverConverged), ...
+                    diagnostic.overview.residualNorm, ...
+                    diagnostic.overview.residualTolerance, ...
+                    diagnostic.overview.fullResidualNorm, ...
+                    diagnostic.overview.acceptedCandidateCount, ...
+                    diagnostic.overview.candidateCount, ...
+                    diagnostic.invalidEvaluationCount, ...
+                    prefix_lines(diagnostic.suggestions));
+            case 'exception-diagnostic'
+                text = sprintf(['stage: %s\nseverity: %s\nidentifier: %s\n' ...
+                    'summary: %s\ndetails: %s\nsuggestions:\n%s\nstack:\n%s'], ...
+                    diagnostic.stage, diagnostic.severity, ...
+                    diagnostic.identifier, diagnostic.summary, ...
+                    diagnostic.details, prefix_lines(diagnostic.suggestions), ...
+                    stack_to_text(diagnostic.stackSummary));
+            otherwise
+                text = sprintf(['stage: %s\nseverity: %s\nidentifier: %s\n' ...
+                    'summary: %s\ndetails: %s\nsuggestions:\n%s'], ...
+                    diagnostic.stage, diagnostic.severity, ...
+                    diagnostic.identifier, diagnostic.summary, diagnostic.details, ...
+                    prefix_lines(diagnostic.suggestions));
+        end
+    end
+
+    function text = stack_to_text(stackSummary)
+        if isempty(stackSummary)
+            text = '  <empty>';
+            return;
+        end
+        rows = cell(numel(stackSummary),1);
+        for k = 1:numel(stackSummary)
+            rows{k} = sprintf('  %s (%s:%d)', stackSummary(k).name, ...
+                stackSummary(k).file, stackSummary(k).line);
+        end
+        text = strjoin(rows, newline);
+    end
+
+    function text = prefix_lines(lines)
+        if isempty(lines)
+            text = '  <none>';
+            return;
+        end
+        lines = lines(:);
+        for k = 1:numel(lines)
+            lines{k} = sprintf('  - %s', lines{k});
+        end
+        text = strjoin(lines, newline);
+    end
+
+    function lines = text_to_lines(text)
+        lines = regexp(text, '\r\n|\n|\r', 'split').';
+    end
+
+    function value = bool_text(flag)
+        if flag
+            value = 'true';
+        else
+            value = 'false';
+        end
     end
 
     function set_status(message,kind)
