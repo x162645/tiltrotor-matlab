@@ -2,34 +2,88 @@
 
 ## Objective and boundary
 
-This plan starts after the read-only inventory. It does not authorize parameter replacement, model implementation, MATLAB execution, or PR merge. Every future numeric proposal must identify the aircraft configuration, weight state, blade version, rotor-speed mode, coordinate origin, sign convention, original unit and SI conversion.
+This plan starts after the PR #7 classification correction. It does not authorize parameter replacement, model implementation, MATLAB execution, test changes, production-code changes, new data directories, or PR merge. The correction separates current conceptual-model governance from a future XV-15 target dataset.
 
-## Track 1 - claims verifiable from current local references
+Every future numeric proposal must identify aircraft configuration, weight state, blade version, rotor-speed mode, coordinate origin, sign convention, original unit, SI conversion, source page/table/figure/equation, and whether manual review remains required.
 
-1. Manually verify `NASA_TM_X_62407.pdf` PDF 14-15 (printed 11-12): weight-state definitions, group weights, inertia table labels, axes and the 13,000 lb condition. Do not use text extraction alone for the damaged inertia table.
-2. Verify PDF 15-16 dimension entries and their footnotes: distinguish rotor-center spacing, wing aerodynamic span, tail span/chord, MAC, incidence and tail length.
-3. Verify PDF 20-22 (printed 17-19): blade count, diameter, chord, solidity, precone, flap clearance, Lock number, twist figure and nominal design tip-speed/rpm modes.
-4. Verify PDF 49 and 56 (printed 46 and 53): steel-blade construction/hub spring and qualitative control mixing/phasing.
-5. Verify `NASA_TM_81244.pdf` PDF 4-9: design characteristics, nacelle-angle convention, governor logic, test-stage rpm choices, gross-weight/stall condition and the distinction between design and then-current flight restrictions.
-6. Verify `NUAA_main_paper.pdf` PDF 3-12: equations (1)-(42), coordinate figures and which relations are only method-level similarities. Do not source current numeric coefficients from these equations.
+## Track A - current conceptual-model parameter governance
 
-Expected direct outcomes: confirm `Nb=3`; create candidate records for weight states, endpoint inertias, rotor geometry and speed modes; record unresolved visual/table items. A candidate is not an accepted code value.
+Purpose:
 
-## Track 2 - additional primary NASA/FAA/academic sources required
+- clarify field semantics;
+- resolve coupled meanings;
+- centralize embedded constants;
+- create replaceable interfaces;
+- preserve current numerical behavior initially;
+- maintain internal physical consistency.
 
-- Mass build-up for both moving nacelle/rotor assemblies, their centroids and conversion-axis geometry.
-- Full inertia tensors by weight/configuration and the reference CG/axes.
-- Steel versus composite/advanced blade geometry, mass distribution, first/second moments, flap axis, precone, hub spring and damping.
-- Rotor-speed governor schedules versus mode, nacelle angle, airspeed and load restrictions.
-- Rotor airfoil stations and Mach/Reynolds/post-stall/reverse-flow polars.
-- Rotor/wing interference, wake contraction/skew, download and dynamic/nonuniform inflow evidence.
-- Component aerodynamic databases with reference dimensions, control gearing and valid ranges.
-- Quantitative flight-control mixing, phase-out, actuator travel/rate and SCAS/governor schedules.
-- Mode-specific trim/test points with weight, CG, atmosphere, flap, rpm and control configuration.
+Track A is not an XV-15 parameter replacement track. It governs the existing conceptual model so that later sources can be attached without silently changing unrelated behavior.
 
-Search priority must be primary NASA technical reports, contractor reports archived by NASA, FAA certification/flight-manual material where public, and original academic wind-tunnel/identification papers. Secondary compilations remain `DOCUMENTED_SECONDARY` and may not override conflicting primary configurations.
+### Track A work packages
 
-## Track 3 - derivations after parent evidence is fixed
+1. Behavior-preserving `RH_mass` / `RH_hub` split.
+   - Initialize both to the current `0.75 m` behavior.
+   - Prove unchanged mass-property and rotor-hub force-arm results before any sourced value is considered.
+2. Separate endpoint inertia data from the interpolation law.
+   - Preserve the current `I0 - betaM*KI` behavior first.
+   - Do not enter NASA inertia values until the damaged inertia table is manually verified.
+3. Introduce a rotor-speed provider initially returning constant `62 rad/s`.
+   - Keep current behavior unchanged.
+   - Later schedules must be mode/configuration records, not a direct scalar overwrite.
+4. Separate blade geometry, mass distribution, polar, flap-axis, spring, and damping structures.
+   - Preserve current constant chord, linear `twistTip`, uniform full-span mass distribution, center-hinge interpretation, and simplified polar until a reviewed blade configuration is selected.
+5. Separate command convention, side allocation, limits, and mode scheduling.
+   - Preserve current common/differential allocation and side-space clamping initially.
+   - Keep quantitative XV-15 mixer schedules out of current parameters until sourced.
+6. Extract embedded empirical constants into named fields with unchanged initial values.
+   - Include wing slip-area heuristics, normal-flow blend constants, vertical-tail drag increment, flap residual scale anchors, and production hard-coded physical/numerical guards.
+   - Extraction must be behavior-preserving and separately reviewed before any numeric change.
+7. Record numerical settings as current-model governance items.
+   - Solver tolerances, finite-difference steps, regularization, diagnostic thresholds, and test thresholds remain `NUMERICAL`, not aircraft-source claims.
+
+## Track B - future XV-15 target dataset
+
+Purpose:
+
+- build an independent XV-15 dataset;
+- do not overwrite current conceptual parameters directly;
+- record source, aircraft configuration, weight state, blade version, rpm mode, coordinate system, and uncertainty;
+- map generic model fields to XV-15 dataset fields.
+
+Future artifacts may include:
+
+```text
+data/xv15/
+docs/XV15_PARAMETER_SOURCES.md
+docs/XV15_DATA_GAPS.md
+docs/XV15_MODEL_MAPPING.md
+```
+
+Do not create these artifacts in this correction task.
+
+### Track B source priorities
+
+1. Local references that can be manually verified:
+   - `NASA_TM_X_62407.pdf` PDF 14-15 (printed 11-12): weight-state definitions, group weights, inertia table labels, axes, and the 13,000 lb condition. Do not use text extraction alone for the damaged inertia table.
+   - `NASA_TM_X_62407.pdf` PDF 15-16: dimension entries and footnotes; distinguish rotor-center spacing, wing aerodynamic span, tail span/chord, MAC, incidence, and tail length.
+   - `NASA_TM_X_62407.pdf` PDF 20-22 (printed 17-19): blade count, diameter, chord, solidity, precone, flap clearance, Lock number, twist figure, and nominal design tip-speed/rpm modes.
+   - `NASA_TM_X_62407.pdf` PDF 49 and 56 (printed 46 and 53): steel-blade construction, hub spring, and qualitative control mixing/phasing.
+   - `NASA_TM_81244.pdf` PDF 4-9: design characteristics, nacelle-angle convention, governor logic, test-stage rpm choices, gross-weight/stall condition, and distinction between design and flight restrictions.
+   - `NUAA_main_paper.pdf` PDF 3-12: method-level equations (1)-(42) and coordinate figures. Do not source current numeric coefficients from these equations.
+2. Additional primary NASA/FAA/academic sources required:
+   - mass build-up for both moving nacelle/rotor assemblies, centroids, and conversion-axis geometry;
+   - full inertia tensors by weight/configuration and reference CG/axes;
+   - steel versus composite/advanced blade geometry, mass distribution, first/second moments, flap axis, precone, hub spring, and damping;
+   - rotor-speed governor schedules versus mode, nacelle angle, airspeed, and load restrictions;
+   - rotor airfoil stations and Mach/Reynolds/post-stall/reverse-flow polars;
+   - rotor/wing interference, wake contraction/skew, download, and dynamic/nonuniform inflow evidence;
+   - component aerodynamic databases with reference dimensions, control gearing, and valid ranges;
+   - quantitative flight-control mixing, phase-out, actuator travel/rate, and SCAS/governor schedules;
+   - mode-specific trim/test points with weight, CG, atmosphere, flap, rpm, and control configuration.
+
+Secondary compilations may be recorded as `DOCUMENTED_SECONDARY`, but they may not override conflicting primary configurations.
+
+## Derivations after parent evidence is fixed
 
 |derived item|required parents|formula/condition|
 |-|-|-|
@@ -40,32 +94,21 @@ Search priority must be primary NASA technical reports, contractor reports archi
 |Blade `Ib` and `Sblade`|verified spanwise mass density and flap-axis location|`Ib=int r_h^2 dm`; `Sblade=int r_h dm`; do not reuse uniform formulas|
 |`Jpolar`|rotating assembly mass distribution|sum polar inertias about mast; state included hub/shaft/blade components|
 |Component AC vectors|verified source stations and code origin|apply one documented station/waterline/buttline-to-body transform|
-|Dimensionless derivatives|verified dimensional data or vice versa|use source reference area/length, dynamic pressure and rate normalization exactly|
+|Dimensionless derivatives|verified dimensional data or vice versa|use source reference area/length, dynamic pressure, and rate normalization exactly|
 
-Every derivation retains parent inventory IDs and uncertainty; derived values cannot outrank their least-confident parent.
+Every derivation retains parent inventory IDs and uncertainty. A derived value cannot outrank its least-confident parent.
 
-## Track 4 - values likely to remain conceptual pending experiments
+## Values likely to remain conceptual pending experiments
 
 - normal-flow blend center/half-width;
 - scalar wing slip-area heuristics;
 - simplified post-stall tanh caps if no complete database is found;
 - one-way `wakeFactor` if no interference data support a higher-order model;
-- solver seeds, tolerances, damping, regularization and diagnostic thresholds.
+- solver seeds, tolerances, damping, regularization, reporting, and diagnostic thresholds.
 
 These may remain only as `ASSUMED_CONCEPT` or `NUMERICAL`, with applicability and sensitivity recorded. They must not be relabeled as XV-15 data because they produce plausible behavior.
 
-## Track 5 - behavior-preserving structural separation before sourcing
-
-1. Split `RH` into mass-CG and hub-geometry fields with both initialized to the current value; add identity regression before any replacement.
-2. Separate endpoint/configuration inertia storage from an interpolation law; initially reproduce current `I0-betaM*KI` exactly.
-3. Introduce a rotor-speed provider that initially returns constant `62 rad/s` for all inputs.
-4. Replace embedded wing/vertical-tail empirical constants with named fields, initially unchanged.
-5. Separate rotor blade geometry, polar, mass distribution and flap-axis/hub-restraint data structures while retaining the current uniform/center-hinge behavior.
-6. Separate command convention, side allocation, actuator limits and nacelle-angle mixing schedules; initial schedule must reproduce current direct mapping.
-
-Each structural change is a distinct task/PR. No structural split and numeric replacement are combined.
-
-## Track 6 - parameter-family regression required after later replacement
+## Regression required after later numerical replacement
 
 |parameter family|minimum dedicated regression before total suite|
 |-|-|
@@ -80,6 +123,19 @@ Each structural change is a distinct task/PR. No structural split and numeric re
 
 After a family-specific regression passes, run the existing total regression. Passing tests establishes only covered internal consistency, not aircraft validation.
 
+## Required phase order
+
+1. current conceptual-model semantic and interface governance;
+2. behavior-preserving structural separation;
+3. current-model dedicated regression;
+4. independent XV-15 target-dataset construction;
+5. manual source/configuration/unit/coordinate verification;
+6. generic-model-to-XV-15 mapping;
+7. one XV-15 parameter family integrated at a time;
+8. family-specific regression;
+9. representative operating-point comparison;
+10. only then, explicitly limited XV-15 reproduction claims.
+
 ## Phase gates
 
 - Gate A - all active parameters are inventoried. Exit evidence: repository-wide `P.` and production-literal search reconciles with `PARAMETER_SOURCE_INVENTORY.md`; unused fields are explicitly identified.
@@ -88,19 +144,6 @@ After a family-specific regression passes, run the existing total regression. Pa
 - Gate D - change one parameter family at a time. Structural separation precedes value replacement and preserves initial behavior.
 - Gate E - family-specific regression passes before the broader suite. Failures, nonconvergence, NaN/Inf/complex values and bound contacts remain visible.
 - Gate F - no dense envelope, transition/airplane stability map or XV-15 fidelity claim until critical mass/inertia, rotor geometry/speed/blade, aerodynamic, wake, control-mixing and trim-closure families are resolved.
-
-## Proposed order
-
-1. Human visual verification of local weight/inertia/rotor tables and figures.
-2. Coordinate and configuration ledger.
-3. Behavior-preserving `RH` and embedded-constant splits.
-4. Mass/inertia family proposal and regression.
-5. Rotor geometry, speed schedule and blade-configuration selection.
-6. Blade mass/flap mechanics, then polar/inflow/wake families.
-7. Airframe aerodynamic database and component stations.
-8. Control mixing/limits and mode-specific trim formulation.
-9. Local trim/linearization verification.
-10. Only after Gate F, limited envelope expansion and explicitly scoped XV-15 comparisons.
 
 ## Stop conditions
 
