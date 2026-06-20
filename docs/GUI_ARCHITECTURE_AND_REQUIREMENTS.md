@@ -41,6 +41,8 @@ app/launch_tiltrotor_app.m
 服务层
 services/validate_parameter_set.m
 services/run_trim_case.m
+services/build_trim_diagnostic.m
+services/build_exception_diagnostic.m
 services/run_linearization_case.m
 services/simulate_linear_response.m
 services/save_analysis_case.m
@@ -54,6 +56,8 @@ model/total_forces_moments.m
 ```
 
 GUI 回调不得复制旋翼、气动、刚体方程、配平目标或线性化公式。底层模型仍是唯一物理计算来源。
+
+诊断服务只整理已有服务结果或已捕获异常，不重新运行配平、线性化或响应，不修改参数结构。
 
 ## 4. 页面功能
 
@@ -93,13 +97,14 @@ GUI 回调不得复制旋翼、气动、刚体方程、配平目标或线性化�
 
 显示：
 
-- 9 状态；
-- 7 操纵量；
-- `udot/wdot/qdot` 残差；
-- 总力与总力矩；
-- 收敛、限幅和有限性状态。
+- 总览：接受状态、求解器状态、目标残差范数、九状态导数范数、限幅状态、候选数量和无效模型评估数量；
+- 状态与操纵：9 状态和 7 操纵量；
+- 残差与限幅：全部 9 个状态导数，并标出 `udot/wdot/qdot` 三个配平目标；同时显示 `theta/collective/cyclicLong` 限幅和角度裕度；
+- 多初值候选：每个候选的初值、终值、代价、残差范数、退出标志、接受状态和限幅状态。
 
 线性化按钮只有在 `report.converged == true` 时启用。
+
+配平结果包含 `diagnostic.kind = 'trim-diagnostic'` 的诊断结构。该结构只使用 `trim_symmetric` 已返回的 report 字段和服务层已知的残差容限。
 
 ### 4.3 线性化与模态
 
@@ -175,6 +180,10 @@ responseResult.deltaControl
 responseResult.actualControl
 responseResult.limitWarning
 ```
+
+### 当前操作诊断
+
+界面底部保留一个当前操作诊断面板，只显示最新一次参数检查、配平、线性化、响应、导出或异常的信息。字段包括阶段、级别、错误标识或 reason codes、摘要、细节和建议。面板提供复制按钮；若当前 MATLAB 环境支持 `clipboard`，会复制纯文本诊断摘要。
 
 ## 6. 运行方式
 

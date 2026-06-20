@@ -1,137 +1,307 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / GUI ANALYSIS WORKBENCH / MATLAB R2021a VERIFIED / HOLD
+STATUS: COMPLETE / GUI V1.1A TRIM DIAGNOSTICS / MATLAB R2021A VERIFIED / HOLD
 
-Branch: `feature/gui-analysis-workbench`
+Branch: `feature/gui-v1.1-trim-diagnostics`
 
 Base branch: `main`
 
-Draft PR: #9 (`https://github.com/x162645/tiltrotor-matlab/pull/9`)
+Previous completed work: PR #9, merged into `main` at `34c27a874bc2c856eb69f68ff0905b3234f644bb`.
 
 ## Purpose
 
-Complete and verify a user-friendly MATLAB R2021a visual workbench for the existing tiltrotor concept model. The workbench must provide:
+Improve the existing MATLAB R2021a tiltrotor analysis workbench in one tightly scoped step:
 
-- critical parameter editing and validation;
-- symmetric trim;
-- numerical linearization and modal display;
-- linear small-disturbance control response;
-- analysis-session export.
+1. make symmetric-trim success and failure easier to understand;
+2. expose diagnostic information already produced by `trim_symmetric`;
+3. convert caught MATLAB exceptions into a consistent user-facing diagnostic structure;
+4. preserve all existing model, trim, linearization, and response calculations.
 
-The current implementation has already been added to the branch. Local Codex must review it, run the staged MATLAB checks, make only necessary compatibility or correctness fixes, and push the verified result.
+This task is GUI/service/test work only. Do not change physical equations, nominal parameters, trim equations, solver behavior, thresholds, seeds, control mapping, or linearization formulas.
 
 ## Read first
+
+Read these files before editing:
 
 1. `AGENTS.md`
 2. `CODEX_TASK.md`
 3. `docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md`
-4. `startup.m`
-5. `run_app.m`
-6. `app/launch_tiltrotor_app.m`
-7. all files in `services/`
-8. `tests/check_gui_services.m`
-9. `params_nominal.m`
-10. `analysis/trim_symmetric.m`
-11. `analysis/linearize_numeric.m`
-12. `model/tiltrotor_eom.m`
-13. `model/total_forces_moments.m`
-14. `tests/run_all_checks.m`
+4. `app/launch_tiltrotor_app.m`
+5. `services/run_trim_case.m`
+6. `services/validate_parameter_set.m`
+7. `tests/check_gui_services.m`
+8. `analysis/trim_symmetric.m` — read only
+9. `model/tiltrotor_eom.m` — read only
+10. `model/total_forces_moments.m` — read only
+11. `params_nominal.m` — read only
+12. `tests/run_all_checks.m` — read only unless a compatibility defect requires a minimal test registration change; do not duplicate the expensive GUI service chain.
 
-Before editing, run:
+Before editing, run and report:
 
 ```powershell
 git status --short
 git branch --show-current
 git log -1 --oneline
+git diff --stat main...HEAD
 ```
 
-Stop and report if the branch is wrong or the worktree contains unrelated modifications.
+Stop immediately if:
+
+- the branch is not `feature/gui-v1.1-trim-diagnostics`;
+- the worktree contains unrelated modifications;
+- the branch is not based on the merged GUI work from `main`.
+
+## Scope
+
+Implement only the following V1.1a features.
+
+### A. Trim diagnostic service
+
+Add a pure service function, preferably:
+
+```text
+services/build_trim_diagnostic.m
+```
+
+It must accept a trim result returned by `run_trim_case` and return one stable structure for GUI display and tests.
+
+Required fields:
+
+```text
+diagnostic.kind
+diagnostic.success
+diagnostic.severity
+diagnostic.summary
+diagnostic.reasonCodes
+diagnostic.suggestions
+diagnostic.overview
+diagnostic.fullResiduals
+diagnostic.limitItems
+diagnostic.candidates
+diagnostic.invalidEvaluationCount
+diagnostic.invalidEvaluationIdentifiers
+```
+
+Required semantics:
+
+- `kind`: `trim-diagnostic`;
+- `success`: follows the accepted trim result;
+- `severity`: `success`, `warning`, or `error`;
+- `summary`: concise Chinese user-facing conclusion;
+- `reasonCodes`: stable machine-readable cell array of codes;
+- `suggestions`: concise Chinese actions grounded in actual report fields;
+- `overview`: solver convergence, accepted status, residual norm, tolerance, full residual norm, at-limit state, violation state, candidate count, accepted candidate count, invalid evaluation count;
+- `fullResiduals`: all nine state derivatives with names, values, units, and an objective/non-objective indicator;
+- `limitItems`: theta, collective, and cyclicLong values, lower/upper limits, lower/upper margins, at-limit, violated, and display units in degrees;
+- `candidates`: initial and final theta/collective/cyclicLong in degrees, cost, residual norm, exit flag, acceptable, at-limit, and within-limits;
+- invalid-evaluation identifiers must be preserved exactly from the trim report.
+
+Do not infer a cause that the report cannot support. Example reason codes may include:
+
+```text
+SOLVER_NOT_CONVERGED
+OBJECTIVE_RESIDUAL_TOO_LARGE
+NONFINITE_FULL_DERIVATIVE
+CONTROL_AT_LIMIT
+CONTROL_LIMIT_VIOLATION
+INVALID_MODEL_EVALUATIONS
+NO_ACCEPTABLE_CANDIDATE
+```
+
+Use only report data already produced by `trim_symmetric`. Do not rerun trim inside the diagnostic builder.
+
+### B. Exception diagnostic service
+
+Add a pure service function, preferably:
+
+```text
+services/build_exception_diagnostic.m
+```
+
+It must convert a caught `MException` plus stage and optional input snapshot into a stable structure:
+
+```text
+diagnostic.kind = 'exception-diagnostic'
+diagnostic.stage
+diagnostic.severity
+diagnostic.identifier
+diagnostic.summary
+diagnostic.details
+diagnostic.suggestions
+diagnostic.inputSnapshot
+diagnostic.stackSummary
+```
+
+Requirements:
+
+- preserve `ME.identifier` and `ME.message`;
+- include only a concise stack summary, not a giant raw dump;
+- provide grounded suggestions for known identifiers already present in the project;
+- use a safe generic suggestion for unknown identifiers;
+- never suppress or relabel NaN, Inf, complex, nonconvergence, or model-domain failures as success;
+- do not classify the known MATLAB shutdown-stage `mwboost::archive::archive_exception` as a model failure when it occurs after completed batch assertions; this batch-only distinction belongs in reporting/tests, not in ordinary GUI callbacks.
+
+### C. Trim-page UI improvements
+
+Modify `app/launch_tiltrotor_app.m` with the smallest R2021a-compatible change.
+
+The Trim page must expose four result views:
+
+1. **总览**
+   - accepted/pass status;
+   - solver status;
+   - objective residual norm and tolerance;
+   - full nine-state derivative norm;
+   - limit status;
+   - candidate accepted/total count;
+   - invalid model evaluation count;
+   - concise explanation and suggestions.
+
+2. **状态与操纵**
+   - preserve the existing state and control displays.
+
+3. **残差与限幅**
+   - show all nine state derivatives;
+   - visually distinguish the three trim-objective derivatives `udot`, `wdot`, `qdot` from the other six;
+   - show theta, collective, cyclicLong limits and remaining lower/upper margins in degrees;
+   - show at-limit and violation flags.
+
+4. **多初值候选**
+   - show every candidate returned by the existing trim report;
+   - display initial and final theta/collective/cyclicLong, cost, residual norm, exit flag, accepted, at-limit, within-limits;
+   - handle exact hover, where only one candidate may exist.
+
+Do not add charts in this step. Tables and concise status cards are sufficient and lower risk for R2021a.
+
+### D. Current-operation diagnostic panel
+
+Add a compact diagnostic panel in the workbench UI that displays the latest operation diagnostic for:
+
+- parameter validation;
+- trim;
+- linearization;
+- response;
+- export.
+
+Minimum functions:
+
+- stage;
+- severity;
+- identifier or reason codes;
+- summary;
+- details;
+- suggestions;
+- a button to copy a plain-text diagnostic summary to the clipboard when supported by MATLAB R2021a.
+
+Do not implement a persistent database, searchable log manager, source-code opener, or large history system. Keeping only the current/latest diagnostic is sufficient for V1.1a.
+
+### E. State invalidation and error behavior
+
+Preserve and verify:
+
+- starting a new trim clears all old trim-dependent linearization and response results;
+- a failed trim cannot enable linearization;
+- caught errors leave the UI in a usable state;
+- the busy pointer and button enables are restored by cleanup;
+- invalid parameter edits still revert;
+- no stale result appears as current after an error.
+
+## UI wording
+
+Use clear Chinese labels for user-facing text. Keep exact internal field names and error identifiers visible in technical-detail fields.
+
+Avoid claims that the model is a validated XV-15 model. Continue to describe it as the current concept/mechanism model.
 
 ## Architectural boundaries
 
-The GUI and service layer may call existing model and analysis functions. They must not duplicate or alter the physical equations.
+Allowed flow:
+
+```text
+GUI -> diagnostic service -> existing trim result/report
+GUI -> existing run_trim_case -> existing trim_symmetric
+```
+
+Prohibited flow:
+
+```text
+GUI -> duplicated trim equations
+Diagnostic service -> rerun trim
+Diagnostic service -> modify P
+GUI -> write params_nominal.m
+```
 
 Do not modify:
 
-- rotor, wing, fuselage, tail, mass-property, force/moment, or rigid-body formulas;
-- control mapping or control signs;
-- nominal physical parameter values;
-- trim objective, solver settings, thresholds, limits, or seeds;
-- numerical linearization equations or current default steps;
-- parameter-source inventory or the separate Draft PR #8 work.
+- `analysis/trim_symmetric.m`;
+- `analysis/linearize_numeric.m`;
+- `params_nominal.m`;
+- any file under `model/`;
+- physical formulas or nominal physical values;
+- trim tolerance, objective, penalty, seeds, multistart logic, solver options, or limit definitions;
+- response integration or waveform behavior;
+- PR #8 or branch `refactor/split-rh-mass-hub`.
 
-The GUI must continue to hold a runtime copy of `P`; it must not write user edits back into `params_nominal.m`.
+## Allowed files
 
-## Required review
+Modify only when necessary:
 
-### 1. Static MATLAB R2021a compatibility
+```text
+CODEX_TASK.md
+app/launch_tiltrotor_app.m
+services/build_trim_diagnostic.m
+services/build_exception_diagnostic.m
+services/run_trim_case.m
+tests/check_gui_services.m
+docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md
+```
 
-Review all new `.m` files for:
+`services/run_trim_case.m` may only be extended to attach a diagnostic generated from the completed result. It must not change input conversion, trim invocation, success criteria, or returned physical values.
 
-- valid function and nested-function structure;
-- APIs available in MATLAB R2021a;
-- valid `uigridlayout`, `uitabgroup`, `uitable`, `uiaxes`, callback, and layout usage;
-- row/column spans and table sizing;
-- correct use of cell arrays, strings, character vectors, and `newline`;
-- finite-value and dimension checks;
-- no hidden Control System Toolbox dependency;
-- no swallowed exceptions.
+Do not modify `startup.m` unless a new folder is introduced. No new folder is needed for this task.
 
-If a UI component is not supported exactly as written in R2021a, replace it with the smallest compatible implementation.
+## Test requirements
 
-### 2. Service contract checks
+Extend `tests/check_gui_services.m` without adding broad sweeps.
 
-Confirm:
+Required focused tests:
 
-- `validate_parameter_set` accepts default parameters and rejects invalid mass/inertia/steps/limits;
-- `run_trim_case` converts degree inputs to radians exactly once;
-- `run_linearization_case` rejects unconverged trim and returns finite 9x9/9x7 matrices;
-- `simulate_linear_response` integrates `delta_x_dot=A*delta_x+B*delta_u` without `ss` or `lsim`;
-- step, pulse, sine, and doublet signals have correct timing and amplitude;
-- actual state/control values equal trim values plus perturbations;
-- control-limit warnings evaluate left/right collective and cyclic combinations correctly;
-- MAT export retains parameters and available results.
+1. successful default hover diagnostic;
+2. diagnostic contains nine finite full residual entries;
+3. limit table contains theta, collective, cyclicLong with correct degree conversion and margins;
+4. candidate table exists and accepted count is consistent with `report.candidateAcceptance`;
+5. a synthetic nonconverged trim report produces `SOLVER_NOT_CONVERGED`;
+6. a synthetic excessive-residual report produces `OBJECTIVE_RESIDUAL_TOO_LARGE`;
+7. a synthetic at-limit report produces `CONTROL_AT_LIMIT`;
+8. invalid-evaluation identifiers are preserved;
+9. known and unknown `MException` values produce structured exception diagnostics;
+10. existing trim -> linearization -> response chain still passes;
+11. entry points resolve in MATLAB R2021a.
 
-### 3. UI workflow checks
-
-Open the application and verify:
-
-1. `run_app` opens one workbench window;
-2. parameter table fills the available tab area and edits only the numeric column;
-3. invalid edits are rejected and reverted;
-4. valid parameter edits invalidate all old results;
-5. default hover trim completes and displays states, controls, residuals, forces, and moments;
-6. linearization remains disabled until trim is accepted;
-7. A/B tables and eigenvalue plot are legible;
-8. response remains disabled until linearization succeeds;
-9. selected input/output plots update correctly;
-10. switching between perturbation and actual-state display works;
-11. exported `.mat` file can be loaded and contains the expected `session` structure;
-12. closing the UI leaves no destructive project changes.
+Prefer synthetic copies of the already computed default trim result to exercise failure classifications. Do not run extra expensive trim cases for each diagnostic condition.
 
 ## Runtime discipline
 
-Do not start with dense speed sweeps, transition scans, multiple response grids, Jacobian maps, or Monte Carlo runs.
+Follow this exact staged sequence.
 
-### Stage 0 — static checks
+### Stage 0 — static/path checks
 
-Run lightweight parser/path checks first:
+Run `checkcode` on every changed or new `.m` file.
+
+Then run:
 
 ```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; which run_app; which launch_tiltrotor_app; which validate_parameter_set; which run_trim_case; which run_linearization_case; which simulate_linear_response;"
+& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; which run_app; which launch_tiltrotor_app; which build_trim_diagnostic; which build_exception_diagnostic;"
 ```
 
-Use `checkcode` on every new or modified `.m` file. Record errors and actionable warnings.
+Stop and fix the first parser/path issue before continuing.
 
-### Stage 1 — focused service integration
-
-Run exactly one focused service chain:
+### Stage 1 — focused service test
 
 ```powershell
 & 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; report = check_gui_services; assert(report.allPassed);"
 ```
 
-This performs one default hover trim, one linearization, and one short response. If it fails, stop the staged sequence, diagnose the first failure, make a minimal fix, and repeat Stage 0 and Stage 1.
+This may perform the existing one hover trim, one linearization, and short response. Do not add speed sweeps, transition scans, Monte Carlo runs, or repeated full linearizations.
 
 ### Stage 2 — existing regression
 
@@ -141,89 +311,83 @@ Only after Stage 1 passes:
 & 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; summary = run_all_checks; assert(summary.allPassed);"
 ```
 
-Do not add the GUI integration chain to `run_all_checks` if doing so would duplicate the expensive hover trim and linearization. Keep it as the focused pre-regression check.
-
 ### Stage 3 — interactive UI smoke test
 
-Open MATLAB normally and run:
+Open MATLAB normally:
 
 ```matlab
 cd('E:\tiltrotor');
 run_app;
 ```
 
-Use the manual sequence in `docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md`. Capture only concise observations; do not perform broad parameter sweeps.
+Verify only:
 
-The known R2021a shutdown-stage `mwboost::archive::archive_exception: output stream error` must be reported separately from completed test-body assertions.
+1. one workbench window opens;
+2. default hover trim succeeds;
+3. overview values agree with the existing trim report;
+4. all nine residual rows appear;
+5. limit margins display in degrees;
+6. candidate table displays;
+7. a deliberately invalid GUI input creates a clear current diagnostic and leaves the UI usable;
+8. a new valid trim clears the old error diagnostic;
+9. linearization and response still work after a valid trim;
+10. closing the UI leaves no project-file changes.
 
-## Allowed files
-
-Necessary fixes are limited to:
-
-```text
-CODEX_TASK.md
-startup.m
-run_app.m
-app/launch_tiltrotor_app.m
-services/validate_parameter_set.m
-services/run_trim_case.m
-services/run_linearization_case.m
-services/simulate_linear_response.m
-services/save_analysis_case.m
-tests/check_gui_services.m
-docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md
-```
-
-A new focused GUI test helper may be added only when an R2021a compatibility defect cannot be tested inside `check_gui_services.m`.
-
-## Prohibited changes
-
-- no `.mlapp` binary replacement during this task;
-- no changes to physical model files;
-- no changes to `params_nominal.m` values;
-- no changes to trim or linearization formulas;
-- no new toolboxes or third-party dependencies;
-- no suppression of NaN, Inf, complex values, nonconvergence, or UI errors;
-- no large refactor unrelated to the GUI workflow;
-- no merge of this Draft PR;
-- no changes to Draft PR #8 or branch `refactor/split-rh-mass-hub`.
+Report the known R2021a shutdown-stage `mwboost::archive::archive_exception: output stream error` separately from completed test-body assertions.
 
 ## Acceptance criteria
 
 The task is complete only when:
 
-- Stage 0 has no parser errors;
-- `check_gui_services` passes all focused checks;
-- existing `run_all_checks` remains all PASS;
-- R2021a opens the application successfully;
-- the default hover trim -> linearization -> 0.1 deg response workflow succeeds;
-- invalid parameter edits are rejected;
-- no Control System Toolbox dependency exists;
-- no physical-model or nominal-parameter change appears in the diff;
-- the exported session loads successfully;
-- the final Git diff contains only allowed changes;
-- the worktree is clean after commit and push.
+- all required diagnostic fields exist and have stable types;
+- default hover produces a successful trim diagnostic;
+- synthetic failure classifications pass;
+- no extra trim/linearization sweeps were introduced;
+- the Trim page clearly displays overview, nine residuals, limits, and candidates;
+- latest-operation exception diagnostics are visible and copyable;
+- existing GUI workflow remains functional;
+- `checkcode` has no parser errors or actionable warnings;
+- `check_gui_services` passes;
+- `run_all_checks` passes;
+- no model, analysis, nominal-parameter, solver, or response-algorithm file changed;
+- final diff contains only allowed files;
+- worktree is clean after commit and push.
 
 ## Closeout
 
-After all acceptance criteria pass, update this file to:
+After all acceptance criteria pass, change the status line to:
 
 ```text
-STATUS: COMPLETE / GUI ANALYSIS WORKBENCH / MATLAB R2021a VERIFIED / HOLD
+STATUS: COMPLETE / GUI V1.1A TRIM DIAGNOSTICS / MATLAB R2021A VERIFIED / HOLD
 ```
+
+Commit and push to:
+
+```text
+feature/gui-v1.1-trim-diagnostics
+```
+
+Suggested commit message:
+
+```text
+feat(gui): add trim diagnostics and structured errors
+```
+
+Do not open or merge a pull request unless explicitly instructed after local verification.
 
 Final report must include:
 
 - files read;
 - files changed;
-- static `checkcode` findings and fixes;
-- Stage 1 and Stage 2 results;
-- interactive smoke-test observations;
-- confirmation that model equations and nominal physical values were unchanged;
-- confirmation that Control System Toolbox is not required;
-- commit SHA;
-- clean `git status --short` output.
-
-Commit and push to `feature/gui-analysis-workbench`.
-
-Do not merge the Draft PR.
+- implementation summary;
+- diagnostic reason codes implemented;
+- `checkcode` results;
+- path-check results;
+- `check_gui_services` results;
+- `run_all_checks` results;
+- interactive UI observations;
+- confirmation that no model/analysis/nominal-parameter files changed;
+- confirmation that no broad sweep was run;
+- final commit SHA;
+- final `git status --short`;
+- remaining limitations or unresolved issues.

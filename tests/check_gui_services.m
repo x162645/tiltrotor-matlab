@@ -14,7 +14,11 @@ run_check('default parameter validation', @check_default_parameters);
 run_check('invalid parameter rejection', @check_invalid_parameter_rejection);
 run_check('invalid inertia rejection', @check_invalid_inertia_rejection);
 run_check('invalid step and limit rejection', @check_invalid_step_limit_rejection);
+run_check('runtime UI text audit', @check_runtime_ui_text_audit);
 run_check('hover trim service', @check_hover_trim);
+run_check('successful trim diagnostic', @check_successful_trim_diagnostic);
+run_check('trim diagnostic synthetic failures', @check_trim_diagnostic_failures);
+run_check('exception diagnostics', @check_exception_diagnostics);
 run_check('trim-point linearization service', @check_linearization);
 run_check('linear response service', @check_response);
 run_check('response waveform timing', @check_response_waveforms);
@@ -93,6 +97,50 @@ fprintf('All passed: %d\n',report.allPassed);
             'Non-increasing cyclic limits should fail parameter validation.');
     end
 
+    function check_runtime_ui_text_audit()
+        runtimeFiles = { ...
+            fullfile(pwd, 'app', 'launch_tiltrotor_app.m'); ...
+            fullfile(pwd, 'services', 'build_trim_diagnostic.m'); ...
+            fullfile(pwd, 'services', 'build_exception_diagnostic.m')};
+        forbidden = { ...
+            'XV-15'; ...
+            '型号验证'; ...
+            '概念模型'; ...
+            '概念参数'; ...
+            '当前概念模型'; ...
+            '内部一致性'; ...
+            '不代表'};
+        combinedSource = '';
+        for iFile = 1:numel(runtimeFiles)
+            sourceText = fileread(runtimeFiles{iFile});
+            combinedSource = sprintf('%s\n%s', combinedSource, sourceText);
+            for iPhrase = 1:numel(forbidden)
+                assert(~contains(sourceText, forbidden{iPhrase}), ...
+                    'Forbidden runtime UI phrase found in %s: %s', ...
+                    runtimeFiles{iFile}, forbidden{iPhrase});
+            end
+        end
+
+        expected = { ...
+            '已载入默认参数'; ...
+            '此页用于调整当前计算使用的关键参数。'; ...
+            '参数修改只对当前软件会话生效。'; ...
+            '阶段：'; ...
+            '级别：'; ...
+            '原因代码：'; ...
+            '摘要：'; ...
+            '详细信息：'; ...
+            '建议：'; ...
+            '调用栈：'; ...
+            '俯仰角 theta'; ...
+            '初始俯仰角(°)'; ...
+            '可以继续运行线性化。'};
+        for iExpected = 1:numel(expected)
+            assert(contains(combinedSource, expected{iExpected}), ...
+                'Expected runtime UI text is missing: %s', expected{iExpected});
+        end
+    end
+
     function check_hover_trim()
         config = struct( ...
             'V',0, ...
@@ -111,6 +159,117 @@ fprintf('All passed: %d\n',report.allPassed);
         assert(numel(trimResult.uTrim) == 7);
         assert(isreal(trimResult.xTrim) && all(isfinite(trimResult.xTrim)));
         assert(isreal(trimResult.uTrim) && all(isfinite(trimResult.uTrim)));
+        assert(isfield(trimResult, 'diagnostic'));
+    end
+
+    function check_successful_trim_diagnostic()
+        assert(~isempty(trimResult), 'Hover trim check must run first.');
+        diagnostic = trimResult.diagnostic;
+        assert(strcmp(diagnostic.kind, 'trim-diagnostic'));
+        assert(diagnostic.success);
+        assert(strcmp(diagnostic.severity, 'success') || ...
+            strcmp(diagnostic.severity, 'warning'));
+        assert(numel(diagnostic.fullResiduals) == 9);
+        fullValues = [diagnostic.fullResiduals.value].';
+        assert(isreal(fullValues) && all(isfinite(fullValues)));
+
+        limitNames = {diagnostic.limitItems.name}.';
+        assert(isequal(limitNames, {'theta'; 'collective'; 'cyclicLong'}));
+        expectedValues = [trimResult.report.trimVariables.theta; ...
+            trimResult.uTrim(1); trimResult.uTrim(3)]*180/pi;
+        actualValues = [diagnostic.limitItems.valueDeg].';
+        assert(max(abs(actualValues-expectedValues)) < 1e-10);
+        lowerMargins = [diagnostic.limitItems.lowerMarginDeg].';
+        upperMargins = [diagnostic.limitItems.upperMarginDeg].';
+        assert(all(isfinite(lowerMargins)) && all(isfinite(upperMargins)));
+
+        assert(numel(diagnostic.candidates) == numel(trimResult.report.candidates));
+        acceptedCount = sum([diagnostic.candidates.acceptable].');
+        assert(acceptedCount == sum(trimResult.report.candidateAcceptance));
+    end
+
+    function check_trim_diagnostic_failures()
+        assert(~isempty(trimResult), 'Hover trim check must run first.');
+
+        synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.solverConverged = false;
+        synthetic.report.converged = false;
+        synthetic.report.candidates(1).acceptable = false;
+        synthetic.report.candidateAcceptance = false(size( ...
+            synthetic.report.candidateAcceptance));
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, 'SOLVER_NOT_CONVERGED')));
+        assert(any(strcmp(diagnostic.reasonCodes, 'NO_ACCEPTABLE_CANDIDATE')));
+
+        synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.residualNorm = 10*synthetic.trimResidualTolerance;
+        synthetic.report.converged = false;
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, ...
+            'OBJECTIVE_RESIDUAL_TOO_LARGE')));
+
+        synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.atLimit = true;
+        synthetic.report.limitReport.anyAtLimit = true;
+        synthetic.report.limitReport.items(1).atLimit = true;
+        synthetic.report.limitReport.items(1).atUpper = true;
+        synthetic.report.converged = false;
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, 'CONTROL_AT_LIMIT')));
+
+        synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.finiteFullStateDerivative = false;
+        synthetic.report.converged = false;
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, ...
+            'NONFINITE_FULL_DERIVATIVE')));
+
+        synthetic = trimResult;
+        synthetic.success = false;
+        synthetic.report.withinLimits = false;
+        synthetic.report.limitReport.anyViolation = true;
+        synthetic.report.limitReport.items(2).violated = true;
+        synthetic.report.converged = false;
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(any(strcmp(diagnostic.reasonCodes, ...
+            'CONTROL_LIMIT_VIOLATION')));
+
+        synthetic = trimResult;
+        synthetic.report.objectiveInvalidEvaluationCount = 2;
+        synthetic.report.objectiveInvalidEvaluationIdentifiers = { ...
+            'rotor_model_bemt:FlapNotConverged'; ...
+            'rotor_model_bemt:CoupledSolveNotConverged'};
+        diagnostic = build_trim_diagnostic(synthetic);
+        assert(diagnostic.invalidEvaluationCount == 2);
+        assert(isequal(diagnostic.invalidEvaluationIdentifiers, ...
+            synthetic.report.objectiveInvalidEvaluationIdentifiers));
+        assert(any(strcmp(diagnostic.reasonCodes, ...
+            'INVALID_MODEL_EVALUATIONS')));
+        assert(any(strcmp(diagnostic.reasonCodes, 'TRIM_ACCEPTED')));
+        assert(strcmp(diagnostic.severity, 'warning'));
+    end
+
+    function check_exception_diagnostics()
+        knownME = MException('run_trim_case:InvalidConfig', ...
+            'Invalid trim input.');
+        diagnostic = build_exception_diagnostic(knownME, 'trim', ...
+            struct('V', -1));
+        assert(strcmp(diagnostic.kind, 'exception-diagnostic'));
+        assert(strcmp(diagnostic.stage, 'trim'));
+        assert(strcmp(diagnostic.identifier, knownME.identifier));
+        assert(strcmp(diagnostic.details, knownME.message));
+        assert(~isempty(diagnostic.suggestions));
+
+        unknownME = MException('example:UnknownFailure', ...
+            'Unknown failure.');
+        diagnostic = build_exception_diagnostic(unknownME, 'response', struct());
+        assert(strcmp(diagnostic.identifier, unknownME.identifier));
+        assert(strcmp(diagnostic.details, unknownME.message));
+        assert(~isempty(diagnostic.stackSummary) || isempty(unknownME.stack));
     end
 
     function check_linearization()
@@ -233,6 +392,10 @@ fprintf('All passed: %d\n',report.allPassed);
             'launch_tiltrotor_app.m is not on the MATLAB path.');
         assert(exist('run_app','file') == 2, ...
             'run_app.m is not on the MATLAB path.');
+        assert(exist('build_trim_diagnostic','file') == 2, ...
+            'build_trim_diagnostic.m is not on the MATLAB path.');
+        assert(exist('build_exception_diagnostic','file') == 2, ...
+            'build_exception_diagnostic.m is not on the MATLAB path.');
     end
 end
 
