@@ -23,6 +23,7 @@ if ~parameterReport.valid
 end
 
 config = apply_defaults(config);
+config.waveform = char(config.waveform);
 validate_config(config);
 
 A = linearResult.A;
@@ -33,6 +34,10 @@ if ~isequal(size(A),[9,9]) || ~isequal(size(B),[9,7]) || ...
         numel(xTrim) ~= 9 || numel(uTrim) ~= 7
     error('simulate_linear_response:DimensionMismatch', ...
         'Expected A 9-by-9, B 9-by-7, 9 states, and 7 controls.');
+end
+if ~isreal(A) || ~isreal(B) || any(~isfinite(A(:))) || any(~isfinite(B(:)))
+    error('simulate_linear_response:InvalidMatrices', ...
+        'A and B must contain finite real values.');
 end
 
 nStep = floor(config.totalTime/config.timeStep);
@@ -49,19 +54,23 @@ active = tau >= 0;
 switch lower(config.waveform)
     case 'step'
         signal = amplitude*double(active);
+        interpolationMethod = 'previous';
     case 'pulse'
         signal = amplitude*double(active & tau <= config.duration);
+        interpolationMethod = 'previous';
     case 'sine'
         activeSine = active;
         if config.duration > 0
             activeSine = activeSine & tau <= config.duration;
         end
         signal = amplitude*sin(2*pi*config.frequencyHz*tau).*double(activeSine);
+        interpolationMethod = 'linear';
     case 'doublet'
         halfDuration = config.duration/2;
         signal = zeros(size(t));
         signal(active & tau < halfDuration) = amplitude;
         signal(tau >= halfDuration & tau <= config.duration) = -amplitude;
+        interpolationMethod = 'previous';
     otherwise
         error('simulate_linear_response:UnknownWaveform', ...
             'Unsupported waveform %s.', config.waveform);
@@ -72,14 +81,16 @@ du(:,config.controlChannel) = signal;
 odeOptions = odeset('RelTol',1e-7,'AbsTol',1e-9);
 [timeOut, dx] = ode45(@state_derivative, t, zeros(9,1), odeOptions);
 if ~isequal(timeOut, t)
-    duOut = interp1(t, du, timeOut, 'linear');
+    duOut = interp1(t, du, timeOut, interpolationMethod);
 else
     duOut = du;
 end
 
 xActual = dx + repmat(xTrim.', size(dx,1), 1);
 uActual = duOut + repmat(uTrim.', size(duOut,1), 1);
-if ~isreal(dx) || any(~isfinite(dx(:))) || any(~isfinite(xActual(:)))
+if ~isreal(dx) || ~isreal(xActual) || ~isreal(uActual) || ...
+        any(~isfinite(dx(:))) || any(~isfinite(xActual(:))) || ...
+        any(~isfinite(uActual(:)))
     error('simulate_linear_response:NonFiniteResponse', ...
         'Linear response contains complex, NaN, or Inf values.');
 end
@@ -114,7 +125,7 @@ result.limitWarning = detect_limit_violation(uActual, P);
 result.parameterValidation = parameterReport;
 
     function derivative = state_derivative(currentTime, deltaState)
-        currentInput = interp1(t, du, currentTime, 'linear').';
+        currentInput = interp1(t, du, currentTime, interpolationMethod).';
         derivative = A*deltaState + B*currentInput;
     end
 end
@@ -145,11 +156,11 @@ if ~(isnumeric(config.controlChannel) && isscalar(config.controlChannel) && ...
     error('simulate_linear_response:InvalidControlChannel', ...
         'controlChannel must be an integer from 1 to 7.');
 end
-if ~(ischar(config.waveform) || (isstring(config.waveform) && isscalar(config.waveform)))
+if ~(ischar(config.waveform) && isrow(config.waveform) && ...
+        any(strcmpi(config.waveform,{'step','pulse','sine','doublet'})))
     error('simulate_linear_response:InvalidWaveform', ...
         'waveform must be step, pulse, sine, or doublet.');
 end
-config.waveform = char(config.waveform); %#ok<NASGU>
 check_scalar(config.amplitudeDeg, 'amplitudeDeg', @(v) true);
 check_scalar(config.startTime, 'startTime', @(v) v >= 0);
 check_scalar(config.duration, 'duration', @(v) v > 0);
