@@ -28,7 +28,7 @@ header.ColumnSpacing = 8;
 uilabel(header,'Text','倾转旋翼机分析工作台', ...
     'FontSize',20,'FontWeight','bold');
 statusLamp = uilamp(header,'Color',[0.93 0.69 0.13]);
-statusLabel = uilabel(header,'Text','已载入名义概念参数');
+statusLabel = uilabel(header,'Text','已载入默认参数');
 uibutton(header,'Text','检查参数', ...
     'ButtonPushedFcn',@onValidateParameters);
 uibutton(header,'Text','恢复默认', ...
@@ -53,8 +53,7 @@ diagnosticGrid = uigridlayout(diagnosticPanel,[1 2]);
 diagnosticGrid.ColumnWidth = {'1x',92};
 diagnosticGrid.Padding = [8 6 8 8];
 diagnosticText = uitextarea(diagnosticGrid,'Editable','off', ...
-    'Value',{'stage: startup'; 'severity: warning'; ...
-    'summary: 尚未运行服务操作。'});
+    'Value',{'阶段：启动'; '级别：提示'; '摘要：尚未运行分析。'});
 uibutton(diagnosticGrid,'Text','复制诊断', ...
     'ButtonPushedFcn',@onCopyDiagnostic);
 
@@ -69,9 +68,9 @@ parameterTable = uitable(parameterLayout, ...
     'CellEditCallback',@onParameterEdited);
 uitextarea(parameterLayout,'Editable','off', ...
     'Value',{ ...
-    '这里仅暴露会直接影响当前概念模型和数值计算的关键参数。'; ...
-    '修改参数后，已有配平、线性化和响应结果会自动失效。'; ...
-    '“检查通过”仅表示结构、单位和基本数值条件合理，不代表完成 XV-15 型号验证。'});
+    '此页用于调整当前计算使用的关键参数。'; ...
+    '修改参数后，需要重新运行配平、线性化和响应。'; ...
+    '参数修改只对当前软件会话生效。'});
 refresh_parameter_table();
 
 %% Trim tab
@@ -144,9 +143,10 @@ trimLimitTable = uitable(trimResidualLimitGrid, ...
 
 trimCandidateGrid = make_fill_grid(trimCandidateTab);
 trimCandidateTable = uitable(trimCandidateGrid, ...
-    'ColumnName',{'初始theta','初始collective','初始cyclicLong', ...
-    '最终theta','最终collective','最终cyclicLong','cost', ...
-    '残差范数','exitflag','接受','触限','限内'}, ...
+    'ColumnName',{'初始俯仰角(°)','初始总距(°)', ...
+    '初始纵向周期变距(°)','最终俯仰角(°)','最终总距(°)', ...
+    '最终纵向周期变距(°)','目标函数','残差范数','退出标志', ...
+    '通过','触限','未越限'}, ...
     'ColumnWidth',{90,105,115,90,105,115,95,95,75,70,70,70});
 
 %% Linearization tab
@@ -242,7 +242,7 @@ title(responseOutputAxes,'状态响应');
 xlabel(responseOutputAxes,'Time (s)');
 grid(responseOutputAxes,'on');
 
-set_status('已载入名义概念参数，请先检查参数或运行配平。','warning');
+set_status('已载入默认参数，请先检查参数或运行配平。','warning');
 
     function onParameterEdited(~, event)
         row = event.Indices(1);
@@ -296,10 +296,10 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     function onResetParameters(~,~)
         P = params_nominal();
         refresh_parameter_table();
-        invalidate_analysis('已恢复名义参数，旧计算结果已失效。');
+        invalidate_analysis('已恢复默认参数，旧计算结果已失效。');
         set_current_diagnostic(make_operation_diagnostic( ...
             'parameter-validation','warning','PARAMETERS_RESET', ...
-            '已恢复名义概念参数。','界面参数副本已恢复为 params_nominal()。', ...
+            '已恢复默认参数。','界面参数副本已恢复为 params_nominal()。', ...
             {'旧计算结果已清空，需要重新运行配平。'}));
     end
 
@@ -399,7 +399,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                     'linearization','warning','UNSTABLE_MODE_PRESENT', ...
                     '线性化完成，当前配平点存在不稳定模态。', ...
                     'A/B 矩阵和特征值已更新。', ...
-                    {'该结论只针对当前配平点和当前概念模型。'}));
+                    {'该结果对应当前配平点。'}));
             else
                 linearStatusLabel.Text = '线性化完成：未发现右半平面特征值';
                 set_status('线性化与模态计算完成。','success');
@@ -528,7 +528,9 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         uialert(fig,sprintf([ ...
             '推荐顺序：\n1. 检查或修改关键参数；\n2. 运行配平；\n' ...
             '3. 在收敛配平点运行线性化；\n4. 设置小幅操纵输入并计算响应。\n\n' ...
-            '响应结果属于配平点附近的小扰动结果。界面不会修改 params_nominal.m。']), ...
+            '参数修改只对当前软件会话生效。\n' ...
+            '线性响应适用于当前配平点附近的小扰动。\n' ...
+            '错误和诊断信息显示在窗口底部的当前操作诊断面板。']), ...
             '使用说明');
     end
 
@@ -594,7 +596,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             '最大绝对值',peakValue; ...
             '峰值时刻 (s)',t(peakIndex); ...
             '末值',displayOutput(end); ...
-            '操纵限幅警告',logical(responseResult.limitWarning)};
+            '操纵限幅警告',bool_text(responseResult.limitWarning)};
         responseSummaryTable.Data = summary;
     end
 
@@ -656,7 +658,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             diagnostic.details = strjoin(detailParts, newline);
         end
         if validation.valid
-            diagnostic.suggestions = {'可以继续运行配平；通过检查不代表型号验证。'};
+            diagnostic.suggestions = {'可以继续运行配平。'};
         else
             diagnostic.suggestions = {'按错误列表修正参数后重新检查。'};
         end
@@ -678,7 +680,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         ov = diagnostic.overview;
         data = { ...
             '接受状态', bool_text(ov.accepted); ...
-            '诊断级别', diagnostic.severity; ...
+            '诊断级别', severity_display(diagnostic.severity); ...
             '求解器收敛', bool_text(ov.solverConverged); ...
             '目标残差范数', ov.residualNorm; ...
             '目标残差容限', ov.residualTolerance; ...
@@ -688,7 +690,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             '候选接受/总数', sprintf('%d / %d', ...
                 ov.acceptedCandidateCount, ov.candidateCount); ...
             '无效模型评估', ov.invalidEvaluationCount; ...
-            'reason codes', strjoin(diagnostic.reasonCodes(:).', ', ')};
+            '原因代码', strjoin(diagnostic.reasonCodes(:).', ', ')};
     end
 
     function lines = diagnostic_overview_lines(diagnostic)
@@ -716,14 +718,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     function data = make_limit_display(items)
         data = cell(numel(items),8);
         for k = 1:numel(items)
-            data{k,1} = items(k).name;
+            data{k,1} = limit_name_display(items(k).name);
             data{k,2} = items(k).valueDeg;
             data{k,3} = items(k).lowerDeg;
             data{k,4} = items(k).upperDeg;
             data{k,5} = items(k).lowerMarginDeg;
             data{k,6} = items(k).upperMarginDeg;
-            data{k,7} = items(k).atLimit;
-            data{k,8} = items(k).violated;
+            data{k,7} = bool_text(items(k).atLimit);
+            data{k,8} = bool_text(items(k).violated);
         end
     end
 
@@ -739,25 +741,26 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             data{k,7} = candidates(k).cost;
             data{k,8} = candidates(k).residualNorm;
             data{k,9} = candidates(k).exitflag;
-            data{k,10} = candidates(k).acceptable;
-            data{k,11} = candidates(k).atLimit;
-            data{k,12} = candidates(k).withinLimits;
+            data{k,10} = bool_text(candidates(k).acceptable);
+            data{k,11} = bool_text(candidates(k).atLimit);
+            data{k,12} = bool_text(candidates(k).withinLimits);
         end
     end
 
     function text = diagnostic_to_text(diagnostic)
         if isempty(diagnostic)
-            text = 'stage: none';
+            text = '阶段：未知阶段';
             return;
         end
         switch diagnostic.kind
             case 'trim-diagnostic'
-                text = sprintf(['stage: trim\nseverity: %s\nreasonCodes: %s\n' ...
-                    'summary: %s\naccepted: %s\nsolverConverged: %s\n' ...
-                    'residualNorm: %.16g\nresidualTolerance: %.16g\n' ...
-                    'fullResidualNorm: %.16g\ncandidates: %d/%d accepted\n' ...
-                    'invalidEvaluationCount: %d\nsuggestions:\n%s'], ...
-                    diagnostic.severity, strjoin(diagnostic.reasonCodes(:).', ', '), ...
+                text = sprintf(['阶段：%s\n级别：%s\n原因代码：%s\n' ...
+                    '摘要：%s\n接受状态：%s\n求解器收敛：%s\n' ...
+                    '目标残差范数：%.16g\n目标残差容限：%.16g\n' ...
+                    '九状态导数范数：%.16g\n候选通过数：%d/%d\n' ...
+                    '无效模型评估：%d\n建议：\n%s'], ...
+                    stage_display('trim'), severity_display(diagnostic.severity), ...
+                    strjoin(diagnostic.reasonCodes(:).', ', '), ...
                     diagnostic.summary, bool_text(diagnostic.overview.accepted), ...
                     bool_text(diagnostic.overview.solverConverged), ...
                     diagnostic.overview.residualNorm, ...
@@ -768,24 +771,37 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                     diagnostic.invalidEvaluationCount, ...
                     prefix_lines(diagnostic.suggestions));
             case 'exception-diagnostic'
-                text = sprintf(['stage: %s\nseverity: %s\nidentifier: %s\n' ...
-                    'summary: %s\ndetails: %s\nsuggestions:\n%s\nstack:\n%s'], ...
-                    diagnostic.stage, diagnostic.severity, ...
+                text = sprintf(['阶段：%s\n级别：%s\n错误标识：%s\n' ...
+                    '摘要：%s\n详细信息：%s\n建议：\n%s\n调用栈：\n%s'], ...
+                    stage_display(diagnostic.stage), ...
+                    severity_display(diagnostic.severity), ...
                     diagnostic.identifier, diagnostic.summary, ...
                     diagnostic.details, prefix_lines(diagnostic.suggestions), ...
                     stack_to_text(diagnostic.stackSummary));
             otherwise
-                text = sprintf(['stage: %s\nseverity: %s\nidentifier: %s\n' ...
-                    'summary: %s\ndetails: %s\nsuggestions:\n%s'], ...
-                    diagnostic.stage, diagnostic.severity, ...
-                    diagnostic.identifier, diagnostic.summary, diagnostic.details, ...
+                text = sprintf(['阶段：%s\n级别：%s\n原因代码：%s\n' ...
+                    '摘要：%s\n详细信息：%s\n建议：\n%s'], ...
+                    stage_display(diagnostic.stage), ...
+                    severity_display(diagnostic.severity), ...
+                    diagnostic_codes_text(diagnostic), ...
+                    diagnostic.summary, diagnostic.details, ...
                     prefix_lines(diagnostic.suggestions));
+        end
+    end
+
+    function text = diagnostic_codes_text(diagnostic)
+        if isfield(diagnostic, 'reasonCodes')
+            text = strjoin(diagnostic.reasonCodes(:).', ', ');
+        elseif isfield(diagnostic, 'identifier')
+            text = diagnostic.identifier;
+        else
+            text = '';
         end
     end
 
     function text = stack_to_text(stackSummary)
         if isempty(stackSummary)
-            text = '  <empty>';
+            text = '  无';
             return;
         end
         rows = cell(numel(stackSummary),1);
@@ -798,7 +814,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function text = prefix_lines(lines)
         if isempty(lines)
-            text = '  <none>';
+            text = '  无';
             return;
         end
         lines = lines(:);
@@ -814,9 +830,58 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function value = bool_text(flag)
         if flag
-            value = 'true';
+            value = '是';
         else
-            value = 'false';
+            value = '否';
+        end
+    end
+
+    function value = severity_display(severity)
+        switch char(severity)
+            case 'success'
+                value = '成功';
+            case 'warning'
+                value = '警告';
+            case 'error'
+                value = '错误';
+            otherwise
+                value = char(severity);
+        end
+    end
+
+    function value = stage_display(stage)
+        switch char(stage)
+            case 'startup'
+                value = '启动';
+            case 'parameter-validation'
+                value = '参数检查';
+            case 'trim'
+                value = '配平';
+            case 'linearization'
+                value = '线性化';
+            case 'response'
+                value = '响应';
+            case 'export'
+                value = '导出';
+            case 'copy-diagnostic'
+                value = '复制诊断';
+            case 'unknown'
+                value = '未知阶段';
+            otherwise
+                value = char(stage);
+        end
+    end
+
+    function value = limit_name_display(name)
+        switch char(name)
+            case 'theta'
+                value = '俯仰角 theta';
+            case 'collective'
+                value = '总距 collective';
+            case 'cyclicLong'
+                value = '纵向周期变距 cyclicLong';
+            otherwise
+                value = char(name);
         end
     end
 

@@ -199,7 +199,7 @@ if any(strcmp(reasonCodes, 'NO_ACCEPTABLE_CANDIDATE'))
     suggestions{end+1,1} = '检查所有候选初值的最终残差、退出标志和限幅状态。';
 end
 if isempty(suggestions)
-    suggestions{end+1,1} = '可以继续线性化；该结果仍只代表当前概念模型的内部一致性。';
+    suggestions{end+1,1} = '可以继续运行线性化。';
 end
 end
 

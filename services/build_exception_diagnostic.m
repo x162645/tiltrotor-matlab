@@ -25,7 +25,7 @@ if isempty(ME.identifier)
 else
     idText = ME.identifier;
 end
-summary = sprintf('%s 阶段发生异常：%s', char(stage), idText);
+summary = sprintf('%s阶段发生异常：%s', stage_display(stage), idText);
 end
 
 function suggestions = make_suggestions(identifier)
@@ -35,13 +35,13 @@ if contains_text(identifier, 'run_trim_case:InvalidParameters')
 elseif contains_text(identifier, 'run_trim_case:InvalidConfig')
     suggestions{end+1,1} = '检查界面工况输入是否为有限实数并处在允许范围内。';
 elseif starts_with(identifier, 'trim_symmetric:')
-    suggestions{end+1,1} = '该异常来自对称配平入口；检查配平输入、初值和底层 report。';
+    suggestions{end+1,1} = '检查配平输入、初值和详细错误信息。';
 elseif starts_with(identifier, 'linearize_numeric:')
-    suggestions{end+1,1} = '该异常来自数值线性化；确认当前配平点有效且扰动步长有限。';
+    suggestions{end+1,1} = '确认当前配平点有效，并检查线性化步长。';
 elseif starts_with(identifier, 'rotor_model_bemt:')
-    suggestions{end+1,1} = '该异常来自旋翼 BEMT/挥舞内部求解；保留标识用于定位模型域或迭代失败。';
+    suggestions{end+1,1} = '旋翼内部求解未完成，请保留错误标识并检查当前工况。';
 else
-    suggestions{end+1,1} = '保留错误标识和消息，按当前阶段输入逐项复现并定位。';
+    suggestions{end+1,1} = '请记录错误标识和消息，并按当前输入重新检查。';
 end
 end
 
@@ -62,4 +62,27 @@ end
 
 function tf = contains_text(textValue, pattern)
 tf = contains(char(textValue), pattern);
+end
+
+function value = stage_display(stage)
+switch char(stage)
+    case 'startup'
+        value = '启动';
+    case 'parameter-validation'
+        value = '参数检查';
+    case 'trim'
+        value = '配平';
+    case 'linearization'
+        value = '线性化';
+    case 'response'
+        value = '响应';
+    case 'export'
+        value = '导出';
+    case 'copy-diagnostic'
+        value = '复制诊断';
+    case 'unknown'
+        value = '未知';
+    otherwise
+        value = char(stage);
+end
 end
