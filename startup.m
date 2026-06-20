@@ -5,6 +5,8 @@ rootDir = fileparts(mfilename('fullpath'));
 addpath(rootDir);
 addpath(fullfile(rootDir, 'model'));
 addpath(fullfile(rootDir, 'analysis'));
+addpath(fullfile(rootDir, 'services'));
+addpath(fullfile(rootDir, 'app'));
 addpath(fullfile(rootDir, 'tests'));
 addpath(fullfile(rootDir, 'examples'));
 
