@@ -24,6 +24,7 @@ run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
+run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
@@ -120,6 +121,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         controlReport = check_control_architecture();
         assert(controlReport.allPassed, ...
             'Control architecture closure has failed items.');
+    end
+
+    function test_trim_mode_framework()
+        trimModeReport = check_trim_mode_framework();
+        assert(trimModeReport.allPassed, ...
+            'General trim mode framework has failed items.');
     end
 
     function test_aerodynamic_components()

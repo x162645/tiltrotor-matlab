@@ -158,6 +158,14 @@ report.initialSimplexPhysicalStep = 0.05*zScale;
 report.initialSimplexPhysicalStepUnits = 'rad';
 report.objectiveInvalidEvaluationCount = invalidEvalCount;
 report.objectiveInvalidEvaluationIdentifiers = unique(invalidEvalIdentifiers);
+report.definitionName = 'legacy_symmetric';
+report.mode = 'legacy_symmetric';
+report.unknownNames = {'theta'; 'collective'; 'cyclicLong'};
+report.fixedStates = struct('v', 0, 'p', 0, 'q', 0, 'r', 0, ...
+    'phi', 0, 'psi', 0);
+report.fixedControls = struct('diffCollective', 0, 'diffCyclic', 0, ...
+    'aileron', 0, 'elevator', 0, 'rudder', 0);
+report.compatibilityMode = true;
 
     function z = trim_from_y(y, seedZ)
         z = seedZ(:) + zScale.*(y(:)-ySeed);
