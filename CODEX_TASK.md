@@ -1,53 +1,39 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / GUI PARAMETER WORKBENCH
+STATUS: ACTIVE / GUI PARAMETER WORKBENCH / STAGE 2
 
 Branch: `feature/gui-v1.2-parameter-workbench`
 Base branch: `main`
 
 ## Objective
 
-Develop a comprehensive GUI parameter workbench. Add only parameters that are actively used by current production calculations, have clear physical or numerical meaning, have explicit units, and can be safely validated.
+Implement the GUI parameter catalog and validation services for the 139 approved editable scalar components.
 
-All GUI-visible text must be customer-facing Chinese. Do not show source-code paths, developer labels, reason codes, Git terminology, test terminology, or implementation-stage wording.
+## Required instructions
 
-## First run
+Read and follow this file in full:
 
-Read:
+```text
+docs/CODEX_GUI_PARAMETER_STAGE2.md
+```
+
+Also read:
 
 ```text
 AGENTS.md
-CODEX_TASK.md
-docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md
 docs/GUI_PARAMETER_WORKBENCH_PLAN.md
 params_nominal.m
-app/launch_tiltrotor_app.m
 services/validate_parameter_set.m
 ```
 
-Then inspect actual parameter consumers in `model/`, `analysis/`, and `services/`.
+## Current boundary
 
-Perform only a read-only parameter inventory. For every numeric field/component, report:
+This run performs Stage 2 only.
 
-```text
-field
-Chinese name
-category
-GUI unit
-internal unit
-production consumers
-meaning
-editable or excluded
-exclusion reason
-dependencies
-validation rule
-basic or advanced
-```
+Do not modify GUI layout, `params_nominal.m`, `model/*`, `analysis/*`, or `tests/run_all_checks.m`.
 
-Exclude deprecated aliases, inactive placeholders, derived values, duplicate matrix entries, internal solver states, strings, and fields with no production consumer.
+Do not run `run_all_checks`.
 
-Report totals, category counts, the complete proposed catalog, ambiguities, and expected implementation files.
+Do not commit or push.
 
-Do not modify production or test files. Do not commit or push. Stop after the inventory with a clean working tree.
-
-Detailed rules are in `docs/GUI_PARAMETER_WORKBENCH_PLAN.md`.
+Stop after the focused parameter-catalog tests and report the results with a clean working tree state summary.
