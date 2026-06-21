@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / TRIM CREDIBILITY DIAGNOSTICS
+STATUS: COMPLETE / TRIM CREDIBILITY DIAGNOSTICS / HOLD
 
 Branch: `feature/trim-credibility-diagnostics`
 
@@ -8,14 +8,15 @@ Base branch: `main`
 
 ## Priority mainline
 
-1. `RH_mass/RH_hub` split: COMPLETE AND MERGED.
-2. General mode-dependent trim core: COMPLETE AND MERGED.
-3. Open-loop pitch-actuator allocation: COMPLETE AND MERGED.
-4. Trim credibility diagnostics: CURRENT TASK.
+1. RH split: COMPLETE AND MERGED.
+2. General trim core: COMPLETE AND MERGED.
+3. Open-loop pitch allocation: COMPLETE AND MERGED.
+4. Trim credibility diagnostics: COMPLETE, AWAITING REVIEW/MERGE.
 5. Linearization credibility diagnostics.
 6. Robust induced-velocity root solution.
 
-Do not start items 5-6 in this branch.
+Do not start items 5-6 in this branch. Keep this branch on HOLD until the
+Draft PR is reviewed and merged.
 
 ## Objective
 
@@ -320,10 +321,13 @@ Do not:
 
 ## Current closeout
 
-For this first Codex run:
+Stage 4 closeout:
 
-- modify no files;
-- create no commit;
-- push nothing;
-- keep the Draft PR unchanged;
-- finish with a clean `git status --short`.
+- trim credibility diagnostics are implemented and registered in
+  `run_all_checks`;
+- the 35 m/s, 45 deg conversion point is intentionally classified as
+  `CAUTION / LOW_MARGIN`, not as a failure;
+- no parameter, limit, tolerance, solver, allocation, or model changes were
+  made to remove the low-margin warning;
+- no linearization credibility or induced-velocity task has been started;
+- this task does not claim XV-15 or flight-test validation.
