@@ -11,17 +11,17 @@ Both dimensions use `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`, and `NONE`. A `
 
 ## Retained H-series gaps
 
-### GAP-H01 - `RH` couples two physical radii
+### GAP-H01 - structural coupling resolved; independent radius values remain unsourced
 
-- Problem: `P.mass.RH` is simultaneously the equivalent moving-mass CG radius in `mass_properties` and the rotor-hub tilt radius in `rotor_model_bemt`.
-- Current code consequence: one number couples CG shift, inertia-reference movement, rotor force arm, and rotor local velocity. Independently correcting either geometry changes the other.
-- Evidence available: `params_nominal.m:17-21`, `model/mass_properties.m:5-6`, `model/rotor_model_bemt.m:34-36`; the repository explicitly calls the equality conceptual.
-- Evidence missing: separate nacelle/rotor moving-mass centroid relative to conversion axis and mast/hub center relative to that axis, with the same aircraft origin and nacelle-angle convention.
-- Current concept-model risk: `HIGH`.
-- XV-15 reproduction blocker: `HIGH`.
-- Recommended disposition: first perform a behavior-preserving structural split into `RH_mass` and `RH_hub`, both initialized to `0.75 m`; only later propose sourced values.
+- Resolved structural defect: `P.mass.RH_mass` is now read only by `mass_properties`, and `P.rotor.RH_hub` is now read only by `rotor_model_bemt`; both retain the unchanged conceptual value `0.75 m`.
+- Compatibility state: `P.mass.RH` remains deprecated, is initialized from `RH_mass`, has zero production reads, and has no model effect when modified.
+- Verification: focused tests cover the old shared-radius formulas at `betaM = [0, pi/4, pi/2]`, independent synthetic perturbations, and deprecated-alias inactivity.
+- Evidence still missing: separate nacelle/rotor moving-mass centroid relative to conversion axis and mast/hub center relative to that axis, with the same aircraft origin and nacelle-angle convention.
+- Current concept-model risk: `MEDIUM` for numeric provenance only; structural coupling status is `RESOLVED`.
+- XV-15 reproduction blocker: `HIGH` for the two aircraft-specific values.
+- Recommended disposition: keep both conceptual values unchanged until independently sourced; do not infer equality for a future XV-15 dataset.
 - Required source type: primary XV-15 mass-properties/build-up report plus dimensioned installation/three-view or manufacturer/NASA geometry.
-- Blocks: independent mass/geometry replacement, transition moments, linearization interpretation, XV-15 comparison.
+- Blocks: aircraft-specific mass/CG and rotor force-arm replacement, transition interpretation, and XV-15 comparison; it no longer blocks independent current-model parameter governance.
 
 ### GAP-H02 - `I0` and `KI` lack a configuration- and unit-closed source
 
@@ -209,7 +209,7 @@ Both dimensions use `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`, and `NONE`. A `
 
 ### GAP-L01 - unused compatibility and metadata fields
 
-- Problem: seven declared compatibility fields are unused; `bladeMassDistribution` and `vtail.c` are also not consumed by production calculations.
+- Problem: eight declared compatibility fields, including deprecated `P.mass.RH`, are unused; `bladeMassDistribution` and `vtail.c` are also not consumed by production calculations.
 - Current code consequence: readers may mistake them for active physics.
 - Evidence available: repository-wide `P.` read search.
 - Evidence missing: none for current use status.

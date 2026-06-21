@@ -31,9 +31,9 @@ eT = [sin(betaM); 0; -cos(betaM)];
 eD = [cos(betaM); 0;  sin(betaM)];
 eY = [0; 1; 0];
 
-rHub0 = [P.rotor.pivotX + P.mass.RH*sin(betaM);
+rHub0 = [P.rotor.pivotX + P.rotor.RH_hub*sin(betaM);
          side*P.rotor.pivotY;
-         P.rotor.pivotZ - P.mass.RH*cos(betaM)];
+         P.rotor.pivotZ - P.rotor.RH_hub*cos(betaM)];
 
 rHub = rHub0 - cgShift;
 Vhub = Vbody + cross(omegaBody, rHub);

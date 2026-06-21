@@ -14,11 +14,12 @@ P.mass.m     = 6000.0;
 % mNac is the combined moving mass of the left and right tilting
 % nacelle/rotor assemblies. It is not a per-side mass.
 P.mass.mNac  = 900.0;
-% RH is currently shared by the moving-mass equivalent CG radius and the
-% rotor hub tilt radius. This coupling is a conceptual assumption, not a
-% sourced equality. Future sourced data should split it into RH_mass and
-% RH_hub while initially preserving the same numeric value.
-P.mass.RH    = 0.75;
+% Equivalent moving-mass CG radius from the nacelle tilt axis, m.
+% ASSUMED_CONCEPT: structural split only; not an XV-15 sourced value.
+P.mass.RH_mass = 0.75;
+% Deprecated compatibility metadata. Production calculations do not read
+% this alias, so modifying it does not affect model results.
+P.mass.RH = P.mass.RH_mass;
 
 P.mass.I0 = [18000,     0,  -800;
                  0, 30000,     0;
@@ -44,6 +45,9 @@ P.rotor.kCD            = 0.012;
 P.rotor.pivotX         = 0.0;
 P.rotor.pivotY         = 5.0;
 P.rotor.pivotZ         = 0.0;
+% Rotor-hub tilt radius from the nacelle tilt axis, m.
+% ASSUMED_CONCEPT: structural split only; not an XV-15 sourced value.
+P.rotor.RH_hub         = 0.75;
 
 P.rotor.nRadial        = 12;
 P.rotor.nAzimuth       = 16;

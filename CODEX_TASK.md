@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / TRACK A1 / BEHAVIOR-PRESERVING RH SPLIT
+STATUS: COMPLETE / RH MASS-HUB SPLIT / HOLD
 
 Branch: `refactor/split-rh-mass-hub`
 

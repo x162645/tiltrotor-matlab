@@ -15,6 +15,9 @@ report.cases = struct('name',{},'passed',{},'message',{});
 report.findings = struct('severity',{},'category',{},'message',{});
 report.parameterProvenance = parameter_provenance();
 report.representativeAngles = [0; pi/4; pi/2];
+report.tolerances.geometryIdentity = 1e-12;
+report.tolerances.decouplingIdentity = 1e-12;
+report.behaviorPreservation = struct();
 
 callCount.total_forces_moments = 0;
 callCount.rotor_model_bemt = 0;
@@ -22,6 +25,10 @@ callCount.rotor_model_bemt = 0;
 add_case('mass positive and invariant with tilt', @test_mass_invariant);
 add_case('CG shift endpoint identities', @test_cg_shift_endpoints);
 add_case('CG shift continuity and central derivative', @test_cg_shift_derivative);
+add_case('legacy shared-radius behavior preserved', @test_legacy_radius_identity);
+add_case('moving-mass radius independent of hub radius', @test_mass_radius_independence);
+add_case('hub radius independent of moving-mass radius', @test_hub_radius_independence);
+add_case('deprecated RH alias has no production effect', @test_deprecated_alias_inactive);
 add_case('inertia symmetry and positive definiteness', @test_inertia_spd);
 add_case('principal moments and radii plausible', @test_principal_radii);
 add_case('KI interpreted per radian', @test_ki_per_radian);
@@ -48,6 +55,12 @@ end
 fprintf('Model calls: total_forces_moments=%d, rotor_model_bemt=%d\n', ...
     report.modelCallCount.total_forces_moments, ...
     report.modelCallCount.rotor_model_bemt);
+fprintf(['RH split tolerances: geometry=%.1e m, decoupling=%.1e m; ' ...
+    'worst legacy CG=%.3e m, hub=%.3e m\n'], ...
+    report.tolerances.geometryIdentity, ...
+    report.tolerances.decouplingIdentity, ...
+    report.behaviorPreservation.legacyCgMaxError, ...
+    report.behaviorPreservation.legacyHubMaxError);
 fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
 
     function result = test_mass_invariant()
@@ -67,9 +80,9 @@ fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
         for i = 1:numel(betas)
             betaM = betas(i);
             mp = mass_properties(betaM, P);
-            expected = [P.mass.mNac*P.mass.RH*sin(betaM)/P.mass.m;
+            expected = [P.mass.mNac*P.mass.RH_mass*sin(betaM)/P.mass.m;
                         0;
-                        P.mass.mNac*P.mass.RH*(1 - cos(betaM))/P.mass.m];
+                        P.mass.mNac*P.mass.RH_mass*(1 - cos(betaM))/P.mass.m];
             err = max(err, norm(mp.cgShift - expected));
         end
         mp0 = mass_properties(0, P);
@@ -87,12 +100,96 @@ fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
         mpP = mass_properties(beta0 + h, P);
         mpM = mass_properties(beta0 - h, P);
         dNum = (mpP.cgShift - mpM.cgShift)/(2*h);
-        dExact = [P.mass.mNac*P.mass.RH*cos(beta0)/P.mass.m;
+        dExact = [P.mass.mNac*P.mass.RH_mass*cos(beta0)/P.mass.m;
                   0;
-                  P.mass.mNac*P.mass.RH*sin(beta0)/P.mass.m];
+                  P.mass.mNac*P.mass.RH_mass*sin(beta0)/P.mass.m];
         err = norm(dNum - dExact);
         result = make_result(is_real_finite(dNum) && err < 1e-11, ...
             sprintf('CG derivative error %.3e.', err));
+    end
+
+    function result = test_legacy_radius_identity()
+        legacyRadius = 0.75;
+        cgErr = 0;
+        hubErr = 0;
+        outputsFinite = true;
+        for i = 1:numel(report.representativeAngles)
+            betaM = report.representativeAngles(i);
+            c = representative_call(betaM, P);
+            expectedCg = legacy_cg_shift(betaM, legacyRadius, P);
+            cgErr = max(cgErr, norm(c.info.massProperties.cgShift - expectedCg));
+            hubErr = max(hubErr, absolute_hub_error(c.info, betaM, legacyRadius, expectedCg, P));
+            outputsFinite = outputsFinite && is_real_finite(collect_outputs(c));
+        end
+        report.behaviorPreservation.legacyCgMaxError = cgErr;
+        report.behaviorPreservation.legacyHubMaxError = hubErr;
+        report.behaviorPreservation.legacyRepresentativeOutputsFinite = outputsFinite;
+        ok = cgErr <= report.tolerances.geometryIdentity && ...
+            hubErr <= report.tolerances.geometryIdentity && outputsFinite;
+        result = make_result(ok, sprintf( ...
+            'Legacy identity errors: CG %.3e m, absolute hub %.3e m, finite=%d.', ...
+            cgErr, hubErr, outputsFinite));
+    end
+
+    function result = test_mass_radius_independence()
+        betaM = pi/4;
+        radiusDelta = 0.125; % Synthetic separation perturbation, m.
+        Pmass = P;
+        Pmass.mass.RH_mass = P.mass.RH_mass + radiusDelta;
+        mp0 = mass_properties(betaM, P);
+        mp1 = mass_properties(betaM, Pmass);
+        expectedDelta = legacy_cg_shift(betaM, radiusDelta, P);
+        cgDeltaErr = norm((mp1.cgShift - mp0.cgShift) - expectedDelta);
+
+        c = representative_call(betaM, Pmass);
+        hubErr = absolute_hub_error(c.info, betaM, P.rotor.RH_hub, mp1.cgShift, Pmass);
+        report.behaviorPreservation.massPerturbCgError = cgDeltaErr;
+        report.behaviorPreservation.massPerturbAbsoluteHubError = hubErr;
+        ok = cgDeltaErr <= report.tolerances.decouplingIdentity && ...
+            hubErr <= report.tolerances.decouplingIdentity;
+        result = make_result(ok, sprintf( ...
+            'Mass-radius perturbation errors: CG delta %.3e m, absolute hub %.3e m.', ...
+            cgDeltaErr, hubErr));
+    end
+
+    function result = test_hub_radius_independence()
+        betaM = pi/4;
+        radiusDelta = 0.125; % Synthetic separation perturbation, m.
+        Phub = P;
+        Phub.rotor.RH_hub = P.rotor.RH_hub + radiusDelta;
+        mp0 = mass_properties(betaM, P);
+        mp1 = mass_properties(betaM, Phub);
+        cgErr = norm(mp1.cgShift - mp0.cgShift);
+
+        c = representative_call(betaM, Phub);
+        hubErr = absolute_hub_error(c.info, betaM, Phub.rotor.RH_hub, mp1.cgShift, Phub);
+        report.behaviorPreservation.hubPerturbCgError = cgErr;
+        report.behaviorPreservation.hubPerturbAbsoluteHubError = hubErr;
+        ok = cgErr <= report.tolerances.decouplingIdentity && ...
+            hubErr <= report.tolerances.decouplingIdentity;
+        result = make_result(ok, sprintf( ...
+            'Hub-radius perturbation errors: CG %.3e m, absolute hub %.3e m.', ...
+            cgErr, hubErr));
+    end
+
+    function result = test_deprecated_alias_inactive()
+        betaM = pi/4;
+        Palias = P;
+        Palias.mass.RH = P.mass.RH + 10.0; % Synthetic deprecated-field perturbation.
+        mp0 = mass_properties(betaM, P);
+        mp1 = mass_properties(betaM, Palias);
+        c0 = representative_call(betaM, P);
+        c1 = representative_call(betaM, Palias);
+        cgErr = norm(mp1.cgShift - mp0.cgShift);
+        outputErr = norm(collect_outputs(c1) - collect_outputs(c0));
+        exactMatch = isequal(collect_outputs(c1), collect_outputs(c0));
+        report.behaviorPreservation.deprecatedAliasCgError = cgErr;
+        report.behaviorPreservation.deprecatedAliasOutputError = outputErr;
+        report.behaviorPreservation.deprecatedAliasExactMatch = exactMatch;
+        ok = cgErr == 0 && outputErr == 0 && exactMatch;
+        result = make_result(ok, sprintf( ...
+            'Deprecated-alias errors: CG %.3e, representative output %.3e, exact=%d.', ...
+            cgErr, outputErr, exactMatch));
     end
 
     function result = test_inertia_spd()
@@ -226,13 +323,36 @@ fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
             sprintf('Deterministic output difference norm %.3e.', norm(y1-y2)));
     end
 
-    function c = representative_call(betaM)
+    function c = representative_call(betaM, thisP)
+        if nargin < 2
+            thisP = P;
+        end
         x = [28; 1.0; -0.8; 0.02; -0.015; 0.01; 0.01; -0.02; 0];
         u = [14*d2r; 0; 0.5*d2r; 0; 0.5*d2r; -1*d2r; 0.5*d2r];
         callCount.total_forces_moments = callCount.total_forces_moments + 1;
         callCount.rotor_model_bemt = callCount.rotor_model_bemt + 2;
-        [F,M,info] = total_forces_moments(x, u, betaM, P);
+        [F,M,info] = total_forces_moments(x, u, betaM, thisP);
         c = struct('x',x,'u',u,'betaM',betaM,'F',F,'M',M,'info',info);
+    end
+
+    function cgShift = legacy_cg_shift(betaM, radius, thisP)
+        cgShift = [thisP.mass.mNac*radius*sin(betaM)/thisP.mass.m;
+                   0;
+                   thisP.mass.mNac*radius*(1 - cos(betaM))/thisP.mass.m];
+    end
+
+    function err = absolute_hub_error(info, betaM, radius, cgShift, thisP)
+        expectedLeft = legacy_absolute_hub(betaM, -1, radius, thisP);
+        expectedRight = legacy_absolute_hub(betaM, +1, radius, thisP);
+        actualLeft = info.rotorLeft.rHub + cgShift;
+        actualRight = info.rotorRight.rHub + cgShift;
+        err = max(norm(actualLeft - expectedLeft), norm(actualRight - expectedRight));
+    end
+
+    function rHub0 = legacy_absolute_hub(betaM, side, radius, thisP)
+        rHub0 = [thisP.rotor.pivotX + radius*sin(betaM);
+                 side*thisP.rotor.pivotY;
+                 thisP.rotor.pivotZ - radius*cos(betaM)];
     end
 
     function err = wing_region_error(wing, cgShift)
@@ -285,9 +405,9 @@ fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
     end
 
     function rHub = rotor_hub(betaM, side, cgShift)
-        rHub0 = [P.rotor.pivotX + P.mass.RH*sin(betaM);
+        rHub0 = [P.rotor.pivotX + P.rotor.RH_hub*sin(betaM);
                  side*P.rotor.pivotY;
-                 P.rotor.pivotZ - P.mass.RH*cos(betaM)];
+                 P.rotor.pivotZ - P.rotor.RH_hub*cos(betaM)];
         rHub = rHub0 - cgShift;
     end
 
@@ -322,8 +442,12 @@ fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
             'Concept-scale aircraft mass in params_nominal; not treated as XV-15 measured data.');
         add_param('moving nacelle/rotor mass total', 'P.mass.mNac', 'ASSUMED_CONCEPT', ...
             'Interpreted by PHYSICS_AND_CODE_AUDIT as total moving mass for left and right tilt assemblies.');
-        add_param('moving-mass lever arm', 'P.mass.RH', 'ASSUMED_CONCEPT', ...
-            'Equivalent moving-mass CG distance from tilt axis; also used in rotor hub tilt geometry.');
+        add_param('moving-mass lever arm', 'P.mass.RH_mass', 'ASSUMED_CONCEPT', ...
+            'Equivalent moving-mass CG distance from tilt axis.');
+        add_param('rotor-hub tilt radius', 'P.rotor.RH_hub', 'ASSUMED_CONCEPT', ...
+            'Rotor-hub center distance from the tilt axis.');
+        add_param('deprecated shared-radius alias', 'P.mass.RH', 'DEPRECATED_UNUSED', ...
+            'Compatibility metadata only; production calculations do not read it.');
         add_param('nominal inertia matrix', 'P.mass.I0', 'ASSUMED_CONCEPT', ...
             'Concept nominal inertia at betaM=0; NASA table mapping remains unverified.');
         add_param('inertia slope per radian', 'P.mass.KI', 'ASSUMED_CONCEPT', ...
@@ -339,7 +463,7 @@ fprintf('All mass/inertia/geometry checks passed: %d\n', report.allPassed);
         add_param('vertical tail aerodynamic centers', 'P.vtail.xAC/yAC/zAC', 'ASSUMED_CONCEPT', ...
             'Concept twin-fin reference points.');
         add_param('CG shift formula', 'mp.cgShift', 'DERIVED', ...
-            'Derived from mNac, RH, betaM, and total mass by the implemented low-order formula.');
+            'Derived from mNac, RH_mass, betaM, and total mass by the implemented low-order formula.');
         add_param('principal moments/radii diagnostics', 'mp.principalMoments/radiusOfGyration', 'DERIVED', ...
             'Derived from the inertia matrix returned by mass_properties.');
 
