@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / GENERAL MODE TRIM CORE
+STATUS: COMPLETE / GENERAL MODE TRIM CORE / HOLD
 
 Branch: `feature/general-mode-trim-core`
 
