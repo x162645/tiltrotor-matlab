@@ -149,13 +149,22 @@ ASSUMED_CONCEPT
 pitchCommand = eta_p
 ```
 
-定义范围：
+定义动态可用范围：
 
 ```math
--1\leq\eta_p\leq1
+\eta_{p,lim}=\frac{1}{\max(g_c,g_e)}
 ```
 
-它不是驾驶杆模型，也不是闭环控制信号；只是配平层的归一化开环命令。
+```math
+-\eta_{p,lim}\leq\eta_p\leq\eta_{p,lim}
+```
+
+其中 `eta_p_lim` 在两个端点为 1，在 `betaM=pi/4` 时为 2。
+`max(g_c,g_e)` 只定义虚拟命令的可用范围，不进入直接执行器映射；
+`cyclicLong` 和 `elevator` 仍严格使用原始 `g_c`、`g_e` 余弦曲线。
+该动态命令范围属于 `ASSUMED_CONCEPT`，用于避免转换区因固定
+`[-1,1]` 命令范围而人为损失执行器权威。它不是驾驶杆模型，也不是
+闭环控制信号。
 
 现有直接执行器限幅的绝对最大值作为归一化参考：
 
@@ -272,11 +281,14 @@ allocation.classification
 allocation.betaM
 allocation.gCyclic
 allocation.gElevator
+allocation.authorityDenominator
+allocation.pitchCommandLimit
 allocation.cyclicReference
 allocation.elevatorReference
 allocation.cyclicDirection
 allocation.elevatorDirection
 allocation.pitchCommand
+allocation.normalizedPitchCommand
 allocation.cyclicLong
 allocation.elevator
 ```
@@ -302,7 +314,21 @@ allocation configuration
 
 ## 9. 数值尺度与限幅
 
-`pitchCommand` 的物理边界固定为 `[-1,1]`。
+`pitchCommand` 的工况相关边界为：
+
+```math
+\left[-\frac{1}{\max(g_c,g_e)},
+       \frac{1}{\max(g_c,g_e)}\right]
+```
+
+归一化诊断量定义为：
+
+```math
+\eta_{p,norm}=\frac{\eta_p}{\eta_{p,lim}}
+```
+
+并要求 `eta_p_norm` 位于 `[-1,1]`。该定义不钳位命令，也不修改
+直接执行器余弦混合曲线。
 
 搜索尺度属于数值设置，建议从 2 deg 的现有端点搜索尺度换算：
 
@@ -360,9 +386,12 @@ report.appliedControls
 - `g_c+g_e=1`；
 - `g_c` 单调不增；
 - `g_e` 单调不减；
+- `pitchCommandLimit` 有限、实数且位于 `[1,2]`；
+- 两端 `pitchCommandLimit=1`，45 deg 时为 2；
 - 两端与 45 deg 精确满足预期；
 - `betaM` 越界、非有限命令、非法方向映射明确报错；
-- 生成执行器量满足公式。
+- 生成执行器量仍满足原始余弦公式；
+- 动态边界命令下至少一个直接执行器达到完整参考行程。
 
 ### Stage 3：端点等价
 
@@ -395,9 +424,13 @@ gamma=0
 
 - 三个动力学残差满足当前配平容差；
 - 状态和控制有限、实数；
-- `pitchCommand`、周期变距、升降舵均不贴限、不越界；
+- `pitchCommand`、`normalizedPitchCommand`、周期变距、升降舵均不贴限、不越界；
 - 两个执行器严格满足虚拟命令映射；
 - 不修改模型参数和求解器容差。
+
+权威保持只读诊断表明，45 deg 配平约使用两个执行器 93.37% 的参考
+行程，只剩约 6.63% 裕度。该低裕度只在本任务中记录，交由后续配平
+可信度诊断处理，不在本任务中调参。
 
 若失败，报告最佳残差、活动限制、非法求值和失败原因，然后停止。不得扩大到工况扫描或调参。
 

@@ -151,3 +151,99 @@ direction, schedule weight, aerodynamic model, or plant equation was changed.
 The allocation test was not registered in `run_all_checks`, and Stage 4 total
 regression was not run. The branch remains on HOLD for review of the 45 deg
 conversion limitation.
+
+## Authority-preserving read-only feasibility diagnostic
+
+A subsequent read-only diagnostic retained the same directions and cosine
+ratio but normalized the available authority by `max(gCyclic,gElevator)` for
+the single 35 m/s, 45 deg condition. Two explicitly authorized initial values
+were used; no operating-condition scan or parameter change was performed.
+
+| Seed | exitflag | theta | collective | normalized authority command | residual norm | invalid evaluations | runtime |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| current conversion initial | 1 | `3.404372101535e-01` | `2.615452255016e-01` | `9.337039599145e-01` | `3.187913604244e-09` | 4 | 11.260173 s |
+| boundary-informed initial | 1 | `3.404372102836e-01` | `2.615452254391e-01` | `9.337039599390e-01` | `1.043533618256e-09` | 2 | 7.258428 s |
+
+The better result used:
+
+```text
+cyclicLong = -5.703672918946e-01 rad
+elevator   = -6.518483335938e-01 rad
+residual   = [9.664557486152e-10, 3.828778668928e-10,
+             -9.127013445538e-11]
+```
+
+No state, virtual command, or direct actuator was at or beyond a limit, and all
+states, controls, and derivatives were finite and real. This isolated the root
+cause: the original fixed `pitchCommand` range `[-1,1]` provided only 50% of
+each direct actuator reference at 45 deg because both raw cosine gains are
+0.5. The direct cosine ratio itself was not the cause.
+
+The reviewed final correction therefore keeps the original direct-actuator
+mapping and changes only the virtual-command range:
+
+```text
+authorityDenominator = max(gCyclic,gElevator)
+pitchCommandLimit = 1/authorityDenominator
+-pitchCommandLimit <= pitchCommand <= pitchCommandLimit
+```
+
+At 45 deg, `pitchCommandLimit=2`. The read-only normalized authority command
+`0.933703959939` corresponds to an original-cosine `pitchCommand` of about
+`1.867407919878`; this value is diagnostic evidence and is not hard-coded.
+Both direct actuators use about 93.37% of their reference travel, leaving about
+6.63% authority margin. The low margin is recorded for later trim-credibility
+diagnostics and is not tuned in this task.
+
+## Final dynamic-command implementation result
+
+The reviewed dynamic command range was implemented while preserving the raw
+cosine actuator mapping:
+
+```text
+gCyclic   = cos(betaM)^2
+gElevator = sin(betaM)^2
+authorityDenominator = max(gCyclic,gElevator)
+pitchCommandLimit = 1/authorityDenominator
+normalizedPitchCommand = pitchCommand/pitchCommandLimit
+```
+
+Static tests confirmed that `pitchCommandLimit` is finite and real, lies in
+`[1,2]`, equals 1 at both endpoints, and equals 2 at 45 deg. A boundary command
+uses the full reference travel of at least one direct actuator without hidden
+clipping. The actuator outputs continue to use the original `gCyclic` and
+`gElevator` formulas.
+
+Endpoint equivalence remained within the required `1e-8` thresholds:
+
+| Endpoint | Max state difference | Max control difference | Residual-norm difference |
+|---|---:|---:|---:|
+| helicopter | `1.727e-09` | `1.935e-11` | `9.680e-10` |
+| airplane | `1.297e-09` | `6.693e-11` | `3.021e-09` |
+
+The final 35 m/s, 45 deg conversion trim was:
+
+```text
+x = [ 3.299130700016e+01, 0, 1.168647348095e+01, 0, 0, 0,
+      0, 3.404372103090e-01, 0 ]
+u = [ 2.615452254109e-01, 0, -5.703672920348e-01, 0, 0,
+     -6.518483337541e-01, 0 ]
+pitchCommand = 1.867407919878 approximately
+pitchCommandLimit = 2
+normalizedPitchCommand = 0.933703959939 approximately
+residual = [ -3.767478726028e-10, 5.692891136277e-10,
+              9.395500474211e-11 ]
+residualNorm = 6.890984e-10
+```
+
+The solution converged, remained within the dynamic virtual-command and direct
+actuator limits, and all states, controls, and derivatives were finite and
+real. Cyclic and elevator reference-travel usage were both `0.933704`, leaving
+`0.066296` (about 6.63%) margin on each actuator. This low margin is recorded
+only; no parameter, limit, direction, cosine ratio, or solver tolerance was
+changed.
+
+The focused allocation suite passed all four cases in `45.155525 s`. After the
+allocation test was registered, the complete internal regression passed all
+15 checks in `79.720065 s`. These tests establish covered-condition internal
+consistency only and do not constitute real-aircraft or XV-15 validation.

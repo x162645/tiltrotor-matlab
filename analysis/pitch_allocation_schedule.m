@@ -5,8 +5,6 @@ function allocation = pitch_allocation_schedule(betaM, pitchCommand, P, directio
 
 validate_scalar(betaM, 'betaM', 0, pi/2, ...
     'pitch_allocation_schedule:InvalidNacelleAngle');
-validate_scalar(pitchCommand, 'pitchCommand', -1, 1, ...
-    'pitch_allocation_schedule:InvalidPitchCommand');
 
 if ~isstruct(P) || ~isscalar(P) || ~isfield(P, 'control') || ...
         ~isstruct(P.control) || ~isscalar(P.control) || ...
@@ -32,17 +30,26 @@ elevatorDirection = validate_direction(direction.elevatorDirection, ...
 
 gCyclic = cos(betaM)^2;
 gElevator = sin(betaM)^2;
+authorityDenominator = max(gCyclic, gElevator);
+pitchCommandLimit = 1/authorityDenominator;
+validate_scalar(pitchCommand, 'pitchCommand', ...
+    -pitchCommandLimit, pitchCommandLimit, ...
+    'pitch_allocation_schedule:InvalidPitchCommand');
+normalizedPitchCommand = pitchCommand/pitchCommandLimit;
 
 allocation.type = 'ebook_cosine_virtual_command';
 allocation.classification = 'ASSUMED_CONCEPT';
 allocation.betaM = betaM;
 allocation.gCyclic = gCyclic;
 allocation.gElevator = gElevator;
+allocation.authorityDenominator = authorityDenominator;
+allocation.pitchCommandLimit = pitchCommandLimit;
 allocation.cyclicReference = cyclicReference;
 allocation.elevatorReference = elevatorReference;
 allocation.cyclicDirection = cyclicDirection;
 allocation.elevatorDirection = elevatorDirection;
 allocation.pitchCommand = pitchCommand;
+allocation.normalizedPitchCommand = normalizedPitchCommand;
 allocation.cyclicLong = cyclicDirection*gCyclic*cyclicReference*pitchCommand;
 allocation.elevator = elevatorDirection*gElevator*elevatorReference*pitchCommand;
 end

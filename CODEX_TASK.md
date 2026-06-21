@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: HOLD / OPEN-LOOP PITCH ALLOCATION / 45 DEG CONVERSION LIMIT
+STATUS: COMPLETE / OPEN-LOOP PITCH ALLOCATION / HOLD
 
 Branch: `feature/open-loop-pitch-allocation`
 
@@ -161,12 +161,15 @@ elevatorReference = max(abs(P.control.elevatorLim))
 Requirements:
 
 - `0 <= betaM <= pi/2` only;
-- `-1 <= pitchCommand <= 1`;
+- `-pitchCommandLimit <= pitchCommand <= pitchCommandLimit`，其中
+  `pitchCommandLimit = 1/max(gCyclic,gElevator)`；
 - finite real inputs;
 - direction values only `+1` or `-1`;
 - type `ebook_cosine_virtual_command`;
 - classification `ASSUMED_CONCEPT`;
 - no hidden clipping inside the helper;
+- report `authorityDenominator`, `pitchCommandLimit`, and
+  `normalizedPitchCommand`;
 - return gains, references, directions, command, and both actuator outputs.
 
 ### 2.2 Conversion trim definition
@@ -308,6 +311,7 @@ analysis/pitch_allocation_schedule.m
 tests/check_pitch_allocation.m
 tests/run_all_checks.m
 docs/PITCH_ALLOCATION_AUDIT.md
+docs/ebook_packets/CONTROL_ALLOCATION_PACKET.md
 ```
 
 Do not modify unless an unexpected compatibility issue is proven and reported first:
@@ -324,7 +328,6 @@ model/*
 app/*
 services/*
 analysis/linearize_numeric.m
-docs/ebook_packets/CONTROL_ALLOCATION_PACKET.md
 ```
 
 ## Prohibited changes
