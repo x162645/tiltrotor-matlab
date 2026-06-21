@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / EBOOK METHOD PRIORITY BASELINE / HOLD
+STATUS: COMPLETE / EBOOK METHOD AND TRIM PACKET BASELINE / HOLD
 
 Branch: `planning/ebook-method-baseline-v2`
 
@@ -8,12 +8,13 @@ Base branch: `main`
 
 ## Purpose
 
-Record the user-approved transition from GUI work to physics-model improvement and define a token-efficient handoff from ChatGPT literature analysis to Codex implementation.
+Record the user-approved transition from GUI work to physics-model improvement, preserve the priority mainline, and provide the concise trim method packet that Codex will consume instead of reading the full electronic book.
 
-The durable priority list and electronic-book method index are in:
+The durable documents are:
 
 ```text
 docs/EBOOK_MODEL_UPGRADE_PRIORITY.md
+docs/ebook_packets/TRIM_METHOD_PACKET.md
 ```
 
 ## Decisions recorded
@@ -28,7 +29,7 @@ docs/EBOOK_MODEL_UPGRADE_PRIORITY.md
 ## Priority status
 
 1. `RH_mass/RH_hub` behavior-preserving split: **COMPLETE AND MERGED** in PR #8.
-2. General mode-dependent trim core: **NEXT IMPLEMENTATION TARGET**.
+2. General mode-dependent trim core: **NEXT IMPLEMENTATION TARGET; METHOD PACKET READY**.
 3. Open-loop pitch-actuator allocation constraint: follows the trim core and must remain separable from flight-control-law work.
 4. Trim credibility diagnostics.
 5. Linearization credibility diagnostics.
@@ -36,26 +37,17 @@ docs/EBOOK_MODEL_UPGRADE_PRIORITY.md
 
 The remaining lower-priority work is tracked in `docs/EBOOK_MODEL_UPGRADE_PRIORITY.md`.
 
-## Next preparation task
+## Trim implementation boundary
 
-Before Codex changes trim code, ChatGPT must create a concise method packet, expected at:
+The prepared method packet requires the next code task to:
 
-```text
-docs/ebook_packets/TRIM_METHOD_PACKET.md
-```
+- add a generic analysis-layer trim core;
+- preserve the current `trim_symmetric` signature and legacy numerical behavior;
+- define explicit helicopter and airplane endpoint actuator sets;
+- refuse an underdetermined default conversion trim until a later allocation constraint is supplied;
+- avoid GUI changes, control-law work, real-aircraft parameter insertion, Jacobian diagnostics, linearization changes, and induced-flow changes.
 
-That packet must define:
-
-- the exact electronic-book chapter/page scope used;
-- trim unknowns and residuals for helicopter, conversion, and airplane configurations;
-- the role of collective, longitudinal cyclic, and elevator;
-- how unknown/constraint counts remain equal;
-- angle conventions and any conversion from the book's mast angle to code `betaM`;
-- current-model compatibility requirements;
-- prohibited assumptions and prohibited real-aircraft parameter insertion;
-- focused MATLAB acceptance tests and runtime budget.
-
-Codex must not read the full electronic book or begin implementation until that packet and a new branch-specific task file are available.
+A new implementation branch and branch-specific `CODEX_TASK.md` must be created only after this documentation baseline is merged.
 
 ## Scope of this branch
 
