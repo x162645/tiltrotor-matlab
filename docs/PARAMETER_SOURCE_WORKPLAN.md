@@ -21,9 +21,10 @@ Track A is not an XV-15 parameter replacement track. It governs the existing con
 
 ### Track A work packages
 
-1. Behavior-preserving `RH_mass` / `RH_hub` split.
-   - Initialize both to the current `0.75 m` behavior.
-   - Prove unchanged mass-property and rotor-hub force-arm results before any sourced value is considered.
+1. **STRUCTURALLY COMPLETE** - behavior-preserving `RH_mass` / `RH_hub` split.
+   - Both active fields remain `0.75 m`; no XV-15 value was introduced.
+   - Focused regression proves unchanged old-formula geometry, independent perturbation behavior, and zero production effect from the deprecated `P.mass.RH` alias.
+   - Independent aircraft-specific numeric sourcing remains pending under Track B and GAP-H01.
 2. Separate endpoint inertia data from the interpolation law.
    - Preserve the current `I0 - betaM*KI` behavior first.
    - Do not enter NASA inertia values until the damaged inertia table is manually verified.

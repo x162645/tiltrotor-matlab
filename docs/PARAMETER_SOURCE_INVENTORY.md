@@ -27,7 +27,9 @@ Consumer abbreviations: `RB` = `model/rotor_model_bemt.m`; `WG` = `model/wing_mo
 |ENV-002|`P.env.g`|`9.80665`|m/s^2|environment|physical|MP-derived checks, RB, EOM, TR scaling|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:10`|Constant standard-gravity-like value|REFERENCE_PENDING|none|not yet identified|No XV-15 target value or relation has been established for this row.|NO_TARGET_VALUE|Primary XV-15 source required before aircraft-specific replacement or comparison.|LOW|NONE|HIGH|No repository citation establishes it|
 |MAS-001|`P.mass.m`|`6000.0`|kg|mass|physical|MP, RB hover seed, EOM|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:13`|Total aircraft mass|DOCUMENTED_PRIMARY|NASA_TM_X_62407.pdf|PDF 14, printed page 11, weight-summary table/paragraph|Basic empty 9,076 lb, research mission empty 10,073 lb, and design gross 13,000 lb are documented weight states; no one state is selected for the current 6000 kg value.|CONFIGURATION_DEPENDENT|Manual review required before any value replacement; preserve conflicts side by side.|MEDIUM|MEDIUM|HIGH|NASA sources distinguish several weight states; current value is not mapped to one NASA/XV-15 evidence is target/comparison context only, not proof of current-value provenance.|
 |MAS-002|`P.mass.mNac`|`900.0`|kg|mass|physical|MP|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:14-16`|Combined moving mass of both nacelle/rotor assemblies, not per side|REFERENCE_PENDING|none|not yet identified|No XV-15 target value or relation has been established for this row.|NO_TARGET_VALUE|Primary XV-15 source required before aircraft-specific replacement or comparison.|MEDIUM|MEDIUM|HIGH|Meaning is explicit in code; documentary source and included hardware are absent|
-|MAS-003|`P.mass.RH`|`0.75`|m|mass/geometry|physical|MP, RB hub position|AMBIGUOUS_COUPLED|Code proves coupled meanings, so one historical provenance cannot safely describe the field.|Code: `params_nominal.m:17-21`; reads `MP:5-6`, `RB:34-36`|Both moving-mass CG radius and rotor-hub tilt radius|REFERENCE_PENDING|none|not yet identified|No XV-15 target value or relation has been established for this row.|NO_TARGET_VALUE|Primary XV-15 source required before aircraft-specific replacement or comparison.|HIGH|HIGH|HIGH|Must be behavior-preservingly split before independent sourcing|
+|MAS-003A|`P.mass.RH_mass`|`0.75`|m|mass geometry|physical|MP|ASSUMED_CONCEPT|Behavior-preserving split of the former shared conceptual radius; no aircraft-source provenance is claimed.|Code: `params_nominal.m`; production reads `MP:5-6`|Equivalent moving-mass CG radius from the nacelle tilt axis|REFERENCE_PENDING|none|not yet identified|The independent XV-15 moving-mass centroid evidence remains pending.|NO_TARGET_VALUE|Primary weight-and-balance or moving-assembly geometry source required before aircraft-specific replacement.|MEDIUM|HIGH|HIGH|Structurally independent; numeric sourcing remains open|
+|MAS-003B|`P.rotor.RH_hub`|`0.75`|m|rotor geometry|physical|RB hub position|ASSUMED_CONCEPT|Behavior-preserving split of the former shared conceptual radius; no aircraft-source provenance is claimed.|Code: `params_nominal.m`; production reads `RB:34-36`|Rotor-hub center radius from the nacelle tilt axis|REFERENCE_PENDING|none|not yet identified|The independent XV-15 conversion-axis-to-hub geometry evidence remains pending.|NO_TARGET_VALUE|Primary rotor/nacelle geometry source required before aircraft-specific replacement.|MEDIUM|HIGH|HIGH|Structurally independent; numeric sourcing remains open|
+|MAS-003C|`P.mass.RH`|`P.mass.RH_mass` (`0.75` initially)|m|compatibility|physical|none|DEPRECATED_UNUSED|Retained only for external-structure compatibility and initialized from `RH_mass`; production reads are zero and changing this alias does not affect model results.|Code: `params_nominal.m`; repository production search found no `model/` or `analysis/` read|Deprecated historical shared-radius name|NOT_APPLICABLE|not applicable|not applicable|This inactive alias is not an XV-15 target parameter.|NOT_APPLICABLE|No aircraft source required for the inactive alias.|INFO|NONE|HIGH|Tests prove alias perturbations leave mass, hub, total force/moment, and representative outputs unchanged|
 |MAS-004|`P.mass.I0`|`[18000 0 -800; 0 30000 0; -800 0 45000]`|kg m^2|inertia|physical|MP, input validation, EOM through `mp.I`|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:23-25`|Nominal inertia at code `betaM=0`|CANDIDATE_PRIMARY|NASA_TM_X_62407.pdf|PDF 15, printed page 12, inertia table; requires manual visual verification|Candidate airplane/helicopter inertia tensors at 13,000 lb in slug-ft^2; damaged text extraction prevents confirmed values or axes.|UNRESOLVED|Manual source/configuration/unit/coordinate verification or additional primary evidence required.|HIGH|HIGH|HIGH|NASA TM X-62407 has configuration-specific values, but current matrix is not traced to them NASA/XV-15 evidence is target/comparison context only, not proof of current-value provenance.|
 |MAS-005|`P.mass.KI`|`diag([300 500 400])`|kg m^2/rad|inertia|physical|MP|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:27-28`; `MP:10`|Slope in `I=I0-betaM*KI`, explicitly per radian|REFERENCE_PENDING|none|not yet identified|No XV-15 target value or relation has been established for this row.|NO_TARGET_VALUE|Primary XV-15 source required before aircraft-specific replacement or comparison.|HIGH|HIGH|HIGH|Per-degree source data would require a factor of `180/pi`; no source is established|
 |ROT-001|`P.rotor.R`|`3.80`|m|rotor geometry|physical|RB, physical checks|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:31`; reads `RB:45,49,280-281`|Current radius is not the exact SI conversion `25 ft/2 = 3.81 m`|DOCUMENTED_PRIMARY|NASA_TM_X_62407.pdf|PDF 20, printed page 17, section 3.7|25.0 ft diameter, corresponding to target radius 3.81 m after D/2 and ft-to-m conversion.|APPROXIMATE_MATCH|Retain exact citation and configuration record before using in an XV-15 dataset.|MEDIUM|MEDIUM|HIGH|Do not silently round a source value to justify the current value NASA/XV-15 evidence is target/comparison context only, not proof of current-value provenance.|
@@ -214,21 +216,21 @@ Counts below are generated from the rows in this document and should be updated 
 
 |measure|count|
 |-|-:|
-|inventory rows|174|
-|`P.` leaf fields|120|
-|active physical/empirical parameter rows|96|
+|inventory rows|176|
+|`P.` leaf fields|122|
+|active physical/empirical parameter rows|97|
 |numerical-setting rows|69|
-|deprecated compatibility fields|7|
+|deprecated compatibility fields|8|
 |other inactive metadata/reference fields|2 (`bladeMassDistribution`, unused `vtail.c`)|
 
 |current-model provenance|count|
 |-|-:|
 |DOCUMENTED_PROJECT_SOURCE|0|
 |DERIVED|5|
-|ASSUMED_CONCEPT|93|
+|ASSUMED_CONCEPT|95|
 |NUMERICAL|68|
-|AMBIGUOUS_COUPLED|1|
-|DEPRECATED_UNUSED|7|
+|AMBIGUOUS_COUPLED|0|
+|DEPRECATED_UNUSED|8|
 |UNRESOLVED|0|
 
 |XV-15 target-evidence status|count|
@@ -278,7 +280,7 @@ These counts are machine-checked from the table. `DOCUMENTED_PRIMARY` appears on
 - `P.rotor.chord = 0.38 m`: current-model provenance is `ASSUMED_CONCEPT`; 14 in chord equals 0.3556 m; comparison is `NUMERIC_CONFLICT`.
 - `P.rotor.Omega = 62 rad/s`: current-model provenance is `ASSUMED_CONCEPT`; source rpm values are mode/configuration dependent; comparison is `CONFIGURATION_DEPENDENT`.
 - `P.rotor.twistTip = -6 deg`: current-model provenance is `ASSUMED_CONCEPT`; documented 45 deg root-to-tip/nonlinear twist evidence is `REPRESENTATION_INCOMPATIBLE` with the current single-field representation.
-- `P.mass.RH`: current-model provenance remains `AMBIGUOUS_COUPLED`; both current concept-model risk and XV-15 reproduction blocker are `HIGH`.
+- `P.mass.RH_mass = P.rotor.RH_hub = 0.75 m`: the active meanings are structurally independent and remain `ASSUMED_CONCEPT`; aircraft-specific values for both remain unsourced and blocked. `P.mass.RH` is retained only as `DEPRECATED_UNUSED` compatibility metadata with zero production reads.
 
 ## Applicability boundary
 

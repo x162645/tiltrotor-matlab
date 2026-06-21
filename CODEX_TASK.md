@@ -1,229 +1,250 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / GUI ANALYSIS WORKBENCH / MATLAB R2021a VERIFIED / HOLD
+STATUS: COMPLETE / RH MASS-HUB SPLIT / HOLD
 
-Branch: `feature/gui-analysis-workbench`
+Branch: `refactor/split-rh-mass-hub`
 
 Base branch: `main`
 
-Draft PR: #9 (`https://github.com/x162645/tiltrotor-matlab/pull/9`)
-
 ## Purpose
 
-Complete and verify a user-friendly MATLAB R2021a visual workbench for the existing tiltrotor concept model. The workbench must provide:
+Resolve GAP-H01 by separating the currently coupled field `P.mass.RH` into two independently named parameters while preserving current numerical behavior:
 
-- critical parameter editing and validation;
-- symmetric trim;
-- numerical linearization and modal display;
-- linear small-disturbance control response;
-- analysis-session export.
+- `P.mass.RH_mass`: equivalent moving-mass CG radius used only by `mass_properties`;
+- `P.rotor.RH_hub`: rotor-hub tilt radius used only by `rotor_model_bemt` and geometry checks.
 
-The current implementation has already been added to the branch. Local Codex must review it, run the staged MATLAB checks, make only necessary compatibility or correctness fixes, and push the verified result.
+Both new fields must initially equal the current value `0.75 m`. This task is structural only. It does not introduce XV-15 values and does not tune any result.
 
 ## Read first
 
-1. `AGENTS.md`
-2. `CODEX_TASK.md`
-3. `docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md`
-4. `startup.m`
-5. `run_app.m`
-6. `app/launch_tiltrotor_app.m`
-7. all files in `services/`
-8. `tests/check_gui_services.m`
-9. `params_nominal.m`
-10. `analysis/trim_symmetric.m`
-11. `analysis/linearize_numeric.m`
-12. `model/tiltrotor_eom.m`
-13. `model/total_forces_moments.m`
-14. `tests/run_all_checks.m`
+- `AGENTS.md`
+- `CODEX_TASK.md`
+- `params_nominal.m`
+- `model/mass_properties.m`
+- `model/rotor_model_bemt.m`
+- `model/total_forces_moments.m`
+- `tests/check_mass_inertia_geometry.m`
+- `tests/check_physical_sanity.m`
+- `tests/check_rotor_force_moment_chain.m`
+- `tests/run_all_checks.m`
+- `docs/PARAMETER_SOURCE_INVENTORY.md`
+- `docs/PARAMETER_GAP_REGISTER.md`
+- `docs/PARAMETER_SOURCE_WORKPLAN.md`
 
-Before editing, run:
+Before editing, search the whole repository for:
 
-```powershell
-git status --short
-git branch --show-current
-git log -1 --oneline
+```text
+P.mass.RH
+RH_mass
+RH_hub
 ```
 
-Stop and report if the branch is wrong or the worktree contains unrelated modifications.
+Report every active read, test read, and documentation occurrence. Do not assume the known two production reads are the only ones.
 
-## Architectural boundaries
+## Required implementation
 
-The GUI and service layer may call existing model and analysis functions. They must not duplicate or alter the physical equations.
+### 1. Parameter definition
 
-Do not modify:
+In `params_nominal.m`:
 
-- rotor, wing, fuselage, tail, mass-property, force/moment, or rigid-body formulas;
-- control mapping or control signs;
-- nominal physical parameter values;
-- trim objective, solver settings, thresholds, limits, or seeds;
-- numerical linearization equations or current default steps;
-- parameter-source inventory or the separate Draft PR #8 work.
+```matlab
+P.mass.RH_mass = 0.75;
+P.rotor.RH_hub = 0.75;
+```
 
-The GUI must continue to hold a runtime copy of `P`; it must not write user edits back into `params_nominal.m`.
+Use SI units and comments that state the distinct physical meanings.
 
-## Required review
+Retain `P.mass.RH` only if compatibility is genuinely required. If retained:
 
-### 1. Static MATLAB R2021a compatibility
+- mark it clearly as deprecated compatibility metadata;
+- initialize it from one of the new fields only to preserve old external callers;
+- prove that no production path reads it;
+- do not use it as a fallback inside production functions;
+- document that modifying the deprecated alias does not affect model results.
 
-Review all new `.m` files for:
+If repository-wide evidence shows no compatibility need, removal is allowed, but all repository callers and tests must be updated and the decision must be documented. Do not silently keep three active radii.
 
-- valid function and nested-function structure;
-- APIs available in MATLAB R2021a;
-- valid `uigridlayout`, `uitabgroup`, `uitable`, `uiaxes`, callback, and layout usage;
-- row/column spans and table sizing;
-- correct use of cell arrays, strings, character vectors, and `newline`;
-- finite-value and dimension checks;
-- no hidden Control System Toolbox dependency;
-- no swallowed exceptions.
+### 2. Production reads
 
-If a UI component is not supported exactly as written in R2021a, replace it with the smallest compatible implementation.
+Update:
 
-### 2. Service contract checks
+- `model/mass_properties.m` to use only `P.mass.RH_mass` in the CG-shift equations;
+- `model/rotor_model_bemt.m` to use only `P.rotor.RH_hub` in hub-position geometry.
 
-Confirm:
+Do not change formulas, signs, angle conventions, force arms, CG subtraction, inertia law, or any numeric value.
 
-- `validate_parameter_set` accepts default parameters and rejects invalid mass/inertia/steps/limits;
-- `run_trim_case` converts degree inputs to radians exactly once;
-- `run_linearization_case` rejects unconverged trim and returns finite 9x9/9x7 matrices;
-- `simulate_linear_response` integrates `delta_x_dot=A*delta_x+B*delta_u` without `ss` or `lsim`;
-- step, pulse, sine, and doublet signals have correct timing and amplitude;
-- actual state/control values equal trim values plus perturbations;
-- control-limit warnings evaluate left/right collective and cyclic combinations correctly;
-- MAT export retains parameters and available results.
+### 3. Tests
 
-### 3. UI workflow checks
+Extend `tests/check_mass_inertia_geometry.m` with explicit behavior-preserving and decoupling checks.
 
-Open the application and verify:
+At minimum verify:
 
-1. `run_app` opens one workbench window;
-2. parameter table fills the available tab area and edits only the numeric column;
-3. invalid edits are rejected and reverted;
-4. valid parameter edits invalidate all old results;
-5. default hover trim completes and displays states, controls, residuals, forces, and moments;
-6. linearization remains disabled until trim is accepted;
-7. A/B tables and eigenvalue plot are legible;
-8. response remains disabled until linearization succeeds;
-9. selected input/output plots update correctly;
-10. switching between perturbation and actual-state display works;
-11. exported `.mat` file can be loaded and contains the expected `session` structure;
-12. closing the UI leaves no destructive project changes.
+1. **legacy-value identity**
+   - with `RH_mass = RH_hub = 0.75 m`, representative outputs at `betaM = [0, pi/4, pi/2]` match the old shared-radius formulas to tight floating-point tolerance;
+   - CG shift matches the old formula using `0.75 m`;
+   - absolute hub geometry `rHub + cgShift` matches the old formula using `0.75 m`.
+
+2. **mass-radius independence**
+   - perturb only `P.mass.RH_mass` in a copied parameter struct;
+   - verify CG shift changes according to the analytic formula;
+   - verify absolute hub geometry remains controlled by unchanged `P.rotor.RH_hub`.
+
+3. **hub-radius independence**
+   - perturb only `P.rotor.RH_hub`;
+   - verify mass-properties CG shift is unchanged;
+   - verify absolute hub geometry changes according to the hub-radius geometry formula.
+
+4. **deprecated alias inactivity**, only if `P.mass.RH` is retained
+   - perturb only the deprecated alias;
+   - verify `mass_properties`, hub geometry, total forces/moments, and representative outputs are unchanged;
+   - repository production search must show zero active reads.
+
+5. preserve the existing mass, inertia, mirror, clearance, component-position, deterministic, and finite checks.
+
+Use synthetic perturbations only to prove separation. Do not introduce sourced XV-15 values.
+
+### 4. Documentation
+
+Update the relevant PR #7 documents so they describe the post-split state accurately:
+
+- `docs/PARAMETER_SOURCE_INVENTORY.md`
+- `docs/PARAMETER_GAP_REGISTER.md`
+- `docs/PARAMETER_SOURCE_WORKPLAN.md`
+
+Required documentation changes:
+
+- replace the single active `P.mass.RH` inventory item with separate `RH_mass` and `RH_hub` items;
+- if an alias remains, classify it as `DEPRECATED_UNUSED` and state that production reads are zero;
+- preserve current provenance as `ASSUMED_CONCEPT` for both new active values;
+- keep XV-15 target evidence as pending/independent;
+- change GAP-H01 from an active coupled-field defect to a resolved structural split with numeric sourcing still pending;
+- keep the future XV-15 blocker open for the values themselves;
+- mark Track A work package 1 structurally complete only after tests pass;
+- do not alter unrelated inventory classifications or counts without a direct consequence of this split.
+
+Create one focused document:
+
+```text
+docs/RH_MASS_HUB_SPLIT_AUDIT.md
+```
+
+It must record:
+
+- old field meaning and read sites;
+- new field meanings and read sites;
+- exact unchanged initial values;
+- compatibility decision for `P.mass.RH`;
+- formulas before and after;
+- targeted test cases and tolerances;
+- runtime/call counts;
+- final conclusion limited to structural decoupling and behavior preservation.
 
 ## Runtime discipline
 
-Do not start with dense speed sweeps, transition scans, multiple response grids, Jacobian maps, or Monte Carlo runs.
+This task must follow the staged execution budget.
 
-### Stage 0 — static checks
+### Stage 0 — static and baseline preparation
 
-Run lightweight parser/path checks first:
+Before code changes:
 
-```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; which run_app; which launch_tiltrotor_app; which validate_parameter_set; which run_trim_case; which run_linearization_case; which simulate_linear_response;"
-```
+- run repository search for all relevant fields;
+- estimate MATLAB work;
+- run only `check_mass_inertia_geometry` as the baseline focused check;
+- if baseline fails, stop and report before editing.
 
-Use `checkcode` on every new or modified `.m` file. Record errors and actionable warnings.
+Expected baseline cost: one focused test function, 12 existing cases, limited representative rotor calls; expected wall time roughly 15–45 seconds on the known R2021a environment.
 
-### Stage 1 — focused service integration
+### Stage 1 — targeted validation after modification
 
-Run exactly one focused service chain:
+Run, in this order:
 
-```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; report = check_gui_services; assert(report.allPassed);"
-```
+1. `check_mass_inertia_geometry`
+2. `check_rotor_force_moment_chain`
+3. `check_physical_sanity`
 
-This performs one default hover trim, one linearization, and one short response. If it fails, stop the staged sequence, diagnose the first failure, make a minimal fix, and repeat Stage 0 and Stage 1.
+Record elapsed time, PASS/FAIL counts, and model-call counts when reported.
 
-### Stage 2 — existing regression
+If any focused check fails, stop. Do not proceed to the total suite and do not tune parameters or tolerances.
 
-Only after Stage 1 passes:
+### Stage 2 — broader regression
 
-```powershell
-& 'F:\matlab\R2021a\bin\matlab.exe' -batch "cd('E:\tiltrotor'); startup; summary = run_all_checks; assert(summary.allPassed);"
-```
-
-Do not add the GUI integration chain to `run_all_checks` if doing so would duplicate the expensive hover trim and linearization. Keep it as the focused pre-regression check.
-
-### Stage 3 — interactive UI smoke test
-
-Open MATLAB normally and run:
+Only after all three focused checks pass, run:
 
 ```matlab
-cd('E:\tiltrotor');
-run_app;
+run_all_checks
 ```
 
-Use the manual sequence in `docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md`. Capture only concise observations; do not perform broad parameter sweeps.
+Do not run trim sweeps, continuation, Jacobians, linearization maps, transition cases, or dense scans.
 
-The known R2021a shutdown-stage `mwboost::archive::archive_exception: output stream error` must be reported separately from completed test-body assertions.
+The known MATLAB R2021a shutdown-stage `mwboost::archive::archive_exception: output stream error` must be reported separately from test-body results. Do not relabel completed PASS assertions as model failures solely because of that shutdown error.
 
 ## Allowed files
 
-Necessary fixes are limited to:
+Production/test/document changes should be limited to:
 
 ```text
 CODEX_TASK.md
-startup.m
-run_app.m
-app/launch_tiltrotor_app.m
-services/validate_parameter_set.m
-services/run_trim_case.m
-services/run_linearization_case.m
-services/simulate_linear_response.m
-services/save_analysis_case.m
-tests/check_gui_services.m
-docs/GUI_ARCHITECTURE_AND_REQUIREMENTS.md
+params_nominal.m
+model/mass_properties.m
+model/rotor_model_bemt.m
+tests/check_mass_inertia_geometry.m
+# tests/run_all_checks.m only if registration truly changes
+docs/PARAMETER_SOURCE_INVENTORY.md
+docs/PARAMETER_GAP_REGISTER.md
+docs/PARAMETER_SOURCE_WORKPLAN.md
+docs/RH_MASS_HUB_SPLIT_AUDIT.md
 ```
 
-A new focused GUI test helper may be added only when an R2021a compatibility defect cannot be tested inside `check_gui_services.m`.
+Do not modify unrelated aerodynamic, rotor-load, control, trim, linearization, or solver files.
 
 ## Prohibited changes
 
-- no `.mlapp` binary replacement during this task;
-- no changes to physical model files;
-- no changes to `params_nominal.m` values;
-- no changes to trim or linearization formulas;
-- no new toolboxes or third-party dependencies;
-- no suppression of NaN, Inf, complex values, nonconvergence, or UI errors;
-- no large refactor unrelated to the GUI workflow;
-- no merge of this Draft PR;
-- no changes to Draft PR #8 or branch `refactor/split-rh-mass-hub`.
+- no XV-15 numeric replacement;
+- no change to `m`, `mNac`, `I0`, `KI`, pivot coordinates, rotor radius, or control limits;
+- no change to equations or signs;
+- no change to solver algorithms, seeds, tolerances, limits, or acceptance thresholds;
+- no new interpolation, schedule, fallback, or calibration logic;
+- no broad refactor beyond the two radius meanings;
+- no destructive Git history operation;
+- do not merge the Draft PR.
 
 ## Acceptance criteria
 
-The task is complete only when:
+The task passes only if:
 
-- Stage 0 has no parser errors;
-- `check_gui_services` passes all focused checks;
-- existing `run_all_checks` remains all PASS;
-- R2021a opens the application successfully;
-- the default hover trim -> linearization -> 0.1 deg response workflow succeeds;
-- invalid parameter edits are rejected;
-- no Control System Toolbox dependency exists;
-- no physical-model or nominal-parameter change appears in the diff;
-- the exported session loads successfully;
-- the final Git diff contains only allowed changes;
-- the worktree is clean after commit and push.
+- all active production reads use the correct new field;
+- mass and hub radius can be perturbed independently with the expected isolated effect;
+- unchanged initial values reproduce old formulas and representative outputs within documented floating-point tolerance;
+- retained legacy alias, if any, has zero production effect;
+- focused tests pass;
+- `run_all_checks` passes after focused tests;
+- no unrelated numeric output changes are observed;
+- documents and counts are internally consistent;
+- MATLAB call scope stays within the staged budget.
 
 ## Closeout
 
-After all acceptance criteria pass, update this file to:
+Update this file to:
 
 ```text
-STATUS: COMPLETE / GUI ANALYSIS WORKBENCH / MATLAB R2021a VERIFIED / HOLD
+STATUS: COMPLETE / RH MASS-HUB SPLIT / HOLD
 ```
 
 Final report must include:
 
-- files read;
-- files changed;
-- static `checkcode` findings and fixes;
-- Stage 1 and Stage 2 results;
-- interactive smoke-test observations;
-- confirmation that model equations and nominal physical values were unchanged;
-- confirmation that Control System Toolbox is not required;
+- all files read;
+- all files changed/created;
+- repository-wide old/new field read-site inventory;
+- compatibility decision for `P.mass.RH`;
+- baseline and post-change test results;
+- test elapsed times and call counts;
+- exact behavior-preservation tolerances and worst errors;
+- confirmation that all initial numeric values remain `0.75 m`;
+- confirmation that no XV-15 value was inserted;
+- confirmation that no unrelated formula, parameter, solver, threshold, or limit changed;
 - commit SHA;
-- clean `git status --short` output.
+- clean working-tree status.
 
-Commit and push to `feature/gui-analysis-workbench`.
+Commit and push to `refactor/split-rh-mass-hub`.
 
 Do not merge the Draft PR.

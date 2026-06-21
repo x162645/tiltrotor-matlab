@@ -2,8 +2,8 @@ function mp = mass_properties(betaM, P)
 %MASS_PROPERTIES 计算短舱倾转引起的重心移动与惯量变化。
 % 对应论文式(1)~(3)的低阶实现。
 
-dx = P.mass.mNac * P.mass.RH * sin(betaM) / P.mass.m;
-dz = P.mass.mNac * P.mass.RH * (1 - cos(betaM)) / P.mass.m;
+dx = P.mass.mNac * P.mass.RH_mass * sin(betaM) / P.mass.m;
+dz = P.mass.mNac * P.mass.RH_mass * (1 - cos(betaM)) / P.mass.m;
 
 mp.cgShift = [dx; 0; dz];
 
