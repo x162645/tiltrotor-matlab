@@ -24,9 +24,6 @@ if definition.compatibilityMode
     return;
 end
 
-stateNames = {'u'; 'v'; 'w'; 'p'; 'q'; 'r'; 'phi'; 'theta'; 'psi'};
-controlNames = {'collective'; 'diffCollective'; 'cyclicLong'; ...
-    'diffCyclic'; 'aileron'; 'elevator'; 'rudder'};
 derivativeNames = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
     'rdot'; 'phidot'; 'thetadot'; 'psidot'};
 
@@ -45,7 +42,7 @@ invalidEvalIdentifiers = {};
 [yOpt, fval, exitflag, output] = fminsearch(@objective, y0, options);
 zOpt = from_scaled(yOpt);
 [xTrim, uTrim, residual, penalty, xdotFull, eomOut, allocation] = ...
-    build_point(zOpt);
+    evaluate_trim_definition_point(condition, definition, zOpt, P);
 limitReport = make_limit_report(zOpt, allocation);
 residualScale = residual_scales(definition.residualNames, P);
 scaledResidual = residual./residualScale;
@@ -97,7 +94,8 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
 
     function J = objective(y)
         try
-            [~, ~, R, thisPenalty] = build_point(from_scaled(y));
+            [~, ~, R, thisPenalty] = evaluate_trim_definition_point( ...
+                condition, definition, from_scaled(y), P);
         catch ME
             if is_objective_domain_error(ME)
                 invalidEvalCount = invalidEvalCount + 1;
@@ -115,60 +113,6 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
         end
         rs = R./residual_scales(definition.residualNames, P);
         J = rs.'*rs + thisPenalty;
-    end
-
-    function [x, uCtrl, R, thisPenalty, xd, thisEomOut, thisAllocation] = ...
-            build_point(z)
-        x = zeros(9,1);
-        uCtrl = zeros(7,1);
-        thisAllocation = struct([]);
-        x = apply_named_values(x, stateNames, definition.fixedStates);
-        uCtrl = apply_named_values(uCtrl, controlNames, definition.fixedControls);
-        for i = 1:nUnknown
-            name = definition.unknownNames{i};
-            stateIndex = find(strcmp(stateNames, name), 1);
-            if ~isempty(stateIndex)
-                x(stateIndex) = z(i);
-            elseif any(strcmp(controlNames, name))
-                uCtrl(strcmp(controlNames, name)) = z(i);
-            end
-        end
-        if isfield(definition, 'allocation')
-            pitchIndex = strcmp(definition.unknownNames, 'pitchCommand');
-            thisAllocation = pitch_allocation_schedule(condition.betaM, ...
-                z(pitchIndex), P, definition.allocation.direction);
-            uCtrl(strcmp(controlNames, 'cyclicLong')) = ...
-                thisAllocation.cyclicLong;
-            uCtrl(strcmp(controlNames, 'elevator')) = thisAllocation.elevator;
-        end
-        theta = x(strcmp(stateNames, 'theta'));
-        alpha = theta-condition.gamma;
-        if condition.V < 1e-10
-            x(strcmp(stateNames, 'u')) = 0;
-            x(strcmp(stateNames, 'w')) = 0;
-        else
-            x(strcmp(stateNames, 'u')) = condition.V*cos(alpha);
-            x(strcmp(stateNames, 'w')) = condition.V*sin(alpha);
-        end
-        [xd, thisEomOut] = tiltrotor_eom(x, uCtrl, condition.betaM, P);
-        xd = xd(:);
-        R = zeros(numel(definition.residualNames),1);
-        for j = 1:numel(R)
-            R(j) = xd(strcmp(derivativeNames, definition.residualNames{j}));
-        end
-        below = max(bounds(:,1)-z(:), 0);
-        above = max(z(:)-bounds(:,2), 0);
-        thisPenalty = 100*sum(below.^2 + above.^2);
-        if ~isempty(thisAllocation)
-            generatedValues = [thisAllocation.cyclicLong; ...
-                thisAllocation.elevator];
-            generatedBounds = [P.control.cyclicLim(:).'; ...
-                P.control.elevatorLim(:).'];
-            generatedBelow = max(generatedBounds(:,1)-generatedValues, 0);
-            generatedAbove = max(generatedValues-generatedBounds(:,2), 0);
-            thisPenalty = thisPenalty + ...
-                100*sum(generatedBelow.^2 + generatedAbove.^2);
-        end
     end
 
     function limits = make_limit_report(z, thisAllocation)
@@ -406,13 +350,6 @@ for i = 1:numel(names)
         error('trim_general:InvalidDefinition', ...
             'Every fixed value must be a finite real scalar.');
     end
-end
-end
-
-function vector = apply_named_values(vector, names, values)
-fields = fieldnames(values);
-for i = 1:numel(fields)
-    vector(strcmp(names, fields{i})) = values.(fields{i});
 end
 end
 
