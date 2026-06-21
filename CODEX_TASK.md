@@ -1,82 +1,382 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / REVISED CONTROL ALLOCATION METHOD / HOLD
+STATUS: COMPLETE / OPEN-LOOP PITCH ALLOCATION / HOLD
 
-Branch: `planning/control-allocation-method-v2`
+Branch: `feature/open-loop-pitch-allocation`
 
 Base branch: `main`
 
-## Current priority mainline
+## Priority mainline
 
 1. `RH_mass/RH_hub` split: COMPLETE AND MERGED.
 2. General mode-dependent trim core: COMPLETE AND MERGED.
-3. Open-loop pitch-actuator allocation: CURRENT TARGET; REVISED METHOD READY.
+3. Open-loop pitch-actuator allocation: CURRENT TASK.
 4. Trim credibility diagnostics.
 5. Linearization credibility diagnostics.
 6. Robust induced-velocity root solution.
 
-Do not start items 4-6 before item 3 is implemented, tested, reviewed, and merged.
+Do not start items 4-6 in this branch.
 
-## Purpose of this branch
+## Objective
 
-Replace the superseded four-unknown/four-residual proposal with a method that directly follows the electronic-book mixer architecture.
+Implement the revised trim-layer open-loop pitch allocation only after a mandatory read-only control-sign/authority audit passes.
 
-The durable method file is:
+The aircraft plant remains at direct actuator level. This task adds a normalized virtual trim command `pitchCommand` that is mapped to `cyclicLong` and `elevator`. It does not add flight control, feedback, SCAS, autopilot, pilot dynamics, or real-aircraft mixer data.
+
+## Read first
+
+Read only:
 
 ```text
+AGENTS.md
+CODEX_TASK.md
+docs/EBOOK_MODEL_UPGRADE_PRIORITY.md
 docs/ebook_packets/CONTROL_ALLOCATION_PACKET.md
+analysis/trim_general.m
+analysis/make_trim_definition.m
+analysis/trim_symmetric.m
+model/tiltrotor_eom.m
+model/total_forces_moments.m
+params_nominal.m
+tests/check_trim_mode_framework.m
+tests/run_all_checks.m
 ```
 
-## Fixed technical route
+Then inspect only direct helper functions needed to evaluate the existing trim points and controls.
 
-- Keep the aircraft plant at direct actuator level.
-- Add a trim-layer normalized virtual open-loop input `pitchCommand`.
-- Map it to direct actuators with a conceptual cosine schedule:
+Do not read the 622-page electronic book or unrelated PDFs.
+
+## Stage 0 — repository and baseline gate
+
+Before editing:
+
+```powershell
+git status --short
+git branch --show-current
+git fetch origin
+git log -1 --oneline
+git diff --stat origin/main...HEAD
+```
+
+Require:
+
+- branch is `feature/open-loop-pitch-allocation`;
+- working tree is clean;
+- branch contains latest `origin/main`;
+- no unexpected branch changes.
+
+Run only:
+
+- `check_trim_mode_framework`;
+- `run_all_checks` once;
+- one helicopter endpoint trim: `V=20 m/s, betaM=0, gamma=0`;
+- one airplane endpoint trim: `V=100 m/s, betaM=pi/2, gamma=0`.
+
+Record numerical outputs and runtime. Stop if the baseline fails.
+
+## Stage 1 — mandatory read-only sign/authority audit
+
+Do not modify any production or test file before this stage passes.
+
+Evaluate three representative points:
+
+1. helicopter endpoint: `V=20 m/s, betaM=0`, using `helicopter_longitudinal`;
+2. conversion reference: `V=35 m/s, betaM=pi/4`, using the existing legacy-compatible trim point only as the local evaluation state;
+3. airplane endpoint: `V=100 m/s, betaM=pi/2`, using `airplane_longitudinal`.
+
+At each applicable point, use central difference with:
+
+```text
+h = 1e-4 rad
+```
+
+to evaluate:
+
+```text
+d(qdot)/d(cyclicLong)
+d(qdot)/d(elevator)
+```
+
+Record:
+
+- derivative values and signs;
+- finite/real status;
+- whether the expected active channel is clearly above numerical noise;
+- whether either command direction reverses across representative points;
+- the resulting `cyclicDirection` and `elevatorDirection`, each restricted to `+1` or `-1`.
+
+Do not use derivative magnitude to tune schedule weights.
+
+### Stage 1 pass condition
+
+Proceed only if:
+
+- both channels have finite, real, interpretable command directions;
+- no representative conversion-point direction reversal invalidates one common open-loop command;
+- the direction choice is supported by the current code and numerical perturbation results.
+
+### Stage 1 failure action
+
+If the gate fails:
+
+- create `docs/PITCH_ALLOCATION_AUDIT.md` with the results and failure reason;
+- do not modify `trim_general`, `make_trim_definition`, or add the schedule helper;
+- update this task status to `BLOCKED / CONTROL SIGN OR AUTHORITY`;
+- commit and push the audit only;
+- stop and report.
+
+Do not flip signs by trial, tune parameters, alter limits, or scan extra operating points.
+
+## Stage 2 — implementation after the audit passes
+
+### 2.1 Pure allocation helper
+
+Add:
+
+```matlab
+allocation = pitch_allocation_schedule(betaM, pitchCommand, P, direction)
+```
+
+Use:
 
 ```text
 gCyclic   = cos(betaM)^2
 gElevator = sin(betaM)^2
 ```
 
-- Generate:
+Generate:
 
 ```text
 cyclicLong = cyclicDirection*gCyclic*cyclicReference*pitchCommand
 elevator   = elevatorDirection*gElevator*elevatorReference*pitchCommand
 ```
 
-- Define `conversion_longitudinal` with:
+where:
 
 ```text
-unknowns  = theta, collective, pitchCommand
-residuals = udot, wdot, qdot
+cyclicReference   = max(abs(P.control.cyclicLim))
+elevatorReference = max(abs(P.control.elevatorLim))
 ```
 
-- Do not make `cyclicLong` and `elevator` simultaneous independent trim unknowns.
-- Do not add a fourth allocation residual.
-- Classify the schedule as `ASSUMED_CONCEPT`, not an XV-15 mixer.
+Requirements:
 
-## Mandatory gate before implementation
+- `0 <= betaM <= pi/2` only;
+- `-pitchCommandLimit <= pitchCommand <= pitchCommandLimit`，其中
+  `pitchCommandLimit = 1/max(gCyclic,gElevator)`；
+- finite real inputs;
+- direction values only `+1` or `-1`;
+- type `ebook_cosine_virtual_command`;
+- classification `ASSUMED_CONCEPT`;
+- no hidden clipping inside the helper;
+- report `authorityDenominator`, `pitchCommandLimit`, and
+  `normalizedPitchCommand`;
+- return gains, references, directions, command, and both actuator outputs.
 
-The future Codex task must first run a read-only sign/authority audit at the helicopter endpoint, one 45-degree reference point, and the airplane endpoint. Production-code editing is forbidden until that audit passes.
+### 2.2 Conversion trim definition
 
-If control direction changes sign or a required channel has no usable authority, Codex must stop and report. It may not flip signs or tune parameters to force convergence.
+Add explicit mode:
 
-## Next implementation branch
+```text
+conversion_longitudinal
+```
 
-After this documentation baseline is merged, create a new implementation branch. Codex will be instructed to execute:
+Unknowns:
 
-1. baseline regression;
-2. read-only sign/authority audit;
-3. pure schedule helper and definition changes only if the audit passes;
-4. endpoint equivalence tests;
-5. one 45-degree conversion trim;
-6. one total regression.
+```text
+theta
+collective
+pitchCommand
+```
 
-## Scope of this branch
+Residuals:
 
-Documentation only. No MATLAB production code, tests, parameters, model equations, GUI, services, solver settings, limits, linearization, or inflow code are changed.
+```text
+udot
+wdot
+qdot
+```
+
+Fixed states:
+
+```text
+v=p=q=r=phi=psi=0
+```
+
+Fixed direct controls:
+
+```text
+diffCollective=0
+diffCyclic=0
+aileron=0
+rudder=0
+```
+
+`cyclicLong` and `elevator` are generated by the allocation helper and must not also be independent unknowns or fixed controls.
+
+Do not infer this mode from `betaM`; the caller must explicitly request it.
+
+### 2.3 Generic trim integration
+
+Extend `trim_general` only as needed so that:
+
+- `pitchCommand` is valid only for a definition with explicit allocation configuration;
+- the full 7-control vector is built with generated cyclic/elevator values;
+- existing four-actuator/three-residual definitions without allocation remain rejected;
+- legacy, helicopter, and airplane execution paths remain unchanged;
+- commanded/applied controls and allocation metadata are reported;
+- generated controls still pass through the existing limit/reporting path;
+- the current solver, tolerances, residual scaling, multistart logic, and acceptance rules remain unchanged.
+
+Suggested numerical search scale for `pitchCommand`:
+
+```text
+(2 deg)/(gCyclic*cyclicReference + gElevator*elevatorReference)
+```
+
+This is `NUMERICAL`, not a physical parameter.
+
+## Stage 3 — focused tests
+
+Add `tests/check_pitch_allocation.m`.
+
+### Static schedule tests
+
+For `betaM = [0,15,30,45,60,75,90] deg`, verify:
+
+- finite real gains;
+- gains in `[0,1]`;
+- `gCyclic + gElevator = 1`;
+- monotonic cyclic decrease and elevator increase;
+- exact endpoint and 45-degree behavior within floating-point tolerance;
+- formula-consistent actuator outputs;
+- explicit errors for invalid angle, command, references, and direction mappings.
+
+### Endpoint-equivalence tests
+
+Compare:
+
+- `conversion_longitudinal`, `V=20 m/s, betaM=0` against `helicopter_longitudinal`;
+- `conversion_longitudinal`, `V=100 m/s, betaM=pi/2` against `airplane_longitudinal`.
+
+Targets:
+
+```text
+max state absolute difference <= 1e-8
+max control absolute difference <= 1e-8
+residual norm difference <= 1e-8
+```
+
+Report actual worst differences. Do not loosen thresholds to hide a different solution branch.
+
+### Single conversion-point test
+
+Run only:
+
+```text
+V=35 m/s
+betaM=pi/4
+gamma=0
+```
+
+Require:
+
+- finite real state, control, report, and derivatives;
+- three dynamic residuals below the current trim tolerance;
+- `pitchCommand`, cyclic, and elevator not active at or beyond limits;
+- actuator outputs exactly traceable to the virtual-command mapping;
+- no parameter or tolerance change.
+
+If this point fails, report best residual, limits, invalid evaluations, and failure reason. Stop before sweeps or tuning.
+
+## Stage 4 — regression
+
+Only after focused tests pass:
+
+- register `check_pitch_allocation` in `tests/run_all_checks.m`;
+- run `run_all_checks` once.
+
+Expected total wall time: approximately 2-6 minutes.
+
+Do not run speed sweeps, tilt-angle sweeps, forward/reverse sweeps, dense multistart scans, or Jacobian maps.
+
+Report the known R2021a shutdown `mwboost::archive::archive_exception` separately if all test assertions completed first.
+
+## Allowed files
+
+```text
+CODEX_TASK.md
+analysis/trim_general.m
+analysis/make_trim_definition.m
+analysis/pitch_allocation_schedule.m
+tests/check_pitch_allocation.m
+tests/run_all_checks.m
+docs/PITCH_ALLOCATION_AUDIT.md
+docs/ebook_packets/CONTROL_ALLOCATION_PACKET.md
+```
+
+Do not modify unless an unexpected compatibility issue is proven and reported first:
+
+```text
+analysis/trim_symmetric.m
+```
+
+Forbidden:
+
+```text
+params_nominal.m
+model/*
+app/*
+services/*
+analysis/linearize_numeric.m
+```
+
+## Prohibited changes
+
+- no real or guessed transmission ratios;
+- no claim of XV-15 mixer fidelity;
+- no feedback, SCAS, autopilot, or pilot model;
+- no fourth allocation residual;
+- no simultaneous independent `pitchCommand`, `cyclicLong`, and `elevator` unknowns;
+- no schedule weighting from control-effectiveness magnitude;
+- no sign selection by convergence trial;
+- no parameter, limit, tolerance, aerodynamic, rotor, mass, EOM, inflow, or linearization changes;
+- no automatic mode selection from `betaM`;
+- no broad scans.
+
+## Acceptance criteria
+
+The task passes only if:
+
+1. Stage 0 baseline passes;
+2. the read-only sign/authority audit passes and is documented;
+3. one virtual command generates both direct actuators;
+4. conversion trim remains three unknowns and three dynamic residuals;
+5. endpoint numerical equivalence meets the stated thresholds;
+6. the single 45-degree conversion point passes or its limitation is honestly documented without tuning;
+7. legacy, helicopter, and airplane results remain unchanged;
+8. focused tests and total regression pass;
+9. all new allocation content is labeled `ASSUMED_CONCEPT`;
+10. no forbidden subsystem is changed.
 
 ## Closeout
 
-This branch remains on HOLD for review. Do not add implementation code and do not merge without explicit user authorization.
+If complete, update status to:
+
+```text
+STATUS: COMPLETE / OPEN-LOOP PITCH ALLOCATION / HOLD
+```
+
+Commit and push to this branch. Update the Draft PR, but do not merge.
+
+Report:
+
+- Stage 0 baseline outputs and runtime;
+- Stage 1 derivative table and selected directions;
+- modified files and architecture;
+- schedule fields and definition schema;
+- endpoint worst differences;
+- 45-degree conversion result;
+- focused and regression results;
+- MATLAB shutdown-warning status;
+- commit SHA and PR link;
+- clean `git status --short`.

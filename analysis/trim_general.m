@@ -44,8 +44,9 @@ invalidEvalCount = 0;
 invalidEvalIdentifiers = {};
 [yOpt, fval, exitflag, output] = fminsearch(@objective, y0, options);
 zOpt = from_scaled(yOpt);
-[xTrim, uTrim, residual, penalty, xdotFull, eomOut] = build_point(zOpt);
-limitReport = make_limit_report(zOpt);
+[xTrim, uTrim, residual, penalty, xdotFull, eomOut, allocation] = ...
+    build_point(zOpt);
+limitReport = make_limit_report(zOpt, allocation);
 residualScale = residual_scales(definition.residualNames, P);
 scaledResidual = residual./residualScale;
 
@@ -75,8 +76,13 @@ report.betaM = condition.betaM;
 report.gamma = condition.gamma;
 report.commandedControls = uTrim;
 report.appliedControls = eomOut.components.appliedControls;
+report.allocation = allocation;
 report.trimVariableScale = scale;
-report.trimVariableScaleUnits = 'rad';
+if isfield(definition, 'allocation')
+    report.trimVariableScaleUnits = {'rad'; 'rad'; '1'};
+else
+    report.trimVariableScaleUnits = 'rad';
+end
 report.trimVariableScaleClassification = 'NUMERICAL';
 report.searchVariable = 'dimensionless';
 report.searchMapping = 'z = initialValues + variableScale.*(y - ones(n,1))';
@@ -111,9 +117,11 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
         J = rs.'*rs + thisPenalty;
     end
 
-    function [x, uCtrl, R, thisPenalty, xd, thisEomOut] = build_point(z)
+    function [x, uCtrl, R, thisPenalty, xd, thisEomOut, thisAllocation] = ...
+            build_point(z)
         x = zeros(9,1);
         uCtrl = zeros(7,1);
+        thisAllocation = struct([]);
         x = apply_named_values(x, stateNames, definition.fixedStates);
         uCtrl = apply_named_values(uCtrl, controlNames, definition.fixedControls);
         for i = 1:nUnknown
@@ -121,9 +129,17 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
             stateIndex = find(strcmp(stateNames, name), 1);
             if ~isempty(stateIndex)
                 x(stateIndex) = z(i);
-            else
+            elseif any(strcmp(controlNames, name))
                 uCtrl(strcmp(controlNames, name)) = z(i);
             end
+        end
+        if isfield(definition, 'allocation')
+            pitchIndex = strcmp(definition.unknownNames, 'pitchCommand');
+            thisAllocation = pitch_allocation_schedule(condition.betaM, ...
+                z(pitchIndex), P, definition.allocation.direction);
+            uCtrl(strcmp(controlNames, 'cyclicLong')) = ...
+                thisAllocation.cyclicLong;
+            uCtrl(strcmp(controlNames, 'elevator')) = thisAllocation.elevator;
         end
         theta = x(strcmp(stateNames, 'theta'));
         alpha = theta-condition.gamma;
@@ -143,23 +159,44 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
         below = max(bounds(:,1)-z(:), 0);
         above = max(z(:)-bounds(:,2), 0);
         thisPenalty = 100*sum(below.^2 + above.^2);
+        if ~isempty(thisAllocation)
+            generatedValues = [thisAllocation.cyclicLong; ...
+                thisAllocation.elevator];
+            generatedBounds = [P.control.cyclicLim(:).'; ...
+                P.control.elevatorLim(:).'];
+            generatedBelow = max(generatedBounds(:,1)-generatedValues, 0);
+            generatedAbove = max(generatedValues-generatedBounds(:,2), 0);
+            thisPenalty = thisPenalty + ...
+                100*sum(generatedBelow.^2 + generatedAbove.^2);
+        end
     end
 
-    function limits = make_limit_report(z)
+    function limits = make_limit_report(z, thisAllocation)
         tol = 1.0e-8;
+        itemNames = definition.unknownNames(:);
+        itemValues = z(:);
+        itemBounds = bounds;
+        if ~isempty(thisAllocation)
+            itemNames = [itemNames; {'cyclicLong'; 'elevator'}];
+            itemValues = [itemValues; thisAllocation.cyclicLong; ...
+                thisAllocation.elevator];
+            itemBounds = [itemBounds; P.control.cyclicLim(:).'; ...
+                P.control.elevatorLim(:).'];
+        end
+        nItem = numel(itemNames);
         items = repmat(struct('name', '', 'value', NaN, 'lower', NaN, ...
             'upper', NaN, 'atLower', false, 'atUpper', false, ...
-            'atLimit', false, 'violated', false), nUnknown, 1);
-        for k = 1:nUnknown
-            items(k).name = definition.unknownNames{k};
-            items(k).value = z(k);
-            items(k).lower = bounds(k,1);
-            items(k).upper = bounds(k,2);
-            items(k).atLower = abs(z(k)-bounds(k,1)) <= tol;
-            items(k).atUpper = abs(z(k)-bounds(k,2)) <= tol;
+            'atLimit', false, 'violated', false), nItem, 1);
+        for k = 1:nItem
+            items(k).name = itemNames{k};
+            items(k).value = itemValues(k);
+            items(k).lower = itemBounds(k,1);
+            items(k).upper = itemBounds(k,2);
+            items(k).atLower = abs(itemValues(k)-itemBounds(k,1)) <= tol;
+            items(k).atUpper = abs(itemValues(k)-itemBounds(k,2)) <= tol;
             items(k).atLimit = items(k).atLower || items(k).atUpper;
-            items(k).violated = z(k) < bounds(k,1)-tol || ...
-                z(k) > bounds(k,2)+tol;
+            items(k).violated = itemValues(k) < itemBounds(k,1)-tol || ...
+                itemValues(k) > itemBounds(k,2)+tol;
         end
         limits.items = items;
         limits.anyAtLimit = any([items.atLimit]);
@@ -212,7 +249,12 @@ controlNames = {'collective','diffCollective','cyclicLong','diffCyclic', ...
     'aileron','elevator','rudder'};
 residualNames = {'udot','vdot','wdot','pdot','qdot','rdot', ...
     'phidot','thetadot','psidot'};
-if ~all(ismember(definition.unknownNames, [stateUnknowns, controlNames])) || ...
+hasAllocation = isfield(definition, 'allocation');
+allowedUnknowns = [stateUnknowns, controlNames];
+if hasAllocation
+    allowedUnknowns = [allowedUnknowns, {'pitchCommand'}];
+end
+if ~all(ismember(definition.unknownNames, allowedUnknowns)) || ...
         ~all(ismember(definition.residualNames, residualNames))
     error('trim_general:InvalidDefinition', ...
         'Definition contains an unsupported unknown or residual name.');
@@ -238,6 +280,13 @@ end
 validate_fixed_values(definition.fixedStates);
 validate_fixed_values(definition.fixedControls);
 
+if hasAllocation
+    validate_allocation_definition(definition);
+elseif any(strcmp(definition.unknownNames, 'pitchCommand'))
+    error('trim_general:InvalidDefinition', ...
+        'pitchCommand requires an explicit allocation configuration.');
+end
+
 nUnknown = numel(definition.unknownNames);
 nResidual = numel(definition.residualNames);
 if nUnknown > nResidual
@@ -253,6 +302,7 @@ elseif nUnknown < nResidual
     error('trim_general:OverdeterminedDefinition', ...
         'The definition has fewer unknowns than residuals.');
 end
+
 if ~(isnumeric(definition.initialValues) && isreal(definition.initialValues) && ...
         isvector(definition.initialValues) && numel(definition.initialValues) == nUnknown && ...
         all(isfinite(definition.initialValues(:))))
@@ -276,6 +326,41 @@ if ~(islogical(definition.compatibilityMode) && isscalar(definition.compatibilit
     error('trim_general:InvalidDefinition', ...
         'compatibilityMode must be a logical scalar.');
 end
+end
+
+function validate_allocation_definition(definition)
+allocation = definition.allocation;
+validHeader = isstruct(allocation) && isscalar(allocation) && ...
+    isfield(allocation, 'type') && ...
+    strcmp(allocation.type, 'ebook_cosine_virtual_command') && ...
+    isfield(allocation, 'classification') && ...
+    strcmp(allocation.classification, 'ASSUMED_CONCEPT') && ...
+    isfield(allocation, 'direction');
+if ~validHeader
+    error('trim_general:InvalidDefinition', ...
+        'The allocation configuration is missing or unsupported.');
+end
+if sum(strcmp(definition.unknownNames, 'pitchCommand')) ~= 1 || ...
+        any(ismember({'cyclicLong','elevator'}, definition.unknownNames)) || ...
+        any(isfield(definition.fixedControls, {'cyclicLong','elevator'}))
+    error('trim_general:InvalidDefinition', ...
+        ['Allocation definitions require pitchCommand and cannot independently ' ...
+        'fix or solve cyclicLong or elevator.']);
+end
+direction = allocation.direction;
+if ~isstruct(direction) || ~isscalar(direction) || ...
+        ~isfield(direction, 'cyclicDirection') || ...
+        ~isfield(direction, 'elevatorDirection') || ...
+        ~is_valid_direction(direction.cyclicDirection) || ...
+        ~is_valid_direction(direction.elevatorDirection)
+    error('trim_general:InvalidDefinition', ...
+        'Allocation directions must each be +1 or -1.');
+end
+end
+
+function tf = is_valid_direction(value)
+tf = isnumeric(value) && isreal(value) && isscalar(value) && ...
+    isfinite(value) && (value == -1 || value == 1);
 end
 
 function validate_legacy_compatibility(definition, P)
@@ -358,5 +443,7 @@ end
 
 function tf = is_objective_domain_error(ME)
 tf = strcmp(ME.identifier, 'rotor_model_bemt:FlapNotConverged') || ...
-    strcmp(ME.identifier, 'rotor_model_bemt:CoupledSolveNotConverged');
+    strcmp(ME.identifier, 'rotor_model_bemt:CoupledSolveNotConverged') || ...
+    strcmp(ME.identifier, ...
+        'pitch_allocation_schedule:InvalidPitchCommand');
 end

@@ -25,6 +25,7 @@ run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
 run_test('general trim mode framework', @test_trim_mode_framework);
+run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
@@ -127,6 +128,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         trimModeReport = check_trim_mode_framework();
         assert(trimModeReport.allPassed, ...
             'General trim mode framework has failed items.');
+    end
+
+    function test_pitch_allocation()
+        pitchAllocationReport = check_pitch_allocation();
+        assert(pitchAllocationReport.allPassed, ...
+            'Open-loop pitch allocation has failed items.');
     end
 
     function test_aerodynamic_components()
