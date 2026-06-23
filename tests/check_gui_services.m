@@ -19,7 +19,8 @@ run_check('trim-point linearization service', @check_linearization);
 run_check('linear response service', @check_response);
 run_check('response waveform timing', @check_response_waveforms);
 run_check('response limit warning', @check_response_limit_warning);
-run_check('analysis session export', @check_export);
+run_check('analysis project save and load', @check_save_load);
+run_check('incompatible project version is rejected', @check_bad_project_version);
 run_check('application entry points', @check_entry_points);
 
 report.names = names;
@@ -209,7 +210,7 @@ fprintf('All passed: %d\n',report.allPassed);
             'Large cyclic command should trigger a control-limit warning.');
     end
 
-    function check_export()
+    function check_save_load()
         assert(~isempty(trimResult), 'Trim check must run first.');
         assert(~isempty(linearResult), 'Linearization check must run first.');
         assert(~isempty(responseResult), 'Response check must run first.');
@@ -219,13 +220,29 @@ fprintf('All passed: %d\n',report.allPassed);
             'linearization',linearResult, ...
             'response',responseResult);
         save_analysis_case(filePath, session);
-        loaded = load(filePath, 'session');
+        loaded = load_analysis_case(filePath);
         delete(filePath);
-        assert(isfield(loaded, 'session'));
-        assert(isfield(loaded.session, 'parameters'));
-        assert(isfield(loaded.session, 'trim'));
-        assert(isfield(loaded.session, 'linearization'));
-        assert(isfield(loaded.session, 'response'));
+        assert(isfield(loaded, 'parameters'));
+        assert(isfield(loaded, 'trim'));
+        assert(isfield(loaded, 'linearization'));
+        assert(isfield(loaded, 'response'));
+        assert(isequaln(loaded.parameters, P));
+    end
+
+    function check_bad_project_version()
+        filePath = fullfile(pwd, 'results', 'gui_bad_version_check.mat');
+        session = struct('formatVersion', 999, 'parameters', P, ...
+            'trim', [], 'linearization', [], 'response', []);
+        save(filePath, 'session', '-v7');
+        cleanupFile = onCleanup(@() delete_if_exists(filePath));
+        try
+            load_analysis_case(filePath);
+            error('check_gui_services:VersionAccepted', ...
+                'Incompatible project version was accepted.');
+        catch ME
+            assert(strcmp(ME.identifier, 'load_analysis_case:UnsupportedVersion'), ...
+                'Unexpected error for incompatible version: %s.', ME.identifier);
+        end
     end
 
     function check_entry_points()
@@ -234,6 +251,12 @@ fprintf('All passed: %d\n',report.allPassed);
         assert(exist('run_app','file') == 2, ...
             'run_app.m is not on the MATLAB path.');
     end
+end
+
+function delete_if_exists(filePath)
+if exist(filePath, 'file')
+    delete(filePath);
+end
 end
 
 function value = ternary(condition,a,b)

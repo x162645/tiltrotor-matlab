@@ -1,39 +1,40 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / GUI PARAMETER WORKBENCH / STAGE 2
+STATUS: ACTIVE / GUI COMPREHENSIVE REVIEW AND REDESIGN / 2026-06-23
 
 Branch: `feature/gui-v1.2-parameter-workbench`
 Base branch: `main`
 
 ## Objective
 
-Implement the GUI parameter catalog and validation services for the 139 approved editable scalar components.
+Complete the GUI comprehensive review and redesign in one continuous task:
 
-## Required instructions
+- remove the old user-level parameter classification system;
+- classify parameters only by physical component and calculation module;
+- rebuild parameter editing, trim, diagnostics, linearization, response,
+  save/load, unsaved-change protection, and layout behavior;
+- preserve MATLAB R2021a compatibility;
+- do not change physical parameter values, model equations, trim algorithm,
+  linearization algorithm, or response algorithm unless a clear interface bug
+  is found and reported first.
 
-Read and follow this file in full:
+## Required Instructions
 
-```text
-docs/CODEX_GUI_PARAMETER_STAGE2.md
-```
+Read and follow:
 
-Also read:
+- `AGENTS.md`
+- the remote task document
+  `origin/docs/gui-comprehensive-review-20260623:docs/GUI_COMPREHENSIVE_REVIEW_AND_REDESIGN_TASK.md`
 
-```text
-AGENTS.md
-docs/GUI_PARAMETER_WORKBENCH_PLAN.md
-params_nominal.m
-services/validate_parameter_set.m
-```
+## Validation
 
-## Current boundary
+Run focused GUI, parameter catalog, trim service, linearization service, and
+response service tests first. Run a representative hover trim, linearization,
+and response chain. Run `checkcode` on modified MATLAB files. Decide whether
+`run_all_checks` is reasonable after focused tests and representative checks.
 
-This run performs Stage 2 only.
+## Git
 
-Do not modify GUI layout, `params_nominal.m`, `model/*`, `analysis/*`, or `tests/run_all_checks.m`.
-
-Do not run `run_all_checks`.
-
-Do not commit or push.
-
-Stop after the focused parameter-catalog tests and report the results with a clean working tree state summary.
+Protect existing uncommitted GUI work. Do not use destructive Git commands.
+When the task is complete and tests are recorded, commit and push to the
+current GUI work branch. Do not create or merge a PR.
