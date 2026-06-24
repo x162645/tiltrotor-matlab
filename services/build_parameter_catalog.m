@@ -263,8 +263,8 @@ items = {
     'wing.CD0','机翼零升阻力系数','机翼阻力模型基值。','气动模型设定','无量纲','无量纲',{'wing','CD0'},[],1,0,0,Inf,true,true,false,'direct','wing';
     'wing.kInduced','机翼诱导阻力系数','机翼阻力随升力平方变化的系数。','气动模型设定','无量纲','无量纲',{'wing','kInduced'},[],1,0,0,Inf,true,true,false,'direct','wing';
     'wing.CYbeta','侧滑对机翼侧向力的影响（CYβ）','机翼侧力随侧滑角变化的系数。','气动模型设定','1/rad','1/rad',{'wing','CYbeta'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
-    'wing.Cm0','机翼零迎角俯仰力矩系数','机翼俯仰力矩模型的常值项。','气动模型设定','无量纲','无量纲',{'wing','Cm0'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
-    'wing.Cmalpha','机翼俯仰力矩迎角导数','机翼俯仰力矩随迎角变化的系数。','气动模型设定','1/rad','1/rad',{'wing','Cmalpha'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
+    'wing.Cm0','机翼零迎角俯仰力矩系数','CALIBRATED_EFFECTIVE_PARAMETER：保留机翼关于当前气动参考点的非零基础固有俯仰矩；不是 NASA、XV-15 或南航文章直接测量值。','标定有效参数','无量纲','无量纲',{'wing','Cm0'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
+    'wing.Cmalpha','机翼俯仰力矩迎角导数','INITIAL_MECHANISTIC_ASSUMPTION：当前 wing.rAC 视为等效气动中心，线性附着流直接固有俯仰矩斜率暂取零；真实值未被确定为零。','初期机理假设','1/rad','1/rad',{'wing','Cmalpha'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
     'wing.CLaileron','副翼对机翼升力的影响','副翼对机翼升力系数的影响系数。','气动模型设定','1/rad','1/rad',{'wing','CLaileron'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
     'wing.Cmaileron','副翼对俯仰力矩的影响','副翼对机翼俯仰力矩系数的影响系数。','气动模型设定','1/rad','1/rad',{'wing','Cmaileron'},[],1,0,-1e4,1e4,true,true,false,'direct','wing';
     'wing.SslipMaxHalf','单侧滑流最大面积','单侧机翼可进入旋翼滑流的最大面积。','几何设定','m^2','m^2',{'wing','SslipMaxHalf'},[],1,0,0,Inf,true,true,false,'direct','wing';
@@ -293,7 +293,7 @@ items = {
     'fuselage.Clp','机身滚转阻尼导数','机身滚转力矩随滚转角速度变化的系数。','气动模型设定','无量纲','无量纲',{'fuselage','Clp'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
     'fuselage.Clr','偏航速度对机身滚转力矩的影响','机身滚转力矩随偏航角速度变化的系数。','气动模型设定','无量纲','无量纲',{'fuselage','Clr'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
     'fuselage.Cm0','机身零迎角俯仰力矩系数','机身俯仰力矩模型常值项。','气动模型设定','无量纲','无量纲',{'fuselage','Cm0'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
-    'fuselage.Cmalpha','机身俯仰力矩迎角导数','机身俯仰力矩随迎角变化的系数。','气动模型设定','1/rad','1/rad',{'fuselage','Cmalpha'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
+    'fuselage.Cmalpha','机身俯仰力矩迎角导数','INITIAL_MECHANISTIC_ASSUMPTION：缺少可靠机身或翼身组合俯仰矩数据，暂不使用原无来源经验斜率；真实贡献可能非零。','初期机理假设','1/rad','1/rad',{'fuselage','Cmalpha'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
     'fuselage.Cmq','机身俯仰阻尼导数','机身俯仰力矩随俯仰角速度变化的系数。','气动模型设定','无量纲','无量纲',{'fuselage','Cmq'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
     'fuselage.Cnbeta','机身偏航力矩侧滑导数','机身偏航力矩随侧滑角变化的系数。','气动模型设定','1/rad','1/rad',{'fuselage','Cnbeta'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
     'fuselage.Cnp','滚转速度对机身偏航力矩的影响','机身偏航力矩随滚转角速度变化的系数。','气动模型设定','无量纲','无量纲',{'fuselage','Cnp'},[],1,0,-1e4,1e4,true,true,false,'direct','fuselage';
@@ -308,12 +308,12 @@ items = {
     'htail.rAC.x','平尾气动中心纵向位置','平尾气动力作用点的纵向位置。','几何设定','m','m',{'htail','rAC'},1,1,0,-Inf,Inf,true,true,false,'direct','htail';
     'htail.rAC.y','平尾气动中心横向位置','平尾气动力作用点的横向位置。','几何设定','m','m',{'htail','rAC'},2,1,0,-Inf,Inf,true,true,false,'direct','htail';
     'htail.rAC.z','平尾气动中心垂向位置','平尾气动力作用点的垂向位置。','几何设定','m','m',{'htail','rAC'},3,1,0,-Inf,Inf,true,true,false,'direct','htail';
-    'htail.incidence','平尾安装角','平尾局部迎角计算中的安装角。','几何设定','deg','rad',{'htail','incidence'},[],180/pi,0,-90,90,true,true,false,'direct','htail';
-    'htail.downwashAlpha','平尾下洗系数','平尾有效迎角中主翼下洗影响系数。','气动模型设定','无量纲','无量纲',{'htail','downwashAlpha'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
+    'htail.incidence','平尾安装角','CALIBRATED_EFFECTIVE_PARAMETER：与下洗在 70 m/s 平尾有效迎角中存在补偿关系，当前配平不能唯一识别真实值；不是 XV-15 实测参数。','标定有效参数','deg','rad',{'htail','incidence'},[],180/pi,0,-90,90,true,true,false,'direct','htail';
+    'htail.downwashAlpha','平尾下洗系数','CALIBRATED_EFFECTIVE_PARAMETER：与平尾安装角在 70 m/s 有效迎角中存在补偿关系，当前配平不能唯一识别真实值；不是 XV-15 实测参数。','标定有效参数','无量纲','无量纲',{'htail','downwashAlpha'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
     'htail.CL0','平尾零迎角升力系数','平尾升力模型常值项。','气动模型设定','无量纲','无量纲',{'htail','CL0'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
     'htail.CLalpha','平尾升力线斜率','平尾升力随有效迎角变化的系数。','气动模型设定','1/rad','1/rad',{'htail','CLalpha'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
     'htail.CLmax','平尾最大升力系数','平尾升力系数饱和尺度。','气动模型设定','无量纲','无量纲',{'htail','CLmax'},[],1,0,0,Inf,false,true,false,'direct','htail';
-    'htail.CLelevator','升降舵对平尾升力的影响','升降舵对平尾升力系数的影响系数。','气动模型设定','1/rad','1/rad',{'htail','CLelevator'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
+    'htail.CLelevator','升降舵对平尾升力的影响','CALIBRATED_EFFECTIVE_PARAMETER：改变单位舵偏控制效率，不改变零升降舵基础载荷；不是 XV-15 实测参数。','标定有效参数','1/rad','1/rad',{'htail','CLelevator'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
     'htail.CD0','平尾零升阻力系数','平尾阻力模型基值。','气动模型设定','无量纲','无量纲',{'htail','CD0'},[],1,0,0,Inf,true,true,false,'direct','htail';
     'htail.kInduced','平尾诱导阻力系数','平尾阻力随升力平方变化的系数。','气动模型设定','无量纲','无量纲',{'htail','kInduced'},[],1,0,0,Inf,true,true,false,'direct','htail';
     'htail.Cm0','平尾零升俯仰力矩系数','平尾俯仰力矩模型常值项。','气动模型设定','无量纲','无量纲',{'htail','Cm0'},[],1,0,-1e4,1e4,true,true,false,'direct','htail';
