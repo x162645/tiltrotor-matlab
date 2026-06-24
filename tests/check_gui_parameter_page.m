@@ -33,6 +33,7 @@ run_check('combined category query modified filtering works', @check_combined_fi
 run_check('excluded items are not shown', @check_exclusions);
 run_check('baseline is not overwritten by normal edits', @check_baseline_stable);
 run_check('trim linearization and response tabs still exist', @check_analysis_tabs);
+run_check('tilt angle UI text is unambiguous', @check_tilt_angle_text);
 
 report.names = names(:);
 report.passed = passed(:);
@@ -260,6 +261,14 @@ report.runtimeSeconds = toc(tStart);
         api.switchTab('linear');
         api.switchTab('response');
         api.switchTab('parameter');
+    end
+
+    function check_tilt_angle_text()
+        assert(isfield(api.handles, 'trimBetaLabel'), ...
+            'Trim beta label handle is not exposed for UI text checks.');
+        assert(strcmp(api.handles.trimBetaLabel.Text, ...
+            '旋翼向前倾转角 (deg)'), ...
+            'Trim angle label does not state the program angle semantics.');
     end
 end
 
