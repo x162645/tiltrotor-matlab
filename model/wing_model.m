@@ -16,12 +16,13 @@ if ~(isfinite(P.wing.muMax) && P.wing.muMax > 0)
     error('P.wing.muMax must be positive and finite.');
 end
 
-% NUAA Eq. (16) uses the opposite nacelle-angle convention. Convert from
-% code betaM (0 hover, pi/2 airplane) to paper beta before evaluating the
-% literal raw slipstream-area expression.
-betaPaper = pi/2 - betaM;
-angleRaw = sin(1.386*(pi/2 - betaPaper)) + ...
-           cos(3.114*(pi/2 - betaPaper));
+% NUAA Eq. (16) uses betaM=0 in helicopter mode and betaM=pi/2 in
+% airplane mode, matching the current code variable. Figure-level nacelle
+% angle annotations may use a different visual reference and are not used
+% as the formula argument here.
+slipstreamAngleArgument = pi/2 - betaM;
+angleRaw = sin(1.386*slipstreamAngleArgument) + ...
+           cos(3.114*slipstreamAngleArgument);
 muRaw = (P.wing.muMax - muMean)/P.wing.muMax;
 SslipRawHalf = P.wing.SslipMaxHalf*angleRaw*muRaw;
 
@@ -68,7 +69,8 @@ end
 out.SslipHalf = S_slip;
 out.SfreeHalf = S_free;
 out.slipstreamAreaModel = 'NUAA_EQ16_WITH_PHYSICAL_AREA_GUARD';
-out.betaPaper = betaPaper;
+out.betaMCode = betaM;
+out.slipstreamAngleArgument = slipstreamAngleArgument;
 out.angleRaw = angleRaw;
 out.muMean = muMean;
 out.muRaw = muRaw;

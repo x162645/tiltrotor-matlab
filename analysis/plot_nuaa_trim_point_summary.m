@@ -6,9 +6,9 @@ function report = plot_nuaa_trim_point_summary()
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 localDir = fullfile(rootDir, 'validation', 'nuaa_trim_trends', ...
-    '20260625_eq12_13_16');
+    '20260625_eq12_13_16_angle_fix');
 docsBaseDir = fullfile(rootDir, 'docs', 'validation', ...
-    'nuaa_trim_trends', '20260625_eq12_13_16');
+    'nuaa_trim_trends', '20260625_eq12_13_16_angle_fix');
 
 localPoints = fullfile(localDir, 'nuaa_trim_points.csv');
 localStability = fullfile(localDir, 'nuaa_stability_map.csv');

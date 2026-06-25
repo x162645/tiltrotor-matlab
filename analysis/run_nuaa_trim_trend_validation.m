@@ -14,7 +14,7 @@ P = params_nominal();
 stamp = datestr(now, 'yyyymmdd_HHMMSS');
 outDir = fullfile(rootDir, 'validation', 'nuaa_trim_trends', stamp);
 docsDir = fullfile(rootDir, 'docs', 'validation', ...
-    'nuaa_trim_trends', '20260625_eq12_13_16');
+    'nuaa_trim_trends', '20260625_eq12_13_16_angle_fix');
 ensure_dir(outDir);
 ensure_dir(docsDir);
 
