@@ -21,6 +21,10 @@ run_case('unsupported names rejected', @test_unsupported);
 run_case('unknown/fixed overlap rejected', @test_overlap);
 run_case('malformed values and sizes rejected', @test_malformed);
 run_case('conversion allocation constraint required', @test_conversion);
+run_case('conversion initial pitch command domain', ...
+    @test_conversion_initial_pitch_command_domain);
+run_case('old high-tilt cyclic seed overflows', ...
+    @test_old_high_tilt_cyclic_seed_overflows);
 run_case('modified legacy compatibility rejected', @test_modified_legacy);
 run_case('legacy hover identity', @test_legacy_hover);
 run_case('legacy 20 m/s identity', @test_legacy_v20);
@@ -129,6 +133,70 @@ fprintf('All general trim mode framework checks passed: %d\n', report.allPassed)
         bad.bounds = repmat([-1 1],4,1);
         bad.fixedControls = rmfield(bad.fixedControls, 'elevator');
         expect_error(bad, 'trim_general:AllocationConstraintRequired');
+    end
+
+    function test_conversion_initial_pitch_command_domain()
+        d2r = pi/180;
+        betaDeg = [0, 15, 44.9, 45, 45.1, 75, 89.9, 90];
+        direction = struct('cyclicDirection', -1, ...
+            'elevatorDirection', -1);
+        for i = 1:numel(betaDeg)
+            beta = betaDeg(i)*d2r;
+            condition = struct('V', 100, 'betaM', beta, 'gamma', 0);
+            definition = make_trim_definition( ...
+                'conversion_longitudinal', condition, P);
+            pitchCommand = definition.initialValues(3);
+            assert(isreal(pitchCommand) && isfinite(pitchCommand));
+            assert(pitchCommand > definition.bounds(3,1) && ...
+                pitchCommand < definition.bounds(3,2));
+            allocation = pitch_allocation_schedule(beta, ...
+                pitchCommand, P, direction);
+            assert(allocation.cyclicLong >= P.control.cyclicLim(1) && ...
+                allocation.cyclicLong <= P.control.cyclicLim(2));
+            assert(allocation.elevator >= P.control.elevatorLim(1) && ...
+                allocation.elevator <= P.control.elevatorLim(2));
+            if betaDeg(i) < 45
+                assert(abs(definition.initialValues(2) - 16*d2r) < 1e-12);
+                assert(abs(allocation.cyclicLong - 2*d2r) < 1e-12);
+            elseif betaDeg(i) == 45
+                assert(abs(definition.initialValues(2) - 8*d2r) < 1e-12);
+                assert(abs(allocation.cyclicLong - (-4*d2r)) < 1e-12);
+                assert(abs(allocation.elevator - (-2.285714285714*d2r)) < ...
+                    1e-12);
+            elseif betaDeg(i) < 90
+                assert(abs(definition.initialValues(2) - 8*d2r) < 1e-12);
+                assert(abs(allocation.elevator - (-4*d2r)) < 1e-12);
+            else
+                assert(abs(definition.initialValues(2) - 8*d2r) < 1e-12);
+                assert(abs(allocation.elevator) < 1e-12);
+            end
+            if abs(betaDeg(i)-75) < eps
+                assert(abs(allocation.elevator - (-4*d2r)) < 1e-12);
+                assert(abs(allocation.cyclicLong/ ...
+                    max(abs(P.control.cyclicLim(:)))) < 0.02);
+            end
+        end
+    end
+
+    function test_old_high_tilt_cyclic_seed_overflows()
+        d2r = pi/180;
+        beta = 75*d2r;
+        direction = struct('cyclicDirection', -1, ...
+            'elevatorDirection', -1);
+        zeroAllocation = pitch_allocation_schedule(beta, 0, P, direction);
+        oldPitchCommand = (-4*d2r)/( ...
+            direction.cyclicDirection*zeroAllocation.gCyclic* ...
+            zeroAllocation.cyclicReference);
+        assert(oldPitchCommand > zeroAllocation.pitchCommandLimit);
+        try
+            pitch_allocation_schedule(beta, oldPitchCommand, P, direction);
+        catch ME
+            assert(strcmp(ME.identifier, ...
+                'pitch_allocation_schedule:InvalidPitchCommand'));
+            return;
+        end
+        error('check_trim_mode_framework:OldSeedDidNotOverflow', ...
+            'The old 75 deg cyclic-derived seed unexpectedly remained legal.');
     end
 
     function test_modified_legacy()

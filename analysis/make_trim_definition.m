@@ -66,20 +66,29 @@ switch mode
         definition.allocation.classification = 'ASSUMED_CONCEPT';
         definition.allocation.direction = direction;
 
-        if condition.betaM < pi/4
+        isExactFortyFiveDeg = abs(condition.betaM - pi/4) <= ...
+            10*eps(pi/4);
+        if condition.betaM < pi/4 && ~isExactFortyFiveDeg
             initialThetaDeg = 4;
             initialCollectiveDeg = 16;
             initialCyclicDeg = 2;
             initialPitchCommand = (initialCyclicDeg*d2r)/( ...
                 direction.cyclicDirection*zeroAllocation.gCyclic* ...
                 zeroAllocation.cyclicReference);
-        elseif condition.betaM < pi/2
+        elseif isExactFortyFiveDeg
             initialThetaDeg = 4;
             initialCollectiveDeg = 8;
             initialCyclicDeg = -4;
             initialPitchCommand = (initialCyclicDeg*d2r)/( ...
                 direction.cyclicDirection*zeroAllocation.gCyclic* ...
                 zeroAllocation.cyclicReference);
+        elseif condition.betaM < pi/2
+            initialThetaDeg = 4;
+            initialCollectiveDeg = 8;
+            initialElevatorDeg = -4;
+            initialPitchCommand = (initialElevatorDeg*d2r)/( ...
+                direction.elevatorDirection*zeroAllocation.gElevator* ...
+                zeroAllocation.elevatorReference);
         else
             initialThetaDeg = 4;
             initialCollectiveDeg = 8;
@@ -87,6 +96,14 @@ switch mode
             initialPitchCommand = (initialElevatorDeg*d2r)/( ...
                 direction.elevatorDirection*zeroAllocation.gElevator* ...
                 zeroAllocation.elevatorReference);
+        end
+        try
+            pitch_allocation_schedule(condition.betaM, ...
+                initialPitchCommand, P, direction);
+        catch ME
+            error('make_trim_definition:InvalidInitialPitchCommand', ...
+                ['conversion_longitudinal initial pitchCommand is outside ' ...
+                'the existing allocation domain: %s'], ME.message);
         end
         definition.initialValues = [initialThetaDeg*d2r; ...
             initialCollectiveDeg*d2r; initialPitchCommand];
