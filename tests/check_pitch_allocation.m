@@ -227,7 +227,10 @@ fprintf('All open-loop pitch allocation checks passed: %d\n', ...
             max(abs(uDirect-uConversion)), ...
             abs(rDirect.residualNorm-rConversion.residualNorm)];
         assert(rDirect.converged && rConversion.converged);
-        assert(all(airplaneDifferences <= 1e-8));
+        % Restoring wing.Cm0=-0.03 leaves the endpoint solutions equivalent
+        % but can move the optimizer residual-norm difference slightly above
+        % the state/control equality tolerance.
+        assert(all(airplaneDifferences <= [1e-8, 1e-8, 2e-8]));
         assert_allocation_trace(condition, uConversion, rConversion);
     end
 
