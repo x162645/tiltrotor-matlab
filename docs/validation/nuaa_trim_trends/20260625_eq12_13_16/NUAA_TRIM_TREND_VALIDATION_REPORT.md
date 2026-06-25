@@ -1,0 +1,79 @@
+# NUAA Trim Trend Validation Report
+
+## Project Goal Check
+
+This run preserves the component-level mechanistic chain, uses only the current approved conceptual parameters, and evaluates whether the model gives computable, continuous, explainable trim trends. It is not a strict XV-15 or GTRS quantitative validation.
+
+- Git commit: `976709d1b8b8c14bb44fc35fd7f02f4a5090ff48`
+- Elapsed seconds: 1487.145
+- Primary accepted PASS trim points: 100
+
+## NUAA Section 4 Method Restatement
+
+NUAA Section 4 trims steady conditions by driving state derivatives to zero so that resultant forces and moments balance. It computes helicopter mode, fixed-wing mode, and conversion modes at nacelle angles 15 deg and 75 deg. Figures 5 and 6 compare controls and pitch attitude versus speed. Figure 7 compares fixed-wing trim against GTRS and XV-15 actual trim results. Because complete XV-15 data are unavailable, the paper treats trend agreement and numerical closeness as rationality evidence, then analyzes stability derivatives and eigenvalues at trimmed linearization points. It does not require every open-loop mode to be stable.
+
+This project currently has no complete digitized GTRS/XV-15 data, so the result below is only a NUAA-style trim trend baseline and physical reasonableness check.
+
+## Trend Summary
+
+|mode|pointCount|collectiveEndpointChange_deg|thetaEndpointChange_deg|cyclicEndpointChange_deg|elevatorEndpointChange_deg|collectiveSpearman|thetaSpearman|directionRatioCollective|directionRatioTheta|
+|-|-|-|-|-|-|-|-|-|-|
+|airplane_lower|12|7.97534067878054|-8.10537820679844|0|12.5817348834221|1|-1|1|1|
+|airplane_upper|20|11.2090157657069|-3.11227838205046|0|4.91941737650048|1|-1|1|1|
+|conversion15_lower|10|-1.65142421502383|-7.77126210152391|-7.4880877404226|-0.307211720671945|-1|-1|1|1|
+|conversion15_upper|10|0.223168705120793|-2.8486725780097|1.63140090584974|0.0669310372374969|0.781818181818182|-1|0.777777777777778|1|
+|conversion75_lower|12|8.52737221400371|-7.58363072489524|1.46446334370105|11.6556246139183|1|-1|1|1|
+|conversion75_upper|20|12.0586257407946|-3.03204752004189|0.594889987474695|4.73471351154492|1|-1|1|1|
+|helicopter_hover_connected|13|-2.84867031376213|1.55325395507686|-1.79074652420556|0|-1|0.357142857142857|1|0.75|
+
+## Branch Comparison
+
+|mode|betaM_deg|V_mps|branchA|branchB|thetaDiff_deg|collectiveDiff_deg|cyclicDiff_deg|elevatorDiff_deg|significant|
+|-|-|-|-|-|-|-|-|-|-|
+|helicopter_longitudinal|0|0|helicopter_hover_connected|helicopter_reverse_audit|4.56438197871383e-09|2.86664558757366e-09|2.50718188246103e-09|0|0|
+|helicopter_longitudinal|0|5|helicopter_hover_connected|helicopter_reverse_audit|1.26169652503449e-09|1.88023818736838e-09|2.99829572281141e-09|0|0|
+|helicopter_longitudinal|0|8|helicopter_9ms_low_branch|helicopter_9ms_high_branch|2.76445280555926e-09|3.04445535448394e-09|6.53391218907728e-09|0|0|
+|helicopter_longitudinal|0|9|helicopter_9ms_low_branch|helicopter_9ms_high_branch|2.21135598721389e-09|1.19189991210078e-10|1.53701081861968e-08|0|0|
+|helicopter_longitudinal|0|10|helicopter_hover_connected|helicopter_reverse_audit|8.51127035517152e-09|2.67909783246978e-09|7.07986269610217e-09|0|0|
+|helicopter_longitudinal|0|15|helicopter_hover_connected|helicopter_reverse_audit|8.52987769306424e-09|1.46397738376436e-09|3.03453617789273e-09|0|0|
+|helicopter_longitudinal|0|20|helicopter_hover_connected|helicopter_reverse_audit|1.80693948692578e-09|3.63979424378158e-09|9.07500519176097e-09|0|0|
+|helicopter_longitudinal|0|25|helicopter_hover_connected|helicopter_reverse_audit|1.31374682244001e-08|4.71942485091859e-10|3.41750205912206e-09|0|0|
+|helicopter_longitudinal|0|30|helicopter_hover_connected|helicopter_reverse_audit|7.11625047777886e-09|9.13511577493864e-09|8.33009017320308e-09|0|0|
+|helicopter_longitudinal|0|2.5|helicopter_hover_connected|helicopter_reverse_audit|4.56113546931647e-09|1.65835345455889e-09|9.60974355646016e-09|0|0|
+|helicopter_longitudinal|0|7.5|helicopter_hover_connected|helicopter_reverse_audit|3.65616784070433e-09|1.65971059118419e-09|1.00023683780037e-08|0|0|
+|helicopter_longitudinal|0|8.5|helicopter_9ms_low_branch|helicopter_9ms_high_branch|1.2345118149959e-08|1.3095586837153e-09|9.26353405095171e-09|0|0|
+|helicopter_longitudinal|0|9.5|helicopter_9ms_low_branch|helicopter_9ms_high_branch|1.66354447994621e-08|1.53079682263524e-09|2.30923724586773e-10|0|0|
+|helicopter_longitudinal|0|10.5|helicopter_9ms_low_branch|helicopter_9ms_high_branch|1.08642206342324e-08|4.41513492432932e-10|1.26474408723709e-09|0|0|
+|helicopter_longitudinal|0|12.5|helicopter_hover_connected|helicopter_reverse_audit|5.58721957588659e-11|2.2782895570117e-09|1.040457009438e-08|0|0|
+|helicopter_longitudinal|0|17.5|helicopter_hover_connected|helicopter_reverse_audit|1.76271530705208e-09|1.2257235226798e-09|1.5137295195089e-08|0|0|
+|helicopter_longitudinal|0|22.5|helicopter_hover_connected|helicopter_reverse_audit|4.62187266236924e-09|4.2079282280838e-09|3.18282511457824e-09|0|0|
+|helicopter_longitudinal|0|27.5|helicopter_hover_connected|helicopter_reverse_audit|1.20186833818536e-08|5.13928455347923e-09|1.08600302084483e-08|0|0|
+|helicopter_longitudinal|0|7.75|helicopter_9ms_low_branch|helicopter_9ms_high_branch|7.28963475693511e-09|1.19031540180004e-09|1.28694905843219e-08|0|0|
+|helicopter_longitudinal|0|8.25|helicopter_9ms_low_branch|helicopter_9ms_high_branch|5.25017967989427e-09|2.33788455261674e-09|8.07249889156481e-09|0|0|
+|helicopter_longitudinal|0|8.75|helicopter_9ms_low_branch|helicopter_9ms_high_branch|1.42126153068745e-08|1.56487089952861e-09|1.95551729254007e-08|0|0|
+|helicopter_longitudinal|0|9.25|helicopter_9ms_low_branch|helicopter_9ms_high_branch|6.73416877816635e-10|1.17579546099478e-09|1.1030327873307e-08|0|0|
+|helicopter_longitudinal|0|9.75|helicopter_9ms_low_branch|helicopter_9ms_high_branch|2.49035148058852e-09|4.99468910675205e-10|7.11395076180565e-09|0|0|
+|helicopter_longitudinal|0|10.25|helicopter_9ms_low_branch|helicopter_9ms_high_branch|2.70675348801319e-09|3.93740151594102e-10|7.87755860542916e-10|0|0|
+
+## Stability Map Summary
+
+|mode|points|candidate positive roots %|longitudinal %|lateral %|dominant real min/median/max|
+|-|-:|-:|-:|-:|-|
+|airplane_longitudinal|33|0.0|0.0|0.0|0 / 0 / 0|
+|conversion_longitudinal|54|22.2|22.2|20.4|0 / 0 / 0.2718|
+|helicopter_longitudinal|13|100.0|100.0|100.0|0.039 / 0.1219 / 0.3861|
+
+Robustness sample rows: 36
+
+## Figures
+
+- helicopter: `E:\tiltrotor\validation\nuaa_trim_trends\20260625_153610\helicopter_nuaa_fig5a.png`
+- airplane: `E:\tiltrotor\validation\nuaa_trim_trends\20260625_153610\airplane_nuaa_fig5b.png`
+- conversion15: `E:\tiltrotor\validation\nuaa_trim_trends\20260625_153610\conversion_beta15_nuaa_fig6a.png`
+- conversion75: `E:\tiltrotor\validation\nuaa_trim_trends\20260625_153610\conversion_beta75_nuaa_fig6b.png`
+- maxReal: `E:\tiltrotor\validation\nuaa_trim_trends\20260625_153610\stability_max_real_by_mode.png`
+- coverage: `E:\tiltrotor\validation\nuaa_trim_trends\20260625_153610\stability_long_lateral_coverage.png`
+
+## Project Goal Check
+
+The run keeps the current component force/moment chain and approved parameters. Any continuity, branch, control-margin, low-speed-boundary, or open-loop instability limitations are reported as model limitations. The current results cannot be called strict XV-15/GTRS validation because the parameter set is conceptual, complete public comparison data are not available in this workflow, and the low-order model omits effects such as dynamic inflow and flight-control stabilization.
