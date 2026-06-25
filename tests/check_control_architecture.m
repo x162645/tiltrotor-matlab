@@ -81,15 +81,18 @@ fprintf('All control architecture checks passed: %d\n', controlReport.allPassed)
 
     function result = test_differential_collective()
         d = D(:,2);
-        ok = d(4) < -1e5 && d(6) > 1e4 && near_zero(d([1 2 3 5]), d);
+        ok = d(2) < -1e4 && d(4) < -1e5 && d(6) > 1e4 && ...
+            near_zero(d([1 3 5]), d);
         msg = ['Expected differential collective to produce roll and yaw ' ...
-            'moments while preserving symmetric force and pitch axes.'];
+            'moments, with the NUAA Eq12 inflow field also producing an ' ...
+            'odd lateral-force derivative.'];
         result = make_result(ok, msg);
     end
 
     function result = test_symmetric_longitudinal_cyclic()
         d = D(:,3);
-        ok = d(1) > 1e4 && d(5) < -1e4 && near_zero(d([2 3 4 6]), d);
+        ok = d(1) > 1e4 && d(5) < -1e4 && near_zero(d([2 4 6]), d) && ...
+            abs(d(3)) < 1e-4*max(abs(d(1)),1);
         msg = ['Expected symmetric longitudinal cyclic to enter blade pitch ' ...
             'as theta1s*sin(psi), changing longitudinal load and ' ...
             'pitch moment without lateral/yaw differential effect.'];

@@ -53,10 +53,10 @@ P.rotor.nRadial        = 12;
 P.rotor.nAzimuth       = 16;
 
 P.rotor.inducedMaxIter = 20;
-P.rotor.inducedRelax   = 0.45;
+P.rotor.inducedRelax   = 0.50;
 P.rotor.inducedTol     = 1.0e-4;
-% Deprecated placeholder. The formal flapping/BEMT path uses uniform
-% induced velocity viField=vi; non-uniform inflow is not implemented yet.
+% Deprecated compatibility metadata. The formal flapping/BEMT path now uses
+% NUAA Eq. (12) directly and does not read this gain.
 P.rotor.inflowHarmonic = 1.0;
 
 % Deprecated empirical disk-tilt gains. These fields are retained only for
@@ -121,6 +121,8 @@ P.wing.Cmalpha         = 0.00;
 P.wing.CLaileron       = 0.45;
 P.wing.Cmaileron       = -0.08;
 
+% ASSUMED_CONCEPT: Eq. (16) scale/normalization placeholders; not sourced
+% XV-15 or NUAA numerical data.
 P.wing.SslipMaxHalf    = 4.0;
 P.wing.muMax           = 0.35;
 P.wing.CDnormal        = 1.10;

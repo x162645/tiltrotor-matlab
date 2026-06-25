@@ -12,12 +12,22 @@ S_half = P.wing.S/2;
 muMean = 0.5*(hypot(rotorLeft.muLong, rotorLeft.muLat) + ...
               hypot(rotorRight.muLong, rotorRight.muLat));
 
-muFactor = 1 - 0.25*min(muMean/max(P.wing.muMax, eps), 1);
-orientationFactor = 0.60 + 0.40*abs(cos(2*betaM));
+if ~(isfinite(P.wing.muMax) && P.wing.muMax > 0)
+    error('P.wing.muMax must be positive and finite.');
+end
 
-S_slip = min(P.wing.SslipMaxHalf, S_half) ...
-       * muFactor * orientationFactor;
-S_slip = min(max(S_slip, 0), S_half);
+% NUAA Eq. (16) uses the opposite nacelle-angle convention. Convert from
+% code betaM (0 hover, pi/2 airplane) to paper beta before evaluating the
+% literal raw slipstream-area expression.
+betaPaper = pi/2 - betaM;
+angleRaw = sin(1.386*(pi/2 - betaPaper)) + ...
+           cos(3.114*(pi/2 - betaPaper));
+muRaw = (P.wing.muMax - muMean)/P.wing.muMax;
+SslipRawHalf = P.wing.SslipMaxHalf*angleRaw*muRaw;
+
+% Code-only physical-area guard: this bound is not part of NUAA Eq. (16).
+SslipUpperHalf = min(P.wing.SslipMaxHalf, S_half);
+S_slip = min(max(SslipRawHalf, 0), SslipUpperHalf);
 S_free = S_half - S_slip;
 
 Fbody = zeros(3,1);
@@ -57,6 +67,15 @@ end
 
 out.SslipHalf = S_slip;
 out.SfreeHalf = S_free;
+out.slipstreamAreaModel = 'NUAA_EQ16_WITH_PHYSICAL_AREA_GUARD';
+out.betaPaper = betaPaper;
+out.angleRaw = angleRaw;
+out.muMean = muMean;
+out.muRaw = muRaw;
+out.SslipRawHalf = SslipRawHalf;
+out.SslipUpperHalf = SslipUpperHalf;
+out.SslipClampedLow = SslipRawHalf < 0;
+out.SslipClampedHigh = SslipRawHalf > SslipUpperHalf;
 out.regions = regionOut;
 out.F = Fbody;
 out.M = Mbody;

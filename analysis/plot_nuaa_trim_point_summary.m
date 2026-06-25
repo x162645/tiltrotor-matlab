@@ -6,9 +6,9 @@ function report = plot_nuaa_trim_point_summary()
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 localDir = fullfile(rootDir, 'validation', 'nuaa_trim_trends', ...
-    '20260625_091852');
+    '20260625_eq12_13_16');
 docsBaseDir = fullfile(rootDir, 'docs', 'validation', ...
-    'nuaa_trim_trends', '20260625');
+    'nuaa_trim_trends', '20260625_eq12_13_16');
 
 localPoints = fullfile(localDir, 'nuaa_trim_points.csv');
 localStability = fullfile(localDir, 'nuaa_stability_map.csv');
@@ -68,10 +68,10 @@ writetable(clean, paths.cleanCsv);
 writetable(summary, paths.summaryCsv);
 make_overview_figure(joined, summary, paths.png, paths.pdf);
 
-copyfile(paths.cleanCsv, paths.docsCleanCsv);
-copyfile(paths.summaryCsv, paths.docsSummaryCsv);
-copyfile(paths.png, paths.docsPng);
-copyfile(paths.pdf, paths.docsPdf);
+copy_if_different(paths.cleanCsv, paths.docsCleanCsv);
+copy_if_different(paths.summaryCsv, paths.docsSummaryCsv);
+copy_if_different(paths.png, paths.docsPng);
+copy_if_different(paths.pdf, paths.docsPdf);
 
 verify_outputs(clean, summary, joined, paths);
 
@@ -526,4 +526,13 @@ function ensure_dir(path)
 if exist(path, 'dir') ~= 7
     mkdir(path);
 end
+end
+
+function copy_if_different(sourcePath, destinationPath)
+sourceCanonical = char(java.io.File(sourcePath).getCanonicalPath());
+destinationCanonical = char(java.io.File(destinationPath).getCanonicalPath());
+if strcmpi(sourceCanonical, destinationCanonical)
+    return;
+end
+copyfile(sourcePath, destinationPath);
 end

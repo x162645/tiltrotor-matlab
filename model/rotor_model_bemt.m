@@ -45,6 +45,7 @@ Vlat   = dot(Vhub, eY);
 tipSpeed = P.rotor.Omega * P.rotor.R;
 muLong = Vlong / max(tipSpeed, eps);
 muLat  = Vlat  / max(tipSpeed, eps);
+mu = hypot(Vlong, Vlat) / max(tipSpeed, eps);
 
 A = pi*P.rotor.R^2;
 vi = sqrt(max(P.mass.m*P.env.g/2, 1)/(2*P.env.rho*A));
@@ -57,6 +58,9 @@ end
 coupledConverged = false;
 viError = Inf;
 flapInfo = struct();
+eq13 = struct('CT',NaN,'mu',mu,'lambda0',NaN,'lambda1',NaN, ...
+    'target',NaN,'old',NaN,'new',NaN,'positiveThrustGuardActive',false, ...
+    'denominatorFloorActive',false);
 
 for iter = 1:P.rotor.inducedMaxIter
     [zFlap, flapInfo] = solve_flap(vi, zFlap);
@@ -67,13 +71,32 @@ for iter = 1:P.rotor.inducedMaxIter
 
     loads = blade_loads(vi, zFlap);
 
-    Vplane = hypot(Vlong, Vlat);
-    denom = 2*P.env.rho*A*sqrt(Vplane^2 + (Vaxial + vi)^2);
-    viTarget = max(loads.T, 0) / max(denom, 1e-8);
+    % NUAA Eq. (13) in the current rotor-axis sign convention.
+    % CT uses 0.5*rho*A*(Omega R)^2 so that
+    % tipSpeed*CT/(4*sqrt(lambda1^2+mu^2)) is algebraically equivalent to
+    % T/(2*rho*A*sqrt(Vplane^2 + (Vaxial+vi)^2)) for positive thrust.
+    % lambda0=-Vaxial/tipSpeed maps positive body velocity along +eT to a
+    % negative inflow ratio; lambda1=lambda0-vi/tipSpeed includes induced
+    % velocity with the existing positive-thrust convention.
+    lambda0 = -Vaxial / max(tipSpeed, eps);
+    lambda1 = lambda0 - vi / max(tipSpeed, eps);
+    CT = max(loads.T, 0)/(0.5*P.env.rho*A*tipSpeed^2);
+    denomEq13 = sqrt(lambda1^2 + mu^2);
+    denomEq13Used = max(denomEq13, 1.0e-12);
+    viTarget = tipSpeed*CT/(4*denomEq13Used);
 
-    viNew = (1 - P.rotor.inducedRelax)*vi ...
-          + P.rotor.inducedRelax*viTarget;
+    viNew = 0.5*(vi + viTarget);
     viError = abs(viNew - vi)/max(1, abs(vi));
+
+    eq13.CT = CT;
+    eq13.mu = mu;
+    eq13.lambda0 = lambda0;
+    eq13.lambda1 = lambda1;
+    eq13.target = viTarget;
+    eq13.old = vi;
+    eq13.new = viNew;
+    eq13.positiveThrustGuardActive = loads.T < 0;
+    eq13.denominatorFloorActive = denomEq13 < denomEq13Used;
 
     vi = viNew;
     if viError < P.rotor.inducedTol && ...
@@ -143,6 +166,24 @@ out.maxUT = loads.maxUT;
 out.maxAbsAlphaBlade = loads.maxAbsAlphaBlade;
 out.inducedVelocity = vi;
 out.inducedVelocityError = viError;
+out.inducedVelocityTargetEq13 = eq13.target;
+out.inducedVelocityUpdateOld = eq13.old;
+out.inducedVelocityUpdateNew = eq13.new;
+out.inducedVelocityUpdateWeight = 0.5;
+out.CT = eq13.CT;
+out.mu = eq13.mu;
+out.lambda0 = eq13.lambda0;
+out.lambda1 = eq13.lambda1;
+out.inducedClosureModel = 'NUAA_EQ13';
+out.positiveThrustGuardActive = eq13.positiveThrustGuardActive;
+out.inducedDenominatorFloorActive = eq13.denominatorFloorActive;
+out.inflowModel = loads.inflowModel;
+out.inducedVelocityField = loads.viField;
+out.inducedVelocityFieldMin = loads.viFieldMin;
+out.inducedVelocityFieldMax = loads.viFieldMax;
+out.inducedVelocityFieldAzimuthMeanError = loads.viFieldAzimuthMeanError;
+out.inducedVelocityFieldPsi = loads.psi;
+out.inducedVelocityFieldRadius = loads.rMid;
 out.iterations = iter;
 out.coupledConverged = coupledConverged;
 out.flap = flapInfo;
@@ -302,10 +343,10 @@ out.M = Mbody;
         thetaBlade = rotorCtrl.collective + twist + theta1s*sin(psi);
         UT = P.rotor.Omega*rMid + VtanTrans;
 
-        % Formal minimum model: uniform induced velocity. Non-uniform inflow
-        % is intentionally not included until a model that vanishes in
-        % axisymmetric hover is introduced and validated separately.
-        viField = viMean;
+        % NUAA Eq. (12), first-harmonic non-uniform induced velocity.
+        % psi=0 is the current spatial +eD direction for both rotors;
+        % rotDir only controls blade motion, not this spatial inflow field.
+        viField = viMean .* (1 + cos(psi).*(rMid/P.rotor.R));
 
         baseUP = Vaxial + viField;
         UP = baseUP - beta.*Vrad - betaDot.*rMid;
@@ -344,6 +385,13 @@ out.M = Mbody;
         loads.Hlong = factor*HvecSum(1);
         loads.Hlat  = factor*HvecSum(2);
         loads.psi = psi;
+        loads.rMid = rMid;
+        loads.viField = viField;
+        loads.viFieldMin = min(viField(:));
+        loads.viFieldMax = max(viField(:));
+        loads.viFieldAzimuthMeanError = ...
+            max(abs(mean(viField, 1) - viMean));
+        loads.inflowModel = 'NUAA_EQ12_FIRST_HARMONIC';
         loads.beta = beta;
         loads.betaDot = betaDot;
         loads.betaDDot = betaDDot;
