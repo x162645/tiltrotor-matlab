@@ -79,33 +79,67 @@ out.SslipUpperHalf = SslipUpperHalf;
 out.SslipClampedLow = SslipRawHalf < 0;
 out.SslipClampedHigh = SslipRawHalf > SslipUpperHalf;
 out.regions = regionOut;
+out.maxEq17BasisError = max_region_field(regionOut, 'eq17BasisError');
+out.maxEq17ReconstructionError = max_region_field( ...
+    regionOut, 'eq17ReconstructionError');
+out.wakeFactorUsed = false;
 out.F = Fbody;
 out.M = Mbody;
 
     function [Freg, Mreg, data] = one_region(rAC, Sreg, side, inSlipstream, rotor)
+        VrigidLocal = Vbody + cross(omegaBody, rAC);
+
+        if inSlipstream
+            v1d = rotor.inducedVelocity;
+            if ~(isfinite(v1d) && v1d >= 0)
+                error('wing_model:InvalidEq17InducedVelocity', ...
+                    'NUAA Eq.17 requires finite nonnegative v1d.');
+            end
+            % NUAA Eq. (17), in current body axes x forward, y right, z down.
+            % This is exactly v1d*rotor.eT because eT=[sin(betaM);0;-cos(betaM)].
+            VwakeEq17 = [v1d*sin(betaM); 0; -v1d*cos(betaM)];
+            VwakeBasis = v1d*rotor.eT;
+            eq17BasisError = norm(VwakeEq17 - VwakeBasis);
+            localVelocityModel = 'NUAA_EQ17';
+            Vlocal = VrigidLocal + VwakeEq17;
+        else
+            v1d = 0;
+            VwakeEq17 = zeros(3,1);
+            VwakeBasis = zeros(3,1);
+            eq17BasisError = 0;
+            localVelocityModel = 'FREE_STREAM_RIGID_BODY';
+            Vlocal = VrigidLocal;
+        end
+
+        eq17ReconstructionError = norm(Vlocal - ...
+            (Vbody + cross(omegaBody, rAC) + VwakeEq17));
+
         if Sreg <= 0
             Freg = zeros(3,1);
             Mreg = zeros(3,1);
-            data = struct('area',0,'F',Freg,'M',Mreg);
+            data = base_region_data(Sreg, side, inSlipstream, rAC, ...
+                VrigidLocal, v1d, VwakeEq17, VwakeBasis, ...
+                eq17BasisError, eq17ReconstructionError, ...
+                localVelocityModel, Vlocal);
+            data.wakeVelocity = v1d;
+            data.V = norm(Vlocal);
+            data.F = Freg;
+            data.M = Mreg;
             return;
-        end
-
-        Vlocal = Vbody + cross(omegaBody, rAC);
-
-        if inSlipstream
-            wakeVelocity = P.rotor.wakeFactor*max(rotor.inducedVelocity,0);
-            Vlocal = Vlocal + wakeVelocity*rotor.eT;
-        else
-            wakeVelocity = 0;
         end
 
         V = norm(Vlocal);
         if V < 1e-8
             Freg = zeros(3,1);
             Mreg = zeros(3,1);
-            data = struct('area',Sreg,'side',side, ...
-                'inSlipstream',inSlipstream,'wakeVelocity',wakeVelocity, ...
-                'rAC',rAC,'Vlocal',Vlocal,'V',V,'F',Freg,'M',Mreg);
+            data = base_region_data(Sreg, side, inSlipstream, rAC, ...
+                VrigidLocal, v1d, VwakeEq17, VwakeBasis, ...
+                eq17BasisError, eq17ReconstructionError, ...
+                localVelocityModel, Vlocal);
+            data.wakeVelocity = v1d;
+            data.V = V;
+            data.F = Freg;
+            data.M = Mreg;
             return;
         end
 
@@ -168,8 +202,15 @@ out.M = Mbody;
         data.area = Sreg;
         data.side = side;
         data.inSlipstream = inSlipstream;
-        data.wakeVelocity = wakeVelocity;
+        data.wakeVelocity = v1d;
         data.rAC = rAC;
+        data.VrigidLocal = VrigidLocal;
+        data.v1dEq17 = v1d;
+        data.VwakeEq17 = VwakeEq17;
+        data.VwakeBasis = VwakeBasis;
+        data.eq17BasisError = eq17BasisError;
+        data.eq17ReconstructionError = eq17ReconstructionError;
+        data.localVelocityModel = localVelocityModel;
         data.Vlocal = Vlocal;
         data.V = V;
         data.alpha = alpha;
@@ -198,6 +239,34 @@ out.M = Mbody;
         data.CmLiftLine = CmLift;
         data.F = Freg;
         data.M = Mreg;
+    end
+
+    function data = base_region_data(area, side, inSlipstream, rAC, ...
+            VrigidLocal, v1d, VwakeEq17, VwakeBasis, eq17BasisError, ...
+            eq17ReconstructionError, localVelocityModel, Vlocal)
+        data = struct();
+        data.area = area;
+        data.side = side;
+        data.inSlipstream = inSlipstream;
+        data.rAC = rAC;
+        data.VrigidLocal = VrigidLocal;
+        data.v1dEq17 = v1d;
+        data.VwakeEq17 = VwakeEq17;
+        data.VwakeBasis = VwakeBasis;
+        data.eq17BasisError = eq17BasisError;
+        data.eq17ReconstructionError = eq17ReconstructionError;
+        data.localVelocityModel = localVelocityModel;
+        data.Vlocal = Vlocal;
+    end
+
+    function value = max_region_field(regions, fieldName)
+        values = zeros(numel(regions), 1);
+        for iRegion = 1:numel(regions)
+            if isfield(regions{iRegion}, fieldName)
+                values(iRegion) = regions{iRegion}.(fieldName);
+            end
+        end
+        value = max(values);
     end
 
     function w = smootherstep(t)

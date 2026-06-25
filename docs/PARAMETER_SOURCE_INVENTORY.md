@@ -69,7 +69,7 @@ Consumer abbreviations: `RB` = `model/rotor_model_bemt.m`; `WG` = `model/wing_mo
 |ROT-035|`P.rotor.flapNewtonRegularization`|`1e-8`|matrix-dependent|solver|numerical|RB normal equations|NUMERICAL|Solver, discretization, reporting, diagnostic, or test setting in code; not aircraft parameter provenance.|Code: `params_nominal.m:82`; `RB:187-188`|Diagonal regularization; dimensional interpretation follows normalized Jacobian|NOT_APPLICABLE|not applicable|not applicable|Not an XV-15 aircraft target value for this correction layer.|NOT_APPLICABLE|No aircraft source required for this row; keep numerical/compatibility rationale under current-model governance.|MEDIUM|MEDIUM|MEDIUM|Unit/scale dependence should be documented before solver changes|
 |ROT-036|`P.rotor.flapLineSearchMaxIter`|`18`|iteration|solver|numerical|RB line search|NUMERICAL|Solver, discretization, reporting, diagnostic, or test setting in code; not aircraft parameter provenance.|Code: `params_nominal.m:83`; `RB:192`|Maximum backtracks|NOT_APPLICABLE|not applicable|not applicable|Not an XV-15 aircraft target value for this correction layer.|NOT_APPLICABLE|No aircraft source required for this row; keep numerical/compatibility rationale under current-model governance.|LOW|NONE|HIGH||
 |ROT-037|`P.rotor.flapDivergenceAngle`|`80*pi/180`|rad|applicability guard|numerical|RB valid-state check|NUMERICAL|Solver, discretization, reporting, diagnostic, or test setting in code; not aircraft parameter provenance.|Code: `params_nominal.m:84`; `RB:238`|Rejects flap states exceeding 80 deg|NOT_APPLICABLE|not applicable|not applicable|Not an XV-15 aircraft target value for this correction layer.|NOT_APPLICABLE|No aircraft source required for this row; keep numerical/compatibility rationale under current-model governance.|MEDIUM|MEDIUM|HIGH|Numerical guard, not a physical flap stop|
-|ROT-038|`P.rotor.wakeFactor`|`1.60`|1|rotor-wing interference|physical|WG slipstream velocity|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:86`; `WG:75`|Multiplier on nonnegative mean induced velocity|REFERENCE_PENDING|none|not yet identified|No XV-15 target value or relation has been established for this row.|NO_TARGET_VALUE|Primary XV-15 source required before aircraft-specific replacement or comparison.|HIGH|HIGH|HIGH|Uniform one-way wake model only|
+|ROT-038|`P.rotor.wakeFactor`|`1.60`|1|rotor-wing interference compatibility|physical|none|DEPRECATED_UNUSED|Retained only for old project-file and GUI/catalog compatibility. NUAA Eq. (17) production wing slipstream velocity reads `rotor.inducedVelocity` directly and does not read this multiplier.|Code: `params_nominal.m`; `services/build_parameter_catalog.m`; production search found no `model/wing_model.m` read|Deprecated historical multiplier on nonnegative mean induced velocity|NOT_APPLICABLE|not applicable|not applicable|This inactive compatibility field is not an XV-15 target parameter.|NOT_APPLICABLE|No aircraft source required for the inactive compatibility field.|INFO|NONE|HIGH|Focused Eq. (17) tests perturb this field and require unchanged wing force, moment, and local velocity outputs.|
 |ROT-039|`P.rotor.Jpolar`|`0.0`|kg m^2|rotor inertia|physical|RB gyro moment|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:88-89`; `RB:106-107`|Zero disables rotor gyroscopic channel|REFERENCE_PENDING|none|not yet identified|No XV-15 target value or relation has been established for this row.|NO_TARGET_VALUE|Primary XV-15 source required before aircraft-specific replacement or comparison.|HIGH|HIGH|HIGH|Needs rotating assembly polar inertia and speed schedule|
 |WIN-001|`P.wing.S`|`18.0`|m^2|wing geometry|physical|WG|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:92`|Total modeled wing area; not equal to exact cited conversion|CANDIDATE_PRIMARY|NASA_TM_X_62407.pdf|PDF 15, printed page 12, general dimensions table|169 ft^2 wing-area entry is candidate XV-15 geometry evidence; definition and current modeled area differ.|NUMERIC_CONFLICT|Manual source/configuration/unit/coordinate verification or additional primary evidence required.|MEDIUM|MEDIUM|HIGH|NASA/XV-15 evidence is target/comparison context only, not proof of current-value provenance.|
 |WIN-002|`P.wing.b`|`10.0`|m|wing geometry|physical|sanity/reference only; not WG loads|ASSUMED_CONCEPT|Current code value and project intent only; no repository-history proof of direct aircraft-source entry.|Code: `params_nominal.m:93`|Reference span; production wing force does not consume it|CANDIDATE_PRIMARY|NASA_TM_X_62407.pdf|PDF 15, printed page 12, general dimensions table|Rotor-center spacing / span-related entries are candidate geometry context, not a confirmed model wing span mapping.|CONFIGURATION_DEPENDENT|Manual source/configuration/unit/coordinate verification or additional primary evidence required.|MEDIUM|MEDIUM|HIGH|Definition may differ from aerodynamic span NASA/XV-15 evidence is target/comparison context only, not proof of current-value provenance.|
@@ -218,7 +218,7 @@ Counts below are generated from the rows in this document and should be updated 
 |-|-:|
 |inventory rows|176|
 |`P.` leaf fields|122|
-|active physical/empirical parameter rows|97|
+|active physical/empirical parameter rows|96|
 |numerical-setting rows|69|
 |deprecated compatibility fields|8|
 |other inactive metadata/reference fields|2 (`bladeMassDistribution`, unused `vtail.c`)|
@@ -227,10 +227,10 @@ Counts below are generated from the rows in this document and should be updated 
 |-|-:|
 |DOCUMENTED_PROJECT_SOURCE|0|
 |DERIVED|5|
-|ASSUMED_CONCEPT|95|
+|ASSUMED_CONCEPT|94|
 |NUMERICAL|68|
 |AMBIGUOUS_COUPLED|0|
-|DEPRECATED_UNUSED|8|
+|DEPRECATED_UNUSED|9|
 |UNRESOLVED|0|
 
 |XV-15 target-evidence status|count|

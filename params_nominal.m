@@ -87,6 +87,9 @@ P.rotor.flapNewtonRegularization = 1.0e-8;
 P.rotor.flapLineSearchMaxIter = 18;
 P.rotor.flapDivergenceAngle = 80.0*d2r;
 
+% Deprecated compatibility metadata. NUAA Eq. (17) wing slipstream
+% velocity now uses rotor.inducedVelocity directly; production wing loads
+% do not read this multiplier.
 P.rotor.wakeFactor     = 1.60;
 
 % 可选旋翼陀螺项。缺乏可信转动惯量时默认关闭。

@@ -21,6 +21,7 @@ run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
 run_test('collective thrust monotonicity', @test_collective_monotonicity);
 run_test('left/right symmetry', @test_symmetry);
 run_test('NUAA Eq12 Eq13 Eq16 closure', @test_nuaa_eq12_13_16);
+run_test('NUAA Eq17 wing velocity chain', @test_nuaa_eq17_wing_velocity);
 run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
@@ -130,6 +131,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         eqReport = check_nuaa_eq12_13_16();
         assert(eqReport.allPassed, ...
             'NUAA Eq12/Eq13/Eq16 focused checks have failed items.');
+    end
+
+    function test_nuaa_eq17_wing_velocity()
+        eq17Report = check_nuaa_eq17_wing_velocity();
+        assert(eq17Report.allPassed, ...
+            'NUAA Eq17 focused wing velocity checks have failed items.');
     end
 
     function test_trim_mode_framework()
