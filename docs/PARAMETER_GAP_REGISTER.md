@@ -161,11 +161,11 @@ Both dimensions use `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`, and `NONE`. A `
 
 - Problem: center `0.35` and half-width `0.15` blend two different conceptual wing models.
 - Current code consequence: loads and derivatives in the transition band depend on a continuity device rather than validated aerodynamics.
-- Evidence available: `WG:98-140`, explicit comments in `params_nominal.m`, and smoothness tests. The checked-out `AGENTS.md` section 25.2 still says `0.20`, while executable code and `docs/PAPER_CODE_MAPPING.md:736` say `0.15`.
+- Evidence available: `WG:98-140`, explicit comments in `params_nominal.m`, smoothness tests, and the reconciled `AGENTS.md` section 25.2. Executable code and `docs/PAPER_CODE_MAPPING.md:736` both record `0.15`.
 - Evidence missing: local wing-flow regime map and force/moment data across normal-to-chordwise flow.
 - Current concept-model risk: `MEDIUM`.
 - XV-15 reproduction blocker: `HIGH`.
-- Recommended disposition: retain executable `0.15` as `ASSUMED_CONCEPT` in this read-only phase, reconcile the stale documentation in a separate authorized documentation task, and do not interpret the boundaries as stall or physical regime limits.
+- Recommended disposition: retain executable `0.15` as `ASSUMED_CONCEPT`, and do not interpret the boundaries as stall or physical regime limits.
 - Required source type: wing-in-slipstream wind-tunnel/CFD data with local velocity definition.
 - Blocks: derivative interpretation near the band, transition envelope, XV-15 comparison.
 

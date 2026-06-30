@@ -960,7 +960,7 @@ collective / diffCollective / cyclicLong / diffCyclic
 分别计算 `FNear` 与 `FLiftLine`，再用 quintic smootherstep 权重连续混合。
 
 `P.wing.normalFlowRatio = 0.35` 表示过渡中心；
-`P.wing.normalFlowBlendHalfWidth = 0.20` 是
+`P.wing.normalFlowBlendHalfWidth = 0.15` 是
 `ASSUMED_MODEL_PARAMETER`，来自本项目低速配平连续性敏感性，不是文献或试验数据。
 
 该连续化只用于避免人工载荷跳变，不表示机翼气动模型已经完成试验验证。

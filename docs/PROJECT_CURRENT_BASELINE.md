@@ -75,6 +75,15 @@ Eq.20/22 force and moment assembly
 
 The old hard near-normal/lift-line switch has been removed. The current wing model evaluates both branches and blends them continuously over a finite normal-flow-ratio band using a smooth transition.
 
+Current executable blend parameters are:
+
+```text
+P.wing.normalFlowRatio           = 0.35
+P.wing.normalFlowBlendHalfWidth  = 0.15
+```
+
+The blend half-width is an `ASSUMED_MODEL_PARAMETER` / code-only continuity device. It is not literature or test data and does not validate the wing aerodynamic model.
+
 ## 5. Current nominal longitudinal parameters
 
 The current physical baseline uses:
@@ -150,13 +159,30 @@ Failing to distinguish these definitions reverses the physical interpretation of
 
 ## 10. GitHub tracking status
 
-PR #19 is the active GUI work line, but its original description is older than the actual branch contents and the branch includes some non-GUI diagnostic work. The PR description alone is not a reliable implementation inventory.
+PR #19 is the active GUI work line. As of the 2026-06-30 remote-fact audit, PR #19 is open, draft, and points at `feature/gui-v1.2-parameter-workbench`. Its current body has been updated to refer reviewers to this physical baseline, but the branch still needs reconciliation with `feature/nuaa-equation-17` before any merge decision.
 
-PR #10 is a historical GUI-v1.1 line and is superseded by PR #19.
+PR #10 is a historical GUI-v1.1 line and is superseded by PR #19. As of the same audit, PR #10 is still open, not merged, and not mergeable; it should be treated as development history rather than a merge candidate.
 
-Issue #24 remains the task tracker. Its core technical execution is present on `feature/nuaa-equation-17`; remaining work is review, branch integration, metadata cleanup, and final lifecycle closure.
+Issue #24 remains open as the NUAA trend-validation task tracker. Its latest 2026-06-30 status comment says the core technical execution is complete on `feature/nuaa-equation-17`; remaining work is review, branch integration, metadata cleanup, and final lifecycle closure.
 
-## 11. Review rule for future work
+## 11. Remote fact-audit snapshot
+
+The 2026-06-30 remote-fact audit recorded:
+
+- `origin/main` at `e93959452b2bbe66b1e75b8c5938842b33842a7a`;
+- `origin/feature/nuaa-equation-17` at `4045eed7a72c4e16428da681548ec6ec384b9ceb`;
+- `origin/feature/gui-v1.2-parameter-workbench` at `ef8b24e7df5d7c2831c21b089fa151788fd7e2dd`;
+- `origin/task/nuaa-trim-trend-validation-20260625` at `83776b2f465be20c311432d05d3ef8ace8e8ba4d`;
+- `origin/feature/gui-v1.1-trim-diagnostics` still exists at `ce0d54b024b9b8e73cfb94173a5f48120eb56176`.
+
+Branch relationships from the audit:
+
+- `origin/main...origin/feature/nuaa-equation-17 = 0 20`; `main` is the merge-base and is 20 commits behind the physical branch.
+- `origin/feature/gui-v1.2-parameter-workbench...origin/feature/nuaa-equation-17 = 0 10`; the GUI v1.2 branch is an ancestor of the physical branch.
+
+Final validation CSV files record actual run commit `ec30f6b936d256ec4124a38bffe31a12183faeb2`. Later branch commits added validation outputs and this baseline document; that difference is not itself a validation error.
+
+## 12. Review rule for future work
 
 Before answering or changing the project, check whether the claim comes from:
 
