@@ -1,40 +1,47 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / GUI COMPREHENSIVE REVIEW AND REDESIGN / 2026-06-23
+STATUS: ACTIVE / FULL WING MODEL WORKFLOW
 
-Branch: `feature/gui-v1.2-parameter-workbench`
-Base branch: `main`
+Instruction branch: `task/full-angle-wing-offline-prototype-20260702`
 
 ## Objective
 
-Complete the GUI comprehensive review and redesign in one continuous task:
+Execute the complete workflow in:
 
-- remove the old user-level parameter classification system;
-- classify parameters only by physical component and calculation module;
-- rebuild parameter editing, trim, diagnostics, linearization, response,
-  save/load, unsaved-change protection, and layout behavior;
-- preserve MATLAB R2021a compatibility;
-- do not change physical parameter values, model equations, trim algorithm,
-  linearization algorithm, or response algorithm unless a clear interface bug
-  is found and reported first.
+`CODEX_FULL_WING_MODEL_AUTONOMOUS_WORKFLOW.md`
 
-## Required Instructions
+The work covers preservation of the current wing model, source acquisition, airfoil selection, XFOIL data generation, full-angle data construction, rotor-wake strip modeling, parallel production implementation, parameter and GUI integration, validation, reporting, milestone commits, push, and Draft PR preparation.
 
-Read and follow:
+## Workspace
 
-- `AGENTS.md`
-- the remote task document
-  `origin/docs/gui-comprehensive-review-20260623:docs/GUI_COMPREHENSIVE_REVIEW_AND_REDESIGN_TASK.md`
+The original local repository may contain protected uncommitted work. Leave it unchanged.
 
-## Validation
+Create an isolated worktree from the original repository's current committed `HEAD`:
 
-Run focused GUI, parameter catalog, trim service, linearization service, and
-response service tests first. Run a representative hover trim, linearization,
-and response chain. Run `checkcode` on modified MATLAB files. Decide whether
-`run_all_checks` is reasonable after focused tests and representative checks.
+- worktree: `E:\tiltrotor-full-wing-model`
+- branch: `task/full-wing-model-autonomous-20260702`
 
-## Git
+Perform engineering work only in that isolated worktree. Do not clean, reset, stash, delete, or overwrite the original worktree.
 
-Protect existing uncommitted GUI work. Do not use destructive Git commands.
-When the task is complete and tests are recorded, commit and push to the
-current GUI work branch. Do not create or merge a PR.
+## Autonomy
+
+The user authorizes continuous execution of routine work without intermediate approval. This includes source download and verification, OCR, digitization, script creation and debugging, XFOIL runs, MATLAB runs, long validation sweeps, new-model implementation, tests, reports, milestone commits, push, and Draft PR creation.
+
+Continue through independent stages when one sub-item is partial. Stop only for the hard-stop conditions listed in the workflow.
+
+## Physical requirement
+
+The new wing model must remove speed-dependent blending of complete `FNear` and `FLiftLine` results. Free-stream and rotor-wake regions must use one common full-angle aerodynamic coefficient law and differ only through local flow and geometry.
+
+## Protection
+
+- Preserve the legacy model.
+- Implement the new model in parallel.
+- Keep the legacy model as default.
+- Do not delete the legacy model.
+- Do not switch the default model.
+- Do not merge the final PR.
+
+## Completion
+
+Return only after all workflow stages have been attempted, tests and validation have been run as far as possible, reports are complete, commits are pushed, a Draft PR is prepared, and `FULL_WING_MODEL_GATE` is reported.
