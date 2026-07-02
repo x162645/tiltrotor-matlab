@@ -1,0 +1,15 @@
+source,pdf_page,item,value,unit,use,status
+NASA TM-88373,6,base airfoil,NACA 64A223,-,same-airfoil link between XFOIL low-angle data and near-vertical tests,DIRECT
+NASA TM-88373,"4;6;16",test alpha range,-75 to -105,deg,near-vertical data segment,DIRECT
+NASA TM-88373,"4;6;16",Reynolds range,"0.6e6 to 1.4e6; main data about 1.0e6",-,XFOIL/test condition matching,DIRECT
+NASA TM-88373,"6;7",model reference and moment reference,"chord 1 ft; span 5 ft; moment about quarter chord",ft,coefficient definition and digitization check,DIRECT
+NASA TM-88373,6,plain-flap configurations,"25%; 30%; 35% of overall flap length; approximately 20%; 25%; 30%c hinge-to-TE equivalents",c,control-surface data mapping,DIRECT
+NASA TM-88373,8,XV-15 wake inflow angle,"predominant -80 to -88; mean about -84; opposite rotation about -96",deg,priority range for 0-degree nacelle wake validation,DIRECT
+NASA TM-88373,8,30-percent flap anchor,"alpha=-85; flap=60: CD about 1.0; CL about 0.1; CM about 0",coefficients,near-minus-90 coefficient anchor,DIRECT_TEXT
+NASA TM-88373,17,minimum drag conclusion,"25-percent flap min CD about 1.2; 30-percent flap min CD about 1.0; 35-percent no further reduction",-,digitization reasonableness check,DIRECT_TEXT
+NASA CR-114614,25,wake-region framework,"wake and freestream loads computed separately; immersed area; local alpha; local dynamic pressure",-,single coefficient law with local flow and geometry,DIRECT
+NASA CR-114614,25,wake-coverage variables,"wake radius; conversion angle; wake angle of attack; fuselage sideslip",-,geometric coverage inputs,DIRECT
+NASA CR-114614,25,disk-to-surface scale,"wing and stabilizer about 0.4R below rotor disk",R,wake contraction and location reference,DIRECT
+NASA CR-176970,"11;48;51",XV-15 minimum geometry,"wing about 5 ft below disk; rotor diameter 25 ft; wing chord 5.25 ft",ft,offline wake-strip validation baseline,DIRECT
+NASA CR-176970,31,25-percent-chord flap CD at alpha=-85,"flap 0/20/40/50/60 deg -> CD 1.69/1.53/1.32/1.21/1.09; 60-deg value extrapolated",-,near-vertical flap drag table,DIRECT_TABLE
+NASA CR-176970,"50;51;52",download integration method,"average adjacent axial velocities; q=0.5rhoV^2; 1-ft span strip x 5.25-ft chord; multiply by CD; sum; divide by total thrust",-,wake-strip algorithm validation,DIRECT
