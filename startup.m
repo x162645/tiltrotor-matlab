@@ -4,10 +4,12 @@ function startup()
 rootDir = fileparts(mfilename('fullpath'));
 addpath(rootDir);
 addpath(fullfile(rootDir, 'model'));
+addpath(fullfile(rootDir, 'model', 'wing'));
 addpath(fullfile(rootDir, 'analysis'));
 addpath(fullfile(rootDir, 'services'));
 addpath(fullfile(rootDir, 'app'));
 addpath(fullfile(rootDir, 'tests'));
+addpath(fullfile(rootDir, 'tests', 'wing_full_angle'));
 addpath(fullfile(rootDir, 'examples'));
 
 resultDir = fullfile(rootDir, 'results');

@@ -30,6 +30,9 @@ run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
+run_test('wing legacy dispatch identity', @test_wing_legacy_identity);
+run_test('wing full-angle strip model', @test_wing_full_angle_model);
+run_test('wing wake strip mechanics', @test_wake_strip_model);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
 run_test('linearization finite values', @test_linearization);
@@ -181,6 +184,24 @@ fprintf('All passed: %d\n',summary.allPassed);
             'Wing near-normal blend continuity has failed items.');
     end
 
+
+    function test_wing_legacy_identity()
+        legacyReport = check_wing_legacy_identity();
+        assert(legacyReport.allPassed, ...
+            'Wing legacy dispatch identity check failed.');
+    end
+
+    function test_wing_full_angle_model()
+        fullAngleReport = check_wing_full_angle_model();
+        assert(fullAngleReport.allPassed, ...
+            'Wing full-angle strip-model check failed.');
+    end
+
+    function test_wake_strip_model()
+        wakeReport = check_wake_strip_model();
+        assert(wakeReport.allPassed, ...
+            'Wing wake strip model check failed.');
+    end
     function test_wing_v2()
         zeroRotor = struct( ...
             'muLong',0,'muLat',0,'inducedVelocity',0, ...

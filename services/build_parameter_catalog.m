@@ -1,4 +1,4 @@
-﻿function catalog = build_parameter_catalog()
+function catalog = build_parameter_catalog()
 %BUILD_PARAMETER_CATALOG Build metadata for editable GUI parameters.
 
 catalog = repmat(empty_item(), 0, 1);
@@ -273,7 +273,10 @@ items = {
     'wing.muMax','滑流面积衰减参考前进比','滑流面积随旋翼前进比减小的参考尺度。','气动模型设定','无量纲','无量纲',{'wing','muMax'},[],1,0,0,Inf,false,true,false,'direct','wing';
     'wing.CDnormal','近法向流阻力系数','机翼近法向来流分支使用的阻力系数。','气动模型设定','无量纲','无量纲',{'wing','CDnormal'},[],1,0,0,Inf,true,true,false,'direct','wing';
     'wing.normalFlowRatio','近法向混合中心','近法向分支与升力线分支的混合中心。','气动模型设定','无量纲','无量纲',{'wing','normalFlowRatio'},[],1,0,0,1,true,true,false,'direct','wing';
-    'wing.normalFlowBlendHalfWidth','近法向混合半宽','近法向分支与升力线分支连续混合的半宽。','气动模型设定','无量纲','无量纲',{'wing','normalFlowBlendHalfWidth'},[],1,0,0,1,false,true,false,'direct','wing'};
+    'wing.normalFlowBlendHalfWidth','近法向混合半宽','近法向分支与升力线分支连续混合的半宽。','气动模型设定','无量纲','无量纲',{'wing','normalFlowBlendHalfWidth'},[],1,0,0,1,false,true,false,'direct','wing';
+    'wing.fullAngleModelEnabled','机翼气动模型','0 表示现有模型，1 表示全迎角条带模型；默认保持现有模型。','模型选择','编号','编号',{'wing','fullAngleModelEnabled'},[],1,0,0,1,true,true,true,'direct','wing';
+    'wing.fullAngleStripCount','机翼条带数量','全迎角条带模型使用的展向条带数量。','计算精度设置','条','条',{'wing','fullAngleStripCount'},[],1,0,4,200,true,true,true,'direct','wing';
+    'wing.fullAngleWakeContraction','旋翼尾流覆盖半径系数','全迎角条带模型中旋翼尾流覆盖半径相对旋翼半径的系数。','几何设定','无量纲','无量纲',{'wing','fullAngleWakeContraction'},[],1,0,0.2,2,false,true,false,'direct','wing'};
 catalog = add_rows(catalog, '机翼', items);
 end
 
