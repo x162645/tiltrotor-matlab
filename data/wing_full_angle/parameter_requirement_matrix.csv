@@ -1,0 +1,11 @@
+item,required,source,source_class,status,notes
+airfoil coordinate source,required,NACA 64A223 surrogate generated in task script,ASSUMED,PARTIAL,Geometry partial because direct coordinate table was not recovered.
+XFOIL Reynolds range,required,"0.6e6, 1.0e6, 1.4e6",DERIVED,AVAILABLE,Matches TM-88373 stated range in initial anchors.
+Mach range,required,0 and 0.10,ASSUMED,PARTIAL,Low-speed tiltrotor wing section envelope for initial database.
+low-angle Cl/Cd/Cm,required,XFOIL clean-airfoil attempts plus analytic fallback only for database continuity,MIXED,PARTIAL,Accepted XFOIL rows are marked separately from fallback rows.
+near -90 deg Cl/Cd/Cm,required,initial_source_anchors.csv / TM-88373,REFERENCE_TEXT,AVAILABLE,"Direct text anchors, not full curve digitization."
+positive deep stall,required,mirrored engineering extension,ASSUMED,PARTIAL,No positive near-normal digitization completed.
+full-angle periodic closure,required,explicit -180/180 closure points,DERIVED,AVAILABLE,Continuity checked numerically.
+wake strip coverage,required,strip overlap with rotor wake disk projection,ASSUMED,PARTIAL,CR-176970 geometry anchors used where available; CR-114614 unavailable.
+rotor induced velocity input,required,existing rotor.inducedVelocity and rotor.eT,CODE_ONLY,AVAILABLE,Does not alter legacy rotor interface.
+default model selector,required,P.wing.fullAngleModelEnabled = 0,CODE_ONLY,AVAILABLE,Legacy remains default.

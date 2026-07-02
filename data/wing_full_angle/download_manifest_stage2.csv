@@ -1,0 +1,4 @@
+﻿"name","url","local_path","downloaded","error","size_bytes","sha256","pdf_header_valid"
+"NASA_TM_88373.pdf","https://ntrs.nasa.gov/api/citations/19870005749/downloads/19870005749.pdf","references\wing_full_angle\NASA_TM_88373.pdf","True","","4542829","E7B77824A6EA4FFD5FD5B657209C348458C4575B05FC2D618DDAD2BDE115A6E4","True"
+"NASA_CR_114614.pdf","https://ntrs.nasa.gov/api/citations/19730022217/downloads/19730022217.pdf","references\wing_full_angle\NASA_CR_114614.pdf","False","远程服务器返回错误: (404) 未找到。","0","","False"
+"NASA_CR_176970.pdf","https://ntrs.nasa.gov/api/citations/19860020297/downloads/19860020297.pdf","references\wing_full_angle\NASA_CR_176970.pdf","True","","3093957","43AF08A69C38C731C87C05E4AECE7991020D08722A3B599B10D8166AE2BA6DA2","True"
