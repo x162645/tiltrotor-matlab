@@ -1,333 +1,47 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / TRIM CREDIBILITY DIAGNOSTICS / HOLD
+STATUS: ACTIVE / FULL WING MODEL WORKFLOW
 
-Branch: `feature/trim-credibility-diagnostics`
-
-Base branch: `main`
-
-## Priority mainline
-
-1. RH split: COMPLETE AND MERGED.
-2. General trim core: COMPLETE AND MERGED.
-3. Open-loop pitch allocation: COMPLETE AND MERGED.
-4. Trim credibility diagnostics: COMPLETE, AWAITING REVIEW/MERGE.
-5. Linearization credibility diagnostics.
-6. Robust induced-velocity root solution.
-
-Do not start items 5-6 in this branch. Keep this branch on HOLD until the
-Draft PR is reviewed and merged.
+Instruction branch: `task/full-angle-wing-offline-prototype-20260702`
 
 ## Objective
 
-Implement the electronic-book-grounded trim credibility diagnostic only after a mandatory read-only prototype verifies the finite-difference, scaling, SVD/rank, full-derivative, and margin calculations.
+Execute the complete workflow in:
 
-The diagnostic must not change the trim solution, solver, acceptance criteria, parameters, limits, allocation, or model equations.
+`CODEX_FULL_WING_MODEL_AUTONOMOUS_WORKFLOW.md`
 
-## Read first
+The work covers preservation of the current wing model, source acquisition, airfoil selection, XFOIL data generation, full-angle data construction, rotor-wake strip modeling, parallel production implementation, parameter and GUI integration, validation, reporting, milestone commits, push, and Draft PR preparation.
 
-Read only:
+## Workspace
 
-```text
-AGENTS.md
-CODEX_TASK.md
-docs/EBOOK_MODEL_UPGRADE_PRIORITY.md
-docs/ebook_packets/TRIM_CREDIBILITY_PACKET.md
-analysis/trim_general.m
-analysis/make_trim_definition.m
-analysis/trim_symmetric.m
-analysis/pitch_allocation_schedule.m
-model/tiltrotor_eom.m
-params_nominal.m
-tests/check_trim_mode_framework.m
-tests/check_pitch_allocation.m
-tests/run_all_checks.m
-```
+The original local repository may contain protected uncommitted work. Leave it unchanged.
 
-Inspect only direct helper functions required to evaluate an existing trim definition. Do not read the 622-page electronic book or unrelated PDFs.
+Create an isolated worktree from the original repository's current committed `HEAD`:
 
-## Stage 0 — repository and baseline gate
+- worktree: `E:\tiltrotor-full-wing-model`
+- branch: `task/full-wing-model-autonomous-20260702`
 
-Before editing:
+Perform engineering work only in that isolated worktree. Do not clean, reset, stash, delete, or overwrite the original worktree.
 
-```powershell
-git status --short
-git branch --show-current
-git fetch origin
-git log -1 --oneline
-git diff --stat origin/main...HEAD
-```
+## Autonomy
 
-Require:
+The user authorizes continuous execution of routine work without intermediate approval. This includes source download and verification, OCR, digitization, script creation and debugging, XFOIL runs, MATLAB runs, long validation sweeps, new-model implementation, tests, reports, milestone commits, push, and Draft PR creation.
 
-- branch is `feature/trim-credibility-diagnostics`;
-- working tree is clean;
-- branch contains latest `origin/main`;
-- relative to `origin/main`, only this task file is changed.
+Continue through independent stages when one sub-item is partial. Stop only for the hard-stop conditions listed in the workflow.
 
-Run in this order:
+## Physical requirement
 
-1. `check_trim_mode_framework`;
-2. `check_pitch_allocation`;
-3. `run_all_checks` once;
-4. the three representative trims:
-   - `helicopter_longitudinal`: `V=20 m/s`, `betaM=0`, `gamma=0`;
-   - `conversion_longitudinal`: `V=35 m/s`, `betaM=pi/4`, `gamma=0`;
-   - `airplane_longitudinal`: `V=100 m/s`, `betaM=pi/2`, `gamma=0`.
+The new wing model must remove speed-dependent blending of complete `FNear` and `FLiftLine` results. Free-stream and rotor-wake regions must use one common full-angle aerodynamic coefficient law and differ only through local flow and geometry.
 
-Record outputs and runtime. Stop if any baseline test or trim fails.
+## Protection
 
-## Stage 1 — mandatory read-only prototype
+- Preserve the legacy model.
+- Implement the new model in parallel.
+- Keep the legacy model as default.
+- Do not delete the legacy model.
+- Do not switch the default model.
+- Do not merge the final PR.
 
-Do not modify production or test files in this stage.
+## Completion
 
-Use a temporary script outside the repository or delete it before finishing. Compute the following at all three representative trim points.
-
-### 1.1 Unknown and residual vectors
-
-Use each definition's actual:
-
-```text
-unknownNames
-residualNames
-variableScale
-bounds
-```
-
-Reconstruct the physical unknown vector `zTrim` from `trimReport.trimVariables` in `definition.unknownNames` order.
-
-### 1.2 Residual evaluation
-
-For a perturbed unknown vector, construct the same 9-state and 7-control point used by `trim_general`, including the current allocation helper when present, and evaluate:
-
-```matlab
-[xdot, out] = tiltrotor_eom(x, uCtrl, condition.betaM, P)
-```
-
-Extract the residuals by `definition.residualNames`.
-
-The prototype may duplicate minimal point-construction logic temporarily. It must not modify `trim_general` in Stage 1.
-
-### 1.3 Three scaled finite-difference steps
-
-Use:
-
-```text
-hScaled = [1e-2, 1e-3, 1e-4]
-```
-
-For unknown `j`:
-
-```text
-deltaZ = hScaled * definition.variableScale(j)
-```
-
-Use central difference if both perturbed points are legal. If a bound or generated actuator limit prevents central differencing, use second-order forward or backward difference. If needed, reduce only that column's step. Never clip an invalid point.
-
-Record for every step and column:
-
-```text
-actual physical step
-central / forward-second-order / backward-second-order / unavailable
-finite-real status
-```
-
-### 1.4 Raw and scaled Jacobians
-
-Compute:
-
-```text
-Jraw = d(residual)/d(physical unknown)
-Jscaled = diag(1./residualScale) * Jraw * diag(variableScale)
-```
-
-Use the same residual scales as `trim_general`:
-
-```text
-linear acceleration residuals: g
-angular/kinematic residuals: 1
-```
-
-Retain row and column labels.
-
-### 1.5 SVD, rank, condition
-
-For the main step `hScaled=1e-3`, report:
-
-```text
-singularValues
-sigmaMax
-sigmaMin
-conditionNumber
-defaultRank
-effectiveRank
-effectiveRankTolerance = 1e-8*sigmaMax
-condition level: LOW / CAUTION / SEVERE
-```
-
-Condition levels:
-
-```text
-<= 1e3       LOW
-1e3 to 1e6   CAUTION
-> 1e6        SEVERE
-```
-
-These are numerical diagnostics only.
-
-### 1.6 Step sensitivity
-
-Relative to the `1e-3` scaled Jacobian, report for `1e-2` and `1e-4`:
-
-```text
-Frobenius relative difference
-singular-value relative changes
-```
-
-Classify maximum Jacobian variation:
-
-```text
-<= 0.05       STABLE
-0.05 to 0.20  CAUTION
-> 0.20        SEVERE
-```
-
-### 1.7 Full-state derivatives
-
-Report all nine derivatives in order:
-
-```text
-udot vdot wdot pdot qdot rdot phidot thetadot psidot
-```
-
-Scale them as:
-
-```text
-translational accelerations / g
-angular accelerations and Euler-angle rates / 1
-```
-
-Report selected and unselected derivative labels separately, plus the maximum absolute scaled full derivative.
-
-### 1.8 Margins
-
-For every bounded trim unknown and generated direct actuator, compute:
-
-```text
-marginAbsolute = min(value-lower, upper-value)
-marginFraction = 2*marginAbsolute/(upper-lower)
-```
-
-Do not clamp negative values.
-
-Classify:
-
-```text
->= 0.10       ADEQUATE
-0.02 to 0.10  LOW
-< 0.02        CRITICAL
-```
-
-Also report:
-
-```text
-max(abs(commandedControls-appliedControls))
-```
-
-The 35 m/s, 45 deg conversion point is expected to show about `0.0663` cyclic/elevator margin and must therefore receive a LOW-margin reason.
-
-## Stage 1 stop gate
-
-After the read-only prototype, stop and report. Do not implement the production diagnostic yet.
-
-Report for each of the three representative conditions:
-
-- trim residual and convergence state;
-- `Jraw` and `Jscaled` with labels;
-- all three step results and difference methods;
-- SVD/rank/condition metrics;
-- Jacobian step variation;
-- all nine full derivatives;
-- unknown and direct-actuator margins;
-- commanded/applied difference;
-- provisional `PASS`, `CAUTION`, or `FAIL` reasons under the method packet rules;
-- runtime.
-
-The prototype passes the gate if:
-
-- all required values are finite and real;
-- every Jacobian column is available;
-- scaled Jacobians are interpretable and effectively full rank;
-- finite-difference step behavior is not contradictory;
-- the conversion point produces the expected low-margin warning without changing the model.
-
-If the prototype reveals duplicated point construction cannot reproduce the exact trim point, stop and report the mismatch. Do not refactor production code until reviewed.
-
-## Future Stage 2 — implementation after review
-
-Expected production interface:
-
-```matlab
-credibility = diagnose_trim_credibility( ...
-    condition, definition, xTrim, uTrim, trimReport, P, opts)
-```
-
-Expected output and later sensitivity tests are defined in:
-
-```text
-docs/ebook_packets/TRIM_CREDIBILITY_PACKET.md
-```
-
-Do not execute Stage 2 until the Stage 1 results are reviewed in ChatGPT.
-
-## Allowed future files
-
-```text
-CODEX_TASK.md
-analysis/diagnose_trim_credibility.m
-analysis/evaluate_trim_definition_point.m   # only if shared point evaluation is required
-tests/check_trim_credibility.m
-tests/run_all_checks.m
-docs/TRIM_CREDIBILITY_AUDIT.md
-```
-
-A minimal modification to `analysis/trim_general.m` is allowed only after Stage 1 review and only if exact compatibility is demonstrated.
-
-## Forbidden changes
-
-```text
-params_nominal.m
-model/*
-app/*
-services/*
-analysis/linearize_numeric.m
-analysis/trim_symmetric.m
-analysis/pitch_allocation_schedule.m
-analysis/make_trim_definition.m
-control limits
-trim tolerances
-solver settings
-```
-
-Do not:
-
-- rewrite the trim solver;
-- switch to Newton, `fsolve`, or Optimization Toolbox;
-- alter allocation directions, cosine weights, or dynamic command range;
-- use random/dense multistart or broad speed/tilt sweeps;
-- start A/B linearization diagnostics;
-- tune variables or parameters from condition number;
-- claim XV-15 or flight-test validation.
-
-## Current closeout
-
-Stage 4 closeout:
-
-- trim credibility diagnostics are implemented and registered in
-  `run_all_checks`;
-- the 35 m/s, 45 deg conversion point is intentionally classified as
-  `CAUTION / LOW_MARGIN`, not as a failure;
-- no parameter, limit, tolerance, solver, allocation, or model changes were
-  made to remove the low-margin warning;
-- no linearization credibility or induced-velocity task has been started;
-- this task does not claim XV-15 or flight-test validation.
+Return only after all workflow stages have been attempted, tests and validation have been run as far as possible, reports are complete, commits are pushed, a Draft PR is prepared, and `FULL_WING_MODEL_GATE` is reported.
