@@ -1,11 +1,12 @@
-﻿function [Fbody, Mbody, out] = wing_integrate_strips(x, uCtrl, cgShift, rotorLeft, rotorRight, P)
+function [Fbody, Mbody, out] = wing_integrate_strips(x, uCtrl, betaM, cgShift, rotorLeft, rotorRight, P)
 %WING_INTEGRATE_STRIPS Integrate full-angle strip forces and moments.
 
 Vbody = x(1:3);
 omegaBody = x(4:6);
 aileron = uCtrl(5);
+flapDeg = 0;
 strips = wing_strip_geometry(P);
-coverage = wing_wake_coverage(strips, rotorLeft, rotorRight, P);
+coverage = wing_wake_coverage(strips, rotorLeft, rotorRight, betaM, cgShift, P);
 Fbody = zeros(3,1);
 Mbody = zeros(3,1);
 stripOut = cell(strips.count, 1);
@@ -24,9 +25,9 @@ for i = 1:strips.count
     area = strips.area(i);
     chord = strips.chord(i);
 
-    free = wing_local_flow(Vrigid, area*fFree, chord, side, aileron, P);
-    left = wing_local_flow(Vrigid + coverage.leftVelocity, area*fLeft, chord, side, aileron, P);
-    right = wing_local_flow(Vrigid + coverage.rightVelocity, area*fRight, chord, side, aileron, P);
+    free = wing_local_flow(Vrigid, area*fFree, chord, side, aileron, flapDeg, P);
+    left = wing_local_flow(Vrigid + coverage.leftVelocity, area*fLeft, chord, side, aileron, flapDeg, P);
+    right = wing_local_flow(Vrigid + coverage.rightVelocity, area*fRight, chord, side, aileron, flapDeg, P);
     F = free.F + left.F + right.F;
     Maero = free.Maero + left.Maero + right.Maero;
     M = cross(r, F) + Maero;
@@ -37,8 +38,10 @@ for i = 1:strips.count
         'freeFraction', fFree, 'leftWakeFraction', fLeft, ...
         'rightWakeFraction', fRight, 'wakeFraction', fWake, ...
         'VrigidLocal', Vrigid, 'F', F, 'M', M, 'Maero', Maero, ...
+        'flapDeg', flapDeg, 'aileronCommand', aileron, ...
         'free', free, 'leftWake', left, 'rightWake', right);
 end
+db = load_wing_aero_database(P);
 out = struct();
 out.model = 'FULL_ANGLE_STRIP';
 out.strips = stripOut;
@@ -48,5 +51,7 @@ out.F = Fbody;
 out.M = Mbody;
 out.usesCompleteResultBranchBlend = false;
 out.usesCommonCoefficientLaw = true;
-out.databaseId = load_wing_aero_database(P).id;
+out.databaseDimensionPolicy = db.dimensionPolicy;
+out.controlSurfaceModel = 'database_only_no_legacy_linear_aileron';
+out.databaseId = db.id;
 end

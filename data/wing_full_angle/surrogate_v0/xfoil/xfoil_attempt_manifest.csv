@@ -1,0 +1,11 @@
+Re,Mach,flap_deg,status,accepted_points,input,polar,log,error
+600000.0,0.0,0,RAN,49,data\wing_full_angle\xfoil\raw\Re0600000_M0.00_clean\xfoil.inp,data\wing_full_angle\xfoil\raw\Re0600000_M0.00_clean\polar.txt,data\wing_full_angle\xfoil\raw\Re0600000_M0.00_clean\xfoil.log,
+600000.0,0.1,0,RAN,50,data\wing_full_angle\xfoil\raw\Re0600000_M0.10_clean\xfoil.inp,data\wing_full_angle\xfoil\raw\Re0600000_M0.10_clean\polar.txt,data\wing_full_angle\xfoil\raw\Re0600000_M0.10_clean\xfoil.log,
+1000000.0,0.0,0,RAN,51,data\wing_full_angle\xfoil\raw\Re1000000_M0.00_clean\xfoil.inp,data\wing_full_angle\xfoil\raw\Re1000000_M0.00_clean\polar.txt,data\wing_full_angle\xfoil\raw\Re1000000_M0.00_clean\xfoil.log,
+1000000.0,0.1,0,RAN,50,data\wing_full_angle\xfoil\raw\Re1000000_M0.10_clean\xfoil.inp,data\wing_full_angle\xfoil\raw\Re1000000_M0.10_clean\polar.txt,data\wing_full_angle\xfoil\raw\Re1000000_M0.10_clean\xfoil.log,
+1400000.0,0.0,0,RAN,49,data\wing_full_angle\xfoil\raw\Re1400000_M0.00_clean\xfoil.inp,data\wing_full_angle\xfoil\raw\Re1400000_M0.00_clean\polar.txt,data\wing_full_angle\xfoil\raw\Re1400000_M0.00_clean\xfoil.log,
+1400000.0,0.1,0,RAN,48,data\wing_full_angle\xfoil\raw\Re1400000_M0.10_clean\xfoil.inp,data\wing_full_angle\xfoil\raw\Re1400000_M0.10_clean\polar.txt,data\wing_full_angle\xfoil\raw\Re1400000_M0.10_clean\xfoil.log,
+0.6e6-1.4e6,0/0.10,20,NOT_ATTEMPTED_GEOMETRY_ROUTE_UNVERIFIED,0,,,,XFOIL flap geometry modification for surrogate 64A223 not validated; not fabricated.
+0.6e6-1.4e6,0/0.10,40,NOT_ATTEMPTED_GEOMETRY_ROUTE_UNVERIFIED,0,,,,XFOIL flap geometry modification for surrogate 64A223 not validated; not fabricated.
+0.6e6-1.4e6,0/0.10,50,NOT_ATTEMPTED_GEOMETRY_ROUTE_UNVERIFIED,0,,,,XFOIL flap geometry modification for surrogate 64A223 not validated; not fabricated.
+0.6e6-1.4e6,0/0.10,60,NOT_ATTEMPTED_GEOMETRY_ROUTE_UNVERIFIED,0,,,,XFOIL flap geometry modification for surrogate 64A223 not validated; not fabricated.

@@ -6,7 +6,7 @@ function [Fbody, Mbody, out] = wing_model_full_angle(x, uCtrl, betaM, cgShift, r
 x = x(:);
 uCtrl = uCtrl(:);
 [Fbody, Mbody, out] = wing_integrate_strips( ...
-    x, uCtrl, cgShift, rotorLeft, rotorRight, P);
+    x, uCtrl, betaM, cgShift, rotorLeft, rotorRight, P);
 out.betaMCode = betaM;
 [wakeArea, freeArea] = strip_area_totals(out.strips);
 out.SslipHalf = 0.5*wakeArea;
@@ -14,6 +14,7 @@ out.SfreeHalf = 0.5*freeArea;
 out.normalFlowBranchWeight = 0;
 out.slipstreamAreaModel = 'STRIP_WAKE_COVERAGE_GEOMETRY';
 out.localVelocityModel = 'RIGID_BODY_PLUS_EXISTING_ROTOR_INDUCED_VELOCITY';
+out.controlSurfaceModel = 'database_only_no_legacy_linear_aileron';
 end
 
 function [wakeArea, freeArea] = strip_area_totals(strips)

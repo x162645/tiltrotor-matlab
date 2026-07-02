@@ -22,12 +22,20 @@ assert(outFree.stripCount == P.wing.fullAngleStripCount);
 assert(abs(outFree.wakeCoverage.total(1)) <= 1);
 coeffA = wing_full_angle_lookup(-pi, P);
 coeffB = wing_full_angle_lookup(pi, P);
+coeffLocal = wing_full_angle_lookup(0.05, 1.0e6, 0.10, 0, P);
 closureError = norm([coeffA.CL - coeffB.CL; coeffA.CD - coeffB.CD; coeffA.Cm - coeffB.Cm]);
 assert(closureError < 1e-10);
+assert(isfield(coeffLocal, 'dimensionReductionActive'), ...
+    'Lookup must expose database dimensionality diagnostics.');
+assert(max_strip_re_mach(outWake) > 0, ...
+    'Full-angle strip diagnostics must include local Re and Mach.');
+assert(strcmp(outWake.controlSurfaceModel, 'database_only_no_legacy_linear_aileron'), ...
+    'Full-angle path must not silently add legacy linear aileron increments.');
 assert(norm(Fwake - Ffree) > 0, 'Wake induced velocity should change full-angle wing load.');
 report.freeForce = Ffree;
 report.wakeForce = Fwake;
 report.closureError = closureError;
+report.dimensionReductionActive = coeffLocal.dimensionReductionActive;
 report.allPassed = true;
 fprintf('\nWing full-angle model\n');
 fprintf('=====================\n');
@@ -38,3 +46,16 @@ function tf = is_real_finite(value)
 tf = isreal(value) && all(isfinite(value(:)));
 end
 
+function value = max_strip_re_mach(out)
+value = 0;
+for i = 1:numel(out.strips)
+    strip = out.strips{i};
+    regions = {strip.free, strip.leftWake, strip.rightWake};
+    for k = 1:numel(regions)
+        item = regions{k};
+        if isfield(item, 'Re') && isfield(item, 'Mach')
+            value = max(value, min(item.Re, item.Mach));
+        end
+    end
+end
+end

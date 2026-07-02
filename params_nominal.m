@@ -8,6 +8,10 @@ d2r = pi / 180;
 %% Environment
 P.env.rho = 1.225;
 P.env.g   = 9.80665;
+% Standard sea-level constants used only for Reynolds/Mach diagnostics in
+% the provisional full-angle wing path.
+P.env.mu  = 1.7894e-5;
+P.env.a   = 340.3;
 
 %% Mass, center of gravity, and inertia
 P.mass.m     = 6000.0;
@@ -143,6 +147,8 @@ P.wing.fullAngleDatabaseFile = fullfile('data','wing_full_angle', ...
 P.wing.fullAngleStripCount = 24;
 P.wing.fullAngleWakeContraction = 1.0;
 P.wing.fullAngleInterpolationMethod = 'pchip';
+P.wing.fullAngleDatabaseDimensionPolicy = 'reduced_alpha_only_provisional';
+P.wing.fullAngleControlSurfacePolicy = 'database_only_no_legacy_linear_aileron';
 
 %% Fuselage
 P.fuselage.S           = 8.0;

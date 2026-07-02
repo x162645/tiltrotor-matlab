@@ -62,3 +62,27 @@ Figures:
 FULL_WING_MODEL_GATE = PARTIAL
 
 The gate is not PASS because source traceability remains incomplete for CR-114614, exact NACA 64A223 coordinates, flap XFOIL data, and full TM-88373 curve digitization. The implementation is suitable as an offline prototype, not as the default model or a validated XV-15 wing model.
+
+## 2026-07-02 Gate-Correction Update
+
+- The current surrogate coordinate/XFOIL/database chain is archived under `data/wing_full_angle/surrogate_v0` and marked `PROVISIONAL_SURROGATE_V0_DO_NOT_USE_FOR_FINAL_PASS`.
+- `wing_full_angle_lookup` now accepts `alpha, Re, Mach, flapDeg, P` and reports `dimensionReductionActive`. The current selected database remains alpha-only and is therefore a reduced provisional database, not a multidimensional final database.
+- `wing_local_flow` now computes local Reynolds number and Mach number for each strip region. Legacy linear aileron CL/Cm increments are no longer added outside the database in the full-angle path.
+- `wing_wake_coverage` now uses rotor hub position, rotor axis, disk-wing projection, wake radius/contraction, side-specific wake centers and strip span-overlap area. It is a `PROVISIONAL_STRUCTURAL_PASS`, not a final CR-114614/CR-176970 formula extraction.
+- NASA CR-114614 was retried through the official NTRS endpoint, but local scripted and PowerShell requests still returned HTTP 404 JSON. Browser-side NTRS availability is noted, but no local verified CR-114614 PDF/text artifact is promoted in this commit.
+- NASA TM-X-3069, NASA TM-4741 and NACA TR-903 are valid local PDFs and support the geometry-source audit. They do not, by themselves, provide a recovered true NACA 64A223 coordinate file in this branch.
+
+Updated gate statuses:
+
+| Gate | Status | Reason |
+|---|---|---|
+| Source acquisition | PARTIAL | CR-114614 still lacks a local verified PDF/text artifact despite official endpoint retry. |
+| Airfoil coordinate credibility | PARTIAL | True NACA 64A223 coordinates were not generated; surrogate_v0 is archived only. |
+| XFOIL clean grid | PARTIAL | Existing XFOIL grid depends on surrogate_v0 and is ineligible for final PASS. |
+| Flap XFOIL grid | PARTIAL | TM-88373 plain-flap geometry transform and final coordinate basis are not complete. |
+| TM-88373 digitization | PARTIAL | Curve-level repeat digitization remains incomplete. |
+| Full-angle database continuity | PROVISIONAL_STRUCTURAL_PASS | Current database is continuous but alpha-only and surrogate-based. |
+| Wake strip architecture | PROVISIONAL_STRUCTURAL_PASS | Geometry is no longer pivotY-only, but source formula extraction remains partial. |
+| Zero-nacelle bump test | PROVISIONAL_STRUCTURAL_PASS | Prior comparison used surrogate_v0 and cannot be promoted to PASS. |
+
+FULL_WING_MODEL_GATE = PARTIAL
