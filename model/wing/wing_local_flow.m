@@ -16,6 +16,7 @@ if area <= 0 || V < 1e-8
     data.CD = 0;
     data.Cm = 0;
     data.controlSurfaceModel = 'no_load_zero_area_or_velocity';
+    data.aileronAerodynamicsMode = 'UNMODELED_NO_CREDIBLE_FULL_ANGLE_AILERON_DATA';
     return;
 end
 alpha = atan2(Vlocal(3), Vlocal(1));
@@ -41,7 +42,8 @@ data.Re = Re;
 data.Mach = Mach;
 data.flapDeg = flapDeg;
 data.aileronCommand = aileron;
-data.controlSurfaceModel = 'database_only_no_legacy_linear_aileron';
+data.controlSurfaceModel = P.wing.fullAngleControlSurfacePolicy;
+data.aileronAerodynamicsMode = 'UNMODELED_NO_CREDIBLE_FULL_ANGLE_AILERON_DATA';
 data.CL = CL;
 data.CD = CD;
 data.Cm = Cm;

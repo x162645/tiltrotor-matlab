@@ -147,8 +147,13 @@ P.wing.fullAngleDatabaseFile = fullfile('data','wing_full_angle', ...
 P.wing.fullAngleStripCount = 24;
 P.wing.fullAngleWakeContraction = 1.0;
 P.wing.fullAngleInterpolationMethod = 'pchip';
-P.wing.fullAngleDatabaseDimensionPolicy = 'multidimensional_nearest_Re_Mach_flap_slice';
-P.wing.fullAngleControlSurfacePolicy = 'database_only_no_legacy_linear_aileron';
+P.wing.fullAngleDatabaseDimensionPolicy = 'multidimensional_linear_Re_Mach_flap_pchip_alpha';
+P.wing.fullAngleOutOfRangePolicy = 'clamp';
+P.wing.fullAngleFlapInterpolationPolicy = 'plain_flap_family_linear_only';
+P.wing.fullAngleDefaultRe = 1.0e6;
+P.wing.fullAngleDefaultMach = 0.0;
+P.wing.fullAngleControlSurfacePolicy = ...
+    'longitudinal_full_angle_baseline_no_lateral_aileron_aero';
 
 %% Fuselage
 P.fuselage.S           = 8.0;

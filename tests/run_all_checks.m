@@ -32,6 +32,8 @@ run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing legacy dispatch identity', @test_wing_legacy_identity);
 run_test('wing full-angle strip model', @test_wing_full_angle_model);
+run_test('wing full-angle multidim lookup', @test_wing_full_angle_lookup_multidim);
+run_test('wing full-angle control surface', @test_wing_full_angle_control_surface);
 run_test('wing wake strip mechanics', @test_wake_strip_model);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
@@ -195,6 +197,18 @@ fprintf('All passed: %d\n',summary.allPassed);
         fullAngleReport = check_wing_full_angle_model();
         assert(fullAngleReport.allPassed, ...
             'Wing full-angle strip-model check failed.');
+    end
+
+    function test_wing_full_angle_lookup_multidim()
+        lookupReport = check_wing_full_angle_lookup_multidim();
+        assert(lookupReport.allPassed, ...
+            'Wing full-angle multidimensional lookup check failed.');
+    end
+
+    function test_wing_full_angle_control_surface()
+        controlSurfaceReport = check_wing_full_angle_control_surface();
+        assert(controlSurfaceReport.allPassed, ...
+            'Wing full-angle control-surface audit failed.');
     end
 
     function test_wake_strip_model()

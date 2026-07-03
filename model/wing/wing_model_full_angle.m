@@ -14,7 +14,8 @@ out.SfreeHalf = 0.5*freeArea;
 out.normalFlowBranchWeight = 0;
 out.slipstreamAreaModel = 'STRIP_WAKE_COVERAGE_GEOMETRY';
 out.localVelocityModel = 'RIGID_BODY_PLUS_EXISTING_ROTOR_INDUCED_VELOCITY';
-out.controlSurfaceModel = 'database_only_no_legacy_linear_aileron';
+out.controlSurfaceModel = P.wing.fullAngleControlSurfacePolicy;
+out.aileronAerodynamicsMode = 'UNMODELED_NO_CREDIBLE_FULL_ANGLE_AILERON_DATA';
 end
 
 function [wakeArea, freeArea] = strip_area_totals(strips)

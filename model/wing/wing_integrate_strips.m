@@ -52,6 +52,7 @@ out.M = Mbody;
 out.usesCompleteResultBranchBlend = false;
 out.usesCommonCoefficientLaw = true;
 out.databaseDimensionPolicy = db.dimensionPolicy;
-out.controlSurfaceModel = 'database_only_no_legacy_linear_aileron';
+out.controlSurfaceModel = P.wing.fullAngleControlSurfacePolicy;
+out.aileronAerodynamicsMode = 'UNMODELED_NO_CREDIBLE_FULL_ANGLE_AILERON_DATA';
 out.databaseId = db.id;
 end

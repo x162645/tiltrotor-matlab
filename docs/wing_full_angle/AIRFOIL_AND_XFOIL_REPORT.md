@@ -36,7 +36,9 @@ Formal clean-airfoil XFOIL used the standard NACA 64A223 coordinates, not `surro
 - Sweeps: positive and negative alpha separately.
 - Raw inputs/logs: `data/wing_full_angle/xfoil_standard/raw/`.
 - Parsed CSV: `data/wing_full_angle/xfoil_standard/parsed/xfoil_clean_polars_standard.csv`.
-- Accepted points: 305.
+- Accepted rows: 305.
+- Unique `(Re, Mach, flap, alpha)` accepted cells: 299.
+- Final database low-angle clean cells: 306, including 7 rows tagged `XFOIL_GRID_INTERPOLATED` from accepted neighboring points.
 - Attempt manifest: `data/wing_full_angle/xfoil_standard/xfoil_attempt_manifest_standard.csv`.
 
 Flap cases are not forced through XFOIL at 40-60 deg deep-separated conditions. The selected database uses TM-88373 text-constrained data for the high-deflection and near-normal-flow region and labels bridge/assumption intervals explicitly.

@@ -1,0 +1,5 @@
+metric,value,passed
+row_count,10830,True
+max_adjacent_l1_jump,0.11699000000000004,True
+min_cd,0.00728,True
+surrogate_v0_used,0,True
