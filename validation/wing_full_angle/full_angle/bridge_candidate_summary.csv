@@ -1,4 +1,5 @@
-candidate,bridge_rows,max_abs_CL,min_CD,max_adjacent_l1_jump,max_second_difference_l1,periodic_closure_l2,max_delta_from_current_in_bridge
-current_selected,297,1.22,0.00728,0.11699000000000004,0.08510999999999992,0.0,0.0
-endpoint_pchip_candidate,297,1.22,0.00728,0.11699000000000004,0.08510999999999992,2.9275225451776116e-16,1.9258155646423454
-flat_plate_reference_candidate,297,0.9,0.08,0.04066768092583221,0.0014075769598354965,4.409816917504253e-16,0.8200283534581458
+candidate,slices,max_bridge_delta,min_CD,max_adjacent_l1_jump,max_second_difference_l1,max_periodic_closure_l2,max_cm_oscillation_count,selection_status
+current_selected,36,0.0,0.00728,0.11699000000000004,0.08510999999999992,0.0,10,SELECTED
+endpoint_linear_pchip_proxy,36,1.1582999999999999,0.00728,0.11699000000000004,0.08510999999999992,0.0,10,SENSITIVITY_ONLY
+flat_plate_asymptotic,36,0.9136512,0.08,0.04066768092583221,0.0014075769598354965,4.409816917504253e-16,2,SENSITIVITY_ONLY
+viterna_type_reference_only,36,0.7886512,0.02,0.03857870701493089,0.0013407712787607273,3.7967211020869984e-16,2,SENSITIVITY_ONLY

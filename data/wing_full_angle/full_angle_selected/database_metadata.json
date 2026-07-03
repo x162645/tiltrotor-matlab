@@ -1,23 +1,15 @@
 {
-  "database_id": "wing_full_angle_standard_naca64a223_multidim_v1_20260703",
+  "database_id": "wing_full_angle_standard_naca64a223_multidim_v2_20260703",
   "selected_airfoil": "standard NACA 64A223",
   "geometry_status": "PDAS_NASA_TM_X_3069_STANDARD_6A",
   "schema": "CL/CD/Cm=f(alpha,Re,Mach,flap_deg)",
   "dimension_policy": "multidimensional_linear_Re_Mach_flap_pchip_alpha",
-  "source_limitations": "TM88373 text-constrained digitization; positive deep stall unvalidated",
+  "source_limitations": "TM88373 Figure 6a graph digitization; positive deep stall unvalidated",
   "surrogate_v0_used": false,
   "grid_out_of_range_policy": "clamp",
   "flap_interpolation_policy": "plain_flap_family_linear_only",
-  "xfoil_raw_accepted_rows": 305,
-  "xfoil_unique_condition_alpha_rows": 299,
-  "xfoil_database_low_angle_rows": 306,
-  "xfoil_grid_interpolated_rows": 7,
-  "source_class_counts": {
-    "BRIDGE_MODEL": 8604,
-    "TM88373_DIGITIZED_TEXT_CONSTRAINED": 930,
-    "ASSUMED_POSITIVE_DEEP_STALL_MIRROR_UNVALIDATED": 930,
-    "XFOIL": 299,
-    "PERIODIC_CLOSURE": 60,
-    "XFOIL_GRID_INTERPOLATED": 7
-  }
+  "tm88373_digitization": "TM88373_DIGITIZED_GRAPH",
+  "tm88373_pdf_page": 32,
+  "tm88373_original_page": 28,
+  "tm88373_figure": "Figure 6a"
 }

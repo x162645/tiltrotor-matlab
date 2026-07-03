@@ -1,0 +1,4 @@
+item,evidence,usable_for_differential_aileron,reason
+TM-88373 Figure 6a,symmetric 30% chord plain-flap two-dimensional data,NO,no left/right differential control-surface derivatives or yaw/roll moments
+NASA CR-176970 text,XV-15 flap/flaperon schedule and full-span flap hover modification,NO,"documents flap/flaperon schedule and hover download, not standalone aileron CL/Cl/Cm/Cn derivatives for full-angle wing path"
+legacy model,P.wing.CLaileron and P.wing.Cmaileron conceptual linear increments,NO_FOR_FULL_ANGLE_DATABASE,existing conceptual increments are not sourced full-angle differential aileron data

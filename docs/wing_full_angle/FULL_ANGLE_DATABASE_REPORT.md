@@ -2,40 +2,38 @@
 
 Date: 2026-07-03
 
-This rebuild uses the standard NACA 64A223 coordinates generated from the PDAS/NASA TM-X-3069 6A method, not the `surrogate_v0` four-digit-like geometry.
+This rebuild uses standard NACA 64A223 coordinates generated from the PDAS/NASA TM-X-3069 6A method and replaces the prior TM-88373 text-constrained near-vertical segment with Figure 6a graph digitization.
 
 ## Dimensions
 
 - alpha: -180 to 180 deg, 1 deg spacing
 - Reynolds: 0.6e6, 1.0e6, 1.4e6
 - Mach: 0, 0.10
-- flap: 0, 20, 40, 50, 60 deg
-- runtime interpolation: PCHIP in alpha within each slice, linear interpolation across Re, Mach and the supported symmetric plain-flap family
-- grid outside policy: `P.wing.fullAngleOutOfRangePolicy = 'clamp'`, reported through lookup diagnostics
+- symmetric plain flap grid from TM-88373 Figure 6a: 0, 30, 45, 60, 75, 90 deg
 
 ## Source Counts
 
-| Source class | Rows | Share |
-|---|---:|---:|
-| BRIDGE_MODEL | 8604 | 79.4460% |
-| TM88373_DIGITIZED_TEXT_CONSTRAINED | 930 | 8.5873% |
-| ASSUMED_POSITIVE_DEEP_STALL_MIRROR_UNVALIDATED | 930 | 8.5873% |
-| XFOIL | 299 | 2.7608% |
-| PERIODIC_CLOSURE | 60 | 0.5540% |
-| XFOIL_GRID_INTERPOLATED | 7 | 0.0646% |
+```json
+{
+  "PERIODIC_CLOSURE": 72,
+  "BRIDGE_MODEL": 10386,
+  "TM88373_DIGITIZED_GRAPH": 1116,
+  "XFOIL": 306,
+  "ASSUMED_POSITIVE_DEEP_STALL_MIRROR_UNVALIDATED": 1116
+}
+```
 
-The original formal XFOIL accepted file has 305 rows. Those rows include duplicated positive/negative sweep conditions, so the unique `(Re, Mach, flap, alpha)` accepted set contains 299 cells. The selected database carries a complete integer-alpha low-angle clean grid of 306 cells: 299 direct accepted unique cells plus 7 `XFOIL_GRID_INTERPOLATED` cells filled from accepted neighboring points. The 7 filled cells are listed in `validation/wing_full_angle/full_angle/xfoil_grid_fill_audit.csv`.
+## TM-88373 Traceability
 
-## Bridge Audit
+- PDF: `references/wing_full_angle/NASA_TM_88373.pdf`
+- PDF page: 32
+- Original page: 28
+- Figure: 6a
+- Configuration: basic leading edge, 30% chord plain flap, configuration b
+- Flap chord definition: report overall-flap-length definition
+- Alpha range used from graph: -75 to -105 deg
+- Nominal Re: about 1.0e6
+- Moment reference: quarter chord
+- Artifacts: `data/wing_full_angle/tm88373_digitized/`
 
-Bridge rows are the dominant source class. The independent candidate audit in `validation/wing_full_angle/full_angle/bridge_candidate_summary.csv` compares:
-
-- `current_selected`;
-- `endpoint_pchip_candidate`;
-- `flat_plate_reference_candidate`.
-
-Maximum coefficient delta from the selected bridge in bridge-only regions is 1.925816 for the endpoint PCHIP candidate and 0.820028 for the flat-plate reference candidate. This is material in unsupported deep-stall intervals, so the database is suitable for the current limited-envelope full-angle structural validation but is not a final aerodynamic validation of all post-stall states.
-
-## Limitations
-
-TM-88373 curves are text-constrained digitization artifacts for the configurations actually used by the model. Page images, calibration, repeat digitization and overlays are saved under `data/wing_full_angle/tm88373_digitized`, but graphical point-picking from the scanned plots is not claimed. Positive deep-stall rows are explicitly marked `UNVALIDATED_POSITIVE_DEEP_STALL`.
+Positive deep-stall rows remain mirrored assumptions and are tagged `UNVALIDATED_POSITIVE_DEEP_STALL`. The full-angle production wing currently calls the database at `flapDeg = 0`; other Figure 6a flap curves support the symmetric plain-flap database dimension and sensitivity checks, not differential aileron aerodynamics.

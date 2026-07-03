@@ -10,7 +10,7 @@ P = params_nominal();
 alpha = 4.3*pi/180;
 Re = 0.8e6;
 Mach = 0.05;
-flapDeg = 10;
+flapDeg = 15;
 mid = wing_full_angle_lookup(alpha, Re, Mach, flapDeg, P);
 expected = corner_weighted_lookup(alpha, Re, Mach, flapDeg, P);
 err = norm([mid.CL-expected.CL; mid.CD-expected.CD; mid.Cm-expected.Cm]);
@@ -60,7 +60,7 @@ end
 function coeff = corner_weighted_lookup(alpha, Re, Mach, flapDeg, P)
 reVals = [0.6e6, 1.0e6];
 machVals = [0.0, 0.1];
-flapVals = [0, 20];
+flapVals = [0, 30];
 reW = (Re - reVals(1))/(reVals(2) - reVals(1));
 machW = (Mach - machVals(1))/(machVals(2) - machVals(1));
 flapW = (flapDeg - flapVals(1))/(flapVals(2) - flapVals(1));

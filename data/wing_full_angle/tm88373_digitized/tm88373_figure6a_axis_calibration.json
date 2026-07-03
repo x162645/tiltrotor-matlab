@@ -1,0 +1,122 @@
+{
+  "0.0": {
+    "pdf_page": 32,
+    "original_page": 28,
+    "figure": "Figure 6a",
+    "configuration": "basic leading edge, 30% chord plain flap, configuration b",
+    "flap_angle_deg": 0.0,
+    "alpha_left_deg": -70,
+    "alpha_right_deg": -110,
+    "coefficient_zero": 0,
+    "coefficient_scale_px_per_unit": 186.7121090617482,
+    "x0_px": 477.1531676022454,
+    "x1_px": 1192.8829190056135,
+    "y0_px": 699.1331194867682,
+    "crop_box_px": [
+      456,
+      322,
+      1214,
+      1048
+    ]
+  },
+  "30.0": {
+    "pdf_page": 32,
+    "original_page": 28,
+    "figure": "Figure 6a",
+    "configuration": "basic leading edge, 30% chord plain flap, configuration b",
+    "flap_angle_deg": 30.0,
+    "alpha_left_deg": -70,
+    "alpha_right_deg": -110,
+    "coefficient_zero": 0,
+    "coefficient_scale_px_per_unit": 186.7121090617482,
+    "x0_px": 1400.3408179631115,
+    "x1_px": 2111.9214113873295,
+    "y0_px": 699.1331194867682,
+    "crop_box_px": [
+      1369,
+      322,
+      2137,
+      1048
+    ]
+  },
+  "45.0": {
+    "pdf_page": 32,
+    "original_page": 28,
+    "figure": "Figure 6a",
+    "configuration": "basic leading edge, 30% chord plain flap, configuration b",
+    "flap_angle_deg": 45.0,
+    "alpha_left_deg": -70,
+    "alpha_right_deg": -110,
+    "coefficient_zero": 0,
+    "coefficient_scale_px_per_unit": 186.7121090617482,
+    "x0_px": 477.1531676022454,
+    "x1_px": 1192.8829190056135,
+    "y0_px": 1489.5477145148357,
+    "crop_box_px": [
+      456,
+      1079,
+      1214,
+      1815
+    ]
+  },
+  "60.0": {
+    "pdf_page": 32,
+    "original_page": 28,
+    "figure": "Figure 6a",
+    "configuration": "basic leading edge, 30% chord plain flap, configuration b",
+    "flap_angle_deg": 60.0,
+    "alpha_left_deg": -70,
+    "alpha_right_deg": -110,
+    "coefficient_zero": 0,
+    "coefficient_scale_px_per_unit": 186.7121090617482,
+    "x0_px": 1400.3408179631115,
+    "x1_px": 2111.9214113873295,
+    "y0_px": 1489.5477145148357,
+    "crop_box_px": [
+      1369,
+      1079,
+      2137,
+      1815
+    ]
+  },
+  "75.0": {
+    "pdf_page": 32,
+    "original_page": 28,
+    "figure": "Figure 6a",
+    "configuration": "basic leading edge, 30% chord plain flap, configuration b",
+    "flap_angle_deg": 75.0,
+    "alpha_left_deg": -70,
+    "alpha_right_deg": -110,
+    "coefficient_zero": 0,
+    "coefficient_scale_px_per_unit": 186.7121090617482,
+    "x0_px": 477.1531676022454,
+    "x1_px": 1192.8829190056135,
+    "y0_px": 2286.186046511628,
+    "crop_box_px": [
+      456,
+      1846,
+      1214,
+      2604
+    ]
+  },
+  "90.0": {
+    "pdf_page": 32,
+    "original_page": 28,
+    "figure": "Figure 6a",
+    "configuration": "basic leading edge, 30% chord plain flap, configuration b",
+    "flap_angle_deg": 90.0,
+    "alpha_left_deg": -70,
+    "alpha_right_deg": -110,
+    "coefficient_zero": 0,
+    "coefficient_scale_px_per_unit": 186.7121090617482,
+    "x0_px": 1400.3408179631115,
+    "x1_px": 2111.9214113873295,
+    "y0_px": 2286.186046511628,
+    "crop_box_px": [
+      1369,
+      1846,
+      2137,
+      2604
+    ]
+  }
+}

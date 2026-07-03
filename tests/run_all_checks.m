@@ -7,6 +7,7 @@ addpath(rootDir);
 addpath(fullfile(rootDir,'model'));
 addpath(fullfile(rootDir,'analysis'));
 addpath(fullfile(rootDir,'tests'));
+addpath(fullfile(rootDir,'tests','wing_full_angle'));
 
 P = params_nominal();
 d2r = pi/180;
@@ -35,6 +36,9 @@ run_test('wing full-angle strip model', @test_wing_full_angle_model);
 run_test('wing full-angle multidim lookup', @test_wing_full_angle_lookup_multidim);
 run_test('wing full-angle control surface', @test_wing_full_angle_control_surface);
 run_test('wing wake strip mechanics', @test_wake_strip_model);
+run_test('TM88373 graph digitization', @test_tm88373_graph_digitization);
+run_test('bridge sensitivity audit', @test_bridge_sensitivity_audit);
+run_test('control-surface aileron audit', @test_control_surface_aileron_audit);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
 run_test('linearization finite values', @test_linearization);
@@ -215,6 +219,24 @@ fprintf('All passed: %d\n',summary.allPassed);
         wakeReport = check_wake_strip_model();
         assert(wakeReport.allPassed, ...
             'Wing wake strip model check failed.');
+    end
+
+    function test_tm88373_graph_digitization()
+        tmReport = check_tm88373_graph_digitization();
+        assert(tmReport.allPassed, ...
+            'TM88373 graph digitization check failed.');
+    end
+
+    function test_bridge_sensitivity_audit()
+        bridgeReport = check_bridge_sensitivity_audit();
+        assert(bridgeReport.allPassed, ...
+            'Bridge sensitivity audit check failed.');
+    end
+
+    function test_control_surface_aileron_audit()
+        aileronReport = check_control_surface_aileron_audit();
+        assert(aileronReport.allPassed, ...
+            'Control-surface aileron audit check failed.');
     end
     function test_wing_v2()
         zeroRotor = struct( ...
