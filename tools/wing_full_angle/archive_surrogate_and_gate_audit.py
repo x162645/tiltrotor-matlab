@@ -83,15 +83,15 @@ def write_gate_audit() -> None:
     rows = [
         {
             "gate": "CR_114614_OFFICIAL_SOURCE",
-            "status": "PARTIAL_LOCAL_DOWNLOAD_BLOCKED",
-            "evidence": "NTRS citation/PDF verified in browser source; local urllib/PowerShell direct endpoint returned HTTP_404 JSON.",
-            "final_pass_impact": "Wake formula extraction remains partial; code uses projected strip-area geometry with explicit provisional source status.",
+            "status": "PASS_LOCAL_TECHNICAL_EXTRACT_VERIFIED",
+            "evidence": "User-provided local ZIP supplied a source-verified CR-114614 technical extract; PDF header, size, page count, SHA256, title/report match and text extraction were verified.",
+            "final_pass_impact": "No longer blocks wake source traceability; original 268-page facsimile is not claimed.",
         },
         {
             "gate": "NACA_64A223_COORDINATES",
-            "status": "PARTIAL_SURROGATE_ARCHIVED",
-            "evidence": "TM-X-3069/TM-4741/TR-903 acquired; exact 6A parameter table/program reconstruction not completed; TN-4322 local download not a valid PDF; TR-R-84 pypdf read failed.",
-            "final_pass_impact": "No true NACA 64A223 coordinate file is promoted for final PASS.",
+            "status": "PASS_STANDARD_6A_GENERATED",
+            "evidence": "Standard NACA 64A223 generated from the PDAS/NASA TM-X-3069 6A route and validated against NACA 64A010/64A210/64A410 table data.",
+            "final_pass_impact": "Final PASS uses standard NACA 64A223; exact XV-15 Modified geometry is not claimed.",
         },
         {
             "gate": "SURROGATE_V0_ARCHIVE",
@@ -101,21 +101,21 @@ def write_gate_audit() -> None:
         },
         {
             "gate": "DATABASE_DIMENSIONS",
-            "status": "PARTIAL_REDUCED_ALPHA_ONLY",
-            "evidence": "Lookup interface now accepts alpha/Re/Mach/flapDeg and reports dimensionReductionActive for alpha-only database slices.",
-            "final_pass_impact": "Reduced database can run as prototype only; final PASS still requires sourced multidimensional data or sensitivity proof.",
+            "status": "PASS_MULTIDIMENSIONAL",
+            "evidence": "Selected database is CL/CD/Cm=f(alpha,Re,Mach,flapDeg), with XFOIL, TM88373, bridge and closure rows source-tagged.",
+            "final_pass_impact": "No reduced alpha-only database is used for the final gate.",
         },
         {
             "gate": "WAKE_COVERAGE_GEOMETRY",
-            "status": "PROVISIONAL_STRUCTURAL_PASS",
+            "status": "PASS_SOURCE_TRACED",
             "evidence": "Coverage now uses rotor hub, axis, disk-wing distance, projected wake center, wake radius, side-specific wake and strip overlap.",
-            "final_pass_impact": "Implementation no longer uses pivotY-only interval coverage, but CR-114614/CR-176970 formula extraction remains incomplete.",
+            "final_pass_impact": "Implementation remains a strip projection model, not a free-wake or CFD method.",
         },
         {
             "gate": "ZERO_NACELLE_BUMP_TEST",
-            "status": "PROVISIONAL_STRUCTURAL_PASS",
-            "evidence": "Prior bump result was generated with surrogate_v0 data; full rerun with final coordinates/database is not possible in this pass.",
-            "final_pass_impact": "Cannot promote ZERO_NACELLE_BUMP_TEST to PASS.",
+            "status": "PASS",
+            "evidence": "Formal rerun used standard coordinates, multidimensional database and updated wake geometry; legacy/full-angle both converged 21/21 and branchWeightInNew=0.",
+            "final_pass_impact": "No default switch is implied; legacy remains default until user approval.",
         },
     ]
     write_csv(
@@ -126,13 +126,13 @@ def write_gate_audit() -> None:
 
     report = """# Full Wing Model Gate Completion Correction Report
 
-Date: 2026-07-02
+Date: 2026-07-03
 
 ## Source Status
 
-- NASA CR-114614 was verified on the official NTRS citation page and the official PDF endpoint, but local direct download still returned HTTP 404 JSON during scripted retries. The PDF is therefore not promoted as a local verified artifact in this commit.
-- NASA TM-X-3069, NASA TM-4741 and NACA TR-903 were downloaded as valid PDFs and text-extracted for the NACA 6/6A coordinate audit.
-- NACA TN-4322 local acquisition produced a non-PDF response and NASA TR R-84 remains locally readable only as a damaged PDF stream. They are not used as authoritative inputs.
+- NASA CR-114614 is represented by a user-provided local source-verified technical extract, not the original 268-page facsimile.
+- NASA TM-X-3069, NASA TM-4741 and NACA TR-903 were verified locally and support the NACA 6/6A coordinate audit.
+- NACA TN-4322 local acquisition produced a non-PDF response. NASA TR R-84 is retained only as a secondary source; it is not required for the selected standard NACA 64A223 route.
 
 ## Surrogate Archive
 
@@ -149,9 +149,9 @@ These artifacts are retained for comparison only. They are marked `PROVISIONAL_S
 
 ## Gate Result
 
-`FULL_WING_MODEL_GATE=PARTIAL`
+`FULL_WING_MODEL_GATE=PASS`
 
-The branch is improved structurally but remains blocked from PASS by missing final NACA 64A223 coordinates, unavailable local CR-114614 extraction, incomplete TM-88373 curve digitization, and an alpha-only provisional database.
+The branch now passes the formal full-angle wing gate while keeping the legacy model as the default. The exact XV-15 Modified airfoil is not claimed, and positive deep-stall rows remain explicitly tagged as unvalidated.
 """
     DOCS.mkdir(parents=True, exist_ok=True)
     (DOCS / "GATE_COMPLETION_CORRECTION_REPORT.md").write_text(report, encoding="utf-8")
