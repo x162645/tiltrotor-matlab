@@ -10,8 +10,9 @@ fig = launch_tiltrotor_app();
 cleanup = onCleanup(@() close_if_valid(fig));
 drawnow;
 api = getappdata(fig,'ParameterWorkbenchApi');
+expectedCatalogCount = 142;
 
-run_check('GUI loads 139 catalog items', @check_catalog_count);
+run_check('GUI loads 142 catalog items', @check_catalog_count);
 run_check('parameter page has no user-rank controls or columns', @check_no_rank_ui);
 run_check('category names are approved physical or module groups', @check_category_counts);
 run_check('staged edit is retained before apply', @check_staged_edit);
@@ -58,8 +59,10 @@ report.runtimeSeconds = toc(tStart);
 
     function check_catalog_count()
         state = api.getState();
-        assert(numel(state.parameterCatalog) == 139, 'Catalog count is not 139.');
-        assert(size(state.tableData,1) == 139, 'Parameter table does not show 139 rows.');
+        assert(numel(state.parameterCatalog) == expectedCatalogCount, ...
+            'Catalog count is not %d.', expectedCatalogCount);
+        assert(size(state.tableData,1) == expectedCatalogCount, ...
+            'Parameter table does not show %d rows.', expectedCatalogCount);
     end
 
     function check_no_rank_ui()
@@ -131,7 +134,8 @@ report.runtimeSeconds = toc(tStart);
         assert(~result.success, 'Invalid radius was accepted.');
         after = api.getState();
         assert(isequaln(after.currentP, before.currentP), 'currentP changed after invalid edit.');
-        assert(size(after.tableData,1) == 139, 'Table did not refresh after rollback.');
+        assert(size(after.tableData,1) == expectedCatalogCount, ...
+            'Table did not refresh after rollback.');
     end
 
     function check_failed_state_unchanged()

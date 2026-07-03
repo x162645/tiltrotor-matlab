@@ -58,7 +58,7 @@ else
     db.validity = repmat({'PROVISIONAL'}, numel(alpha), 1);
 end
 db.path = filePath;
-db.id = 'wing_full_angle_v0_partial_20260702';
+db.id = 'wing_full_angle_standard_naca64a223_multidim_v1_20260703';
 if isfield(P.wing, 'fullAngleDatabaseDimensionPolicy')
     db.dimensionPolicy = P.wing.fullAngleDatabaseDimensionPolicy;
 else

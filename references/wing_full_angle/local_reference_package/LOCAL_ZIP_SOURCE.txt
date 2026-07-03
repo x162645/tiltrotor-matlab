@@ -1,0 +1,3 @@
+Local package used for source recovery after browser/client download failures.
+Source ZIP: E:\tavernchara\XV15_full_angle_wing_reference_PDFs.zip
+NASA_CR_114614_source_verified_technical_extract_NOT_FACSIMILE.pdf is a source-verified technical extract, not the 268-page facsimile PDF.

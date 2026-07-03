@@ -1,26 +1,42 @@
 # Full-Angle Wing Autonomous Workflow Report
 
-Branch: task/full-wing-model-autonomous-20260702
+Branch: `task/full-wing-model-autonomous-20260702`
+
+Draft PR: #27
 
 ## Implemented
 
-- Isolated worktree was created at E:\tiltrotor-full-wing-model from the committed HEAD of the original repository.
-- Remote instruction files were copied into the isolated branch and committed.
-- Legacy wing model was preserved as model/wing/wing_model_legacy.m.
-- Public model/wing_model.m became a dispatcher with legacy default and full-angle opt-in.
-- Full-angle coefficient lookup, strip geometry, wake coverage and strip integration were implemented under model/wing/.
-- Parameter and GUI catalog support was added without switching defaults.
-- Data scripts, XFOIL outputs, database CSVs and figures were generated.
+- Isolated worktree continued at `E:\tiltrotor-full-wing-model`.
+- Legacy wing model remains preserved and default.
+- New full-angle model remains opt-in and parallel under `model/wing/`.
+- Local reference ZIP was verified and source manifests were updated.
+- Standard NACA 64A223 coordinates were generated from a traceable NACA 6A route.
+- Formal clean XFOIL grid was regenerated on the standard coordinates.
+- TM-88373 selected curves were converted into auditable text-constrained digitization artifacts with rendered source pages, CSV, overlays, repeat digitization and uncertainty.
+- A multidimensional full-angle database was rebuilt: `CL/CD/Cm(alpha,Re,Mach,flapDeg)`.
+- CR-114614 wake terms and CR-176970 strip-method evidence were mapped to the production wake geometry.
+- The full-angle path uses one coefficient lookup for free-stream and wake strip portions.
+- GUI parameter integration and project services remain compatible.
 
-## Important Limitations
+## Validation
 
-- This is not an XV-15 high-fidelity or flight-test validated model.
-- The NACA 64A223 coordinate file is a documented surrogate.
-- CR-114614 could not be downloaded from the tested NTRS endpoint.
-- TM-88373 was used through initial anchors; full curve digitization remains incomplete.
-- Flap polars were not generated because the geometry route was not verified.
-- Existing article-trend diagnostics remain not formally comparable to NUAA Table 2.
+- `run_all_checks`: 21/21 PASS.
+- Legacy identity: PASS, exact force/moment identity.
+- Formal XFOIL accepted points: 305.
+- Database checks: PASS, 10830 rows, max adjacent L1 jump 0.116990.
+- Wake strip focused check: PASS.
+- 0-deg nacelle formal sweep: legacy and full-angle both 21/21 converged; `branchWeightInNew = 0`.
+- GUI checks: catalog, modified IDs, parameter page and services all PASS.
 
-## Final Approval Item
+## Scope Statements
 
-Do not switch the default wing model or merge this PR until the PARTIAL gates above are resolved or explicitly accepted by the project owner.
+- The model claims standard NACA 64A223, not the unrecovered XV-15 modified airfoil.
+- The CR-114614 artifact is a verified local technical extract, not the 268-page original facsimile.
+- Positive deep-stall rows are present for full-angle closure and are explicitly tagged unvalidated.
+- The wake model is a source-traced strip projection, not a free-wake or CFD method.
+
+## Gate
+
+`FULL_WING_MODEL_GATE = PASS`
+
+The only remaining user approval item is whether to switch the default wing model from legacy to full-angle and merge PR #27. No default switch or merge has been performed.

@@ -1,0 +1,2 @@
+point_count,max_thickness_ratio,max_thickness_x,max_camber,trailing_edge_gap,leading_edge_closed,x_min,x_max,self_intersection_check,airfoil,coordinate_file,source,xfoil_load_pane_status,final_pass_eligible
+801,0.2300164226393011,0.37823987320402835,0.013309839302931998,1.1384264298046539e-07,True,-0.00022707947891794354,1.000000002273096,PASS_MONOTONE_SURFACE_X,NACA 64A223 standard,data/wing_full_angle/airfoils/naca64a223_standard_pdas.dat,PDAS AIRFOLS/BROOKS.FOR parsed 64A parameter table; NASA TM-X-3069 CAL6SF/ML6S formulas,PASS,True

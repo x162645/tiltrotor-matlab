@@ -1,0 +1,18 @@
+{
+  "status": "TEXT_CONSTRAINED_DIGITIZATION_PARTIAL",
+  "axis_alpha_deg": [
+    -105,
+    -75
+  ],
+  "coefficients": [
+    "CL",
+    "CD",
+    "Cm"
+  ],
+  "source_pages": {
+    "figure6_text_page": "data/wing_full_angle/tm88373_digitized/source_pages/figure6_text_page.png",
+    "model_geometry_page": "data/wing_full_angle/tm88373_digitized/source_pages/model_geometry_page.png",
+    "data_reduction_page": "data/wing_full_angle/tm88373_digitized/source_pages/data_reduction_page.png"
+  },
+  "notes": "Curves are reconstructed from TM-88373 text anchors and CR-176970 Table 4 CD values. Graphical point-picking is not claimed."
+}

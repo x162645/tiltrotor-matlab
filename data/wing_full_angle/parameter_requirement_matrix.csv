@@ -1,11 +1,11 @@
 item,required,source,source_class,status,notes
-airfoil coordinate source,required,NACA 64A223 surrogate generated in task script,ASSUMED,PARTIAL,Geometry partial because direct coordinate table was not recovered.
+airfoil coordinate source,required,standard NACA 64A223 generated from PDAS/NASA TM-X-3069 6A method,DERIVED,PASS,Validated against published 64A010/64A210/64A410 tables; XV-15 Modified geometry not claimed.
 XFOIL Reynolds range,required,"0.6e6, 1.0e6, 1.4e6",DERIVED,AVAILABLE,Matches TM-88373 stated range in initial anchors.
 Mach range,required,0 and 0.10,ASSUMED,PARTIAL,Low-speed tiltrotor wing section envelope for initial database.
-low-angle Cl/Cd/Cm,required,XFOIL clean-airfoil attempts plus analytic fallback only for database continuity,MIXED,PARTIAL,Accepted XFOIL rows are marked separately from fallback rows.
-near -90 deg Cl/Cd/Cm,required,initial_source_anchors.csv / TM-88373,REFERENCE_TEXT,AVAILABLE,"Direct text anchors, not full curve digitization."
-positive deep stall,required,mirrored engineering extension,ASSUMED,PARTIAL,No positive near-normal digitization completed.
+low-angle Cl/Cd/Cm,required,formal XFOIL grid on standard NACA 64A223,MIXED,PASS,Accepted XFOIL rows are used for clean flap=0 low-angle slices; fallback rows are source tagged.
+near -90 deg Cl/Cd/Cm,required,TM-88373 text-constrained selected curve digitization,DIGITIZED_TEXT_CONSTRAINED,PASS,Selected curves include CL/CD/Cm and repeat digitization audit for actual database configurations.
+positive deep stall,required,explicit mirrored positive-deep-stall extension,ASSUMED,PARTIAL,Rows are marked UNVALIDATED_POSITIVE_DEEP_STALL and do not claim TM test support.
 full-angle periodic closure,required,explicit -180/180 closure points,DERIVED,AVAILABLE,Continuity checked numerically.
-wake strip coverage,required,strip overlap with rotor wake disk projection,ASSUMED,PARTIAL,CR-176970 geometry anchors used where available; CR-114614 unavailable.
+wake strip coverage,required,rotor-axis projected strip area with CR-114614 local extract and CR-176970 checks,REFERENCE_DERIVED,PASS,CR-114614 is a verified local technical extract, not an original facsimile; model is not a free-wake method.
 rotor induced velocity input,required,existing rotor.inducedVelocity and rotor.eT,CODE_ONLY,AVAILABLE,Does not alter legacy rotor interface.
 default model selector,required,P.wing.fullAngleModelEnabled = 0,CODE_ONLY,AVAILABLE,Legacy remains default.

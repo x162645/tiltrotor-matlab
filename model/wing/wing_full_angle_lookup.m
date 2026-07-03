@@ -48,6 +48,9 @@ coeff.databaseId = db.id;
 coeff.databasePath = db.path;
 coeff.dimensionPolicy = db.dimensionPolicy;
 coeff.dimensionReductionActive = db.isReducedAlphaOnly || ...
+    (db.hasReDimension && ~isfinite(Re)) || ...
+    (db.hasMachDimension && ~isfinite(Mach)) || ...
+    (db.hasFlapDimension && ~isfinite(flapDeg)) || ...
     (~db.hasReDimension && isfinite(Re)) || ...
     (~db.hasMachDimension && isfinite(Mach)) || ...
     (~db.hasFlapDimension && isfinite(flapDeg) && abs(flapDeg) > 1e-12);
@@ -63,19 +66,34 @@ end
 
 function rowMask = select_dimension_rows(db, Re, Mach, flapDeg)
 rowMask = true(size(db.alpha));
-if db.hasReDimension && isfinite(Re)
+if db.hasReDimension
     values = unique(db.Re(isfinite(db.Re)));
-    [~, idx] = min(abs(values - Re));
+    if isfinite(Re)
+        target = Re;
+    else
+        target = values(ceil(numel(values)/2));
+    end
+    [~, idx] = min(abs(values - target));
     rowMask = rowMask & abs(db.Re - values(idx)) < 1e-9;
 end
-if db.hasMachDimension && isfinite(Mach)
+if db.hasMachDimension
     values = unique(db.Mach(isfinite(db.Mach)));
-    [~, idx] = min(abs(values - Mach));
+    if isfinite(Mach)
+        target = Mach;
+    else
+        target = values(1);
+    end
+    [~, idx] = min(abs(values - target));
     rowMask = rowMask & abs(db.Mach - values(idx)) < 1e-12;
 end
-if db.hasFlapDimension && isfinite(flapDeg)
+if db.hasFlapDimension
     values = unique(db.flapDeg(isfinite(db.flapDeg)));
-    [~, idx] = min(abs(values - flapDeg));
+    if isfinite(flapDeg)
+        target = flapDeg;
+    else
+        target = 0;
+    end
+    [~, idx] = min(abs(values - target));
     rowMask = rowMask & abs(db.flapDeg - values(idx)) < 1e-9;
 end
 end

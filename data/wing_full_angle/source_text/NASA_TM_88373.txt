@@ -1,0 +1,2574 @@
+
+
+--- PDF_PAGE 1 ---
+NASA Technical Memorandym 88373 USAAVSCbM Technical Memorandum 86-A-8 
+Aerodynamic Characteristics of 
+Two-Dimensional Wing 
+Configurations at Angles of Attack 
+Near -9OO 
+Martin Maisel, Georgene Laub, and W.J. McCroskey 
+'\ 
+December 1 986 
+(NASA-TH-8837 -1) AERO CY NAMlC CHAZ ACTLRISXICS 
+CE TWC-DIREMSICNAf WILG CCNEICUEiAZIONS AT 
+ANGLES OF ATIACK NEAE -90 DES LhASA) 84 p 
+CSCL 018 
+National Aeronautics and 
+Space Administration 
+NB7-151E2 
+Dnclas 
+G3/02 40347 
+United States Army 
+Aviation Systems 
+Command 
+
+
+--- PDF_PAGE 2 ---
+NASA Technical Memorandum 88373 
+~~ ~ 
+~ 
+USAAVSCOM Technical Memorandum 86-A-8 
+Aerodynamic Characteristics of 
+Two-Dimensional Wing 
+Configurations at Angles of Attack 
+Near -90' 
+Martin Maisel, 
+Georgene Lau b, 
+W. J. McCroskey, Aeroflightdynamics Directorate, U.S. Army Aviation Research 
+and Technology Activity, 
+Ames Research Center, Moffett Field, California I 
+National Aeronautics and 
+Space Adminis!ra!ton 
+Ames Research Center 
+Moffett Field, California 94035 
+United States Army 
+Aviation Systems 
+Command 
+St. Louis, Missouri 6312 i 
+
+
+--- PDF_PAGE 3 ---
+SYMBOLS 
+b 
+C 
+'e 
+cD 
+CL 
+CM 
+cP 
+D 
+L 
+M 
+P 
+q 
+Re 
+S 
+V 
+X 
+Y 
+U 
+ratio of model wing chord to test section lateral dimension 
+wing chord, ft (reference chord = 1 ft) 
+effective chord length, projection on chord line of distance from 
+leading edge to trailing edge, ft 
+drag coefficient, D/qS 
+lift coefficient, L/qS 
+pitching moment coefficient, M/qSc 
+P tunnel stat i c '9 pressure coefficient, (plocal - 
+drag force, lb 
+lift force, lb 
+pitching moment about quarter chord, ft-lb 
+pressure, lb/ft 2 
+dynamic pressure, ( 1/2)pV2, lb/ft2 
+Reynolds number, p(Vc)/p 
+2 wing reference area, ft (reference area = 5 ft2> 
+tunnel velocity, ft/sec 
+chordwise distance from leading edge/c 
+distance normal to chord line/c 
+angle of attack, referenced to chord line, deg 
+flap deflection angle, deg 
+slat deflection angle, deg 
+cons tan t 
+coefficient of viscosity, slugs/ft-sec 
+iii 
+
+
+--- PDF_PAGE 4 ---
+P mass density of air, slugs/ft3 
+Subscripts: 
+base 
+force 
+0 
+local 
+lower 
+pressure 
+upper 
+pertains to conditions at the most downstream (leeward) surface of a 
+body 
+value derived from wind tunnel balance system data 
+uncorrected value 
+pertains to condition at a point on the surface of the model 
+pertains to the lower wing surface (-y) 
+value derived from model surface pressure data 
+pertains to the upper wing surface (+y) 
+iv 
+
+
+--- PDF_PAGE 5 ---
+AERODYNAMIC CHARACTERISTICS OF TWO-DIMENSIONAL WING CONFIGURATIONS 
+. 
+AT ANGLES OF ATTACK NEAR -90" 
+M. D. Maisel, G. H. Laub, and W. J. McCroskey 
+Aeroflightdynamics Directorate, U.S. Army Aviation and Technology Activity 
+Ames Research Center, Moffett Field, California 
+SUMMARY 
+Wind tunnel tests were conducted to determine the drag of two-dimensional wing 
+sections operating in a near-vertical flow condition. Various leading- and trail- 
+ing-edge configurations, including plain flaps of 25, 30, and 35% chord were tested 
+at angles of attack from -75 to -105". Reynolds Numbers examined ranged from 
+approximately 0.6~10~ to 1.4~10 . The data were obtained using a wind tunnel force 
+and moment balance system and arrays of chordwise pressure orifices. 
+showed that significant reductions in drag, beyond what would be expected by virtue 
+of the decreased frontal area, were obtainable with geometries that delayed flow 
+separation. Rapid changes in drag with angle of attack were noted for many config- 
+urations. The results, however, were fairly insensitive to Reynolds Number varia- 
+tions. Drag values computed from the pressure data generally agreed with the force 
+data within 2%. 
+6 
+The results 
+INTRODUCTION 
+Several vertical take-off and landing (VTOL) rotorcraft configurations place a 
+wing surface in the wake of the lifting rotor during hover conditions. 
+of this are the compound helicopter which uses wing surfaces to reduce the rotor 
+mean loads in high-speed cruise flight and the tilt rotor aircraft which places the 
+rotor axes at the wing tips. It is essential for all types of vertical take-off 
+rotorcraft to minimize the vertical drag of airframe components immersed in the 
+rotor wake to increase the lift available for useful load. To that end, flow vis- 
+ualization investigations were conducted employing tufts and smoke on the XV-15 Tilt 
+Rotor Research Aircraft at NASA Ames Research Center and on a scale tilt-rotor model 
+in the Army 7- by 10-Foot Subsonic Wind Tunnel at Ames to determine the general 
+nature of the flow over the wing. These tests revealed that a portion of the wing 
+is exposed to a flow field which, after approaching from above, forms a stagnation 
+bubble near the midchord, and then spills over the leading and trailing edges of the 
+wing in a chordwise direct.ion (fig. 1). This flow condition is so uncommon that 
+there exists little information in the literature on the resulting vertical drag and 
+the influence of leading- and trailing-edge geometry and passive devices on the 
+magnitude of that drag. Examples of the available data are presented in refer- 
+ences 1, 2, and 3. Recognizing the potentially significant gains in hover payload 
+Two examples 
+
+
+--- PDF_PAGE 6 ---
+that could be obtained with even modest reductions in wing download for vehicles 
+such as the tilt rotor aircraft, an experimental investigation was conducted in the 
+U. S. Army Aeromechanics Laboratory (currently the Aeroflightdynamics Directorate, 
+U. S. Army Aviation Research and Technology Activity, AVSCOM) 7- by 10-Foot Subsonic 
+Wind Tunnel at Ames Research Center. The effort focused on the chordwise two- 
+dimensional flow condition noted above. This report presents the test results for a 
+series of two-dimensional wing sections operating in a near-vertical flow field 
+(i.e., at angles of attack near -90"). The data is intended to provide some insight 
+into the effects of wing geometry on near-vertical drag and to provide guidance in 
+the design of the portion of the wing immersed in a rotor wake 
+primarily chordwise flow. 
+which experiences 
+Figure 2 illustrates the installation of the two-dimensional model in the wind 
+tunnel. The model spar is cantilevered from the frame of the force and moment 
+balance system located below the wind tunnel floor, which places the span vertically 
+and the chord horizontally (approximately normal to the flow) in the test section. 
+A turntable in the balance frame permitted remote adjustment of the model angle of 
+attack 220". Large endplates (located 1 ft from the wind tunnel floor and ceiling) 
+were used to separate the wing section from the wind-tunnel-wall boundary layer. 
+The endplate size was based on the observations and recommendations of refer- 
+ence 4. 
+1 contact the wing model. A fairing between the lower endplate and the wind tunnel 
+floor prevented the development of significant airloads on the nonaerodynamic sup- 
+port portion of the wing spar. 
+Both endplates were mounted to the wind tunnel walls and did not physically 
+2 
+TEST OBJECTIVES 
+The two-dimensional model wind tunnel test focused on the following objectives 
+for the near -90" angle-of-attack flow condition: 
+1. Establishment of the relative vertical drag of various wing (leading- and 
+trailing-edge) configurations to identify the significant factors which influence 
+the reduction of drag and to enable meaningful trade-off design studies between the 
+structural-mechanical (weight) and aerodynamic requirements of wings for application 
+to rotorcraft. 
+2. Establishment of values for drag coefficients of the various two- 
+dimensional wing sections for use in analysis of download performance losses. 
+3. Assessment of the sensitivity of the drag coefficient to inflow angle 
+(angle of attack). 
+4. Assessment of the effect of Reynolds number on drag coefficient. 
+MODEL AND APPARATUS 
+
+
+--- PDF_PAGE 7 ---
+A 12-in. chord was selected to obtain Reynolds numbers on the order of one 
+million within the model structural limits, although it was recognized that the 
+blockage correction would be fairly large (approximately 10%) for some of the higher 
+drag configurations. An array of detachable leading- and trailing-edge configura- 
+tions were fabricated. 
+slotted linkages attached to tiedown points on the wing's lower surface. Figure 3 
+illustrates the cross section of the various shapes tested, which are based on the 
+NACA-64A223 airfoil used on the XV-15 Tilt Rotor Research Aircraft. 
+reference used in this report is based on the overall length of the flap. 
+comparison, when the hinge center to trailing-edge distance is used to define the 
+flap length, the 25, 30, and 35% flap chord ratios reported here become 20, 25, and 
+30% respectively. In addition, equilateral triangular cylinders with 12-in. sides 
+(same as the basic wing chord) and 8.5-in. sides were tested with the base to the 
+wind and with the apex to the wind to aid in assessing the wall correction method by 
+comparison with prior data. 
+during a portion of the tests. 
+All movable surfaces (flaps, slats) were manually set using 
+The flap chord 
+For 
+Wind-tunnel-wall pressure signatures were obtained 
+For the basic airfoil with plain flaps, 15 upper- and 10 lower-surface pressure 
+orifices were placed at three spanwise locations--midspan and 12 in. from each 
+endplate. The distribution of the pressure orifices is shown in figure 4. 
+connected to these orifices was routed out from the top of the model through the 
+upper fairing to the six-transducer scanivalve package located on top of the tunnel. 
+Tubing 
+TESTS 
+Test section dynamic pressure (9) ranged from 11 to 53 lb/ft2 (giving an air- 
+speed range of approximately 100 to 220 ft/sec). The maximum speed, which varied 
+for each configuration, was limited by model deflections or by vibratory oscilla- 
+tions. Except for the Reynolds number evaluation, the data presented in this report 
+were obtaine at a dynamic pressure of 31 lb/ft (yielding a Reynolds number of 
+about 1.0~10 ). 
+2 
+t! 
+REDUCTION OF DATA 
+Data Acquisition 
+Data acquisition and reduction were performed using the 7- by 10-Foot (No. 2) 
+wind tunnel data acquisition system. 
+data were stored following each run for further analysis. 
+system recorded the model pressure and force data, tunnel dynamic pressure, static 
+pressure, settling chamber temperature, and forces from the tunnel's external bal- 
+ance system. Model angle of attack (positioned using the tunnel turntable system) 
+was entered manually into the program. 
+Data reduction was performed online and the 
+This data acquisition 
+3 
+
+
+--- PDF_PAGE 8 ---
+Model pressures were acquired at three spanwise stations using a six-transducer 
+scanivalve package. The pressure acquisition program controlled the scanivalve 
+stepping, sampled all the data channels at each scanivalve step, and averaged all 
+the tunnel flow and force measurements taken at the 17 scanivalve steps. The online 
+program yielded the model pressure data as differential pressures relative to the 
+tunnel static pressure and presented forces and moments in coefficient form. An 
+off-line version of the program converted the pressures to coefficient form. 
+The force acquisition program was a modified version of the pressure program 
+with the exception that only three readings were averaged for each data point. As 
+with the pressure program, the forces were presented in coefficient form. Neither 
+on-line program included tunnel wall corrections. 
+Accuracy of Measurements 
+The accuracy of the measured force, moment, and pressure data were determined 
+to be within the following limits. 
+Lift 20.2 lb 
+Drag 20.2 lb 
+Model pressure 20.1 lb/ft2 
+Wind tunnel pressure 20.1 lb/ft2 
+Angle of Attack 20.5 deg 
+Flap/slat deflection 22.0 deg 
+Pitching Moment 21.0 ft-lb 
+Some of the bluff bodies tested during this investigation produce an unsteady, 
+turbulent-wake and/or model-dynamic oscillations that could affect the repeatability 
+of the test data. Multiple data points for most of the test conditions revealed 
+that a hysteresis condition exists for some configurations where flow separation was 
+imminent or unstable. 
+FORCE/MOMENT DATA REDUCTION 
+The six-component, wind-tunnel scale data was reduced to standard aerodynamic 
+coefficient form, based on the reference 1-ft chord length, the 5-ft span, and the 
+dynamic pressure which was corrected for blockage. 
+one-quarter chord location. 
+Moments are referenced to the 
+The sign convention as applied to the data presented here is in accordance with 
+standard practice with respect to the flow direction and the airfoil orientation at 
+low (conventional) angles of attack. 
+values of lift coefficient at angles of attack near -90" represent a force directed 
+toward the airfoil's trailing edge. 
+Therefore, it should be noted that positive 
+4 
+
+
+--- PDF_PAGE 9 ---
+RESULTS AND DISCUSSION 
+I 
+I. 
+The investigation examined a 25, 30, and 35% chord plain flap with the basic 
+airfoil leading edge, and an array of leading edge configurations with the 30% 
+trailing edge flap. 
+examined for most test models. 
+flap slot unsealed. 
+data plots are given in table 1. 
+A range of inflow angles from -75 to -105" angle of attack was 
+A listing of the model configurations tested and the resulting 
+Except where noted, the models were run with the 
+Confirmation that the tested inflow angles included the angle-of-attack range 
+of interest was provided by obtaining photographs of tufts in the near wake of the 
+XV-15 rotor while the aircraft was mounted on a tiedown stand. The results of this 
+test are shown in figure 5. The predominant inflow lies between -80 and -88" a, 
+with a mean value of approximately -84". 
+at a height-to-diameter ratio of about 0.75 during the tiedown test and that the 
+direction of the rotor rotation is from the wing leading edge to the trailing 
+edge.) 
+attack of about -96". 
+(Note that the XV-15 rotor was operating 
+Opposite rotation of the rotor would be expected to provide a mean angle of 
+Trailing Edge Variations for a 30% Flap 
+Plain Flap, 302 c 
+Figure 6 presents the 30% plain flap with the basic airfoil leading edge (con- 
+figuration b of fig. 3). 
+of attack for various flap angles is shown in figure 6a. 
+The variation of the aerodynamic coefficients with angle 
+In figure 6b the drag coefficient is seen to decrease with flap deflection 
+until a CD level of about 1.0 is reached. 
+is given in figure 6c. 
+flap angle is interrupted by a sharp drag coefficient increase at the onset of flow 
+separation on the upper surface of the flap. This separation is indicated by 
+unstable and reversed surface tufts, and by sharp local pressure changes. Fig- 
+ures 6b and c also show that the flap angle at which separation occurs varies with 
+wing angle of attack. Moreover, the separation appeared to be dependent on the 
+orientation of the flap upper-surface angle with respect to the free-stream 
+direction. 
+A cross plot at pertinent inflow angles 
+The steady reduction in drag coefficient with increasing 
+The lift and moment coefficient generally increases in value with decreasing 
+angle of attack but remains small for all flap positions tested. At the minimum 
+drag configuration (6F = 60° The 
+moment coefficient decreases in value with increasing flap deflection and approaches 
+zero at the 60" 15~ minimum drag point. As a reference, for comparison with other 
+data, the drag coefficient for the 30% plain flap at -85" angle of attack is 1.0. 
+at -85" a), the lift coefficient is about 0.1. 
+Figure 6d shows that the reduction in drag coefficient with flap deflection is 
+greater than the associated reduction of the wing frontal area. This figure 
+
+
+--- PDF_PAGE 10 ---
+(d 
+& 
+(d 
+a 
+Q, 
+L 
+3 rn rn 
+Q, 
+L a 
+(d 
+& 
+(d 
+a 
+Q, 
+0 
+L 0 cu 
+Q, 
+N 
+L 
+Q, 
+0 5 
+8 
+rn > 
+u n 
+8 
+rn 
+5 
+u 
+.. n 0 
+J u 
+c 
+X 
+CD 
+0 
+n- n 
+n 
+W 
+Ln 
+cu 
+M 
+crr 
+.d 
+h 
+a, 
+N 
+.d 
+- a 
+Ln 0 cu m In m 00 Cqm 00 mm ar, 
+(d ow 4-c crro 
+.. 
+nn 
+," %I 
+.,M .,M.,M 
+m M- 
+. .. 
+Lrr crrct 
+nn 
+CUL 
+mm 
+vv 
+.. 
+.,M .,M 
+Lrrcrr 
+W 
+M 
+U 
+Q, 
+a 
+(d 
+4 
+G-4 
+GI 0 
+a 
+(da 
+.4L curd a 
+(d 
+,-I az Q,o 
+.d G G 
+c 
+.d 
+(d 
+1 
+a 
+ob 0.4 
+zvl 
+
+
+--- PDF_PAGE 11 ---
+a, 
+rn rn a, L 
+a 
+5 
+(d 
+c, 
+(d 
+U 
+a, 0 
+L 
+0 cu 
+8 
+rn > 
+O n 
+8 
+rn > 
+u r 
+.. n u 
+.. 
+J u 
+.. 
+U aL 
+(d 0- 4s crro 
+c 
+oc, LO 
+Ua, 
+v1 
+2 .2 
+n 
+0 
+u3 
+U 
+- 
+M 
+-4 
+crr 
+h 
+n 
+U 
+.. 
+n 
+tu 
+u3 
+v 
+M 
+.A 
+crr 
+0 M 
+a 
+n 
+-7 
+-Ln 
+My 
+.. .2 .y crrcrr 
+o 
+(d 
+4 
+v1 
+a, 
+M 
+U a, I 
+M C 
+.4 
+U 
+(d 
+a, 
+4 
+L a, 
+3 0 
+J 
+M 
+crru Lr,u 
+n .2 n 
+h h 
+n n 
+v U 
+EO - 
+NN 
+n 
+tu 
+Q\ 
+W 
+c 
+M 
+-4 
+crr 
+0 m 
+n 
+4 
+a 
+o 
+(d 
+4 
+rn 
+h 
+tu 
+N 
+M 
+.4 
+crr 
+v 
+- 
+0 M 
+n 
+E 
+Y 
+M 
+M 
+.r( 
+crr 
+- o 
+(d 
+4 
+rn 
+-43 4 -!L L c, 0 
+LO Lcu 
+a aa a a a 
+3 3 3 
+a,% a,(d b.5 
+boo moa 
+E 
+3 
+n 
+n 
+v 
+M 
+N 
+M 
+Lr, 
+4 
+n 
+(d 
+M 
+(u 
+u 
+M 
+.4 
+Lr, 
+0 M 
+n 
+0 
+M 
+M 
+crr 
+u 
+-4 
+8 a, L 
+u 
+(da 
+4KJ rn4 
+-0 -n -n -n 
+NO NU NU NU 
+4 4 .=a .=a a, a, a, a, 
+4 04 04 04 0 
+CdU KJO CdO (du 
+w b b F 
+m m m m 
+annnanx~n 
+7 
+
+
+--- PDF_PAGE 12 ---
+indicates that even when the actual or frontal chord is used to calculate the drag 
+coefficient, the coefficient diminishes more than twice as rapidly as the frontal 
+surface area (or chord length). For the plain flap configuration with attached flow 
+on the upper surface, nearly one-half of the drag reduction observed is attributable 
+to the area change in the two-dimensional flow environment. 
+Upper Surface Spoiler 
+The separation phenomenon became the subject of additional experiments. 
+vation of the tufts applied to the configuration b flap indicated that chordwise 
+flow, rather than the free-stream flow, dominated in the vicinity of the leading- 
+edge of the flap. 
+attached aft of the flap leading-edge radius at high flap angles. An attempt was 
+made, therefore, to reduce the strength of the chordwise flow component, thus chang- 
+ing the flow angle approaching the flap upper surface. This was done by placing a 
+spoiler normal to the wing's upper surface forward of the flap's leading edge (con- 
+figuration d, fig. 3). The spoiler's chordwise location and height above the wing 
+surface were varied to determine the most effective arrangement. Figure 7 shows the 
+drag coefficient obtained with this approach (at a 75" flap angle) was reduced by as 
+much as 0.2 at angles of attack between -75 and -90". 
+at an angle of attack of about 10" lower than what was possible for the untreated 
+airfoil. 
+increase in the lift coefficient and little change in moment values. 
+Obser- 
+This results in the inability of the flow field to remain 
+Attached flow was maintained 
+When compared to the basic plain flap configuration, the spoiler causes an 
+The minimum drag coefficient was reduced by 0.1 (to approximately 0.9 CD at 
+a = -85") by using the upper surface spoiler. 
+spoiler position on the drag coefficient. 
+Figure 7c depicts the effects of the 
+Modified Flap Contour 
+The second attempt to delay separation used a modified flap upper-surface 
+(configuration e, of fig. 3). 
+surface faired into the constant radius flap leading edge, rather than the nearly 
+flat surface defined by the airfoil coordinates. This method not only altered the 
+separation point but it also provided a small drag reduction (less than 0.1) 
+throughout the range of inflow angles examined, when compared to the unmodified 
+configuration. The practical aspect of this approach (i.e., no additional weight or 
+mechanical complexity) makes it an attractive candidate for download reduction. 
+However, a determination needs to be made of the effects of this flap shape on the 
+airfoil's aerodynamics for the range of inflow angles and Mach numbers encountered 
+in airplane mode flight. 
+modified flap. 
+The modification employed a (convex) curved flap 
+, 
+Figure 8 illustrates the gains achieved with the 30% chord 
+I 
+a 
+
+
+--- PDF_PAGE 13 ---
+Flap Slot 
+A variant of the 30% plain flap, shown in configuration f of figure 3, provides 
+a large slot forward of the flap's leading edge. 
+though the slot would be sufficient to delay separation. 
+It was anticipated that flow 
+The performance of this model is shown in figure 9. When compared to the drag 
+of the basic airfoil (configuration b), the large slot produced significant drag 
+reductions for the lower flap angles (0" to 45") for which attached flow existed 
+through ventilation of the lower surface. For the 60" flap angle, however, the slot 
+had essentially no effect on the drag in the attached-flow region (a < -85"). In 
+the formerly separated zone (a > -85"), the slot enabled the flow to remain 
+attached, and an associated drag reduction was produced. At 75" flap angle, how- 
+ever, the slot could not maintain fully attached flow on the flap's upper surface. 
+The small radius of the forward corner of the slot was found to be too sharp to 
+permit adequate flow turning. The drag coefficient for the 6F = 75" configuration 
+at an angle of attack of -85" is slightly below 1.0. 
+The influence of the flap slot size on drag can be evaluated by comparing the 
+drag coefficients produced by the large slot of configuration f and the small slot 
+of configuration b with the closed slot variant of the configuration b airfoil. 
+This effect is shown in figure 10. 
+Flap Hinge Location 
+Configuration g (fig. 3) investigated the effects of relocating the flap hinge 
+Using the same flap shape as in configur- line to the lower surface of the airfoil. 
+ation b, the lower hinge produces an increase in the slot size as flap angle is 
+increased while moving the flap's leading edge above the wing's upper surface 
+contour. 
+As in configuration f, the flap slot created by this arrangement was ineffec- 
+tive in maintaining attached flow at the high flap angles. Furthermore, the ele- 
+vated flap leading edge, coupled with its relatively small radius, apparently con- 
+tributes to an earlier onset of the separated-flow condition. The results, shown in 
+figure 11, indicate a minimum CD of about 1.1 at -85" a 
+approach would probably have been more effective if the flap shape and hinge point 
+were arranged to provide a large radius leading edge which fairs smoothly into the 
+wing's upper surface contour. 
+and 60" 6F. This design 
+Leading-Edge Variations 
+A number of leading-edge variations were examined. The two basic themes of the 
+leading-edge designs were the reduction of frontal (chordwise) area and the delay of 
+separation through the use of leading-edge slats or the modification of the leading- 
+edge contour. 
+each other. 
+These approaches were used either separately or in combination with 
+9 
+
+
+--- PDF_PAGE 14 ---
+Umbrella Flap 
+Configuration h (fig. 3) employs a device referred to as the "umbrella flap.'' 
+The upper and lower segments of this device are hinged at the leading edge. 
+constant radius fairing was selected for the wing's fixed leading edge (forming a 
+slot between the umbrella flap and the wing). The upper and lower flap segments 
+were independently and systematically varied to identify the optimum arrangement. 
+The various positions tested are illustrated in figure 12. Figure 13 shows that 
+with the rather large (25% c) umbrella flap, the minimum drag coefficient can be 
+reduced to approximately 0.4 at -85" a with a 60" trailing-edge flap angle (umbrella 
+flap set at -30" upper surface and -10" lower surface). Although this is the lowest 
+level of drag obtained during this test series, it should be noted that the umbrella 
+flap also produces high lift coefficients (which would alter the aircraft's force 
+and moment trim in hover). This negative lift coefficient represents an aircraft 
+positive thrust force. 
+flap operation (i.e., hinged segments) while maintaining a stringent leading-edge 
+contour to obtain the desired cruise mode performance. Therefore, the umbrella 
+flap, while quite effective in reducing download, must be assessed in view of the 
+aforementioned potential problems. 
+A near- 
+In addition, the leading edge must be designed to permit 
+Also interesting to note is the complex shape of some of the umbrella flap lift 
+and drag coefficient curves. 
+separation (i.e., separation may occur on the flap's upper surface, the umbrella's 
+upper and lower segments, and the wing's leading edge). 
+This is due to the multiple possibilities for flow 
+The effect of additional blockage within the leading-edge slot was simulated by 
+placing a 1/4-in. (2% x) diameter rod approximately 1/4-in. forward of the wing's 
+leading-edge surface (representing, for example, a tilt conversion system cross- 
+shaft or a bundle of hydraulic lines). 
+CD = 0.4 to CD = 0.5 at a = -85") resulting from the additional blockage and the 
+associated premature flow separation. Clearly, the leading-edge slot and, of 
+course, the leading-edge surface must remain clean to obtain the lowest download 
+values. 
+Figure 13h depicts the drag increase (from 
+The effect of the modified flap's upper surface on the performance of the 
+umbrella flap (illustrated in configuration i of fig. 3) is presented in fig- 
+ure 14. The data, obtained at a 75" flap angle shows that, similar to the prior 
+application of this flap, separation is delayed and drag is reduced. 
+Leading Edge Slat 
+Two leading-edge slats which maintained a smooth-nose-radius contour were 
+investigated. 
+the wing when retracted for cruise flight, and the configuration-k and -1 slats 
+would form the upper surface of the leading edge in cruise flight. 
+The configuration-j slat would form the lower leading-edge surface of 
+10 
+
+
+--- PDF_PAGE 15 ---
+Lower Surface Slat 
+The position of the configuration-j, lower-surface slat was varied to determine 
+the optimum orientation. Chordwise locations include: alignment with the airfoil's 
+leading edge, and a position forward of the original leading edge. At the original 
+leading-edge chord location, the slat was operated with the nose pivoted around the 
+center point of the leading-edge radius and at an elevated position. 
+were examined at each slat setting. 
+tions tested. 
+Various angles 
+Figure 15 illustrates the range of slat posi- 
+The performance of all slat positions yielded reasonably low drag coefficients 
+in the -75 to -85" range of angle of attack, but a rapid increase between -85 and 
+-105" was observed because of flow separation at the slat's forward surface and 
+below the leading-edge-door hinge line (fig. 16). Figure 16c shows the effect of 
+angle of attack on drag coefficient for three different slat positions. 
+tivity to angle of attack may result in undesirable variations of download during 
+hover in gusty air. It would also appear that, the configuration-j slat when 
+retracted for cruise flight, could produce a spanwise discontinuity in the airfoil 
+contour at the intersection of the slat and the upper surface door (which would 
+hinge downward to provide the slot opening during hover operations). This spanwise 
+line could adversely affect the airplane mode performance of the wing. In view of 
+the probable hover and airplane mode problems with this configuration, it appears 
+unsuitable for the intended application. 
+The sensi- 
+Upper Surface Slat 
+The upper surface slat, in the airplane flight mode, provides a continuous 
+upper surface from the leading edge radius to the 25% chord point. This design is 
+based on the presumption that a clean slot is obtained by providing a leading-edge 
+fairing ahead of the forward spar that would enclose all wing hardware and systems 
+(lines, cables, shafting, actuators, etc.). This slat allows for a less complex 
+mechanism than the lower surface slat does in that it could be hinged from a fixed 
+point near the wing's lower surface. Two hinge locations (configurations k and 1) 
+and a foreshortened wing leading-edge version (configurations m and n) were exam- 
+ined. The upper surface slat test positions are shown in figure 17. 
+Initially, the largest wing volume was used. In this configuration the 
+leading-edge fairing is closely nested to the lower/aft surface of the slat. This 
+arrangement provided a very small slot size and produced higher levels of download 
+drag than the prior configuration provided. In addition, a strong sensitivity to 
+angle of attack was noted. 
+figure 19 depicts the performance of the aft-hinge-point model. 
+moment-coefficients remain near zero for all test conditions. The effect of slat 
+position (for the forward-hinge location) presented in figure 18c shows that minimum 
+drag is obtained at approximately 50" 6s for angles of attack between -80 and 
+-85". 
+Figure 18 shows the forward-hinge-point data whereas 
+The lift- and 
+At higher (negative) angles of attack a lower slat angle would be desired. 
+11 
+
+
+--- PDF_PAGE 16 ---
+Figure 19c (aft-hinge location) indicates that a 50" slat angle would be 
+acceptable for all tested angles of attack (-80 to -90"). 
+forward- and aft-hinge location effect is given in figure 20. The leading-edge-slot 
+size was then increased as illustrated in configuration m. This arrangement would 
+reduce the volume available for hardware forward of the wing spar. Figure 21 shows 
+that the altered contour and larger slot not only reduced drag, but also reduced the 
+sensitivity of the drag coefficient to the angle of attack. 
+improvement in drag was obtained with the modified trailing-edge flap (configura- 
+tion n) as shown in figure 22 in that attached flow was maintained for the 75" flap 
+angle at angles of attack near -90". 
+A comparison of the 
+An additional small 
+I 12 
+This configuration appears to combine a desirable low level of download drag 
+and a low sensitivity to angle of attack in the hover mode with a simple mechanism 
+requirement and a favorable airplane mode geometry. Furthermore, consideration 
+could be given to the use of this slat in improving wing lift in the low speed range 
+for short takeoff and landing rotorcraft such as the low-speed portion of the tilt 
+rotor flight envelope. 
+The final leading-edge configuration in this test series employed the altered 
+leading-edge contour of configuration m, but deleted the leading-edge slat. The 
+results, presented in figure 23, show that configuration o delivers a drag variation 
+that is fairly insensitive to angle of attack and is slightly higher than the 
+slatted airfoil in the -75 to -90" angle-of-attack range. 
+Variations in Flap Size 
+Plain Flap, 25% c 
+The performance of the basic airfoil with a 25% plain flap (configuration a) is 
+shown in figure 24a. 
+closely resemble the values for the 30% flap (fig. 6a), separation (and the associ- 
+ated drag increase) occurs over a greater range of angles of attack than it does for 
+the 30% flap. The minimum achievable drag coefficient at -85" angle of attack would 
+be approximately 1.2 (at a flap angle of about SO"), compared to about 1.0 for the 
+30% configuration (at 60" 6F). 
+related to the additional buildup of chordwise flow due to the larger unflapped 
+section of the airfoil. 
+Although the drag coefficients at flap angles below 45" 
+The greater range of separated inflow angles may be 
+The application of the upper surface spoiler (similar to configuration d) to 
+alter the chordwise flow field produces a greater reduction in drag than achieved 
+for the 30% flap (figs. 24c and d), but the minimum drag (CD = 1.05) remains higher 
+than for the larger flap. 
+Plain Flap, 35% c 
+The variation of the aerodynamic coefficients with angle of attack at various 
+flap angles for the 35% chord plain flap model (configuration c of fig. 3) is pre- 
+sented in figure 25a. The drag coefficient variation is summarized in figure 25b. 
+
+
+--- PDF_PAGE 17 ---
+The reason why this model did not provide a further reduction in minimum drag, as 
+compared to the 30% chord plain flap, is not understood. Observations of the flow 
+conditions on the flap's upper surface, however, were consistent with the measured 
+data. At a -90" inflow angle, flow separation on the 35% chord flap occurred at 60" 
+LSF. The 30% chord (producing the minimum drag) indicated separation at about 70" 
+LSF, whereas the flow over the 25% chord plain flap separated at about 52.5" dF for 
+the -90" a condition. It is possible that the favorable aspects of the 35% chord 
+flap as compared to the 30% chord flap (i.e., the larger flap leading-edge radius 
+and the expected lower chordwise velocity at the flap cove) are more than offset by 
+the longer flap chord length which is subjected to the adverse pressure field. If 
+this rationale is correct, it suggests that in the vicinity of the minimum drag 
+condition (or just prior to the onset of separation) flow perturbations or surface 
+irregularities could trigger the separation phenomenon and result in higher than 
+minimum-achievable drag values. 
+Reynolds Number Effects 
+Each model was tested over a range of wind tunnel speeds to obtain a Reynolds 
+number variation. Figure 26 shows the effect of Reynolds number on the drag coeffi- 
+cient for an array of configurations. The drag is found to be fairly insensitive to 
+Reynolds number between the achievable values of 0.6~10~ to 1.4~10 . 
+Reynolds number is based on the free-stream velocity and the full (1 ft) chord 
+dimension. 
+6 Note that the 
+Pressure Data 
+Surface pressure data was obtained during portions of the 25, 30, and 35% plain 
+flap tests (configurations a, b, c, and d). For the 25% flap at a constant (-90") 
+angle of attack, a variation of flap angle produces the pressure distribution shown 
+in figure 27. For all flap positions, the base pressure is seen to be nearly con- 
+stant across the chord. A noticeable irregularity of the upper-surface pressure 
+coefficient is observed at the leading edge of the flap. As the flap angle is 
+increased, the flap's upper surface pressure coefficient decreases until a local 
+separation occurs just behind the flap's leading-edge radius at 45" LSF. 
+on the flap, the flow reattaches (as also indicated by tuft observation and by the 
+slightly elevated surface pressure). At higher flap angles, the separation encom- 
+passes the entire flap upper surface, and the pressure remains at, or below, the 
+lower surface value. 
+Further aft 
+The effects of angle of attack on surface pressure is illustrated in fig- 
+ure 28. 
+surface of the flap becomes partially separated (aft of the flap leading edge) at 
+-95" a. At -100" a, local separation is still apparent, but the attached portion 
+has grown, when compared to the -95" a data. 
+As the inflow progresses from -75 to -100" a, the fully separated upper 
+A comparison of the chordwise pressure distribution recorded with the flap slot 
+closed and the data obtained with the flap slot open is shown in figure 29. For the 
+13 
+
+
+--- PDF_PAGE 18 ---
+flap angle shown, sealing the flap slot increases the drag coefficient by about 
+1%. 
+flap's leading edge can be seen. 
+No significant change in the pressure distribution in the vicinity of the 
+The upper surface spoiler is seen (in fig. 30) to markedly affect the pressure 
+distribution aft of the spoiler location. 
+download pressure produces a drag reduction on the order of 1520% of the untreated 
+airfoil drag. 
+The reduction in flap upper-surface 
+The effect of flap size is indicated in figures 31 and 32. The pressure dis- 
+tribution for the 0" flap angle is shown in figures 31a, b, and c, and the 60° flap 
+data is given in figures 32a, b, and c. 
+In general, the drag coefficients computed from the pressure data were found to 
+be within 2% of the drag coefficients obtained from the wind tunnel force data. 
+CONCLUDING REMARKS 
+Significant reductions in the two-dimensional drag of wing sections at angles 
+of attack near -90" can be obtained by the use of leading- and trailing-edge 
+devices. It has been demonstrated that an effective method of drag reduction 
+involves the delay of flow separation by alteration of the basic airfoil contour. 
+The deflected trailing-edge plain flap (modified with a curved upper surface) and a 
+curved leading edge behind a hinged slat (configuration n) is an example of a suc- 
+cessful geometry. The reduction of "frontal" or exposed flat plate area (resulting 
+from flap deflection, for example), accounts for less than half of the total achiev- 
+able drag reduction. 
+The lowest drag level was obtained with the umbrella flap design concept. 
+However, a practical size umbrella flap would probably be smaller than the 25% chord 
+size examined in this test series (and would therefore offer a smaller drag reduc- 
+tion). This, coupled with several previously noted problems in the hover and cruise 
+modes, makes it less attractive than some of the other configurations that produce 
+slightly greater drag values. 
+Drag coefficients were primarily determined from force measurements (corrected 
+for blockage). Surface pressure data enabled the computation of a drag coefficient 
+(less the skin friction component) which generally agreed to within 2% of the force 
+data. 
+The 25% plain flap produced a minimum drag coefficient of about 1.2, whereas 
+The 35% chord Plain the 30% plain flap delivered a minimum CD of approximately 1.0. 
+flap did not provide a further reduction of minimum drag, when compared to the 30% 
+flap data. 
+The best umbrella flap model yielded a drag coefficient of about 0.4, and the 
+upper-surface leading-edge slat offered a minimum drag coefficient of 0.6. 
+14 
+
+
+--- PDF_PAGE 19 ---
+The drag of many configurations was found to be sensitive to angle of attack. 
+Sharp drag increases often occurred after the onset of flow separation from the 
+leading- or trailing-edge surfaces. 
+Finally, the drag coefficients proved to be rather insensitive to Reynolds 
+number over the 0.6~ lo6 to 1.4~ lo6 Re range tested. 
+15 
+
+
+--- PDF_PAGE 20 ---
+APPENDIX A 
+SURFACE PRESSURE DATA REDUCTION 
+The surface pressure values were measured as the difference between the local 
+and the wind tunnel static pressures and were reduced to pressure coefficient form 
+by dividing by the average blockage-corrected dynamic pressure. These values were 
+then plotted against chord location. Flap deflection is accommodated in the data 
+processing and the resulting reduction of overall chord length (noted as "effective 
+chord") is displayed on the plots. As in the force coefficient computations, the 
+reference 1-ft chord is used in calculations of drag coefficients obtained from the 
+surface pressure data. 
+Computation of the drag coefficient based on the pressure data was accomplished 
+using a segmented computer curve-fit (applying low-order polynomials) to obtain a 
+good point match and to accommodate flow discontinuities at the flap cove and in the 
+case of the upper surface spoiler. The difference between the lower and upper 
+surface pressure coefficients was integrated along the chord as follows: 
+The contribution to drag caused by skin friction on the bluff bodies tested in this 
+experiment is small and was not included in this assessment. It is also noted that 
+the surface pressures that were obtained reflected time-averaged values since the 
+tubing length between the orifice and the pressure transducer precluded any high 
+frequency measurements. 
+16 
+
+
+--- PDF_PAGE 21 ---
+APPENDIX B 
+TUNNEL WALL EFFECTS CORRECTIONS 
+The blockage caused by the presence of a model in a closed-section wind tunnel 
+creates an acceleration of the local flow and increases the drag. 
+known to depend primarily on the drag and on the physical size of the model. 
+Although many investigations have. been made of the phenomenon, as seen in refer- 
+ence 5, no completely satisfactory method exists for correcting wind tunnel data to 
+free-air conditions. Two of the most successful theoretical approaches to date are 
+the Image Method, e.g., Allen and Vincenti (ref. 6) and Pankhurst and Holder 
+(ref. 7), and the Momentum Method of Maskell (ref. 8). 
+This effect is 
+Although references 6 through 8 differ in their approaches and basic assump- 
+tions, each predicts that the blockage correction for a two-dimensional bluff body 
+is determined primarily by the "blockage parameter" bCD,, where b is the ratio of 
+the lateral dimension of the wind tunnel, and 
+cient. To a first approximation, each analysis yields the following expression for 
+bluff bodies with high drag and low lift: 
+CD is the measured drag coeffi- 0 
+1 - EbCD cD 
+cD 
+- 
+0 0 
+(B2) cD cp - 1 
+cp - 1 - CD 
+-- 
+0 0 
+where E is a constant, CD is the corrected, "free-air" drag coefficient, and Cp 
+and Cpo 
+respectively. 
+are the corrected and uncorrected values of the pressure coefficient, 
+In references 6 and 7, E = 0.50 for incompressible flow and is independent of 
+the shape of the body. In Maskell's analysis (ref. 8), E depends strongly upon the 
+aspect ratio of the model and weakly upon its cross-sectional shape; E is of order 
+unity for two-dimensional cases. The numerous previous wind tunnel measurements 
+that are cited in references 5 and 9, for cylinders of various cross sections, 
+suggest values somewhere between 0.5 and 1.0, depending upon the details of the 
+particular wind tunnel installation and the shape and complexity of the model. 
+Therefore, the basic form of equations (Bl) and (B2) is indicated to be appropriate 
+here, provided that a reasonable estimate of E can be obtained for the range of 
+values of the blockage parameter 
+tests . 
+bCDo that was encountered in the present airfoil 
+To determine a suitable value of the empirical constant E for the present 
+experimental setup, two models having equilateral-triangular cross sections and 
+chords of 8.5 and 12 in. were tested at two different orientations, with the apex 
+17 
+
+
+--- PDF_PAGE 22 ---
+pointing upstream and pointing downstream, thus providing four combinations of the 
+blockage parameter bCDo. 
+Reynolds number over the range explored, 0.6 to 1.4~10 , to within measurement 
+accuracy. 
+The data so obtained were found to be independent of 6 
+The corresponding free-air drag coefficients for wedges have been documented to 
+With these values 
+within 25% in reference 9; i.e., CD = 2.0 
+CD = 1.3 
+for CD and the measured values of CD, for 15 combinations of Reynolds numbers, 
+sizes, and orientations, the values of E as shown in table B1 were computed from 
+the following rearrangement of equation (Bl): 
+with the flat face forward and 
+for the apex of an equilateral triangle facing forward. 
+The mean value of E is 0.60, in good agreement with the various independent 
+studies cited above. 
+The experimental results for the triangles are summarized in table B2. All of 
+the results are in excellent agreement with Hoerner (ref. 9). It is interesting to 
+note that the corrected base pressure coefficient, CPbase, is essentially indepen- 
+dent of the orientation of the triangle, even though CD is not. 
+For the present airfoil sections with b = 0.10, the following formulae were 
+used to correct the measured data: 
+= cD (1 - 0.06~~ 1 
+0 0 cD 
+- i)(i - 0.06~~ 1 
+0 cP 
+The blockage correction to the drag coefficient, therefore, is seen to be about 10% 
+of the nominal values for the higher drag configurations examined in this test 
+series. The validity of that magnitude of correction was tested by Allmaras 
+(ref. 10) using a two-dimensional revision to the three-dimensional wall-pressure 
+signature method devised by Hackett, Wilsden, and Lilley (ref. 11). Wall-pressure 
+data for that study were obtained from a subsequent wind tunnel entry using the same 
+equalateral-triangle cross-sectional bodies discussed above. Allmaras concluded 
+that the blockage corrections derived from the wall-pressure method were in good 
+agreement with the simpler methods used for the subject investigation. 
+No corrections were applied to account for the corner flow condition at the 
+model/endplate interface. 
+Flow observations using wool tufts, comparisons of the three spanwise surface 
+pressure measurements, and wake surveys indicated that the flow was uniform in the 
+spanwise direction to within the accuracy of the measurements despite the fact that 
+8 
+t 
+
+
+--- PDF_PAGE 23 ---
+the aspect ratios of the large triangle and the full chord airfoil models were 
+only 5. 
+TABLE B1.- BLOCKAGE CORRECTION FACTOR E DERIVED 
+FROM DATA ON TRIANGLES 
+Configuration CD 'Do E 
+(from ref. 9) 
+- figure 34 2.00 0.10 2.31 0.581 
+0.071 2.24 0.675 figure 3p 2.00 
+0.10 1.41 0.553 
+0.071 1.38 0.593 
+- 4 figure 3s 1.30 
+4 figure 3r 1.30 
+~ ~~~~ ~~ 
+TABLE B2.- SUMMARY OF RESULTS FOR THE EQUILATERAL TRIANGLES 
+C C 
+CD CD 'base (from 'base ref. 9) Configuration C 
+(from ref. 9) 
+DO 
+figure 3q 2.31 1-99 2.00 
+1 .98a 
+-1.17 -1. 13a 
+figure 3p 2.25 2.03 2.00 -1.24 -1. 13a 
+-b 1 .98a 
+- qfigure 3s 1.41 1.29 1.30 -1.12 -1. 13a 
+--- (figure 3r 1.38 1.30 1.30 -1.18 -1. 13a 
+aFlat plate normal to flow. 
+19 
+
+
+--- PDF_PAGE 24 ---
+References 
+1. Koenig, D. G.: Low-Speed Tests of Semispan-wing Models at Angles of Attack from 
+0" to 180"". NASA Memorandum 2-27-5198, April 1959. 
+2. Critzos, C. C.; Heyson, H. H.;and Boswinkle, Jr., R. W.: Aerodynamic Charac- 
+teristics of NACA-0012 Airfoil Section at Angles of Attack from 0" to 
+180". NACA TN 3361, 1955. 
+3. Pope, A.: Forces and Pressures over an NACA-0015 Airfoil Through 180" of Angle 
+of Attack. Georgia Tech. Report No. E102, 7947. 
+4. Stansby, P. K.: The Effects of End Plates on The Base Pressure of a Circular 
+Cylinder. Aeronautical J., vol. 78, no. 1, 1974, pp. 36-37. 
+5. Anon.: Blockage Corrections for Bluff Bodies in Confined Flows. Engineering 
+Sciences Data Item No. 80024, Nov. 1980 (Great Britain). 
+6. Allen, H. J.; and Vincenti, W. G.: Wall Interference in Two-Dimensional Flow 
+Wind Tunnel with Consideration of the Effect of Compressibility. 
+Report 782, 1944. 
+NACA 
+7. Pankhurst, R. C.; and Holder, D. W.: Wind Tunnel Techniques. Pitman, 1952. 
+8. Haskell, E. C.: A Theory of the Blockage Effects on Bluff Bodies and Stalled 
+Wings in a Closed Wind Tunnel. Aero. Res. Coun. R2M 3400, 1963. 
+9. Hoerner, S. F.: Fluid-Dynamic Drag. Published by the author, 1965. 
+10. Allmaras, S. R.: On Blockage Corrections for Two-Dimensional Wind Tunnel Tests 
+Using the Wall-Pressure Signature Method. NASA TM 86759, 1986. 
+11. Hackett, J. E.; Wilsden, D. J.; and Lilley, D. E.: Estimation of Tunnel Block- 
+age from Wall Pressure Signatures: A Review and Data Correlation. NASA 
+CR-15224, 1979. 
+20 
+
+
+--- PDF_PAGE 25 ---
+Figure 1.- Smoke flow visualization of two-dimensional flow conditions on a tilt- 
+rotor wing during tie-down (hover-mode) operations. 
+21 
+
+
+--- PDF_PAGE 26 ---
+W 
+I- a 3 n 
+z 
+W I 
+n 
+3 
+9 
+a 
+LL 
+a 
+b 
+CT n 
+-0 
+c 
+3 
+.d 
+n 
+N 
+W 
+E a CT 
+LL 
+v) 
+W 
+-I 
+a 
+52 
+-I 
+W 
+2 
+2 
+3 
+I- 
+-& 
+0 0 
+tr, 
+I 
+0 
+h 
+I 
+e- 
+- 
+n 
+L a, u 
+c a, u 
+22 
+
+
+--- PDF_PAGE 27 ---
+CONFIGURATION a 
+/ 
+PLAIN FLAP (25%CHORD) * 
+CONFIGURATION e 
+10 
+MODIFIED TRAILING EDGE 
+FLAP CONTOUR 
+c-3. CON FIGURATION b C-NqQ 
+u 
+PLAIN FLAP (30% CHORD) * u 
+SLOT FORWARD OF FLAP 
+u 
+PLAIN FLAP (35% CHORD)* 
+IQ CONFIGURATION d 
+PLAIN FLAP WITH 
+UPPER SURFACE SPOl LER 
+*FLAP SIZE REFERS TO FLAP LEADING EDGE 
+TO TRAILING EDGE DIMENSION 
+u 
+LOWER FLAP - HINGE LOCATION 
+CON F I G U RAT I ON h 
+UMBRELLA LEADING EDGE FLAP 
+. 
+Figure 3.- Model configurations. 
+23 
+
+
+--- PDF_PAGE 28 ---
+CONFIGURATION i 
+UMBRELLA LEADING EDGE 
+WITH MODIFIED TRAILING \I 
+EDGE FLAP CONTOUR 
+CONFIGURATION j 
+LOWER SURFACE 
+LEADING EDGE SLAT 
+CON FlGU RAT ION k 
+UPPER SURFACE 
+LEADING EDGE SLAT, 
+FORWARD HINGE LOCATION 
+CONFIGURATION I 
+UPPER SURFACE 
+LEADING EDGE SLAT, 
+AFT HINGE LOCATION 
+&(,-=-J?Q CONFIGURATION n 
+UPPER SURFACE LEADING EDGE SLAT WITH 
+INCREASED SLOT SIZE AND MODIFIED FLAP 
+fin CONFIGURATION o 
+REDUCED WING LEADING EDGE VOLUME, 
+MODI FlED FLAP 
+LEADING EDGE SLAT REMOVED 
+Figure 3.- Continued. 
+24 
+
+
+--- PDF_PAGE 29 ---
+WIND TUNNEL FLOW DIRECTION 
+K2 K2 
+8.5" TRIANGLE 
+FLAT FACE TO WIND 
+CON FIGURATION 
+1 2" TR I AN G L E 
+FLAT FACE TO WIND 
+8.5" TRIANGLE 
+APEX TO WIND 
+12" TRIANGLE 
+APEX TO WIND 
+-I 
+kl2" REFERENCE CHORD 
+Figure 3.- Concluded. 
+25 
+
+
+--- PDF_PAGE 30 ---
+(a) 25% FLAP CHORD 
+(b) 30% FLAP CHORD 
+0 UPPER SURFACE ONLY 
+0 UPPER AND LOWER 
+SURFACE PAIRS 
+(c) 35% FLAP CHORD 
+oRIFICE 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+NUMBER 
+0 1 3 8 15 25 35 51 62.5 68* 75 80 90 95 98 LOCATION 
+*70% FOR 35% CHORD FLAP- 
+Figure 4.- Pressure orifice locations for plain-flap configurations. 
+26 
+
+
+--- PDF_PAGE 31 ---
+OUTBOARD 
+> 0 
+w 
+3 a w 
+K 
+10 
+fp@ WING CIDENCE 
+ANGLE OF 
+ATTACK 
+\ 
+I \ / 
+01 o'i? 
+DIRECTION 
+VIEW FROM SIDE 
+L 
+30 
+s 
+w' 
+0 z w 
+K 
+0 
+5 20 
+00 
+L 
+0 
+a On1 0 r( \ \ /o 
+/ 
+1 .. 1 ,n\ 
+XV-15 N703 
+GROUND RUN 176B, MAY 1983 
+PHOTO. TUFT SURVEY - 
+16 PHOTO. FRAMES 
+163 TUFT READINGS 
+TUFT 
+LOCATIONS 
+NOTE: ROTOR ROTATION OVER 
+WING FROM LEADING 
+EDGE TO TRAILING EDGE 
+lq\ 
+/I 
+11 
+01 'b I \ 
+O/ \ I \ 
+MEAN ANGLE OF ATTACK, deg 
+(REFERENCED TO WING CiiORD LINE) 
+Figure 5.- Flow orientation in near-rotor wake. 
+27 
+
+
+--- PDF_PAGE 32 ---
+-1.6 t 
+-1.6 
+1.6 
+.8 
+I 
+0 
+20 
+n 
+0 
+-.8 
+-1.6 
+1.6 
+.8 
+0 
+-.8 
+I I 1 
+I 
+t" 
+I--"- .. 
+- 
+t I I I I 4 
+-90 -100 -110 
+ff, deg 
+-70 -80 
+(a) Lift, drag, and moment coefficients for various flap angles. 
+Figure 6.- Aerodynamic characteristics of a two-dimensional wing at angles of 
+attack near -90"; basic leading edge, 30% chord plain flap (configuration b). 
+28 
+
+
+--- PDF_PAGE 33 ---
+- 
+.8 1 
+FLAP ANGLE, deg 
+00 60 
+o 40 75 
+Ll 45 0 90 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(b) Effect of angle of attack on drag coefficient for various flap angles. 
+I I 1 I I 
+0 20 40 60 
+I 
+80 100 
+FLAP ANGLE, deg 
+!e) Effect or flap angle on drag coefficient for various angles of attack. 
+Figure 6. - Con t hued. 
+29 
+
+
+--- PDF_PAGE 34 ---
+50 
+W 
+3 
+2 40 
+a 0 r 0 
+5 30 
+3 U 
+B 0 a 20 
+L 
+z 0 
+I- 
+2 
+- 
+s 10 
+n w a 
+s 
+C 
+a = -85" 
+CI 
+coefficient. ) Effect of flap angle on reduction of chord length and dr 
+Figure 6.- Concluded. 
+
+
+--- PDF_PAGE 35 ---
+1.6 
+- 
+- 
+NO SPOILER - 
+I I I I 
+.8 I- 
+c I 
+a 0 
+-.8 1 
+-1.6 
+x=63%C 
+.8 I--"" 
+0 4 t 
+-'8[ x=67%C 
+-1.6 L I I I 1 
+-70 -80 -90 -100 -110 
+a. deg 
+(a) Effect of spoiler location, 75" flap angle. 
+Figure 7.- Aerodynamic characteristics of a two-dimensional wing at angles of attack 
+mar -90"; basic leading edge, 30% chcrd plain flap, i;pper surface spoiler 
+(configuration d) . 
+31 
+
+
+--- PDF_PAGE 36 ---
+NOSPOILER 
+0 SPOILER 
+-7 0 -90 -80 -100 -1 10 
+a, deg 
+(b) Effect of upper surface spoiler on drag coefficient, 75" flap angle. 
+ff, deg 
+1.41 1:; 
+A -90 
+1 
+.6 
+30 40 50 60 70 80 
+SPOILER LOCATION, %C 
+(c) Effect of upper surface spoiler on drag coefficient, 75" flap angle. 
+Figure 7.- Concluded. 
+32 
+
+
+--- PDF_PAGE 37 ---
+1.6 
+.8 
+0 
+-.8 
+-1.6 
+1.6 
+.8 
+E 0 
+20 
+n 0 
+-.8 
+-1.6 
+1.6 
+.8 
+0 
+-.8 
+OCD 
+a 'M 
+6F = 45" O CL 
+I 
+I 
+-1.6 -70 -80 -90 -100 -110 
+ff, deg 
+6F = 75" 
+F 
+-70 -80 -90 -100 -110 
+ff, deg 
+(a) Lift, drag, and moment coefficients for various flap angles (plain flap and 
+modified flap). 
+Figure 8.- Comparison of the aerodynamic characteristics of configuration e (modi- 
+fied trailing-edge flap contour) with configuration b (30% chord plain flap). 
+33 
+
+
+--- PDF_PAGE 38 ---
+0 STANDARD FLAP 
+0 MODIFIED FLAP 
+(b) Effect of modified trailing-edge flap contour on drag coefficient, 75" flap 
+angle. 
+Figure 8.- Concluded. 
+34 
+
+
+--- PDF_PAGE 39 ---
+I>?{ [=.+, 
+0 
+0 
+1.6 6F=45" 
+- 
+#-?- 1 
+A- 
+.8 I----=" 
+n 0 
+-1.6 
+.8 
+t 
+-m8 t 
+1 6F=600 
+t 
+-70 -80 -90 -100 -110 -70 -80 -90 -100 -110 
+a, deg a, deg 
+-1.6L 
+(a) Lift, drag, and moment coefficients for various flap angles. 
+Figure 9.- Aerodynamic characteristics of a two-dimensional wing at angles of attack 
+near -90"; basic leading edge, 30% chord plain flap, slot forward of flap 
+(configuration f). 
+35 
+
+
+--- PDF_PAGE 40 ---
+FLAP ANGLE, deg 
+00 8 60 
+0 30 0 75 
+A 45 0 90 
+.4 I t I I I 
+-70 -80 -90 -1 00 -1 10 
+a, deg 
+(b) Effect of angle of attack on drag coefficient for various flap angles. 
+Figure 9.- Concluded. 
+36 
+
+
+--- PDF_PAGE 41 ---
+I. 
+I, 
+SLOT SIZE = 0% C 
+cD 
+6F = 45" 6F = 75" 
+-1.6 -*I/ t 
+SLOT SIZE = 0.5% C - 
+6F = 45" 1.6 - 
+- 
+.8 - 
+E 0 - 
+f3 - 
+-.8 - 
+0 
+- 
+-1.6 L 
+SLOT SIZE = 4.6% C - 
+6F = 45" 1.6 - 
+- 
+-.8 - 
+- 
+-1.6 I I I I I I I I 
+-70 -80 -90 -100 -110 -70 -80 -90 -100 -110 
+a, deg a, deg 
+(a) Effect of slot size forward of flap for various flap angles. 
+Figure 10.- Comparison of the aerodynamic characteristics of configuration f (slot 
+forward of fiapj witn configuration b (30% chord plain flap). 
+37 
+
+
+--- PDF_PAGE 42 ---
+.8 
+38 
+- 
+, I I I I 1 
+
+
+--- PDF_PAGE 43 ---
+1.6 
+.8 
+0 
+-.8 
+-1.6 
+1.6 
+.8 
+E 
+LI 00 
+b 
+0 
+0 
+-.8 
+-1.6 
+L 
+I 
+'D 
+A 'M 
+O CL 
+I 
+.8 
+F 
+-.8 
+t 
+-1.6 1 I I f I 
+-70 -80 -90 -100 -110 
+a, deg 
+I 
+t 
+t L 
+t 
+-70 -80 -90 -100 -110 
+a, deg 
+(a) Lift, drag, and moment coefficient variations for various flap angles (center 
+hinge and lower hinge). 
+Figure 11.- Comparison of the aerodynamic characteristics of configuration g (lower 
+hinge location) with configuration b (center hinge location). 
+39 
+
+
+--- PDF_PAGE 44 ---
+1.6 
+1.2 
+n 0 
+HINGE POSITION 
+0 LOWER 
+- 
+- 
+- 
+i I I I 1 
+-70 -80 -90 -1 00 -1 10 
+a, deg 
+(b) Effect of hinge location on drag coefficient, 60° flap angle. 
+Figure 11.- Concluded. 
+40 
+
+
+--- PDF_PAGE 45 ---
+6, - UPPER ANGLE/LOWER ANGLE 
+Figure 12.- Test positions for umbrella leading-edge flap surfaces. 
+41 
+
+
+--- PDF_PAGE 46 ---
+1.6 
+.8 
+0 
+-.8 
+-1.6 
+r 
+6s = O"/O" 
+/ 
+.. . 
+I4 
+6s = -10"/0" 
+I 
+-1.6 t 
+6s = -20"/0" 
+A rA 
+-.8 
+-1.6 1 I I I I 
+-70 -80 -90 -100 -110 
+% deg 
+(a) Aerodynamic coefficient variations, 
+'0 
+A 'M 
+O CL 
+6s= UPPER ANGLE/LOWER ANGLE 
+r 
+t+=-.-' 
+I 1 I I 
+-70 -80 -90 -100 -110 
+a, deg 
+0" lower leading-edge flap angle and 60° 
+trailing-edge flap angle. 
+Figure 13.- Aerodynamic characteristics of a two-dimensional wing at angles of 
+attack near -90"; umbrella leading-edge flap, 30% chord plain flap 
+(configuration h). 
+42 
+
+
+--- PDF_PAGE 47 ---
+1.6 1 ss = ool-loo ' 'D 
+A 'M 
+O CL 
+I 6s = UPPER ANGLE/LOWER ANGLE 
+-1.6 c 
+,.I 6s = -10"1-10" 
+-1.6 L 
+.8t 
+I- 
+-.8/ \ / 
+-1.6 
+-70 -80 -90 -100 -110 
+a, deg 
+as = -20"/-10" 
+F t 
+I I I i 
+6s = -4O"/-10' 
+F 
+t 
+-90 -100 -110 -70 -80 
+a, deg 
+(b) Aerodynamic coefficient variations, -10' lower leading-edge flap angle and 60° 
+trailing-edge flap angle. 
+Figure 13.- Continued. 
+43 
+
+
+--- PDF_PAGE 48 ---
+0 
+-.8 1 /-- 
+I) c. 
+~i 
+-1.6 L 
+0. 
+--8 
+-1.6 
+1.6 6s = -10'1-20" F 
+- I 
+- 
+- - & 
+L 1 I I 1 
+'D 
+A 'M 
+O CL 
+6s = UPPER ANGLE/LOWER ANGLE 
+6s = -2o"/-20" 
+F 
+r 
+6s = -2O"I-20" 
+"; -8 2 
+r 
+6s = -30" 1-20" 
+1 
+I I I I I 
+-70 -80 -90 -100 -110 
+Q, deg 
+(c) Aerodynamic coefficient variations, -2OO lower leading-edge flap angle and 60" 
+trailing-edge flap angle. 
+Figure 13.- Continued. 
+44 
+
+
+--- PDF_PAGE 49 ---
+6s, L.E. POSITION, deq 
+UPPER ANGLE/LOWER ANGLE 
+0 o/o 
+0 -1o/o 
+1.2 
+.8 
+n 0 
+.4 
+.8 - 
+0 0 
+. 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(d) Effect of angle of attack on drag coefficient for various upper leading-edge 
+flap angles, Oo lower leading-edge flap angle and 60° trailing-edge flap angle. 
+as, L.E. POSITION, deg 
+UPPER ANGLE/LOWER ANGLE 
+0 o/-10 
+0 -lo/-10 
+A -2O/-lO 
+01 L 1 I I 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(e) Effect of angle of attack on drag coefficient for various upper leading-edge 
+flap angles, -loo lower leading-edge flap angle and 60° trailing-edge flap angle. 
+Figure 13.- Continued. 
+45 
+
+
+--- PDF_PAGE 50 ---
+6s. L.E. POSITION, deg 
+UPPER ANGLE/LOWER ANGLE 
+U 01-20 
+1.2 
+.a 
+n 
+0 
+.4 
+- 
+- 
+- 
+0 -IO/-20 
+1.2 
+.a 
+n 0 
+.4 
+n -2o/-20 
+I 
+- 
+I3 -101 0 
+- 
+- 
+- 
+- 
+- 
+0 I 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(f) Effect of angle of attack on drag coefficnent for various upper leading-edge 
+flap angles, -20' lower leading-edge flap angle and 60" trailing-edge flap angle. 
+0' I I I J 
+-70 -a0 -90 -100 -1 10 
+a, deg 
+(g) Effect of angle of attack on drag coefficient for various lower leading-edge 
+flap angles, -10" upper leading-edge flap angle and 60' trailing-edge flap angle. 
+Figure 13.- Continued. 
+46 
+
+
+--- PDF_PAGE 51 ---
+-.8} \ .. - / 
+2 -1.6 t 
+-.8[ 
+-1.6 1 
+-70 -80 -90 -100 -110 
+a, deg 
+t L 
+-90 -100 -110 -70 -80 
+a, deg 
+(h) Effect of blockage in leading-edge slot on aerodynamic characteristics for 
+leading-edge flap angle of -30/-10°. 
+Figure 13.- Continued. 
+47 
+
+
+--- PDF_PAGE 52 ---
+o BLOCKAGE 
+0 NO BLOCKAGE 
+I 
+I I I I 
+-80 -90 -100 -1 10 01 -70 
+a, deg 
+(i) Effect of blockage in leading-edge slot on drag coefficient for leading-edge 
+flap angle of -30/-10°, 60" trailing-edge flap angle. 
+Figure 13.- Concluded. 
+48 
+
+
+--- PDF_PAGE 53 ---
+6s = UPPER ANGLE/LOWER ANGLE 
+1.2 
+.8 
+n 0 
+.4 
+I I I -1.6 1 I a 
+-70 -80 -90 -100 -110 -70 -80 -90 -100 -110 
+a, deg a, deg 
+(a) Lift, drag, and moment coefficient comparison for modified flap contour and 
+plain flap, 75" flap angle. 
+- 
+- 
+- 
+- 
+- 
+0 STANDARD FLAP 
+o MODIFIED FLAP 
+01 1 I I 1 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(b) Effect of modified trailing-edge flap contour on drag coefficient, -30/-10° 
+leading-edge flap angle and 75" trailing-edge flap angle. 
+Figure 14.- Comparison of the aerodynamic characteristics of configuration i 
+(umbrella leading-edge/modified flap contour) and configuration h (plain flap). 
+49 
+
+
+--- PDF_PAGE 54 ---
+0 
+/ 
+/ 
+POSITION 1 
+\ 
+'. 
+0" 
+POSITION 2 
+POSITION 3 
+14" 
+POSITION 4 
+Figure 15.- Test positions for lower-surface-leading-edge slat. 
+50 
+
+
+--- PDF_PAGE 55 ---
+‘D 
+SLAT POSITION #1 A ‘M “ 1 SLATPOSlTlON#3 
+- 6s=-lO” 
+- 
+I 
+6s = 0” 
+o E -1.6 t 
+n 0 
+1.6 1 SLAT POSITION #2 
+-1.6 -m8m -70 -80 -90 -100 -110 
+01, deg 
+6s = 4“ 
+t 
+SLAT POSITION #4 
+F 
+-90 -100 -110 -70 -80 
+deg 
+(a) Lift, drag, and moment coefficients for various leading-edge lower surface slat 
+positions, 60° trailing-edge flap angle. 
+Figure 16.- Aerodynamic characteristics of a two-dimensional wing at angles of 
+attack near -90”; leading-edge lower surface slat, 30% chord plain flap 
+(configuration j). 
+51 
+
+
+--- PDF_PAGE 56 ---
+SLAT POSITION #3 SLAT POSITION #4 
+1.6 1 
+-.* t 6s = +14" I- 
+O =l -1.6 
+6s = 0" 
+-m81 
+-1.6 
+-70 -80 -90 -100 -110 
+a, deg 
+t 
+SLAT POSITION #4 
+F 
+6s = -14" 
+F I I I I I 
+-70 -80 -90 -100 -110 
+a, deg 
+(b) Lift, drag, and moment coefficients for various lower surface slat positions, 
+60° flap angle. 
+Figure 16.- Continued. 
+52 
+
+
+--- PDF_PAGE 57 ---
+1.2 
+SLAT POSITION 
+0 0°,#1 
+’ 
+0 0°,#2 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(c) Effect of angle of attack on drag coefficient for various slat positions, 60° 
+flap angle. 
+Figure 16.- Concluded. 
+53 
+
+
+--- PDF_PAGE 58 ---
+LOCAT I ON 
+LOCAT ION 
+LEADING EDGE 
+FORWARD HINGE 
+W 
+Figure 17.- Test positions for upper surface leading-edge slat. 
+54 
+
+
+--- PDF_PAGE 59 ---
+'D 
+Irj .8 
+I- 
+0 =l -1.6 
+0 
+1.6 
+t 
+-*a1 6s-450 , , , 1 6s=600 , , , 
+-1.6 
+-70 -80 -90 -100 -110 -70 -80 -90 -100 -110 
+a, deg a, deg 
+(a) Lift, drag, and moment coefficients for various leading-edge upper surface slat 
+angles, 60' flap angle. 
+Figure 18.- Aerodynamic characteristics of a two-dimensional wing at angles of 
+attack near -90'; upper-surface leading-edge slat forward hinge, 30% chord plain 
+flap (configuration k). 
+55 
+
+
+--- PDF_PAGE 60 ---
+SLAT ANGLE, deg 
+15 
+lm4r 0 30 
+0 n 1.01 
+*6 I 
+I 1 I I I 
+-70 -80 -90 -1 00 -110 
+ff, deg 
+(b) Effect of angle of attack on drag coefficient for various slat angles, 60° flap 
+angle. 
+1.4 
+1 .o 
+n 0 
+.6 
+ff, deg 
+-80 
+O -85 
+A -90 
+0 20 40 60 80 
+SLAT ANGLE, deg 
+(c) Effect of slat angle on drag coefficient for various angles of attack, 60° flap 
+angle. 
+Figure 18.- Concluded. 
+56 
+
+
+--- PDF_PAGE 61 ---
+'D 
+A 'M 
+O CL 1.6 
+.8 
+0 
+-.8 
+3 -1.6 
+0 
+0 
+i 
+n 
+-70 -80 -90 -100 -110 -70 -80 -90 -100 -110 
+a, deg a, deg 
+(a) Lift, drag, and moment coefficients for various leading-edge upper surface slat 
+angles, 60" flap angle. 
+Figure 19.- Aerodyanmic characteristics of a two-dimensional wing at angles of 
+attack near -90"; upper surface leading-edge slat aft hinge, 30% chord plain flap 
+(configuration 1). 
+57 
+
+
+--- PDF_PAGE 62 ---
+SLAT ANGLE, deg 
+15 
+r 30 
+45 
+n 0 
+.4 
+-70 -80 -90 -100 -110 
+a, deg 
+(b) Effect of angle of attack on drag coefficient for various slat angles, 60° flap 
+angle. 
+I I I I I 
+0 20 40 60 80 
+SLAT ANGLE, deg 
+(c> Effect of slat angle on drag coefficient for various angles of attack, 60" flap 
+angle. 
+Figure 19.- Concluded. 
+58 
+
+
+--- PDF_PAGE 63 ---
+HINGE POSITION 
+0 FORWARD 
+.4 1 I I I I 
+-70 -80 -90 -100 -110 
+a, deg 
+Figure 20.- Effect of leading-edge upper surface hinge location on drag coefficient 
+for 45O slat angle and 60° flap angle (configuration k and configuration 1). 
+59 
+
+
+--- PDF_PAGE 64 ---
+1.6 
+.8 
+0 
+-.8 
+-1.6 
+1.6 
+.8 
+E 0 
+6s = 30" 
+- 
+- 
+- 
+- 
+- 
+-1.6 c 
+1.6 F 
+0 I 
+t- 
+6s = 45" 
+-1.61 I I I I L I I I 1 
+-70 -80 -90 -100 -110 -70 -80 -90 -100 -110 
+a, deg Q, deg 
+(a) Lift, drag, and moment coefficients for various leading-edge slat angles, 60° 
+flap angle. 
+Figure 21.- Effect of wing leading-edge shape on aerodynamic characteristics for 
+various flap angles (configuration k and configuration m). 
+60 
+
+
+--- PDF_PAGE 65 ---
+1.2 
+0 .8- 0 
+.4 
+LEADING EDGE 
+0 FULLVOLUME 
+0 REDUCED VOLUME 
+c 
+- 
+- 
+- 
+- 
+Effect of wing 
+-70 -80 -90 -100 -110 
+a, deg 
+leading-edge shape on drag coefficient, 45" 
+flap angle. 
+Figure 21.- Concluded. 
+slat angle and 60° 
+. 
+61 
+
+
+--- PDF_PAGE 66 ---
+2 -1.6 -F81 
+0 
+b 
+6F = 75" 
+6s = 45" 
+0 
+*81 - - oo 
+-.8 
+-1.6l 1 1 I 1 
+-70 -80 -90 -100 -110 
+a, deg 
+--, 
+~ 
+-70 -80 -90 -100 -110 
+a, deg 
+(a) Effect of modified flap contour on lift, drag, and moment coefficients for 
+various slat and flap angles. 
+Figure 22.- Comparison of the aerodynamic characteristics of configuration n (modi- 
+fied trailing-edge flap contour) and configuration rn (30% chord plain flap). 
+. 
+62 
+
+
+--- PDF_PAGE 67 ---
+FLAP ANGLE, deg 
+0 60 
+0 75 
+" -70 -80 -90 -100 -1 10 
+a, deg 
+(b) Effect of angle of attack on drag coefficient for the reduced leading-edge 
+volume and the modified flap, 50" slat angle. 
+Figure 22.- Concluded. 
+63 
+
+
+--- PDF_PAGE 68 ---
+(a) Lift, drag, and moment coefficient variations for the reduced volume leading- 
+edge with and without slat, 60° flap angle. 
+0 SLAT AT 50 deg 
+0 SLAT REMOVED 
+I I I 1 
+-70 -80 -90 -100 -1 10 
+a, deg 
+(b) Effect of slat on drag coefficient for a range of angles of attack, 60" flap 
+angle. 
+Figure 23.- Comparison of aerodynamic characteristics for configuration n (reduced 
+leading-edge volume/modified flap contour with slat) and configuration o (slat 
+removed ) . 
+
+
+--- PDF_PAGE 69 ---
+1.6 
+.8 
+0 
+-.8 
+-1.6 
+1.6 
+.8 
+s 
+LI 00 
+b 
+0 
+0 
+-.8 
+-1.6 
+6c = 0" 'D 
+r 
+O CL 
+A 'M 
+f 
+1" 
+I 
+-.8 1 
+-1.6 
+-70 -80 -90 -100 -110 
+a, deg 
+6~ = 60" 
+I- t 
+-70 -80 -90 -100 -110 
+a, deg 
+(a) Lift, drag, and moment coefficients for various flap angles. 
+Figure 24.- Aerodynamic characteristics of a two-dimensional wing at angles of 
+attack near -90"; basic leading edge, 25% chord plain flap (configuration a). 
+65 
+
+
+--- PDF_PAGE 70 ---
+FLAP ANGLE, deg 
+1.6 
+n 0 
+1.2 
+.8 
+- 
+- 
+- 
+- 
+- 
+00 60 
+9 30 0 75 
+45 c 90 
+-70 -80 -90 -100 -110 
+ff, deg 
+(b) Effect of angle of attack on drag coefficient for various flap angles. 
+Figure 24.- Continued. 
+66 
+
+
+--- PDF_PAGE 71 ---
+.8 
+0 
+-.8 
+5 -1.6 
+-1.6 
+-90 -100 -110 -70 -80 
+a, deg 
+- 
+I 
+- 
+6F = 60" 
+- 
+-70 -80 -90 -100 -110 
+a, deg 
+(c) Effect of upper surface spoiler on aerodynamic characteristics for various flap 
+angles. 
+Figure 24.- Continued. 
+67 
+
+
+--- PDF_PAGE 72 ---
+2.0 
+1.6 
+n 0 
+1.2 
+.8 
+NO SPOILER 
+o SPOILER 
+I I I J 
+-70 -80 -90 -100 -110 
+a, deg 
+(d) Effect of upper surface spoiler on drag coefficient, 60° flap angle. 
+Figure 24.- Concluded. 
+68 
+
+
+--- PDF_PAGE 73 ---
+1.6 
+.8 
+0 
+-.8 
+-1.6 
+t 
+-.8 1 
+-1.6 
+-70 -80 -90 -100 -110 
+a, deg 
+t 
+-90 -100 -110 
+ff, deg 
+-70 -80 
+(a) Lift, drag, and moment coefficients for various flap angles. 
+Figure 25.- Aerodynamic characteristics of a two-dimensional wing at angles of 
+attack near -90"; basic leading edge, 35% cnord piain r'iap (configuration c). 
+69 
+
+
+--- PDF_PAGE 74 ---
+FLAP ANGLE, deg 
+00 60 
+o 30 0 75 
+c 90 
+-70 -80 -90 -100 -110 
+a, deg 
+(b) Effect of angle of attack on drag coefficient for various flap angles. 
+Figure 25.- Concluded. 
+70 
+
+
+--- PDF_PAGE 75 ---
+2.0 
+1.6 
+1.2 
+0 0 
+t- 
+- 
+- 
+- 
+- 
+- 
+30% FLAP CHORD 
+SF = 0", CONFIG. b 
+0 SF = 60°, CONFIG. b 
+A 6~ = 60°, CONFIG. f 
+6~ = 6O", CONFIG. h 
+.8 
+.4 
+Ol I 1 I I I 
+.4 .6 .8 1 .o 1.2 1.4 
+Re X lo4 
+- 
+- 
+- 
+- 
+Figure 26.- Effect of Reynolds number on drag coefficient for a wide range of drag 
+levels at -90" angle of attack. 
+71 
+
+
+--- PDF_PAGE 76 ---
+FLAP LENGTH = 25% C 
+0 UPPER SURFACE 
+LOWER SURFACE 
+0 DELTA (LOWER-UPPER) 
+8 EFFECTIVE CHORD LENGTti 
+= 1.672 FORCE 
+(a) FLAP ANGLE = 0" = 1.748 
+0 -. 'DPR ESSU R E 
+"- -3 
+LAP ANGLE = 30" 
+u. -3 
+= 1.361 
+FORCE 
+(c) FLAP ANGLE = 45" = 1.333 
+'DP R ESSU R E 0 
+"I 
+-3 I I I I I 
+0 20 40 60 80 VOO 
+%CHORD 
+Figure 27.- Effect of flap angle on surface pressure distribution, 
+angle of attack -90". 
+72 
+
+
+--- PDF_PAGE 77 ---
+FLAP LENGTH = 25% C 
+0 UPPER SURFACE 
+C LOWER SURFACE 
+8 EFFECTIVE CHORD LENGTH 
+0 DELTA (LOWER-UPPER) 
+. 
+= 1.410 *r 'DFORCE 
+LAP ANGLE = 60" 
+I I I I a I 
+I I I la I 
+0 20 40 60 80 - 100 
+% CHORD 
+Figure 27.- Concluded. 
+73 
+
+
+--- PDF_PAGE 78 ---
+FLAP LENGTH = 25% C 
+0 UPPER SURFACE 
+0 DELTA (LOWER-UPPER) 
+@ EFFECTIVE CHORD LENGTH 
+LOWER SURFACE 
+I I 1 I a 1 
+= 1.412 
+= 1.403 
+'DFORCE 
+(b) ANGLE OF ATTACK = -80" 
+-3 1 I 1 I I a I 
+0 20 40 60 80 100 
+%CHORD 
+Figure 28.- Effect of angle of attack on surface pressure distribution, 
+flap angle = 60". 
+74 
+
+
+--- PDF_PAGE 79 ---
+FLAP LENGTH = 25% C 
+OUPPER SURFACE 
+A LOWER SURFACE 
+Q EFFECTIVE CHORD LENGTH 
+0 DELTA (LOWER-UPPER) 
+= 1.410 
+0 = 1m362 (d) ANGLE OF ATTACK = .- I-1 
+2 
+0 
+LL 
+W 
+w 
+EO 
+-1 E 
+y -2 
+W 
+K 
+3 
+v) 
+a 
+-90" 
+--I 
+-3 
+(e) ANGLE OF ATTACK = -95" 
+-3 1 I I I I 0 I 
+-3 I 1 I I I A I 
+0 20 40 60 80 wv 100 
+%CHORD 
+Figure 28.- Ccnzluded. 
+75 
+
+
+--- PDF_PAGE 80 ---
+3.0r 
+FLAP LENGTH = 25% C 
+0 UPPER SURFACE 
+A LOWER SURFACE 
+8 EFFECTIVE CHORD LENGTH 
+0 DELTA (LOWER-UPPER) 
+= 1.505 
+= 1.527 ‘DFORCE 
+‘DPR ESSU R E 
+(a) FLAP SLOT CLOSED 
+-3.0 
+= 1.493 FORCE 
+(b) FLAP SLOT OPEN = 1.510 
+i 2.0 (0.5% CHORD) 
+-3.0 
+%CHORD 
+Figure 29.- Effect of flap slot on pressure distribution. 
+76 
+
+
+--- PDF_PAGE 81 ---
+FLAP LENGTH = 25% C 
+0 UPPER SURFACE 
+A LOWER SURFACE 
+@ EFFECTIVE CHORD LENGTH 
+0 DELTA (LOWER-UPPER) 
+(a) 12.5% CHORD SPOILER 
+AT 67% x 
+I I I 1 a 1 
+= 1.408 2 r 'DFORCE 
+(b) NO SPOILER 
+-3 1 I 1 I I 0 J 
+0 20 40 60 80 100 
+% CHORD 
+Figure 30.- Effect of upper-surface spoiler on surface pressure distribution 
+flap angle = 60°, angle of attack = -85". 
+77 
+
+
+--- PDF_PAGE 82 ---
+0 UPPER SUR FACE 
+A LOWER SURFACE 
+@EFFECTIVE CHORD LENGTH 
+O DELTA (LOWER-UPPER) 
+(a) 25% CHORD FLAP 
+I I 
+I 1 1 
+OL 
+A A -- 31 -A- - 
+n 
+= 1.692 DFORCE 
+= 1.6--. 
+0 'DPR ESSUR E 
+Ad 
+(c) 35% CHORD FLAP 
+I 1 I 1 Q 
+0 20 40 60 80. 100 
+%CHORD 
+Figure 31.- Effect of flap size on surface pressure distribution, 
+flap angle = O", angle of attack = -90". 
+78 
+
+
+--- PDF_PAGE 83 ---
+0 UPPER SURFACE 
+A LOWER SURFACE 
+8 EFFECTIVE CHORD LENGTH 
+0 DELTA (LOWER-UPPER) 
+= 1.374 r CDFORCE 
+25% CHORD FLAP 
+nK -3 
+I I I la 
+0 I 
+(c) 35% CHORD FLAP 
+I 1 I In, 1 
+0 20 40 60 80 100 
+%CHORD 
+Figure 32.- Effect of flap size on surface pressure distribution, flap angle = 60°, 
+angle Of att.aCk = -90'. 
+79 
+
+
+--- PDF_PAGE 84 ---
+2. Government Accession No. 1. Report No. NASA TM-88373 
+USAVSCOM TM-86-A-8 
+4. Title and Subtitle 
+AERODYNAMIC CHARACTERISTICS OF TWO-DIMENSIONAL WING 
+CONFIGURATIONS AT ANGLES OF ATTACK NEAR -90" 
+3. Recipient's Catalog No. 
+5. Report Date 
+December 1986 
+6. Performing Organization Code 
+7. Author(sJ 
+Martin Maisel, Georgene Laub, and W. J. McCroskey 
+9. Performing Organization Name and Address 
+Aeroflightdynamics Directorate, U.S. Army Aviation Research and 
+Technology Activity, Ames Research Center, Moffett Field, 
+CA 94035 
+8. Performing Organization Report No. 
+A-86427 
+10. Work Unit No. 
+I?. Contract or Grant No. 
+12. Sponsoring Agency Name and Address 
+National Aeronautics and Space Administration, Washington, 
+D.C. 20546 and U.S. Army Aviation Systems Command, St.Louis, 
+MO 63120 
+16. Abstract 
+Wind tunnel tests were conducted to determine the drag of two-dimensional wing sections 
+operating in a near-vertical flow condition. 
+including plain flaps of 25, 30, and 35% chord were tested at angles of attack from -75 to -105". 
+Reynolds numbers examined ranged from approximately 0.6~10~ to 1 .4x106. The data were obtained 
+using a wind tunnel force and moment balance system and arrays of chordwise pressure orifices. 
+The results showed that significant reductions in drag, beyond what would be expected by virtue 
+of the decreased frontal area, were obtainable with geometries that delayed flow separation. 
+Rapid changes in drag with angle of attack were noted for many configurations. The results, 
+however, were fairly insensitive to Reynolds number variations. 
+pressure data generally agreed with the force data within 2%. 
+Various leading- and trailing-edge configurations, 
+Drag values computed from the 
+13. Type of Report and Period Covered 
+Technical Memorandum 
+14. Sponsoring Agency Code 
+532-06-1 1 
+17. Key Words (Suggested by Author(s)) 
+Download, Two-dimensional wing, Wind tunnel 
+testing, Drag, Wing leading edge, Wing trail- 
+ing edge, Wing flap, Wing slots, Wing slats, 
+Wing spoiler 
+18. Distribution Statement 
+Unlimited - Unclassified 
+Subject category - 02 
+19. Security Classif. (of this report) 
+Unclassified 
+21. NO. of Pages 22. &ice' 20. Security Classif. (of this page) 
+Unclassified 83 A03 
+
+
+--- PDF_PAGE 85 ---
+1. Report No. NASA TM-88373 
+USAVSCOM TM-86-A-8 
+Martin Maisel, Georgene Laub, and W. J. McCroskey 
+2. Gowmnwnt Accrsrion No. 3. Recipient's Catalog NO. 
+1 A-86427 
+4. Title and Subtitle 
+AERODYNAMIC CHARACTERISTICS OF TWO-DIMENSIONAL WING 
+CONFIGURATIONS AT ANGLES OF ATTACK NEAR -90" 
+7. Authods) 
+- 
+10. Work Unit No. 
+9. Performing Organization Name and Address 
+5. Report Date 
+December 1986 
+6. Performing Organization Code 
+8. Performing Organization Report No. 
+11. Contract or Grant No. 
+Aeroflightdynamics Directorate, U.S. Army Aviation Research and 
+Technology Activity, Ames Research Center, Moffett Field, 
+CA 94035 
+12. Sponsoring Agency Name and Address 
+National Aeronautics and Space Administration, Washington, 
+D.C. 20546 and U.S. Army Aviation Systems Command, St.Louis, 
+MO 63120 
+13. Type of Report and Period Covered 
+Technical Memorandum 
+14. Sponsoring Agency Code 
+532-06-11 
+15 Supplementary Notes 
+Point of contact: M. Maisel, MS 237-5, Ames Research Center, Moffett Field, CA 94035 
+(415) 694-6372 or FTS 464-6372 
+16. Abstract <- io3 
+i( Wind tunnel tests were conducted to determine the drag of two-dimensional wing sections 
+operating in a near-vertical flow condition. Various leading- and trailing-edge 
+Reynolds numbers examined ranged from approximately The data were obtained 
+Rapid changes in drag with angle of attack The results, 
+pressure data generally agreed with the force data within 2% 
+7. Key Words (Suggested by Authorls)) 
+Download, Two-dimensional wing, Wind tunnel 
+testing, Drag, Wing leading edge, Wing trail- 
+ing edge, Wing flap, Wing slots, Wing slats, 
+Wing spoiler 
+18. Distribution Statement 
+Unlimited - Unclassified 
+Subject category - 02 
+19. Security Classif. (of this report) 20. Security clnrif. (of this pp) 
+Unclassified Unclassified 
+21. No. of Pages 22. Rice' 
+83 A03 

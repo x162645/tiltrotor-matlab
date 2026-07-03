@@ -1,6 +1,6 @@
 
 
---- PDF_PAGE 1 DOC_ID 19970008124 ---
+--- PDF_PAGE 1 ---
 NASA Technical Memorandum 4741
 / a / ""
 Computer Program To Obtain Ordinates for
@@ -9,7 +9,8 @@ Charles L. Ladson, Cuyler W. Brooks, Jr., Acquilla S. Hill, and Darrell W. Sprol
 December 1996
 
 
---- PDF_PAGE 2 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 2 ---
 NASA Technical Memorandum 4741
 Computer Program To Obtain Ordinates for
 NACA Airfoils
@@ -22,7 +23,8 @@ Langley Research Center • Hampton, Virginia 23681-0001
 December 1996
 
 
---- PDF_PAGE 3 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 3 ---
 The use of trademarks or names of manufacturers in this report is for
 accurate reporting and does not constitute an official endorsement,
 either expressed or implied, of such products or manufacturers by the
@@ -40,7 +42,8 @@ Springfield, VA 22161-2171
 (703) 487-4650
 
 
---- PDF_PAGE 4 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 4 ---
 Abstract
 Computer programs to produce the ordinates for airfoils of any thickness, thick-
 ness distribution, or camber in the NACA airfoil series were developed in the early
@@ -128,7 +131,8 @@ airfoil parameter determining radial coor-
 dinate of z'
 
 
---- PDF_PAGE 5 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 5 ---
 Ilt0 average value of _t, _ _/de
 Subscripts:
 cam cambered
@@ -240,7 +244,8 @@ series airfoil is specified by a 4-digit code of the form
 pmxx, where p and m represent positions reserved for
 
 
---- PDF_PAGE 6 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 6 ---
 specification of the camber and xx allows for specifica-
 tion of the thickness-chord ratio as a percentage, that is,
 "pml2" designates a 12-percent-thick (t/c = 0.12) 4-digit
@@ -326,7 +331,8 @@ c 2
 3
 
 
---- PDF_PAGE 7 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 7 ---
 Radiusof curvature at maximum thickness:
 x (1 -m) 2-=m R=
 c 2d 1(1 - m) - 0.588
@@ -425,7 +431,8 @@ were developed, and details of these have been published
 in reference 12. Essentially, the modification consisted of
 
 
---- PDF_PAGE 8 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 8 ---
 z-plane
 z'-plane
 Z r_ = e(_-_o)+i (O-¢p)
@@ -516,7 +523,8 @@ was used in ref. 1.) This tangency point is usually located
 at about 0.005 chord but varies with airfoil thickness and
 
 
---- PDF_PAGE 9 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 9 ---
 .02 .10
 y(x) .01
 I
@@ -597,7 +605,8 @@ R(x)
 6
 
 
---- PDF_PAGE 10 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 10 ---
 series. By use of this method, a smooth transition
 between airfoil and ellipse is produced, the tangency
 point is known, and there is a continuous variation of
@@ -676,7 +685,8 @@ scaled to give any desired design lift coefficient. Values
 7
 
 
---- PDF_PAGE 11 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 11 ---
 of k 1 and r and the camber-line designation were taken
 from reference 5 and are presented in the following table:
 Camber-line
@@ -767,7 +777,8 @@ cates, this mean-line loading should always be used for
 the 6A-series airfoils. This camber-line equation is given
 
 
---- PDF_PAGE 12 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 12 ---
 asoneof theoptionsin sdectionof meanlinesin the
 program.
 Calculation of Cambered Airfoils
@@ -860,7 +871,8 @@ completely self-guiding and to reduce required input to
 9
 
 
---- PDF_PAGE 13 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 13 ---
 theminimumnecessaryfor therequestedairfoilsection
 andmeanline.Theconventionusedfor thetwooutput
 file namesconsistof combiningauser-suppliedfile pre-
@@ -956,7 +968,8 @@ ences beyond the fifth digit caused by rounding
 differences.
 
 
---- PDF_PAGE 14 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 14 ---
 Derived airfoils. In reference 1, about 25 cases,
 including several from each airfoil family, were com-
 puted for thickness-chord ratios from 0.06 to 0.15, and
@@ -1027,7 +1040,8 @@ August 29, 1996
 11
 
 
---- PDF_PAGE 15 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 15 ---
 Appendix
 Convergence of Leading-Edge Radius of
 NACA 4-Digit and 4-Digit-Modified Series
@@ -1104,7 +1118,8 @@ sional coordinates.
 12
 
 
---- PDF_PAGE 16 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 16 ---
 References
 1. Ladson, Charles L.; and Brooks, Cuyler W., Jr.: Development
 of a Computer Program To Obtain Ordinates for NACA 6- and
@@ -1149,7 +1164,8 @@ Rep. 903, 1948.
 13
 
 
---- PDF_PAGE 17 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 17 ---
 Table I. Sample Computer File "64012.rpt" for Symmetric Airfoil
 AIRFOLS ORDINATE INFORMATION REPORT
 for 64012 airfoil
@@ -1407,7 +1423,8 @@ D2Y/DX2
 14
 
 
---- PDF_PAGE 18 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 18 ---
 0 008500
 0 008750
 0 009000
@@ -1783,7 +1800,8 @@ Table I. Continued
 15
 
 
---- PDF_PAGE 19 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 19 ---
 Table I. Continued
 0
 0
@@ -2207,7 +2225,8 @@ O.510000
 16
 
 
---- PDF_PAGE 20 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 20 ---
 Table I. Concluded
 740000
 750000
@@ -2455,7 +2474,8 @@ Table I. Concluded
 17
 
 
---- PDF_PAGE 21 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 21 ---
 _ Table II. Sample Computer File "64412.rpt" for Cambered Airfoil
 6-SERIES
 0.984284 0.999700
@@ -2626,7 +2646,8 @@ DYL/DXL
 -0 672141
 
 
---- PDF_PAGE 22 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 22 ---
 Table II. Continued
 0.005500
 0.005750
@@ -3136,7 +3157,8 @@ Table II. Continued
 -0.125888
 
 
---- PDF_PAGE 23 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 23 ---
 ba Table II. Continuedo
 0.080000
 0.082500
@@ -3692,7 +3714,8 @@ O.
 0 065736
 
 
---- PDF_PAGE 24 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 24 ---
 Table II. Continued
 0.480000
 0.490000
@@ -4202,7 +4225,8 @@ O.78OO00
 0.015202
 
 
---- PDF_PAGE 25 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 25 ---
 __000000"0
 60L90T O- IET600"O
 ISL890 O- E[EgTO'O
@@ -4269,7 +4293,8 @@ O000L6"O
 p_pnlouoo "II _lqe,L
 
 
---- PDF_PAGE 26 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 26 ---
 Form Approved
 REPORT DOCUMENTATION PAGE OMB NO. 0704-0188
 Publicreportingburdenfor this collectionof informationis estimatedto average 1 hourper response,includingthe timefor reviewinginstructions,searchingexistingdata sources,
@@ -4338,4 +4363,5 @@ Prescribedby ANSI Std. Z39-18
 298-102
 
 
---- PDF_PAGE 27 DOC_ID 19970008124 ---
+
+--- PDF_PAGE 27 ---

@@ -1,0 +1,4001 @@
+
+
+--- PDF_PAGE 1 ---
+AN EXPERIMENTAL AND ANALYTICAL METHOD FOR
+APPROXIMATE DETERMINATION OF THE TILT
+ROTOR RESEARCH AIRCRAFT
+ROTOR/WING DOWNLOAD
+FINAL REPORT
+PRINCIPAL INVESTIGATORS
+David E. Jordon
+William Patterson
+Doral R. Sandlin
+05/30/84 - 11/30/85
+California Polytechnic State University
+Aeronautical Engineering Department
+San Luis Obispo, California
+Grant No. NCC2-259
+(NASA-CR-176S70) AN EXPERIHEK1AL AND N86-2S769
+ANALYTICAL METBGD FOE APPBOXIKATE
+I DETERMINATION OF 1BE TUT EOTOB BESEARCH
+IAJBCSAFT EOTOB/KIKG DOWNLOAD FiDalfieport, ^^
+30 May 198U - 30^Rov..1985 (Califcrnia G3/02 43236
+
+
+--- PDF_PAGE 2 ---
+ABSTRACT
+AN EXPERIMENTAL AND ANALYTICAL METHOD FOR
+APPROXIMATE DETERMINATION OF THE TILT
+ROTOR RESEARCH AIRCRAFT
+ROTOR/WING DOWNLOAD
+David E. Jordan
+May 1986
+An investigation was performed to analyze the XV-15
+Tilt Rotor Research Aircraft download phenomenon. This
+phenomenon is a direct result of the two rotor wakes
+impinging on the wing upper surface when the aircraft is in
+the hover configuration. This study represents one of many
+devoted to the analysis of this problem.
+For this study the analysis proceeded along two lines.
+First was a method whereby results from actual hover tests
+of the XV-15 aircraft were combined with drag coefficient
+results from wind tunnel tests of a wing that was represen-
+tative of the aircraft wing. Second, an analytical method
+was used that modeled the airflow caused by the two rotors.
+Formulas were developed in such a way that a computer
+program could be used to calculate the axial velocities in
+the vicinity of the aircraft's wing. The axial velocities
+were then used in conjunction with the aforementioned wind
+tunnel drag coefficient results to produce download values.
+An attempt was made to validate the analytical results by
+modeling a model rotor system for which direct download
+values were determinable.
+i i
+
+
+--- PDF_PAGE 3 ---
+Table of Contents
+Page
+List of Tables v
+List of Figures vi
+List of Symbols viii
+Chapter
+1. Introduction 1
+Description 1
+History 4
+2. Experimental Determination of the Download . 9
+Hover Test 9
+Wind Tunnel Tests 20
+Experimental Download Analysis 22
+3. Analytic Determination of the Download . . . 28
+Vortex Ring Induced Velocity 29
+Wake Contraction 33
+Time Spacing of Vortex Rings 35
+Analytic Download Analysis 36
+Computer Program Calibration 39
+Download Computer Program 41
+Velocity Profiles 44
+4. Model Test 49
+5. Results and Discussion 51
+Experimental Download Analysis 51
+
+
+--- PDF_PAGE 4 ---
+Chapter Page
+5. (continued)
+Model Test Analysis 55
+Analytic Download Analysis 56
+6. Conclusion 63
+References 66
+Appendixes
+A. Transformation from Equation 6 to
+Equation 7 68
+B. Empirical Adjustment to Power Polar to
+Reflect Nonlinear Aerodynamics Region ... 70
+C. Development of the Biot-Savart Equation
+to Determine the Axial Velocity
+Component Due to a Vortex Ring 73
+D. Calibration Version of XV-15 Computer
+Program 82
+E. Download Version of XV-15 Computer
+Program 88
+F. Calibration Version of Model Rotor
+Computer Program 100
+G. Download Version of Model Rotor
+Computer Program 106
+IV
+
+
+--- PDF_PAGE 5 ---
+Tables
+Table Page
+1. Out of Ground Effect Full Span Flap
+Hover Data 12
+2. Deviation of C From Linear C Vs. C
+Relationship1" p. ....... 20
+3. Rotor Lifted Weights and Flap Deflection
+Angles at a Constant Power Setting .... 21
+4. Drag Coefficients and Flap Deflection
+Angles 23
+5. Experimental Download 24
+6. Analytic Download 58
+
+
+--- PDF_PAGE 6 ---
+Figures
+Figure Page
+1. The XV-15 Tilt Rotor Research Aircraft ... 2
+2. XV-15 Flap/Flaperon Schedule 10
+3. XV-15 Engine Exhaust Jet Thrust 13
+4. XV-15 Power Coefficient/Weight
+Coefficient Polar 18
+5. Weight Coefficient Deviation From Linear
+Aerodynamics as a Function of Power
+Coefficient 19
+6. XV-15 Experimental Power Coefficient/
+Weight Coefficient Polar 19
+7. Effect of Flap Angle Deflection on
+Rotor Lifted Weight 21
+8. Effect of Flap Angle Deflection on Two-
+Dimensional Drag Coefficient 23
+9. Effect of Flap Angle on Drag Coefficient
+Change, Referenced to the Drag
+Coefficient for 0° Flap Deflection .... 25
+10. Change in Rotor Lifted Weight, Referenced
+to Rotor Lifted Weight for 0° Flap
+Deflection, as a Function of the
+Change in Drag Coefficient 26
+11. Experimental XV-15 Download As a Function
+of Flap Deflection Angle 27
+12. The Geometry Used for Deriving the Axial
+Velocity Component Due to a
+Vortex Ring 30
+13. Vortex Ring Downstream Position as a
+Function of Time 38
+14. In Ground Effect Vortex Ring
+Representation . 43
+15. Computer-Generated Velocity Profile,
+Ct = .0094 46
+- vi
+
+
+--- PDF_PAGE 7 ---
+Figure Page
+16. Computer-Generated Velocity Profile,
+Ct = .01 47
+17. Computer-Generated Velocity Profile,
+Ct = .0105 48
+18. Model Rotor Test Setup 49
+19. Effect of Hover Height on Analytic
+XV-15 Download 58
+Vll
+
+
+--- PDF_PAGE 8 ---
+Symbols
+A_: rotor disk area (ft. )
+C,: drag coefficient
+C : power coefficient
+C : profile power coefficient
+C.: thrust coefficient
+C : weight coefficient
+c: wing chord (ft.)
+DL: aircraft rotor/wing download (Ib.)
+DL/T: aircraft download-to-thrust ratio
+*f: flap deflection angle (deg.)
+F.: engine exhaust jet thrust (Ib.)
+GW: aircraft gross weight (Ib.)
+T : circulation strength (ft. /sec.)
+H/D: rotor height above ground to rotor diameter ratio
+IGE: in ground effect hover
+K: vortex ring time spacing factor
+OGE: out of ground effect hover
+R: rotor radius (ft.)
+r1: vortex ring radius (ft.)
+P: ambient air density (slugs/ft. )
+STOL: short take-off and landing
+T: rotor thrust (Ib.)
+VTOL: vertical take-off and landing
+V 111
+
+
+--- PDF_PAGE 9 ---
+Symbols (continued)
+v.: average induced velocity at the rotor disk
+(ft./sec.)
+Vfc: rotor tip speed (ft./sec.)
+W: aircraft rotor lifted weight (Ib.)
+IX
+
+
+--- PDF_PAGE 10 ---
+CHAPTER 1
+Introduction
+Description
+The XV-15 (Figure 1) is a "Tilt-Rotor" aircraft. The
+aircraft has a wingspan of 32 feet 2 inches, a length of 46
+feet 3 inches, and a design gross weight of 13,000 pounds.
+The aircraft's propulsion system consists of two Lycoming
+LTC1K-4K turboprop engines and two 25-foot diameter, three-
+bladed prop-rotors. These engines are variants of Lycoming
+T53-L-13B engines and are mounted one on each wing tip.
+The rotor axes are capable of rotation from a vertical
+position (for helicopter and hover flight) to a horizontal
+position (for airplane flight). Control of the aircraft in
+the helicopter configuration is provided by rotor-generated
+forces and moments, while in the airplane configuration
+control is provided primarily by conventional control sur-
+faces. Operation at engine tilt angles between vertical
+and horizontal provides short take-off and landing (STOL)
+capabilities, as opposed to vertical take-off and landing
+(VTOL) capabilities. Cross shafting of the two engines
+provides rotational speed synchronization, permits power
+transfer for transient conditions, and prevents complete
+loss of power to either rotor due to a single engine
+failure.
+
+
+--- PDF_PAGE 11 ---
+Figure 1
+The XV-15 Tilt Rotor Research Aircraft
+
+
+--- PDF_PAGE 12 ---
+3
+The XV-15 was designed and built as a "proof of
+concept" aircraft and is providing a data base for the
+larger scale V-22 Osprey that is currently in the prelimi-
+nary design phase. Two XV-15 aircraft were built by Bell
+Helicopter Textron Inc. under contract by NASA. One, air-
+craft 702, was retained by Bell Helicopter and is operated
+in Texas; the other, aircraft 703, is operated by NASA at
+Ames Research Center.
+The XV-15 tilt rotor research aircraft is a unique
+aircraft with unique capabilities. Along with the capabil-
+ities, however, come unique problems. One problem occurs
+when the aircraft is operating in a hover. In this con-
+figuration the engines are in a vertical position with the
+rotor disks parallel to the wing surface. The wing is
+approximately 5 feet below the rotor disk and experiences a
+"downward" directed force due to the direct impingement of
+the rotor wake on the wing. The approximate determination
+of the magnitude of this downward directed force, hereafter
+referred to as download, was the goal of this research
+project. The download and its elimination, or at least
+reduction, is a significant problem for today's XV-15 proof
+of concept prototype and tomorrow's V-22 Osprey production
+aircraft.
+It is difficult to experimentally determine the air-
+craft download due to the number of variables involved:
+rotor thrust, engine exhaust jet thrust, aircraft gross
+weight, download, and upload in the case of a ground effect
+
+
+--- PDF_PAGE 13 ---
+4
+reflected wake. The problem with the experimental deter-
+mination of the download arises from the fact that there is
+no readily apparent way to separate the download out of a
+gross measurement of the vertical force system. While the
+aircraft gross weight can be exactly determined, the
+exhaust jet thrust can only be approximated, being a
+function of inlet air velocity, and the installed rotor
+thrust defies determination due to its direct interrelation
+with the download phenomenon. These facts have led to many
+attempts to determine download through model test and theo-
+retical techniques.
+History
+The first record of a download type phenomenon was
+encountered in the late 1950s with the XV-3 (Deckert and
+Ferry, 1960). The XV-3 was a S/VTOL aircraft much like the
+XV-15 except that it was powered by one ra'dial type piston
+engine mounted in the aircraft fuselage. Power was shafted
+to a transmission at each wing tip which drove two bladed
+prop-rotors.
+During the flight test evaluations of the XV-3 it was
+discovered that a large increase in power required was
+encountered suddenly when hover flight was approached.
+This fact was attributed to an aspect ratio effect. The
+reasoning was that theoretically, above transitional
+speeds, the prop-rotors were actually influencing a
+diameter of air extending from the outboard edge of one
+prop-rotor to the outboard edge of the other. With this
+
+
+--- PDF_PAGE 14 ---
+5
+large mass of air being influenced, the induced power
+required was necessarily low. However, below transitional
+speed (i.e., in hovering flight), each prop-rotor was
+thought to influence a diameter of air approximately equal
+to its own diameter. Thus, with the much smaller mass of
+air being influenced, the induced power requirement had to
+be increased to produce the same thrust. While this expla-
+nation seems feasible, the problem could have been the
+first encounter with tilt-rotor download.
+In 1969 a test was conducted at Wright-Patterson Air
+Force Base that placed a mock-up under a full-scale CH-47
+Chinook rotor (Gillmore, 1971). It was speculated that on a
+wing without leading or trailing edge devices the download
+force would approach 12% of the aircraft gross thrust. The
+test wing, however, was run utilizing trailing edge flaps
+deflected 70° in conjunction with a leading edge device that
+opened like an umbrella, top and bottom. Using this con-
+figuration it was demonstrated that the download could be
+reduced to 4% of gross thrust. While these results seem
+perfectly accurate and acceptable, the extension of these
+values to reflect the XV-15 would be questionable. The
+test used only one rotor and no image plane or end plate to
+simulate the longitudinal symmetry of the XV-15. Thus, the
+test did not adequately model the flow phenomenon that
+exists on the XV-15.
+Other tests were conducted by the Bell Helicopter
+Company beginning in 1968 (Marr, Sambell, and Neal, 1973)
+
+
+--- PDF_PAGE 15 ---
+6
+that utilized a 1/5 scale powered aeroelastic model of the
+XV-15. The model was tested at rotor height above ground
+to rotor diameter (H/D) ratios from 0.5 through 1.0. In an
+attempt to isolate the download force, the model was run
+both with and without wing panels installed. The test
+revealed that at an H/D value of 1.0 the wing panel down-
+load was 11.4% of the model thrust. This value was higher
+than the 7% that was predicted for the full-scale aircraft.
+It was thought that the difference between the predicted
+and actual values could be attributed to a Reynold's number
+effect. A Reynold's number correction had the effect of
+reducing the predicted download value to 5-7% of the full-
+scale thrust. The results of these tests are also suspect
+because of two factors. First, the Reynold's number cor-
+rection was based on wind tunnel data of "cross sectional
+shapes with rounded edges and flat sides" and not the model
+aircraft wing. Second, the download predicted for the
+full-scale tilt rotor aircraft was based on in ground
+effect (IGE) data and therefore does not adequately reflect
+the general out of ground effect (OGE) solution.
+The latest tests that addressed the download issue
+were performed at the Outdoor Aerodynamic Research Facility
+(OARF) at NASA-Ames Research Center in 1984 (McVeigh,
+1985). The download aspect of the tests was specifically
+directed toward the V-22 Osprey program but it was felt
+that the results were applicable to this study. The tests
+consisted of a 25-foot diameter three-bladed prop-rotor
+
+
+--- PDF_PAGE 16 ---
+7
+mounted with its axis of rotation parallel to the ground.
+This configuration precluded any influence that the ground
+would have had on the prop-rotor performance. The effect
+of the opposing prop-rotor was simulated by using a large
+image plane. A wing, complete with a 31% of wing chord
+full span flap and follower, was placed downstream of the
+rotor disk between the rotor axis and the image plane. The
+wing was instrumented to facilitate the measurement of
+forces and moments. The results of the test show that for
+a flap deflection angle of 67° and a nominal design thrust
+coefficient of .016, the download-to-thrust ratio was 9.3%.
+The wing used for the tests had a chord of 10.5 feet and
+was placed approximately 8 feet downstream of the rotor
+disk with a 6° dihedral. This test represents the most
+recent and most accurate work done to date attempting to
+resolve the download issue.
+The above tests show that the download problem is
+significant and deserves attention. The fact that early
+estimates of the download were in the 3% to 5% range but
+have grown to 9% to 10% of gross thrust is significant in
+itself. Applied to a hovering XV-15 aircraft, the dif-
+ference in the early and late estimates of download account
+for a difference of almost 1,000 pounds.
+The download analysis, for this study, was performed
+utilizing two different procedures. The first method was
+an experimental method that combined results from actual
+aircraft hover tests of the XV-15 and results of wind
+
+
+--- PDF_PAGE 17 ---
+8
+tunnel tests of a model XV-15 wing. The second method was
+a computer simulation of the aircraft propulsion system,
+namely two 25-foot diameter prop-rotors, that relied on
+vortex ring theory. This method also made use of the same
+wind tunnel test results.
+
+
+--- PDF_PAGE 18 ---
+CHAPTER 2
+Experimental Determination of the Download
+Hover Test
+Flight tests were utilized to attempt to experimen-
+tally determine the XV-15 rotor/wing download. A hover
+test was conducted in 1983 in which the aircraft was flown
+using five different deflection settings with careful
+attention to maintain the aircraft gross weight within a
+narrow range (approximately 13,500 to 13,700 pounds). Data
+from the hover test was utilized in conjunction with data
+acquired from wind tunnel tests of a representative two-
+dimensional airfoil to arrive at values of download-to-
+thrust ratio.
+The XV-15 aircraft wing is equipped with a flap/
+flaperon control surface system. The system is rigged to
+provide a linear relationship between the flap and flaperon
+deflection, i.e., a flap deflection of 40° causes a flaperon
+deflection of 25°, a flap deflection of 20° causes a flaperon
+deflection of 13°, etc. (Figure 2). Throughout this linear
+deflection relationship, roll control is accomplished by
+the pilot's flaperon input overriding the associated flap/
+flaperon angle relationship. The flaperon deflection,
+corresponding to the pilot input, is from the position
+predetermined by the flap setting. For the hover download
+investigation, a special modification was implemented to
+
+
+--- PDF_PAGE 19 ---
+10
+the flap/flaperon system which facilitated ground adjust-
+ment of the flaps and flaperons to the same deflection
+angle, thereby producing the effect of a full span flap
+system (Figure 2). The deflection angles used during the
+test for the full span flap system were 0°, 20°, 40°, 50°,
+and 60°.
+60 -
+40
+c onO Vk. -a
+XV-15 Flap/Flaperon Schedule
+---"As Built" Flap/Flaperon
+Full Span Flap Mod.
+20 40
+Flap Angle £t-
+60 80
+Figure 2
+XV-15 Flap/Flaperon Schedule
+In order to facilitate a direct correlation between
+test points throughout the hover test, efforts were made to
+keep the aircraft gross weight within a narrow range.
+Ballast was added to the aircraft during the flap readjust-
+ment ground time to compensate for the fuel burned during
+each portion of the test. Accordingly, the aircraft gross
+weight was maintained within a 200-pound range. Aircraft
+gross weight determination during the test sequences was
+
+
+--- PDF_PAGE 20 ---
+11
+performed after the tests using on-board fuel quantity
+instrumentation data.
+An aircraft wheel hover height of 50 feet above the
+ground was established for the tests using visual
+references. This height corresponds to an H/D ratio of
+2.5, insuring that the data taken would represent OGE
+conditions.
+Rotor speeds were held constant (+1 RPM.) throughout
+the test points through the use of the engine RPM governor.
+Three data points per flap setting were recorded and are
+presented in Table 1. Ambient test conditions were moni-
+tored and recorded through the use of a local weather
+station that was placed well outside of the rotor influ-
+ence. Light winds existed throughout the test period
+ranging from 2.5 knots at 320/045° to 4 knots at 340°. The
+aircraft heading was held constant at 320° during the tests.
+The system of vertical forces that act on the XV-15
+during hover operation is composed of four components:
+engine exhaust jet thrust, rotor thrust, aircraft gross
+weight/ and the rotor/wing download.
+Engine jet thrust was determined with an acceptable
+degree of accuracy using Lycoming LTC1K-4K engine data
+(Figure 3). Engine exhaust jet thrust is dependent on
+engine horsepower and free stream velocity in the vicinity
+of the engine inlet. After the rotor tip speed and mast
+torque were determined from aircraft instrumentation, rotor
+horsepower could be calculated. Assuming that the
+
+
+--- PDF_PAGE 21 ---
+Table 1
+Out of Ground Effect Full Span
+Flap Hover Data
+12
+RECORD
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+547
+548
+549
+FLAP
+(DBG)
+0
+0
+0
+20
+20
+20
+40
+40
+40
+50
+50
+50
+60
+60
+60
+GROSS WT WIND
+(LBS) (V../DIRECT)K
+13550
+13536
+13527
+13537
+13521
+13513
+13657
+13647
+13637
+13673
+13662
+13645
+13614
+13601
+13585
+2.5/045°
+2.5/045°
+2.5/045°
+3.5/340°
+3.5/340°
+3.5/340°
+3.0/345°
+3.0/345°
+3.0/345°
+3.0/340°
+3.0/340°
+3.0/340°
+4.0/340°
+4.0/340°
+4.0/340°
+0
+0.9917
+.9917
+.9917
+.9917
+.9917
+.9917
+.9955
+.9955
+.9955
+.9917
+.9917
+.9917
+.9936
+.9936
+.9936
+ROTOR MAST TORQUE (WLB)
+SPEED
+<RPM) LEFT RIGHT
+587
+587
+587
+587
+587
+587
+587
+587
+587
+587
+587
+587
+588
+588
+587
+116814
+114808
+115728
+112384
+113043
+114356
+111464
+111305
+110827
+109476
+108636
+109314
+107176
+108460
+105907
+118841
+116764
+118494
+114652
+114092
+115005
+113951
+114479
+115429
+112615
+111456
+113052
+118768
+108746
+109352
+Parameters
+RECORD
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+547
+548
+549
+AVG.
+SHAFT
+POWER
+. (HP)
+1098
+1079
+1091
+1057
+1058
+1068
+1050
+1052
+1054
+1034
+1025
+1036
+1008
+1013
+1003
+CP
+.001150
+.001130 .
+.001143
+.001108
+.001108 .
+.001119
+.001095
+.001097 .
+.001099
+.001083
+.001074 .
+.001084
+.001048
+.001054 .
+.001048
+ENGINE
+JET
+C THRUST
+P (LBS)
+85.0
+001141 83.5
+84.0
+83.0
+001112 83.0
+83.0
+82.5
+001097 83.0
+83.0
+82.0
+001080 81.7
+82.0
+81.0
+001050 81.5
+80.2
+WEIGHT
+(GW-2F .
+13380
+13369
+13359
+13371
+13355
+13347
+13492
+13481
+13471
+13509
+13499
+13481
+13454
+13438
+13425
+Cw
+(NON
+) LINEAR)
+.00979
+.00978
+.00977
+.00978
+.00977
+.00977
+.00983
+.00982
+.00981
+.00988
+.00989
+.00986
+.00979
+.00978
+.00980
+Cw3/2
+.000967
+.000966
+.000973
+.000982
+.000969
+Cw
+(LINEAR)
+.01007
+.010043
+.01006
+.010107
+.009987
+
+
+--- PDF_PAGE 22 ---
+200
+13
+160
+^, 120
+80
+40 V'o= Engine Inlet Free Stream
+Velocity
+Data Source: Lycoming LTC 1K-4K
+Model Specification Number 104.47
+Figure 1.6.1
+400 600 800 1000 1200 1400
+HPeng
+400 500 MO 700 • KOO 900 1000 1)00 1200 1300
+HPmast
+Figure 3
+XV-15 Engine Exhaust Jet Thrust
+transmission linking the engine and rotor was 93% effi-
+cient, calculation of the engine horsepower was then
+possible. Computation of the free stream velocity in the
+vicinity of the engine inlet was accomplished through the
+use of simple momentum theory (i.e., v. = V. -ycT/2) .
+In order to determine the aircraft thrust coefficient, the
+thrust per rotor was assumed to be 110% of half the air-
+craft gross weight and the rotor tip speed was determined
+
+
+--- PDF_PAGE 23 ---
+14
+from aircraft instrumentation. These two values facili-
+tated calculation of the average rotor-induced velocity.
+This value of average rotor-induced velocity was assumed to
+approximately represent the free stream velocity in the
+vicinity of the engine inlet. With the induced velocity
+and engine horsepower determined, a first approximation of
+engine exhaust jet thrust was possible. Further iterations
+to refine the engine exhaust jet thrust values were deemed
+unnecessary due to the apparent insensitivity of the jet
+thrust to the level of rotor thrust and also the relatively
+small value that the jet thrust represented compared to the
+other forces in the system. Engine jet thrust during the
+hover tests was determined to be between 80 and 85 pounds
+per engine. Doubling this value accounted for the total
+engine exhaust jet thrust. This total engine exhaust jet
+thrust was then subtracted from the aircraft gross weight
+and the value that resulted represented the "rotor lifted"
+aircraft weight (i.e., W = GW - 2F.).
+The rotor lifted aircraft weight was used to define a
+"weight coefficient." This weight coefficient was in the
+form of the standard helicopter thrust coefficient, with
+half of the total rotor lifted weight substituted for the
+rotor thrust. The form of the weight coefficient was
+
+
+--- PDF_PAGE 24 ---
+15
+In order to be able to apply the OGE hover test data
+at other levels of power coefficient (C ), the C = mC.
++ C power polar algorithm (Hayden, 1976), applicable only
+po
+in the linear aerodynamic range, was utilized. This
+algorithm expresses the total power coefficient as being
+composed of the induced power, which is proportional to the
+thrust coefficient to the three halves power, and the
+profile power, which is that power required to turn the
+rotor in a zero thrust condition. Although this is an
+approximation, for hovering flight the combination of
+induced and profile power accounts for 90% to 100% of the
+total power.
+Solving the algorithm for thrust coefficient (C.)
+gives:
+m
+2/3
+(2)
+Calculating the slope (m) between a general point
+„ 3/2
+(CPl' ) and the C intercept (0, C ) gives:
+p po
+- C.
+m 3/2
+(3)
+Substituting this expression into that for C. gives
+V p " CP0
+V CPO 1
+2/3
+<v (4)
+where (C , C, ) is a general OGE hover point corresponding
+to a given flap setting and C is the C axis intercept ofP0 P
+
+
+--- PDF_PAGE 25 ---
+16
+the C. = mct + c curve, which is based on prior XV-15
+o
+hover data (Hoerner, 1965). Referring back to the
+relationship that the rotor lifted weight is equal to the
+aircraft gross weight less the engine exhaust jet thrust
+plus the rotor/wing download gives
+T = W + DL ( 5a)
+or
+..f. . DL 1 (5b)
+Dividing through by the density, rotor disk area and rotor
+2tip speed squared ( PA_V ) gives:
+. DL
+w . ... ( b I
+Using the manipulation outlined in Appendix A and
+substituting this final result into the previous
+relationship for thrust coefficient (C.) gives:
+(7)
+Due to the fact that it has been shown (Makofski and
+Menkick, 1956) that the rotor/wing download to rotor thrust
+(DL/T) ratio is independent of the rotor disk loading but
+dependent on body configuration in the rotor wake alone,
+this ratio for the XV-15 is assumed to be dependent on flap
+configuration only. Thus (1 + DL/T) was assumed to have a
+constant value for each flap angle setting and the expres-
+sion for C. derived from the power polar expression became:
+2/3 ,
+C« )
+5fl (8)
+
+
+--- PDF_PAGE 26 ---
+17
+This relationship, depicted in Figure 4, states that the
+rotor lifted aircraft weight (W) is, for a specific flap
+setting, only a function of applied power, C . Therefore,
+for each flap setting and its associated C and C
+pl wl
+values, a unique C value will be defined. From this it
+follows that for each unique C there will be a unique W,
+or rotor lifted aircraft weight. This relationship is
+particularly useful due to the fact that weight coefficient
+(C ) values were easily obtainable from the hover test data
+(Table 1) while true thrust coefficient values could not be
+initially determined. The linear relationship of the
+3/2C = mC. ' + C expression is applicable only for values
+o
+of C below .0008, as can be seen in Figure 5. The
+3/2deviation of C from the linear C vs. C relationshipw p w c
+is presented in Figure 6. At values of C above .0008,
+which is the case with the OGE hover data taken for this
+study, an empirical adjustment was utilized to reflect the
+departure from linear aerodynamics (Table 2). This adjust-
+ment consisted of finding a C dependent AC value fromp w
+Figure 6, utilizing the study values of C . This AC was
+then added to the nonlinear C values to arrive at the
+3/2associated C on the C vs. C linear projection. A neww p w
+value of C , at the desired C , is then obtained by inter-
+polation (using the linear equation, Equation (8)). A
+second adjustment was then made to project the interpolated
+3/2C back to the nonlinear C vs. C curve. The secondw p w
+AC value was obtained from Figure 6 at the desired Cw p
+
+
+--- PDF_PAGE 27 ---
+18
+.0012
+.0010
+.0008
+.0006
+.0004
+.0002 -
+0
+20
+40 Flap Angle (deg.)
+50
+60
+© XV-15 Flight 146A (N703)
+Full Span Flap Modification
+Q Cp0 From XV-1S Tie Down Test
+Ground Run 106 (N?02)
+.0002 .0004 .0006 .0008
+3/2
+.001.
+Figure 4
+XV-15 Power Coefficient/Weight
+Coefficient Polar
+
+
+--- PDF_PAGE 28 ---
+19
+.0016
+.0012 •
+u
+• .0008
+.0004 -
+u
+<]
+XV-1S Tie Down Test
+Ground Run 106 (N702)
+.0004 .0008 .0012 .0016
+Figure 5
+Weight Coefficient Deviation From Linear
+Aerodynamics as a Function of
+Power Coefficient
+.0016 -• ,
+.0012 -
+.0008 -
+.0004 -
+.0004
+/•' Linear Projection
+O XV-15 Tie Down Test
+Ground Run 106 (X702)
+Corrected to OGE
+& XV-15 Flight 17
+OCE Hover (N702)
+Q C From XV-15 Tie Down Test
+Ground Run 106 (N702)
+.OOOK
+C.-V2
+.0012 .0016
+Figure 6
+XV-15 Experimental Power Coefficient/
+Weight Coefficient Polar
+
+
+--- PDF_PAGE 29 ---
+20
+Table 2
+Deviation of G From Linear C Vs. C 3/2
+wRelationship w
+CP
+.0008
+.0009
+.0010
+.0011
+.0012
+.0013
+.0014
+.0015
+S,3/2UN
+.0007
+.000808
+.000908
+.001012
+.001114
+.001215
+.001316
+.001418
+C3/2
+WACT
+.0007
+.000796
+.000888
+.000972
+.001055
+.001134
+.001212
+.001283
+WUN
+.00788
+.00867
+.00938
+.01008
+.01075
+.01139
+.01201
+.01262
+WACT
+.00788
+.00859
+.00924
+.00981
+.01036
+.01087
+.01137
+.01181
+Cw
+0
+.00008
+.00014
+.00027
+.00038
+.00051
+.00064
+.00081
+(.001). Utilizing this method, outlined in Appendix B,
+computed values of Cw and W were determined and are
+presented, with the associated flap angle test points, in
+Table 3. The incremental weight (AW) column in Table 3
+reflects the additional weight, referenced to the 0° flap
+angle weight, that could be hovered OGE as a result of
+increased flap angle deflection. The effect of flap angle
+on rotor lifted weight UW) is presented in Figure 7.
+Wind Tunnel Tests
+Wind tunnel tests of two-dimensional wing sections
+were performed in the Army 7-foot by 10-foot wind tunnel at
+NASA Ames Research Center during April and May of 1983.
+The wind sections utilized plain flap configurations and
+were tested at angles of attack near -90°. Flaps of various
+chord sections were tested.
+
+
+--- PDF_PAGE 30 ---
+21
+1000
+© XV-1S Flight 146 (N703)
+Interpolated § C- =.001
+SHP = 963 RPM =587
+Sea Level Standard Day
+60 80
+Flap Anglo
+(deg.l
+Figure 7
+Effect of Flap Angle Deflection on
+Rotor Lifted Weight
+Table 3
+Rotor Lifted Weights and Flap Deflection
+Angles at a Constant Power Setting
+* f
+(DBG)
+0
+20
+40
+50
+60
+C
+<§C =.001)P
+.00897
+.00912
+.00923
+.00939
+.00948
+W
+(GW-2F . )
+(Ibs?)
+12,261
+12,466
+12,665
+12,835
+12,983
+AW
+(Wx -Wt )
+ffBs.)f
+0
+205
+404
+574
+722
+
+
+--- PDF_PAGE 31 ---
+22
+The variation of drag coefficient with flap angle for
+the various flap chords tested is presented in Figure 8.
+The decrease in drag coefficient with increasing flap
+deflection angle is interrupted by a sharp rise, reflecting
+the onset of separated flow on the flap upper surface. The
+wing section with the .25c flap, which is the same size
+flap as that on the XV-15, demonstrated flow separation
+characteristics about 10° earlier than observed on the air-
+craft. The cause of this could be traceable to the fact
+that the XV-15 flap is slightly thicker than that which
+would be dictated by the basic airfoil contour. The result
+of the greater flap thickness is a larger flap leading edge
+radius than that which was built into the wind tunnel flap.
+Since the drag coefficient characteristics for each of the
+flap chords tested were similar in the attached flow
+region, it was assumed that the XV-15 wing drag coeffi-
+cients could be represented by extrapolation of the . 25c
+flap data to 60° flap deflection, based on the performance
+characteristics of the .30c and .35c flaps. The extrapola-
+tion is shown as a broken line in Figure 8 and is included
+in Table 4.
+Experimental Download Analysis
+The AC- values listed in Table 4 represent drag
+coefficient decreases, referenced to the 0° flap deflection
+drag coefficient, for each increase in flap deflection.
+The relationship of AC, to flap deflection angles is
+
+
+--- PDF_PAGE 32 ---
+23
+2.0
+1.6 •
+1.2 -
+0.8 •
+0.4 -
+Army TxlO' Wind Tunnel Test
+2-Dimensional Wing Kith
+Plain Flap
+O -2Sc
+& .30c
+Q .35c
+« = -85°
+20 RO40 60
+Plap Angle Sr
+{Joe.I
+Figure 8
+Effect of Flap Angle Deflection on Two-
+Dimensional Drag Coefficient
+Table 4
+Drag Coefficients and Flap
+Deflection Angles
+AC
+-,q«f=0 d«
+0
+20
+40
+50
+60
+1.69
+1.53
+1.32
+1.21
+1.09*
+0
+0.16
+0.37
+0.48
+0.60
+'Extrapolated
+
+
+--- PDF_PAGE 33 ---
+24
+depicted in Figure 9. Realizing that the decrease in drag
+coefficient ( AC,) was responsible for the increase in
+rotor lifted weight ( AW) for a given power setting (C ), a
+relationship between AC, and AW was established and is
+shown in Figure 10. Using a linear regression technique,
+it was possible to establish a ( AW/ AC^) ratio, which was
+valid and constant for a specific power setting. Multipli-
+cation of this ratio by the two-dimensional wing drag
+coefficient for each associated flap deflection angle made
+it possible to define a form of the rotor/wing download as:
+DL = C
+f
+AC0 J
+p (9)
+Results of the experimental download analysis for the
+selected power setting (C = .001) were computed as
+percentages of the total aircraft thrust, which was a
+function of flap deflection angle. The computed download
+values are listed in Table 5 and depicted in Figure 11.
+Table 5
+Experimental Download
+*f±.
+0
+20
+40
+50
+60
+W
+(GW-2F. )
+12402
+12599
+12753
+12967
+13079
+DOWNLOAD
+(AW/ACd)Cd
+1885
+1706
+1472
+1249
+1216
+TOTAL THRUST
+(W+DL)
+«f
+14287
+14305
+14225
+14316
+14294
+DOWNLOAD
+(% THRUST)
+13.2
+11.9
+10.3
+9.4
+8.5
+
+
+--- PDF_PAGE 34 ---
+25
+.6
+Army 7'xlO' Wind Tunnel Test
+2-Dimensional King With
+.25c Plain Flap
+rt=-85°
+20 40
+Flap Angle £,
+(deg.)
+60 80
+Figure 9
+Effect of Flap Angle on Drag Coefficient
+Change, Referenced to the Drag
+Coefficient for 0° Flap
+Deflection
+
+
+--- PDF_PAGE 35 ---
+26
+1000
+800
+600
+400
+200 •
+c =.001
+SHP=963 RPM-587
+Sea Level Standard Day
+Least Squares Curve Fit
+Figure 10
+Change in Rotor Lifted Weight, Referenced
+to Rotor Lifted Weight for O° Flap
+Deflection, as a Function of the
+Change in Drag Coefficient
+
+
+--- PDF_PAGE 36 ---
+27
+20 -i
+Experimental XV-15 Download
+Showing Flap Deflection
+Angle Relationship
+(Full Span Plain Flap)
+1 1n 20
+\
+40
+1
+60
+1
+80
+Flap Angle, Of
+(deg.)
+Figure 11
+Experimental XV-15 Download As a Function
+of Flap Deflection Angle
+
+
+--- PDF_PAGE 37 ---
+CHAPTER 3
+Analytic Determination of the Download
+The airflow from a spinning propeller, or prop-rotor
+in the present case, can be approximated through the use of
+vortex ring theory. A vortex ring is a vortex filament
+that forms a circle of radius r1. The approximation of the
+rotor's airflow in this study consisted of a set of concen-
+tric vortex rings, one set for each prop-rotor, beginning
+at a position that coincided with the geometric location of
+the rotor disks. This study was concerned with hovering
+performance simulation only, so the number of vortex rings
+to be included in the analysis was dictated by the hover
+scenario being analyzed, i.e., IGE or OGE.
+The velocity of the air that impinges on the upper
+surface of the aircraft's wing is the cause of the rotor/
+wing download and hence was the parameter that needed to be
+determined. More specifically, the axial component of the
+rotor slipstream velocity needed to be determined.
+Three aspects of the vortex system that required
+investigation in order for the analysis to be performed
+were: a set of equations that could be used to calculate
+the induced axial velocity components of each of a number
+of vortex rings; an equation that could model the rotor
+wake contraction, i.e., predict the radius (r1) of each of
+the vortex rings downstream of the rotor disk; and a system
+28
+
+
+--- PDF_PAGE 38 ---
+29
+whereby spacing between each successive vortex ring could
+be adjusted to obtain an average induced axial velocity, at
+the rotor disk, that agreed with that predicted by momentum
+theory for helicopter rotor inflow.
+Vortex Ring Induced Velocity
+The velocity induced by a vortex ring can be deter-
+mined by beginning with the Biot-Savart law written in
+vector notation:
+dv - r * * ds4» * 3
+(10)
+*•
+giving the velocity vector dv induced by an element of
+length ds = r'd^' of the vortex ring at the point (x,r,0)
+or (x,y,z) (Figure 12). Forming the vector ds/ds, which
+represents the unit vector tangent to the vortex ring at
+the position of the vortex element, with the unit vectors
+in the x, y and z directions gives:
+ds f •» ,f-g|- » 01 + cos*'j - sln^'k
+(11)
+Forming the radius vector R, which represents the distance
+from the vortex element to the point (P) at which the
+induced velocity is to be calculated, in a similar fashion
+gives:
+R =• xt + (rsln* - r'sint1)] + (rcos* - r'cos*')Jc
+(12)
+with the magnitude of the vector being:
+
+
+--- PDF_PAGE 39 ---
+30
+Figure 12
+The Geometry Used for Deriving the Axial
+Velocity Component Due to a
+Vortex Ring
+
+
+--- PDF_PAGE 40 ---
+31
+* J x2 + r2 + r'2 - 2rr'cos(* -
+The cross product of the two vectors then becomes:
+(13)
+-- = -(rcosU -*' ) - r1 )T xcosflc
+(14)
+The x, or axial, component of the induced velocity caused
+by the whole vortex ring can then be determined by inte-
+grating the resulting Biot-Savart expression around the
+circumference of the ring. The expression to be integrated
+becomes:
+2t
+Vx-r)
+rcos(»-»') -
+[Jx2 * r2 + 1 - 2rcosU-*') I
+(15)
+where the ratios x/r ' and r/r1 have been replaced by x and
+r for clarity. Following the steps outlined in Appendix C,
+the final form of the equation to be solved for the axial
+velocity component of the vortex ring is:
+Vx'r) '
+1 2 E(k)
+(16)
+where K(k) and E(k) are those functions also shown in
+Appendix C. The axial velocity shows singular behavior at
+0, r 1 and near this point the equation can be
+evaluated by expanding the elliptic integrals for K(k) and
+E(k) in powers of (1 - k2):
+
+
+--- PDF_PAGE 41 ---
+32
+K(k) = A+(A-l)/4(l-k2)+(9/64)(A-7/6){l-k2)2+
+(17)
+E(k) =
+(18)
+Where:
+A = In * k2=
+J 1 - k2 x2+(r+l)2
+The remaining parameter that required attention in
+order to be able to evaluate the induced axial velocity
+equations was the vortex circulation strength, r.
+Beginning with the Kutta-Joukowski law, which relates
+circulation to lift, or in this case thrust, an expression
+for circulation strength can be written:
+T = PVtrR
+(19)
+Utilizing the dimensionless thrust coefficient from
+standard helicopter terminology, the rotor -produced thrust
+can also be expressed as:
+(20)
+Equating these two expressions gives:
+TR = VtCt
+(21)
+
+
+--- PDF_PAGE 42 ---
+33
+or
+rR «= »R2VtCt
+(22)
+Differentiating both sides of this expression with respect
+to R gives:
+rdR = 2»RVtCtdR
+(23)
+or
+r - 2.RVtct
+(24)
+This expression, while representing the circulation
+strength about a rotor disk of radius R, has also been
+shown to represent the total circulation strength about the
+axis of rotation due to the trailing vortex system
+(Franklin, 1955). Since this study involved a three-bladed
+prop-rotor system, it was assumed that the circulation
+strength due to each blade could be obtained by dividing
+the total circulation strength, about the axis of rotation,
+by three. Thus, the final form of the trailing vortex
+circulation strength due to each blade becomes:
+2iRV.C.
+r = A * I
+(25)
+Wake Contraction
+A formula was needed that could be used to model the
+contraction of the rotor wake as a function of downstream
+
+
+--- PDF_PAGE 43 ---
+34
+position from the rotor disk. From the literature investi-
+gated (Marr, Sambell, and Neal, 1973), a formula was
+obtained that, while not reflecting extreme precision,
+modeled the gross characteristics of the wake contraction.
+The expression is of the form
+r(z) 0.707 1
+0.5(2 - e'nz/R)
+1/2
+(26)
+where: r(z) = downstream wake radius
+R = rotor radius
+z = downstream position
+n = a constant
+The determination of the constant, n, began with the
+continuity equation written between the rotor disk and a
+general point in the rotor wake. It can be shown, between
+these two points, that the following relation holds:
+z J
+(27)
+Considering a velocity relationship of the form
+MVDJ
+v°lVCD
+(28)
+it can be written
+(29)
+This relationship was further developed by obtaining
+expressions for the ratios on the right-hand side. For the
+
+
+--- PDF_PAGE 44 ---
+35
+velocity ratio it is accepted that the ratio of the inflow
+velocity at the rotor disk to that infinitely far down-
+stream is 0.5. Marr, Sambell, and Neal (1973) theorized
+that the radius ratio Rz/Rd equals .908 at a value of z/R
+equal to 0.2. Substituting these values yielded a velocity
+ratio of
+-^ = 0.60645
+01
+(30)
+Considering this relationship and that expressed by Equa-
+tions (26) and (29), it can be shown that
+1/2J2 - e"nZ/R] = 0.60645
+(31)
+From which it follows that n = 1.19706.
+Time Spacing of Vortex Rings
+A method had to be devised whereby the spacing between
+vortex rings could be adjusted so that the average inflow
+velocity through the rotor disk, determined using the com-
+puter simulation model, could be made to agree with that
+predicted by the momentum theory for helicopter rotors
+Once again, beginning with the continuity equation, it
+is seen that
+V(z) [ R1 ]2
+V, " I R(z) J
+1 (32)
+
+
+--- PDF_PAGE 45 ---
+36
+Substituting Equation 26 for the radius ratio and squaring
+gives
+2 -
+1
+(33)
+Substituting the momentum theory for the induced velocity
+at the rotor disk gives
+V(z) • VtJtI7r(2 - e~nz/R]
+(34)
+Realizing that this represents velocity in the z direction,
+i.e., dz/dt, it can be rearranged to the form
+tdt-_L. * <*4 (2 - e-"27*)
+(35)
+Integration of this equation yields the final form as
+ict- L z + R lQ |2 _ e~nz/R
+2 2n I
+(36)
+The constant, K, was introduced to provide the means for
+time spacing adjustment of the vortex ring elements, as
+stated earlier.
+Analytic Download Analysis
+With all the components identified and accounted for,
+the task of modeling the XV-15 propulsion system flow, for
+the purpose of analytically approximating the aircraft
+download, could be begun.
+
+
+--- PDF_PAGE 46 ---
+37
+Due to the dependence of the time equation (Equa-
+tion 36) and the velocity equation (Equation 16) itself on
+the rotor tip speed, a constant tip speed had to be estab-
+lished. The actual aircraft hovers at 98% of the full
+rotor speed of 601 RPM, or 588.98 RPM. This rotor speed
+corresponds to a tip speed of 768.38 ft/sec and, since it
+represents the actual hover condition, was the constant tip
+speed chosen. At this speed each rotor blade completes one
+revolution approximately every .1022 seconds. The vortex
+system that is actually generated by the rotor resembles
+three continuous shed vortices that together form a con-
+tracting helicoil shape proceeding downstream from the
+rotor disk. It was assumed, for this study, that the
+actual vortex system could be adequately modeled by
+breaking the three concentric helical vortices into three
+concentric vortex rings. In this scheme, three vortex
+rings were considered shed for each rotor revolution, one
+for each rotor blade. It was initially assumed that the
+vortex rings would be equally spaced over the time it took
+the rotor to complete one revolution (i.e., a vortex ring
+was assumed to be shed from the rotor approximately every
+.034 seconds). Because Equation 36 could not be solved
+explicitly for downstream position of the vortex rings as a
+function of time, another procedure was implemented.
+Because the entire analysis was performed for three thrust
+coefficients, Equation 36 was plotted using each thrust
+coefficient and whole values of z, the downstream position
+
+
+--- PDF_PAGE 47 ---
+38
+.4
+Kt
+.1 -
+Comparison of Vortex Ring
+Tioe/Displaceoent
+Relationship
+—— Cf.0094
+Ct..0100
+Ct-.010S
+so
+i
+(ft.)
+Figure 13
+Vortex Ring Downstream Position as a
+Function of Time
+
+
+--- PDF_PAGE 48 ---
+39
+of the vortex rings (Figure 13). Then, using five sets of
+points from each resulting curve, a fifth order inter-
+polating polynomial was formed for each thrust coefficient
+dependent curve. This resulted in three fifth order
+polynomials that were explicitly solvable for the vortex
+ring downstream position as a function of ring time
+spacing. Up to this point the time spacing factor, K, had
+been held constant at unity and was retained in the inter-
+polating polynomials. Then, beginning with the initial
+time spacing of the vortex rings (.034 seconds between
+rings), the downstream distance that each ring had been
+displaced from the rotor disk could be calculated. With
+this distance known, the associated vortex ring radii could
+be calculated (Equation 26) and the contribution of each
+ring to the total axial velocity at the points of consid-
+eration could be computed. The ring spacing factor K could
+then be adjusted and the computations performed again until
+successive iterations arrived at the desired result.
+Computer Program Calibration
+The average inflow velocity at the rotor disk dictated
+by simple momentum theory is dependent on both tip speed
+and thrust coefficient. Hence, the calibration of the
+spacing factor K had to be performed for each of the three
+different thrust coefficient cases.
+The geometry of the calibration program was set up in
+such a manner that the points at which the velocities were
+calculated coincided with the aircraft's rotor plane. The
+
+
+--- PDF_PAGE 49 ---
+40
+calculations were begun 2.5 feet outboard of the rotor tip
+path and proceeded in one-foot increments through the rotor
+plane to a point 2.5 feet outboard of the rotor tip path on
+the opposite side. For each point the axial velocity
+component due to each of the vortex rings was calculated.
+These components were then summed to arrive at a total
+axial velocity for each point. Because the aircraft rotors
+are 25 feet in diameter, this scheme led to a total axial
+velocity value for each of 31 points. The 25 velocity
+values that occurred in the "rotor disk" were then averaged
+to arrive at an average inflow velocity through the rotor
+disk. The vortex ring spacing factor K was then varied
+until the average inflow velocity through the rotor disk
+agreed with that predicted by momentum theory. Small K
+values packed the rings more closely and resulted in higher
+average velocities, while large K values spaced the rings
+out and resulted in lower average velocities. The range of
+K was between zero and one. The K values that resulted in
+the correct average inflow velocities were then retained
+and used later in the version of the program that computed
+aircraft download.
+The number of vortex rings in the calibration program
+analysis was limited to 72. This number of rings produced
+adequate results evidenced by the fact that increasing the
+number of rings included in the analysis to 100 increased
+the average inflow velocity through the rotor disk by a
+maximum of .39%.
+
+
+--- PDF_PAGE 50 ---
+41
+Download Computer Program
+With the proper predetermined spacing factor K, the
+program version that calculated the analytic download could
+be formulated.
+The geometry of the analysis consisted of two systems
+of vortex rings, each concentric, their centerlines sepa-
+rated by approximately 32 feet. The axial velocities were
+calculated at 71 points; beginning at a point approximately
+6.5 feet outboard of one rotor tip path and progressing, in
+one-foot increments, to a point approximately 6.5 feet
+outboard of the other rotor tip path. The points at which
+the velocities were calculated were 4.67 feet below the
+rotor planes, coinciding with the position of the wing on
+the aircraft itself.
+Both IGE and OGE hover scenarios were investigated.
+For the OGE scenarios (H/D = infinity), each rotor was
+modeled by 72 concentric vortex rings for a total of 144
+rings. For the IGE scenarios (H/D = 2.0, 1.0 and 0.5), the
+number of vortex rings used was dictated by the H/D ratio.
+For these cases the corresponding rotor heights were 50, 25
+and 12.5 feet, respectively. The ground plane was modeled
+by using a mirror image of the shed vortex system,
+reflected about the "ground plane." This was accomplished
+in the following manner. The H/D ratio to be investigated
+was a program-prompted input. If it was an IGE hover
+condition, this input set the required distance that sepa-
+rated the rotor plane from the ground plane. Then, while
+
+
+--- PDF_PAGE 51 ---
+42
+going through the program loop that calculated the vortex
+rings' downstream positions, the positions were monitored
+until a position was reached that corresponded to the
+required distance between the rotor and ground plane. At
+this point, the next vortex ring that was formed was iden-
+tical to the one that occurred at the ground plane position
+and in fact was superimposed on the ring that occurred at
+the ground plane. The next ring that was formed was iden-
+tical to the ring that preceded the ring that occurred
+before the ground plane position. Each successive ring
+that was formed for the reflected ring system was identical
+to its corresponding ring in the shed vortex system
+(Figure 14). The circulation strengths on the superimposed
+mirror image system, however, were reversed. With all the
+positions and radii of the vortex rings determined, the
+total axial velocity at each point of concern could be
+computed. The velocities from successive points were then
+averaged and used to form an average dynamic pressure, q,
+based on standard sea level conditions.
+Values for the wing drag coefficients were taken from
+wind tunnel tests of a representative, two-dimensional wing
+section. The wing section was equipped with movable flaps
+that permitted testing at deflections of 0°, 20°, 40°, 45°,
+and 60°. The wing section was tested at angles of attack
+near -90°. The results of these tests provided five differ-
+ent drag coefficients corresponding to the five flap angle
+
+
+--- PDF_PAGE 52 ---
+cG
+2> G• /
+? C
+6 cGround *SN /5&v Ground
+Plane VZ/ V& Plane
+? <T
+3 e3 &
+/ ^5 e
+Figure 14
+In Ground Effect Vortex Ring Representation
+deflections. The flap deflection angle to be analyzed was
+a program-prompted input.
+With the averaged dynamic pressures and drag coeffi-
+cients determined, all that remained to be done, for
+download or drag considerations, was to determine an appro-
+priate surface area. Due to the fact that the points used
+to arrive at the averaged dynamic pressure were separated
+by one foot, this one-foot length was multiplied by 5.25
+feet, the aircraft wing chord. This 5.25-square-foot area
+was used between the vortex system centerlines, as the
+rotors are positioned on the wing tips of the aircraft.
+Each averaged dynamic pressure was then multiplied by a
+5.25-square-foot-area and the appropriate drag coefficient,
+depending on the flap deflection angle, to arrive at a
+
+
+--- PDF_PAGE 53 ---
+44
+component of drag or download. The drag components across
+the wing were then summed to arrive at a total value of
+drag. The resulting total drag or download value was then
+divided by the total rotor-produced thrust, determined by
+the thrust coefficient being investigated. This gave
+results for download as a percentage of total aircraft
+thrust. Listings of both the calibration and download
+versions of the XV-15 program are included in Appendixes D
+and E.
+Velocity Profiles
+During the formulation of the propulsion system com-
+puter simulation program, it was necessary to check each of
+the velocity components against published values (Deckert
+and Ferry, 1960) before the total velocities were computed.
+This was done in order to check the accuracy of the values
+from the computer program. The published values are
+presented as numbers that are dependent on the rotor radius
+to vortex ring radius (r/r1) ratio and also on the distance
+between the point at which the velocity is being calculated
+and the vortex ring centerline to vortex ring radius (x/r1)
+ratio. The published numbers are then multiplied by two
+pi, the vortex ring radius (r1) and divided by the circula-
+tion strength to arrive at the velocity value. Manually
+calculating these two ratios and knowing the circulation
+strength permitted a spot check of some of the number of
+velocity components that resulted from the computer program
+against the published values. When these values agreed, it
+
+
+--- PDF_PAGE 54 ---
+45
+was concluded that the program was functioning correctly
+and the correct total velocity at each point would result.
+An interesting intermediate result was obtained when
+the program was next set up to calculate the total axial
+velocity at each point along the line between the two rotor
+centerlines. These results produced a two-dimensional
+cross section of what was theoretically occurring to the
+rotor airflow due to the proximity of the rotors and the
+geometry of the installation. The resultant total axial
+velocities were bilaterally symmetric and are presented for
+each of the three thrust coefficients in Figures 15, 16,
+and 17.
+
+
+--- PDF_PAGE 55 ---
+46
+60-i
+upwath
+V, (fl/s«c) O
+downwash
+100-
+125
+16
+h/d«0.5
+20
+X(ft)
+Figure 15
+Computer-Generated Velocity Profile,
+Ct = .0094
+
+
+--- PDF_PAGE 56 ---
+47
+•pwa*h
+V. (ft/»*c) O
+downwach
+100-
+125
+h/d«O.5
+20
+Figure 16
+Computer -Generated Velocity Profile,
+C. = .01
+
+
+--- PDF_PAGE 57 ---
+48
+80-
+125
+-h/da o.S
+16 20
+X(tt)
+Figure 17
+Computer-Generated Velocity Profile,
+Ct = .0105
+
+
+--- PDF_PAGE 58 ---
+CHAPTER 4
+Model Test
+After it was determined that the velocity values from
+the computer program were accurate, it was desirable to
+formulate a test for the download aspect of the program to
+demonstrate its validity. This was accomplished by using a
+model rotor system, a schematic of which is presented in
+Figure 18.
+-X»v-/x
+Rnovtible
+Flat Pine
+J Bladrd ftotor
+[Itctric Motor
+Figure 18
+Model Rotor Test Setup
+The model consisted of a 1.135-foot radius, fixed
+collective pitch rotor. The rotor had no provisions for
+cyclic pitch. The rotor was powered by a small DC motor
+that was powered by an instrumented power source. Power
+was transferred from the motor to the rotor by a shaft and
+49
+
+
+--- PDF_PAGE 59 ---
+50
+gear system. The power that was input to the motor was
+monitored through the use of volt and ampere meters on the
+power source. The thrust output by the rotor was deter-
+mined through the use of a spring scale mounted at the
+opposite end of a statically balanced lever arm.
+The model rotor system was operable both with and
+without a flat plate "wing" section placed 1.5 inches below
+the rotor disk. It was thought that by operating the model
+system both with and without the wing installed, monitoring
+the power source, spring balance and rotor RPM, the down-
+load on the flat plate "wing" could be deduced.
+A computer program was formulated to simulate the/
+model performance. Both the calibration and download
+versions of the model program are included in Appendixes F
+and G. These programs were constructed in exactly the same
+manner as were the programs that modeled the XV-15.
+
+
+--- PDF_PAGE 60 ---
+CHAPTER 5
+Results and Discussion
+Experimental Download Analysis
+Values of rotor/wing download for the XV-15 Tilt Rotor
+Research Aircraft were deduced by combining the results
+from actual aircraft hover tests and wind tunnel tests of a
+representative two-dimensional wing section.
+The hover tests were conducted at NASA Ames Research
+Center in 1983. The aircraft was modified to allow the
+flap and flaperon control surfaces to operate as one. This
+provided the effect of a full span plain flap system. The
+aircraft gross weight was closely monitored and maintained
+within a 200-pound range. The rotor speed was held con-
+stant during the hover test points.
+The wind tunnel tests were also conducted at Ames
+Research Center, but in the Army 7-foot by 10-foot wind
+tunnel. These tests resulted in drag coefficients for an
+airfoil section that had a .25c operable flap and was
+tested at angles of attack near -90°.
+The values of the rotor/wing download that resulted
+from combining the data of these two tests are tabulated in
+Table 5 (page 24) and presented graphically in Figure 11
+(page 27). The values determined for the download phenom-
+enon ranged from 13.2% of total aircraft thrust (DL/T) for
+a 0° flap deflection to 8.5% (DL/T) for a 60° flap
+51
+
+
+--- PDF_PAGE 61 ---
+52
+deflection, both at a power coefficient (C ) equal to .001.
+While these results appear reasonable, they are larger than
+those previously predicted for the XV-15 download phenom-
+enon. Investigation of past studies that analyzed the
+download phenomenon, however, revealed that the magnitude
+of the resulting download values has increased. Thus the
+larger values produced by this study agree with the trend.
+However, there are some aspects of the experimental anal-
+ysis that merit investigation.
+The XV-15 was not flown in its regular configuration
+for the hover tests used for this study. A special modifi-
+cation was made to the flap/flaperon system so they could
+be deflected as one control surface. Thus, the data taken
+for this study reflect an XV-15 aircraft with a full span
+plain flap instead of the actual flap/flaperon system.
+While some data exist that reflect the actual flap/flaperon
+system, the limited number of test points and data scatter
+prevent a comparison to the full span plain flap data.
+Hence, as a result of this study, it can be deduced that
+the actual download for the XV-15, in the nominal hover
+configuration (40° flap/25°flaperon) lies between the 25° full
+span plain flap value of 11.5% DL/T and the 40° full span
+plain flap value of 10.4% DL/T. Hence, more OGE hover
+tests of the XV-15 with the "as-built" flap/flaperon sys-
+tem, at various angles of deflection, are required to
+narrow this download range and better define the XV-15
+download.
+
+
+--- PDF_PAGE 62 ---
+53
+The wind tunnel tests of the two-dimensional wing
+section, while providing valid results for the "as tested"
+configuration, did not adequately model the actual flow
+field in the vicinity of the aircraft. Since the tests
+have been completed, more understanding has been developed
+about the flow field that exits about the XV-15. A region
+exists, midway between the rotor centerlines, where there
+actually is an "upwash." This is caused by the radial
+components of the rotor wakes that travel along the wing
+span and intersect in the vicinity of the aircraft center-
+line, turning upward. This flow phenomenon was validated
+in the subsequent computer simulation model of the XV-15
+done for this study. The existence of this upwash is
+documented in the velocity profile plots (Figures 15, 16,
+and 17). Due to this fact, and another more obvious limi-
+tation, the extension of the two-dimensional drag data to
+adequately represent the aircraft wing drag is question-
+able. The more obvious limitation is encountered in the
+process of transforming two-dimensional airfoil section
+data to reflect three-dimensional characteristics. While
+the transformation of sectional data to reflect wings of
+finite aspect ratio is, in general, easily accomplished, it
+is not so in this case. A better representation of the
+airflow about the wing of the XV-15 must be established in
+order to obtain more closely representative drag data. It
+is believed that tests must be performed with a wing,
+instrumented to obtain force and moment data, placed
+
+
+--- PDF_PAGE 63 ---
+54
+downstream and in between two contra-rotating prop-rotors.
+Whether this test is run with scale-model or actual-size
+hardware, it would further the understanding of the wing
+drag characteristics as they apply to the XV-15 configura-
+tion.
+The assumption that the download-to-thrust (DL/T)
+ratio was a constant for a given flap angle deflection was
+found to be accurate when applied to a constant C anal-
+ysis. The download-to-thrust ratio was found to actually
+increase slightly with increasing power coefficient, but
+this increase amounted to only 2% over a range of C
+from .0006 to .0015.
+A method that more accurately predicts the engine
+exhaust jet thrust must be developed. The method used for
+this study relied on the assumption that the average inflow
+velocity, as predicted by simple momentum theory, ade-
+quately represented the velocity in the vicinity of the
+engine inlet. To better understand the engine inflow
+velocity, pressure surveys of that area should be per-
+formed. The magnitude of the exhaust thrust, however, was
+small enough that its contribution to the analysis was
+minor.
+The correction of the power polar (C vs. C. )
+algorithm to reflect the nonlinear aerodynamic effects at
+high C values also deserves more study and validation.
+
+
+--- PDF_PAGE 64 ---
+55
+Model Test Analysis
+The model test and subsequent computer simulation of
+the model did not supply results with the desired preci-
+sion. The results that were produced, however, compare
+favorably. The model test resulted in a download-to-thrust
+(DL/T) ratio of 11.2% of rotor thrust at a thrust coeffi-
+cient of .0075 and an H/D ratio of infinity. The computer
+simulation of the model, however, produced a DL/T ratio of
+approximately 9.7% for the same conditions. The difference
+(approximately 13%) between the two values could be attrib-
+utable to a few factors.
+First is the validity of taking two-dimensional drag
+data and applying it to a three-dimensional test. The drag
+coefficient for the computer simulation was taken to be
+1.98 based on the literature reviewed (McVeigh, 1985).
+This represented a flat plate oriented perpendicular to the
+flow (i.e., an angle of attack of -90°), tested at Reynold's
+numbers between 10,000 and 1,000,000. Since there were no
+provisions on the model setup to measure the velocities
+that occurred at the wing surface, a determination of the
+test Reynold's number was not possible. It is also thought
+that a better understanding of the drag characteristics
+should be obtained. This would allow the computer program
+to model more precisely the actual test conditions. A
+model system should be built and tested that incorporates a
+wing, instrumented to provide force and moment data, sepa-
+rate from the rotor force system. This would allow direct
+
+
+--- PDF_PAGE 65 ---
+56
+measurements and correlation of the download force on the
+wing and the rotor-produced thrust.
+While some of the aspects of the model test could
+benefit from further refinement, the test provided an
+interesting result. The comparison between the model test
+and computer simulation did show, in this case, that the
+computer simulation provided a lower estimate of the down-
+load than did the model test. This provided the valuable
+information that the computer simulation predicts lower
+download values than those which actually occur. Extended
+to the aircraft simulation program, this means that the
+magnitude of the actual download is at least as large as
+the analytically determined download.
+Analytic Download Analysis
+This aspect of the study was developed with contribu-
+tions from a number of sources. The main component of the
+study was the theory involved in modeling an aircraft rotor
+system's airflow through the use of vortex ring theory.
+Formulas were developed that modeled the rotor wake
+contraction downstream of the rotor disk (Equation 26) and
+also allowed for adjustment of the time spacing of the
+vortex rings in the wake (Equation 36). A formula was also
+obtained that allowed determination of the needed vortex
+ring circulation strength (Equation 25). Then, beginning
+with the Biot-Savart law, a formula was developed that
+permitted calculation of the axial velocity component due
+to each of the vortex rings (Equation 36). The velocity
+
+
+--- PDF_PAGE 66 ---
+57
+components were then summed and used in conjunction with
+the aforementioned wind tunnel drag coefficients to arrive
+at download values. This analysis was performed for three
+different thrust coefficients and four H/D ratios for each
+thrust coefficient. These download values are tabulated in
+Table 6. Figure 19 is presented to show the effect that
+different H/D ratios had at a constant thrust coefficient
+of .0094 on the theoretical download values. The effects
+that different thrust coefficients had on the download
+results were too small to allow an adequate graphic com-
+parison. The range of download values for this method of
+analysis varied from 14.44% DL/T for a 0° flap deflection to
+9.233% DL/T for a 60° flap deflection, both at H/D equal to
+infinity and C equal to .0105. Changing the H/D ratios
+from infinity to 0.5 had the effect of reducing the DL/T
+ratio by from 5% to 7%. There are, however, a few aspects
+of this method of analysis that warrant further investiga- -
+tion.
+The method by which the circulation strength of the
+vortex rings was determined requires further investigation
+and refinement. The velocity components that were computed
+using this method are directly proportional to the circula-
+tion strength, hence the circulation strength is an
+important parameter. While the method presented seems
+rational, it is thought that other, factors that were not
+investigated could affect the circulation strength. One
+such aspect is the assumption that the circulation strength
+
+
+--- PDF_PAGE 67 ---
+58
+Table 6
+Analytic Download
+Cfc h/D
+00
+.0094 2.0
+1.0
+0.5
+00
+.01 2.0
+1.0
+0.5
+00
+.0105 2.0
+1.0
+0.5
+V°°
+14.429
+13.848
+11.919
+7.368
+14.424
+13.807
+11.717
+7.567
+14.440
+13.784
+11.794
+6.625
+T <*>«f=20°
+12.919
+12.403
+10.691
+6.632
+12.914
+12.366
+10.511
+6.811
+12.928
+12.345
+10.579
+5.967
+T'«fMO°
+11.241
+10.797
+9.325
+5.814
+11.236
+10.765
+9.170
+5.970
+11.248
+10.747
+9.229
+5.236
+Y (*)1 fif=45"
+10.737
+10.315
+8.916
+5.569
+10.733
+10 . 28 5
+8.768
+5.718
+10.744
+10.268
+8.824
+5.017
+T'«f=60°
+9.227
+8.869
+7.687
+4.833
+9.223
+8.844
+7.562
+4.961
+9.233
+8.829
+7.609
+4.360
+
+
+--- PDF_PAGE 68 ---
+59
+is -i
+14
+13
+12
+11 -
+10 -
+J»
+8 -
+i
+s -
+4 -
+3 -
+2 -
+Analytical XV-1» Download
+Showing H/D Relationship
+H/D « infinity
+H/D « 2.00
+H/D =1.00
+H/D = O.SO
+C, -= .0094
+20
+I
+40
+1
+60
+I
+80
+Flap Angle,
+Figure 19
+Effect of Hover Height on Analytic
+XV-15 Download
+
+
+--- PDF_PAGE 69 ---
+60
+remains constant in the vortex ring as it translates down
+the rotor wake, while it is believed that a decay of circu-
+lation strength actually occurs. In order to better
+resolve this issue, rotor tests that address the circula-
+tion strength phenomenon should be performed.
+The formula (Equation 26) that models the rotor's wake
+contraction as a function of downstream distance from the
+rotor disk also requires more investigation. Analytical
+methods have been produced since Equation 26 was developed
+in 1982 that more closely model the actual behavior of the
+wake downstream of the rotor disk. These methods should be
+incorporated into this type of computer simulation analysis
+to reflect the increased knowledge of rotor wake
+contraction. The constant, n, in Equation 26 should be
+investigated further to determine its control of the final
+wake shape and overall characteristics. It is thought that»
+a better method of solving for this constant could be
+devised and implemented in the analysis.
+The fact that this computer simulation concerned
+itself with only the airflow due to the two aircraft rotors
+and not any of the contributions due to the body effects of
+the aircraft itself sheds some doubt on the precision of
+the final answers. While the resulting values of download
+are reasonable, the inclusion of the aircraft body into the
+analysis would no doubt have an effect on the final
+results. For further study, the results of this analysis
+could be used in conjunction with a method that included
+
+
+--- PDF_PAGE 70 ---
+61
+the physical body of the aircraft to better understand the
+wake/body characteristics that contribute to the download
+phenomenon. This could also be extended to gain a better
+understanding of the sensitivity of the download to basic
+configuration changes of the aircraft body shape.
+While extension of the wind tunnel data to reflect the
+actual aircraft conditions is suspect, in the case of the
+computer simulation it is thought that the wind tunnel
+results adequately represent the situation that exists in
+the computer simulation. The computer simulation concerned
+itself with only the determination of the axial components
+of the velocity that exist on the upper wing surface.
+Since the wind tunnel tests essentially reflected only
+axial and not radial velocities, i.e., spanwise flow, it is
+thought that the results from the wind tunnel tests and
+computer simulation were compatible. Hence, the results
+from both tests, when combined, were thought to form a
+valid analysis procedure. Further tests should be per-
+formed to either validate this assumption or develop a more
+nearly correct means of representation of the flow charac-
+teristics .
+The intermediate results of the velocity profiles
+demonstrated the validity of the upwash phenomenon that
+occurs between the rotors along the aircraft centerline.
+This upwash has since been further validated through the
+use of flow visualization techniques applied to both the
+aircraft itself and model tests. The inclusion of this
+
+
+--- PDF_PAGE 71 ---
+62
+phenomenon in the download picture presents another factor
+to be considered.
+
+
+--- PDF_PAGE 72 ---
+CHAPTER 6
+Conclusion
+Analysis of the download phenomenon, which occurs when
+the XV-15 Tilt Rotor Research Aircraft is flying in the
+hover/helicopter configuration, was pursued utilizing two
+different methods. The download is a result of the air-
+craft's wing being in close proximity (approximately 5
+feet) and parallel to the two rotor disks. The download
+force has the direct effect of reducing the aircraft's
+useful hover load and hence is an important parameter when
+considering tilt rotor aircraft.
+The first analysis method utilized results from actual
+aircraft hover tests and wind tunnel tests of an XV-15
+representative wing section. The download results for this
+method ranged from 13.2% DL/T for a 0° flap deflection to
+8.5% DL/T for a 60° flap deflection, both at an H/D of
+infinity and a C of .001.
+The second analysis method relied on an analytical
+model of the aircraft's two prop-rotors and their asso-
+ciated airflow. The model was then used to determine the
+axial velocities that occur at the position which the
+aircraft wing occupies. By then applying the drag coeffi-
+cients from the aforementioned wind tunnel tests, download
+values resulted. A computer program was utilized for this
+analysis method. The results for this analysis method
+63
+
+
+--- PDF_PAGE 73 ---
+64
+ranged from 14.44% DL/T for a 0° flap deflection to 9.233%
+DL/T for a 60° flap deflection, both at an H/D of infinity
+and a C. equal to .0105. The analytical analysis was
+performed for each of three thrust coefficients (.0094,
+.01, .0105) and also included the investigation of four
+H/D (infinity, 2.0, 1.0, 0.5) ratios for each thrust
+coefficient. The effect that the different H/D ratios had
+on the download results was quite apparent. Reducing the
+H/D ratio from infinity to 0.5 had the effect of reducing
+the DL/T ratio by from 5% to 7%. However, the effect that
+the different thrust coefficients had was not pronounced
+enough to allow any conclusion to be drawn.
+A model rotor system was tested and analytically
+modeled in an attempt to validate the computer analysis.
+While the results did not agree with the desired precision,
+reflecting a 13% difference, the download results of the
+computer analysis were lower than those of the model test.
+This implied that the computer program predictions were
+within the lower bounds of the actual aircraft download
+values.
+This study does not represent the definitive download
+analysis. At the time that this report was written, there
+were at least two other separate studies being conducted in
+attempts to better define the XV-15 download issue. One
+study is utilizing a powered model of the XV-15 aircraft
+with wing surfaces instrumented to obtain force and moment
+data. An additional objective of this test is to
+
+
+--- PDF_PAGE 74 ---
+65
+investigate flow control, i.e., suction and blowing, and
+its ability to lessen the model download forces. Another
+study, utilizing the XV-15 aircraft, is attempting to
+establish a relationship between rotor thrust and hub
+spindle beam bending moments to resolve the download issue.
+It is thought that if this relationship can be established
+from data taken with the aircraft on the tie-down stand at
+NASA Ames Research Center, it can be applied to data
+recorded in free hover flight and download values will be
+determinable.
+The download phenomenon is an extremely important
+performance parameter for the tilt rotor family of air-
+craft. When viewed in a useful load context, the download
+can be responsible for large reductions in the aircraft
+hover weight capabilities. With the V-22 aircraft coming
+into production for military and even possibly civil appli-
+cations, more effort must be made to better understand and
+define the download phenomenon. It is only when a problem
+is fully understood and defined that intelligent attempts
+to deal with it are possible.
+
+
+--- PDF_PAGE 75 ---
+References
+Deckert, Wallace H.; and Ferry, Robert G. "Limited Flight
+Evaluation of the XV-3 Aircraft." Air Force Flight
+Test Center, Edwards AFB, CA, 1960.
+Dommasch, Daniel 0. Elements of Propeller and Helicopter
+Aerodynamics. New York: Pitman, 1953.
+Franklin, Philip. A Treatise on Advanced Calculus, 5th
+printing. New York: John Wiley and Sons, 1955.
+Gillmore, K. B. "Survey of Tilt-Rotor Technology
+Development," presented at AGARD Flight Mechanics
+Panel Meeting on Advanced Rotorcraft, NASA Langley RC,
+1971.
+Gessow, Alfred; and Myers, Garry C. Jr. Aerodynamics of
+the Helicopter, 6th printing. New York: Frederick
+Ungar, 1952.
+Hayden, James S. "The Effect of the Ground on Helicopter
+Hovering Power Required." United States Army Aviation
+Engineering Flight Activity, 1976.
+Hoerner, Sighard F. Fluid Dynamic Drag, 2nd ed. Great
+Britain: Published by the author, 1965.
+Jahnke, Eugene; and Emde, Fritz. Tables of Functions With
+Formulae and Curves, 4th ed. New York: Dover, 1945.
+Kuchemann, Dietrich; and Weber, Johanna. Aerodynamics of
+Propulsion, 1st ed. New York: McGraw-Hill, 1953.
+Magee, John P. "Download Estimation for JVX Technical
+Evaluation of Tilt-Rotor Configuration." Unpublished
+notes, 1982.
+"Tilt-Rotor Technology Thrusts." Society of
+Automotive Engineers Technical Paper Series, October
+1983.
+Maisel, M.; and Harris, D. "Hover Tests of the XV-15 Tilt-
+Rotor Research Aircraft." American Institute of
+Aeronautics and Astronautics, AIAA-81-2501, 1981.
+66
+
+
+--- PDF_PAGE 76 ---
+67
+Makofski, Robert A.; and Menkick, George F. "Investigation
+of Vertical Drag and Periodic Airloads Acting on Flat
+Panels in a Rotor Slipstream." NACA Technical Note,
+TN 3900, 1956.
+Marr, R. C.; Sambell, K. W.; and Neal, G. T. "V/STOL Tilt-
+Rotor Study, Volume VI, Hover, Low Speed and
+Conversion Tests of a Tilt-Rotor Aeroelastic Model."
+Bell Helicopter Company Final Report No. 301-099-002,
+May 1973.
+McVeigh, Michael A. "V-22 Tilt-Rotor Large Scale Rotor
+Performance/Wing Download Test and Comparison With
+Theory." llth European Rotorcraft Forum, September
+1985.
+
+
+--- PDF_PAGE 77 ---
+Appendix A
+Transformation from Equation 6 to Equation 7
+68
+
+
+--- PDF_PAGE 78 ---
+69
+_ W/+PL
+w " w
+W
+W+Dl-Di-
+\A/-t- DU
+W-^-DL
+T* W -»- OU
+So-
+W ; DA.
+X " T
+DL- "
+
+
+--- PDF_PAGE 79 ---
+Appendix B
+Empirical Adjustment to Power Polar to
+Reflect Nonlinear Aerodynamics Region
+70
+
+
+--- PDF_PAGE 80 ---
+71
+e procedure* ore tlap de$\eo-KorN a
+deper»«ier\-t- , 4ki* example, is 4or 4-Ue case o-f aero
+•flap deflec+ior\ ( i.e. , dj- O )
+Table J-, +V\e overage. s-Vuci«^ vo.\u«5 of
+ar\dl Cw are -
+w « .O003
+C^ u»oo\<l e^ual 44^e norx-
+l«*r\e««" Cvrf Sto^y value, plu^ -t-Ke Cp
+= .OO?77
+w = .OJL007^^" J *A.J
+A/cxr ( +He linear irvf erpo/arion e^uofion (£0^.81 i's
+used +o calcoia-te- -Fhe li'near Cw vait/e a+ a C P
+V3
+f. 0100?)
+o-f .OOJL " a
+•*-kis linear C^ value., a-f -t-Ke. cieslred Cp ,
+projec-J-ed back -ho re-Flee.+" -rke. nonl'
+. From PiQure 5", a-f- Cp-.ooJ. -
+Cw * . OOOJ.S'
+
+
+--- PDF_PAGE 81 ---
+72
+^Cw
+c
+
+
+--- PDF_PAGE 82 ---
+Appendix C
+Development of the Biot-Savart Equation
+to Determine the Axial Velocity
+Component Due to a Vortex Ring
+73
+
+
+--- PDF_PAGE 83 ---
+- P
+L f
+r J- XV r*+ 1 -4lTr i.i^^<.2rco*(4-
+XV
+-r
+4-irr
+xv
+=/«air
+-r f
+4irr'J
+-r
+4lTt
+air
+fA=J
+74
+'cos
+arr
+1 ) (rcosC^-^O-j.)
+r' Vx*+0-*Afiy><r-;».V-] J /T 2rCco»^-^'WJ] ' f"« 2rCl
+oN1" KV(rti^ r x
+L£i^lf<bsL}ll
+x%(^x^ J
+
+
+--- PDF_PAGE 84 ---
+75
+-tKe expression 4or Tj. i* developed —
+j. * I ^^^"^^^**^"""^™*y
+2TT
+'JjI^dZ 2f[l-<o*<4-4<^
+x^fr-l)- J
+or ike.
+.'-^ -tVe.
+OJ1
+- J
+JL
+/. 2rCco&(0-^tJL [ x'-t-^t- -3.^t2r-
+I/ xVCr^)3- [ xVrr-
+b<L
+iU- cVr*-i^ [ nVrx-2rf J.-2rt2»- J
+1
+/. 3i-Cco»r0-0'Uxl ' f xVCfi-A.>)"-2rCco&^-^') + -L
+V-2" ^vCr^-jL^ I xt-i-Ct-+i.^-4r-
+
+
+--- PDF_PAGE 85 ---
+76
+-u./ > / ».—
+-•)fJ-3 1
+i>" J
+4-r
+•JX-4r[x^C)-. "
+1-
+4r
+I
+*** 2. / \ v* ^" * » i . ^ \
+«. _ 4-r
+K as
+2TT
+re-ducecl -ho —
+2TT
+c(qS
+-tke rvurvxara+or o-F i-Ue lefi-
+devc.1 oped
+t^d in-*-€.ora.l t'
+
+
+--- PDF_PAGE 86 ---
+77
+So tV\e t
+consider Q. cKa^AC. of
+Let
+Cos
+r ~
+o
+CoS
+And
+Also -for
+for- -'*
+TKe paciK arf
+be. cK«^^ci€ci Vo fro^ C? ) W2^ )
+
+
+--- PDF_PAGE 87 ---
+78
+•ho tke. re«,o\-Va«^-t- value, o-f -rUe ir%-fe«ra,l doe •*-»
+p<r»'odi'o no-fore o-f -fVve. »rrte<»rav\3 air%cJ-ti\e -fac.1-
+a^Ks Cover TT rq<JiG»\5 .
+"*^e. p^K c<**^ als
+value of
+O -to
+l-Zcic*) ^,^\l 2.4*
+, »1* " r(Z)|//| u«v x. U»
+'^ ^ J Jtf ^ J
+The. arc as co»v\ple-t-e.
+cxo f ^- a _i/ Si^ o^ a
+"/ ll , 3.
+-/ -\/I-klSin
+('Isr ^,-
+
+
+--- PDF_PAGE 88 ---
+79
+o
+-for XA
+- OCkY) -
+Ar\<i -t-ke relai»o*^ -for -tVie axVa.1 vjeloc.i'4-y
+Ar
+A— r
+
+
+--- PDF_PAGE 89 ---
+[ afr+^ECk^ ^[af-llKaO + ea^
+^ xN-fr-iV- " KVx^Ci-a-V)
+J
+subs-H'-Kj-Ht^ A -t-is "^
+< F/
+Ml
+K -
+c. -fUi's i^>
+80
+
+
+--- PDF_PAGE 90 ---
+81
+o-f
+be. Solved -Hxkeb rke. -Por»*\ -
+
+
+--- PDF_PAGE 91 ---
+Appendix D
+Calibration Version of XV-15
+Computer Program
+82
+
+
+--- PDF_PAGE 92 ---
+83
+ORIGINAL PAGE IS
+OF POOR QUAUTY
+ccC THIS PROGRAM IS DESIGNED TO SIMULATE THE XV-IS ROTOR SYSTEWI PERFORMANCE
+C THROCC8 THE USE OF A VORTEX RING ANALYSIS. THIS PROGRAM I SI BASED OR
+C A CONSTANT ROTOR TIP SPEED OF) 766.38 RVSEC AND CAR PERrORKVTHE
+C ANALYSIS FOR THREE DIFFERENT THRUST COEFFICIENTS C .««»4. .61S .«103) .
+C THIS PARTICULAR PROCRAH VERSION WAS DESIGNED TO CALIBRATE THE VORTEX
+C RING SPACING FACTORi (K) AND HENCE MODELS ONLY ONE ROTOR OF THE SIDE
+C BY SIDE ROTOR SYSTEM. THE VALUE FOR K IS AR INPUT PARAMETER IN THIS
+C PROGRAM AND IS VARIED UNTIL AH AVERAGE INFLOW VELOCITY.THAT:AGREES
+C WITH THAT PREDICTED BY SIMPLE MOMENTUM THEORY. I.e.. V*Vtlp<CtX2. )»«.8.
+C IS OBTAINED.
+C DUE TO THE FACT THAT THE AVERAGE INFLOW VELOCITY AT THE ROTOR DISK
+C IS WHAT'S DESIRED. THE POINTS'AT WHICH THE VELOCITIES ARE CALCULATED
+C LIE ALONG A LINE WHICH 18 COINCIDENTAL WITH THE ROTOR PLANE'.
+C
+C
+C
+C
+C********************
+C
+cC LIST OF VARIABLES:
+C
+C K VORTEX RING' SPACING FACTOR
+C B ROTOR SPEED (SEC/REV)
+C F(I> TINE BETWEEN VORTEX RINGS (SEC)
+C (BASED ON THREE RINGS-PER REVOLUTION)
+C CT< I) CORRECTED TIME BETWEEN VORTEX RINGS (SEC) I
+C (K»F(I»
+C Z( I > THE POSITION OF EACH VORTEX RING. DOWNSTREAM
+C OF THE ROTOR DISK. AS A FUNCTION OF CORRECTED
+C TIME (FT)
+RR( I ) VORTEX RING. RADIUS (FT)
+C (A FUNCTION -OF ROTOR GEOMETRY AND DOWNSTREAM
+C POSITION)
+C TWH. THE TOTAL NUMBER OF VORTEX RINGS CONSIDERED
+C IN THE ANALYSIS
+C A TOE VORTEX RING CIRCULATION (FTM2XSEC)
+C CT THRUST COEFFICIENT (THnUSTx<nHO»AREA»VHp*»2. »
+C L THE DISTANCE BETWEEN THE ROTOR AXIS AND THE
+' pom WHERE:TDE AXIAL VELOCITIES ARE BEINGCALCULATED (FT)
+C J THE ABSOLUTE VALUE OF POINT (FT)
+C X THE RATIO OF VORTEX RING DOWNSTREAM POSITION
+C TO RING RADIUS (Z(I)'RR(I»
+C R TOE RATIO OF J TO THE: RING RADIUS
+C <RAD/RR( I))
+C S.T.U.E.B.C.CIRC..COMPONENTS OF THE EQUATION USED TO DETERMINE
+C THE AXIAL VELOCITY DUE TO EACH RING (FROfT:
+C 'AERODYNAMICS OF PROPULSION* .KUCBEHANN 6 WEBER.
+C 1933)
+C P.D INTERMEDIATE STORAGE VARIABLES
+C V(H.II) THE COMPONENT OF THE AXIAL VELOCITY AT POINT
+C H DUE TO RING N (FTxSEC)
+C VTOTII ) THE TOTAL AXIAL VELOCITY AT EACH OF 31 POINTS
+C DUE TO SUKJ1 IMC THE COMPONENTS FROM EACH VORTEX
+C RING (FTXSEC)
+
+
+--- PDF_PAGE 93 ---
+84
+ORIGINAL PAGE IS
+OF POOR QUAUTY
+C VAVC THE SUM OF THE AXIAL VELOCITIES1.ALONG THE ROTOR
+c DISK <rrvsEc>c VDIST. THE AVERAGE:-.INFLOW VELOCITY ALONG THE ROTOR DISKC (FTXSEC)
+C
+C
+cc IRTCCER TITO
+REAL K.KT(72> ,RR<72>,2(72) ,FC72) ,VTOT<31) ,V(31.72)
+C
+C
+ccC THE VALUE TO BE USED FOR THE VORTEX RING SPACING FACTOR (K) IS
+C FIRST READ IN AND THE USER IS PROMPTED FOR THE DESIRED THRUST
+C COEFFICIENT (CT).
+C
+C '
+C
+C
+WRITE(6.4)
+4 FORlttTC WHAT K VALUE WILL BE USED?1 >
+READ(3.3)K
+3 FORrtAT(C12.3>
+WHITE<6.9)
+9 FORHATC WHAT THRUST COEFFICIENT (CT) WILL DE USED?')
+WRITE<6.11)
+II FORHATC ( .0094. .91. .9I93)?')
+R£AD(3.ie>CT
+10 FORMAT<C12.5>
+C
+C
+C
+C
+C NEXT. BASED ON A ROTOR SPEED OF 76(1.38 FT/SEC (.1022 SEC'REV). TBE
+C TIME SPACING OF TUE1VORTEX RINGS IS CALCULATED USING THE INPUT RING
+C SPACING FACTOR (K).
+C
+C
+C
+C
+B=.1022
+DO 29 1=1.72
+KT<I)-K»F(I)
+29 CONTINUE
+C
+C
+C»
+C
+C
+C DEPENDING ON VHICH THRUST COEFFICIENT WAS SELECTED. AN IF/TBEN
+C STATEMENT SETS THE PROPER VALUE OF VORTEX RING CIRCULATION AND
+C TRANSFERS CONTROL TO TBE APPROPRIATE INTERPOLATING POLYNOMIAL.
+C
+
+
+--- PDF_PAGE 94 ---
+85
+ORIGINAL PAGE IS
+iDF POOR QUALITY
+cc IF<CT.E0..0094> THEN
+A*189.08
+CO TO 23
+ENDIF
+IFCCT.EO..91> THEN
+A-201.16
+CO TO 30
+ENDIF
+IFCCT.EO..8163) THEN
+A*2II.22
+CO TO 33
+ENDIF
+C
+C
+C
+C
+C DEPENDING ON WHICH THRUST COEFFICIENT WAS SELECTED, ONE OF THREE
+C INTERPOLATING POLYNOMIALS IS USED TO CALCULATE THE DOWNSTREAM
+C POSITION OF EACH VORTEX RING AS A FUNCTION OF TIME. EACH VORTEX
+C RING'S RADIUS IS ALSO CALCULATED AS A FUNCTION OF RING DOWNSTREAM
+C POSITION.
+C
+C
+C
+C
+29 DO 40 !•!.72
+Z<I)*-63.833*KT< I )«3.»208.424«KT( I )«»4 .-242.399«KT< I )»»3.
++ +I20.798»KT<I>»»2.»73.9I2»KT(I)
+RR( I ><a.B373*SORT( \ .'( . 3* < 2 .-£XP< - . 69312»Z( I » »)
+40 CONTINUE
+CO TO 24
+C
+C
+C
+30. DO 43 I=1.72
+Z< I1--6B.I32»KT(I)»»3.+22l.77»KT<I>*»4.-236.8O6»KT<I)»»3.
+» «I26.62»KT<1)»«2.+78.083«KT(I)
+RR( l>»a.8373»SORT( I ./\. .3»<2 . -EXP(- .093 I2»Z( I » ) ) )
+40 CONTINUE
+CO TO 24
+C
+C
+C
+33 DO 30 I-I.72
+Z(I)'-64.74«»KT(I)»»3.»2II.7S6»KTCI)«»4.-247.2l9»KT(I)»»3.
+* *I23.687»KT(I)*«2.»81.398»KT(I)
+RR(l><a.8373«SORT<l .x( .3«(2.-EXP(-.09312*Z( I » » )
+30 CONTINUE
+C
+C
+CCC THE TOTAL IWMBEH OF RINGS TO BE USED FOR THE ANALYSIS CTNR) AND
+C THE POSITION OF TBEIFIRST POINT. AT WHICH TEE AXIAL VELOCITIES ARE
+
+
+--- PDF_PAGE 95 ---
+86
+ORIGINAL PAGE IS
+OF POOR QUALTTY
+C TO BE CALCULATED. WITH RESPECT TO HIE ROTOR AXIS ARE READ IN.
+C
+C
+C
+C
+24 TNR-72
+L«-13
+C
+C
+C
+C
+C TWO DO LOOPS ARE USED TO CALCULATE EACH VORTEX RING'S AXIAL.
+C VELOCITY COHPOHEHT AT EACH POINT OF INTEREST. THE INNER LOOP
+C CALCULATES THE VELOCITIES FROM EACH OF THE RINGS AND THE OUTER LOOP
+C INCREMENTS THE POINT AT VHICHiTHE VELOCITIES ARE CALCULATED*.
+C
+C
+C
+C
+DO 63 fl'1,31
+C
+DO 70 N'l.TNR
+IF(L.LT.O)J«-L
+lF(L.CE.e>J=L
+X«-Z(N)XRJUN>
+T«ALOC<4.X<I.-S>»«.S1-
+U«T»«T-I .)X4. )«(! .-S)*<<».X64.)»(T-(7.X6.
+3)»( I.-S))»(3.XI6.)»(T-(I3./
+B+l . )*«2. )»«.3
+D«U*C»E
+P«B»D
+CIRC'AX<2.»3. I
+V(H.N)-CIRC*P
+78 CONTINUE
+C
+L=L+I
+C
+63 CONTINUE
+CC _ _ ____
+C
+C
+C THE VELOCITY COHPONE1TTS DUE TO EACH OF THE VOBTEX RINGS ARE NO1-'
+C SUHHED TO ARRIVE AT A .TOTAL AXIAL VELOCITY AT EACH POIJTT OF-,
+C INTEREST
+C
+C
+C
+C
+DO 73 J't .31
+DO 76 IM.TNH
+VTOT(J)=VTOT(J)+V( J. I )
+76 CONTINUE
+
+
+--- PDF_PAGE 96 ---
+87
+ORIGINAL PAGE IS
+OF POOR QUALITY
+73 CONTINUE
+cc
+ccC THE TOTAL AXIAL VELOCITY AT EACH POIKT OF INTEREST IS HOW PRINTED
+c OUT ALONG WITH THE ASSOCIATED VALUE OF VORTEX RING SPACING FACTORC (K). THRUST COEFFICIENT (CT). AND THE mmBCH OF VORTEX RINGS USED.
+C
+C
+cc WRITE<6.83)K.CT.TNR
+85 FOHHATdX.' FOR K«' .F7.6. • . CT='.F3.4.
++ ' AMD'.IX.12.' VORTEX RI DCS')
+WRITE(6.96)
+9e FORHATUX.1 THE TOTAL AXIAL VELOCITY AT EACH POINT ALONG A LINE' )
+WRITE<6.93)
+93 FORHATUX.' COINCIDENTAL W1TB THE PLANE OF TOE ROTOR IS:' )
+DO 97 J'I.31
+WHITE(6.96>J.VTOT<J)
+96 FORHATCX.2X.3BVrrOT(.12.2II)*.C12.S>
+97 CONTINUE
+C
+C
+C
+C
+C SINCE FOR CALIORATION PURPOSES THE AVERAGE VELOCITY ALONG THE ROTOR
+C DISK IS WHAT'S OF PRIME IMPORTANCE. TUAT VALUE IS NOW CALCULATED
+C AND OUTPUT.
+C
+C
+C
+C
+DO 69 l«4.28
+VAVC=VAVC»VTOT( I)
+69 CONTINUE
+VDISK=VAVC/23.e
+WRITE(6.7I)VDISK
+71 FORMATS.' TDE AVERAGE INFLOW VELOCITY IS'.IX.F5.2.' FT'SEC" )
+STOP
+END
+
+
+--- PDF_PAGE 97 ---
+Appendix E
+Download Version of XV-15
+Computer Program
+88
+
+
+--- PDF_PAGE 98 ---
+89
+ORIGINAL PAGIE FS
+OF POOR QUALITY
+ccC THIS PROGRAM 19 DESIGNED, TO SIMULATE THE PROPULSION SYSTEM OF THE
+C XV-13 AIRCRAFT. THROUGH THE USE OF A VORTEX RING ANALYSIS. FOR THE
+C PURPOSE OF DETENU KING THE ROTOR GENERATED WING DOWNLOAD THAT OCCURRS
+C in THE HOVER CONFIGURATION. THE PROGRAM IS BASED ON A CONSTANT ROTOR
+C TIP SPEED OF 768.36 FT/SEC AND DTI LIZES'THE PREDETERMINED VORTEX RING
+C SPACING FACTOR K. TUE PROGRAM, COMPUTES'-THE AXIAL VELOCITY COMPONENTS
+C DUE TO EACH VORTEX RING AT A POSITION WHERE THE AIRCRAFT VIHC WOULD
+C BE. 4.67 DOWNSTREAT FROM THE ROTOR DISKS. THE COMPUTATION IS BEGUN
+C 33 FEET FROM THE AIRCRAFT LONGITUDINAL CENTERLINE AND PROCEEDS IN
+C I FOOT INCREMENTS UNTIL A POSITION 33 FEET ON THE OPPOSITE SIDE OF
+C THE AIRCRAFT CENTERLINE IS REACHED. THE AXIAL VELOCITY COMPONENTS
+C FROM EACH VORTEX RING BEING CALCULATED AT EACH OF THE INCREMENTAL
+C STEPS. THE TOTAL VELOCITY. THE SUMMATION OP ALL THE AXIAL COMPONENTS
+C IS THEN AVERAGED BETWEEN EACH'TWO SUCCESSIVE POINTS AND THIS AVERAGED
+C VELOCITY IS THEN USED TO CALCULATE A FORCE (DOWNLOAD) COMPONENT.
+C THE FORMULA USED IS'F*.3»RUO»VBAR*x2.*SxC4. THE SURFACE
+C AREA <S> IN THE FORMULA 16 TAKER TO BE A I FOOT CHORD SECTION
+C MULTIPLIED BY THE AIRCRAFT WING CHORD. 3.23 FEET. THE DOWNLOAD
+c conruTATion is ONLY PERFORMED USING TDK COMPUTED VELOCITIES-THATC LIE BETWEEN THE ROTOR CERTERLIHES. TDISiDEINC THE ONLY AREA THAT IS
+C ACTUALLY AIRCRAFT WING. THE DOWNLOAD IS THEN SUMMED AND DIVIDED BY
+C THE TOTAL ROTOR PRODUCED THRUST TO ARRIVE AT DOWNLOAD AS A PERCENT OF
+C ROTOR THRUST. THE PROGRAM IS-DESIGNED TO SIMULATE A NUMBER! OF HOVER
+C CONFIGURATIONS. ANY OF THnZT THRUST COEFFICIENTS « .9994. .61 . .»I63)
+C CAN BE -USED AS ANY OF FOUR ROTOR HEIGHT ABOVE GROUND TO ROTOR DIAMETER
+C <HXD> RATIOS <HxD-I«FlNITY <OOT OF GROUND EFFECT. OCEI. HxD<2.« <IN GROUND
+C EFFECT. ICE). HxD'I.O ICE. AND HxD'O.S ICE). THE PROGRAM ALSO HAKES
+C USE OF DRAG COEFFICIENTS DETERMINED FROM WIND TUNNEL TESTS IN WHICH
+C A WING. REPRESENTATIVE OF THE'XV-13 WING. WAS ALIGNED WITH ITS CHORD
+C PERPENDICULAR TO THE FREE STREAM VELOCITY. THE WINC WAS EQUIPPED
+C WITH FLAPS. ALSO REPRESENTATIVE OF THE XV-13, AND TESTED SO AS TO
+C DETERMINE DRAG COEFFICIENTS CORRESPONDING TO DIFFERING DECREES OF FLAP
+C DEFLECTION. THE DRAG COEFFICIENTS ARE UTILIZED HERE AND HENCE GIVE
+C THE PROGRAM THE CAPABILITY OF ANALYZING ANY OF FIVE FLAP DEFLECTION
+C CONFIGURATIONS <».2O.4«.43 8 6« DECREES).
+C
+cC***xx***xtt*xxx*xxxxxxxxxxxxxx*xx**xxxxxxx*xxxxxxxxxx*xx*Xttxxxx
+C
+C
+Cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx»xxxxxxxxxx*xxxxx»xxx»»x*x«x*
+ccC LIST OF VARIABLES:
+C
+I! CT THRUST COEFFICIF.NT <T/lRnOxA»Vtxx2. »
+r. BSD ROTOR HEICDT ABOVE CHOUND PLANE TO ROTOR
+C DIAMETER RATIO
+C FLAPSET THE DECREES OF WING FLAP DEFLECTION <DEC>
+C CD DRAG COEFFICIENT
+C A VORTEX RING" CIRCULATION (FT»»2./SEC>
+C K VORTEX RING SPACING FACTOR
+C a ROTOR SPEED (SECxREV)
+C F( I ) TIME BETWEEN HOTOR DLADE PASSAGES (SEC/REV)
+C KT( I ) CORRECTED TIDE DETVEEN VORTEX RING SUCDDINC
+C (K*F(I» (SECxREV)
+C Z(l ) THE POSITION OF EACH VORTEX RING. DOWNSTREAM OF
+
+
+--- PDF_PAGE 99 ---
+90
+C THE ROTOR BIST. AS * FU1TCT10R OF CORRECTED TINE
+C <FT>
+C RRCl) VORTEX RING RADIUS «FT) (A FUNCTION OF ROTOR
+C GEOMETRY AND VORTEX RIHC DOWNSTREAM POSITION
+C COORD< I ) THE DOWNSTREAM POSITION OF THE VORTEX RINGS WITH
+C RESPECT TO THE XV-15 WINC POSITION <FT)
+C HOVERD THE RATIO OF ROTOR HEICOT ABOVE GROUND PLANE
+C TO ROTOR DIAMETER (H'D)
+C NUMBING THE NUMBER OF VORTEX RINGS. FOR AN IB GROUND
+C EFFECT (ICE) HOVER CONDITION. THAT ARE NEEDED TO
+C SATISFY THE PRESCRIBED ROTOR HEICITT TO DIAMETER
+C RATIO POSITIONING OF THE GROUND: PLANE.
+C Tim THE TOTAL NUMBER OF VORTEX RINGS USED IN TDE
+C ANALYSIS (DICTATED BY THE HOVER CONDITION!
+C TWICENR THE NUMBER OF THE VORTEX RING THAT CORRESPONDS-
+C TO TDE MIRROR IMAGE OF THE FIRST VORTEX RING
+C FROM THE HI CUT ROTOR (ICE HOVER)
+C THREEWH THE NUMBER OF THE FIRST VORTEX RING FROM THE LEFT
+C ROTOR < ICE HOVER)
+C RS THE TOTAL NUMBER OF VORTEX RINGS ON TUE RIGHT SIDE
+C (ICE HOVER)
+C LS TDE RUMQER OF THE FIRST VORTEX RING ON THE LEFT SIDE
+C (ICE HOVER)
+C L THE DISTANCE FROM TIIE AIRCRAFT LONGITUDINAL CENTER-
+C LINE TO THE POINT AT WHICH THE AXIAL VELOCITIES ARE
+C CALCULATED (FT)
+C RAD TUE DISTANCE FROM THE AIRCRAFT LONGITUDINAL CEBTER-
+C LIHE TO TUE ROTOR CEBTERLIBES (FT)
+C X THE RATIO OF VORTEX RING DOWNSTREAM POSIIOfl TO RIBC
+C RADIUS (Z(l)xRR(l))
+C H THE RATIO OF TUE DISTANCE. FROfl THE POINT AT WHICH
+C THE VELOCITIES ARE TO'BE CALCULATED TO TUE ROTOR
+C . CENTERLINES. TO TUE RING'S RADII
+C S.T.U.E.B.C.CIRC. .COMPONENTS OF THE EQUATION USED TO DETERMINE THE
+C AXIAL VELOCITY COMPONENTS DUE TO EACH RINC (FROM
+C -AERODYNAMICS OF PROPULSION'. KUCI1EMANN 0 WEDER. 1953)
+C P.D INTERMEDIATE STORAGE VARIABLES
+C V«M.N) THE COMPONENT OF TUE AXIAL VELOCITY AT PONT H DUE TO
+C RINC K (FT/SEC)
+C VTOTU) THE TOTAL AXIAL VELOCITY AT F-ACH OF 71 POINTS DUE TO
+C SUMMING THE COMPONENTS FROM EACH VORTEX RINC (FTXSEC)
+C VBAH THE VELOCITY OBTAINED BY AVEAACINC TDE TOTAL AXIAL
+C VELOCITIES AT TWO SUCCESSIVE POINTS (FT'SEC)
+C DVnLDl THE FORCE (DOWHLOAD) OBTAINED DY USING VBAR AKD A
+C S.23 SO. FOOT WINC SECTIONAL AREA (LD)
+C (DWtlLUI- . 5«[UlO*VBAH««2.*3.2S*<:i»
+C DW71LD2 THE SUM OF TUE INDIVIDUAL DOWNLOAD COMPONENTS (LD)
+C PRCflDLI TDE PERCENTAGE OF TOTAL ROTOR TIIIIUST THAT IS DOWN-
+C LOAD UDVHLD2XTURUST)»ieO. ) <TURUST= f (CT»
+C
+C
+C»
+C
+C
+I NTECER TWICENR .TDREEKH .TNR. Y; NUMRI NC. RS . LS . FLAPSET
+REAL K.KT(72).ZAC.LAC
+DIMENSION Z(144).COORD(I44>,F<72).RR(I44>.VTOTC7I).V(7I.144)
+C
+C
+c»»»«»»»**x»«»»,.»*»,»,> **,„,»,»»..»,.,,.»,»,,,..»«»«»»«»<»c
+
+
+--- PDF_PAGE 100 ---
+91
+c __ _ _C 1BJ. US EH IS FIRST FHOflFlLO FOR THE DESIRED THUDS I COTTFlCIEin' »CT) .
+C ROTOR HEIGHT ABOVE GROUND PLANE TO • ROTOR DIAMETER RATIO <B>D>. AHD
+C FLAP 6CTTIKC (FLAPSET)
+C
+C ____ __
+C
+C
+VRITE(6.9>
+» FORHATC WHAT THRUST COEFFICIENT <CT) WILL BE OSED?' >
+WHITE(6.1I )
+II FORHATC <.6«94. .81 . .eieS)?' >
+READ(9.ie>CT
+16 FORflAT(C12.3>
+WRITEC6.I6)
+16 FORHATC WHAT B/D RATIO WILL BE USED?- )
+WRITEC6.I4)
+14 FORHATC <e.S.l ,8.2;e. OR OCE.BOVEHD- )
+WRITE* 6.17)
+17 FOHHATC (EITTEH 9.6 FOR OCE HOVER)- )
+BXAD<5.I8)HOVERD
+IB FORHAT(CI2.S)
+VR1TC(6,I9)
+19 FORHATC WHAT FLAP SETTIHC WILL BE USED?' )
+WRITE(6.13>
+15 FOWtATC <«.2e. 48.43.66 DEC. )' )
+READ < 5. 8) FLAPSET
+6 rORHATC12>
+C
+C
+CCC FROM THE SELECTED FLAP SETTING. THE PROPER DRAC COEFFICIENT IS SET
+CCC***W*****X****XXXXXXXXVXXXXXXXBXXXVXXXKXXXXXXXXXXXX*XXXKgtXXX*XXXX V1CXXXX-
+cc IF<FLAPSET.EO.e) THEN
+CD=I .78
+EHDIF
+IFtFLAPSET.EA.aei THER
+CD<I .32
+END IF
+I F< FLAPSET. EQ.*e> THEN
+CD-I .32
+END IF
+IF«FLAPSET.Ea.45l THEN
+CD-I .26
+END IF
+I F< FLAPSET. Ed. 69) TBEJI
+COM .68
+END IF
+C
+C
+C
+C
+C THE VAUJES FOR VORTEX RING CIRCVLATIOH (A) AKD VORTEX RING SPACING
+
+
+--- PDF_PAGE 101 ---
+92
+C FACTOR <KI ARK ROV SET CORRESPONDING TOiTHE SELECTED IHJUISI'I COUflCIEKT
+C
+C
+C
+C
+IF<CT.Ed..e«<»4> THEH
+A'169.00
+1C*.446
+ENDIF
+IF(CT.EO..ei) THEH
+A'261.16
+K',446
+ENDIF
+IF(CT.EQ..8ieS) THEN
+A'211.22
+K«.442
+ENDIF
+C
+C
+0«
+C
+C
+C SINCE THE ARICRAFT HAS A THREE BLADED ROTOR. THHEE VORTEX RINGS ARE
+C CONTINUOUSLY SHED FROM THE ROTOR IN A HELICAL SHAPE. AN APPROXIMATION
+C IS HADE HERE THAT TRANSFORMS THE THREE CONTINUOUS HELICAL VORTICES
+C INTO TEHEE ROUND VORTEX RCKCS. EVENLY SPACED (N TIKE AND SPACE. OVER
+C ONE ROTOR REVOLUTION. THE VORTEX RINGS' POSITION IN TIME IS THEN
+C ALTERED BY THE APPROPRIATE VORTEX RING SPACING FACTOR <K> THAT WAS
+C PREDETERMINED US I NCI THE CALIBRATION PROGRAM VERSION
+C
+C
+C
+C
+H=.1622
+DO 26 1M ,72
+KT(I)«KxF<lI
+26 CONTINUE
+C
+C
+C
+C
+C DEPENDING ON WHICH THRUST COEFFICIENT WAS SELECTED. CONTROL IS NOW
+C TRANSFERRED TO AN APPROPRIATE FIFTH ORDER INTERPOLATING POLYNOMIAL.
+C THE POLYNOMIALS AHE. OS ED TO SET THE DOWNSTREAM POSITION OF EACH VORTEX
+C RING AS A FUNCTION OF THEIR RESPECTIVE CORRECTED TIKE SPACING. THE
+C RADII OF EACH VORTEX RING IS ALSO CALCULATED. THESE BEING A FUNCTION
+C OF THE RING'S DOWNSTREAM POSITION AS WELL AS THE ROTOR'S DIAMETER.
+C THE POSITION OF EACH RING WITH RESPECT TO THE AIRCRAFT WING- IS ALSO
+C DETERMINED.
+C IF ONE OF THE ICE DOVER CONDITIONS IS DEINC ANALYZED. CONTROL IS
+C TRANSFERRED TO ANOTHER SECTION OF TOE PROGRAM WHEN THE DOWNSTREAM
+C POSITION OF A VORTEX RING CLOSELY. IF NOT EXACTLY. SATJSFIES THE
+C PRESCRIBED H/D RATIO.
+C
+CCZ***»B*XXXX»»»»»K»*ZXX<»KIXXXXZXXXXXZXZXXZXXXXXIXXZ>>»a»XXZXXXXX»ZZZXXXXXX
+C
+
+
+--- PDF_PAGE 102 ---
+93
+ORIGINAL
+OF POOR
+irtCT.EO. .01 ) CO TO 36
+iFccr.ca. .ei*3> co TO 33cc23 DO 46 1*1 .36
+Z<I >«-63.833*CT<l>»«3.»208.424»KT(] >»»4.-242.399«KT( I >«»3
+» »12e.79O»ICT<l>*»2.*73.912»irm >
+RRC I )=8.837S«SORT( I ./I .3»<2 . -EXP(- .09S12»Z( II))))
+COORD<M*Z( I 1-4.67
+IF«flOVERD.E«.0. 3>.AND.<Z(M .CE. 12.5) .OR.
+» (HOVEHD.EQ.l .0>.AND. (Z(I ) .CE.23. > .OR .
+» <HOVERO.EQ.2.e>.AAD.(Z(I ).CE.5O. )) TUEK
+PURRING: I
+ZAC=Z(1 )
+CO TO 26
+ENDIf
+4« COITTINUC
+CO TO 24
+C
+C
+C
+36 DO 43 Ml. 36
+Z(I)*-68.152»ICTU>*»3.+22I .77»KT( I )«»4. -236.O36»KT( I »*3.
+» «-!26.62>KT(l )«»2.»78.eO3»CT<I)
+RR(I >*8.B375*SQJm \./<> .5«(2.-EXP(-.O93l2»Z< I ) ) ) ) )
+COORD(I)<Z<l)-4v67
+IF«BOVERB.EQ.e.3) .A«D.(Z(1).CE. 12.5) .OR.
+* (HOVEHD.EQ.I .6).AHD. <Z( I > .CE.23 .) .OR.
+•> <HOVERD.E<».2.e>.AflD. <Z(t > .CE.SO. » TUEP
+ZAC=Z( I >
+CO TO 26
+ENBIF
+45 coirrimiECO TO 24
+cc
+c33 DO 5« IM.36
+Z< I )>-«4.746«KT( 1 )»*3.»2I I .756«KT< I >««4 . -247 . 21 9*KT( I )»»3.
+» »I23.687*ICT( I)»»2.+8I .398*KT( I )
+RR(I>-8.837S*S(fflT(l ./I .5»(2.-EXP(-.693l2*Z( I ) ) ) ))
+COORD( I )-Z( 1 )-4.67
+IF< (nOVEHD.EX».e.3) . AflD. (Z( I ) .CE. 12.5) .OH.
+* (HOVEHD.EO. I .0).AKI>. (Z« I ) .CE.2S. ) .OR.
+•> (UOVEHO.EO.2.e).AJtD. (Z(l ) .CE.SO. » 7T1E.1
+ZAC=Z( 1 )
+CO TO 26
+EtIDIF
+se
+ccc»c
+cC IF AN OCE BOVER COHDIT10n IS DEIHC ANALVZED. Tills SECTION PRODUCES
+C THE VORTEX IlinC SYSTEM FOR THE LEFT RUTOd. THIS LF.FT UOTOR VORTEX
+C RING SYSTEM 19 IDENTICAL TO THE RICFTT EXCEPT FOR TUE FACT THAT ITS
+C CENTERLINE COINCIDES WITH THAT OF TUE LEFT ROTun . CONTROL IS TUEB
+
+
+--- PDF_PAGE 103 ---
+94
+ORIGINAL PAGE IS
+OF POOR QUALHTY
+C TRANSFERRED TO STATEHCTT LABEL 69.
+CC
+C
+C
+24 DO 41 I "I .36
+Zt3*+l>«Z<l>
+RR(36»I )=RR(I)
+COORD (3 6* I )« COORD (I >
+41 CONTINUE
+Tim =72
+CO TO 69
+C
+C
+C*********************************************************
+C
+C
+C IF AN ICC HOVEH CONDITION IS BEING ANALYZED. CONTROL IS TRANSFERRED
+C TO THIS SECTION FROM THE INTERPOLATING POLYNOMIALS. THIS SECTION
+C PRODUCES THE MIRROR' I HACK OF THE VORTEX RING SYSTEM ON THE RIGHT
+C SIDE. REFLECTED ABOUT THE GROUND PLANE DICTATED BY THE B/D RATIO.
+C ONCE THIS IS ACCOMPLI SHED. AN I IDENTICAL VORTEX RING SYSTEM IS PRO-
+C DUCED FOR THE LEFT SIDE.
+C THE FIRST SECTION SUPERIMPOSES A VORTEX RINC. IDENTICAL IN RADIUS
+C AND POSITION. ONTO THE LAST RINC THAT WAS PRESCRIBED FROM THE INTER-
+C POLATINC POLYNOMIAL, I.e.. THE RINC THAT SATISFIES THE B/D RATIO.
+C
+C
+C
+C
+26 YSNUHRINC+IZ(Y)-2(NUKRINC)RR(Y>sRR(NUNRlNC>
+COORD < Y ) « COORD < NUHR I HC )
+C
+C
+C
+C
+C THIS DO LOOP PRODUCES THE REMAINING 'MIRRORED1 VORTEX RINC SYSTEH--
+C BEGINNING AFTER THE TWO SUPERIMPOSED VORTEX RINGS. THE FIRST RIKC
+C PRODUCED BY THIS SECTION IS IDENTICAL IN RADIUS AND POSITION. WITH
+C RESPECT TO THE SUPERIMPOSED RINGS. AS THE RINC THAT OCCURRS PRIOR
+C TO THE SUPERIMPOSED. RINGS. HENCE. THIS SECTION PRODUCES A SET OF
+C VORTEX RINGS THAT ARE IDENTICAL IN RADIUS AND POSITION WITHiRESPECT
+C TO TBE SUPERIMPOSED RINGS. I.e.. GROUND PLANE.
+C
+CC4V~A-*^%vwAXMAvAwww^*wmvA*xxvxxw wxAvncwk wwx^-nx wo4txxx» w
+c
+C
+DO 27 |:2.NUnRINC
+LOPEM+NUHRINC
+LIP«Y-I
+ZJLOPE>*Z(Y)*(Z(Y)-Z<LIP»
+RR<LOPE)=RR(L1P)
+COORD! LOPE ) = Z < LOPE ) -4 . 67
+27 CONTINUE
+C
+
+
+--- PDF_PAGE 104 ---
+95
+ORIGINAL PAGE IS
+OF. POOR QUALFTY
+cc
+C THIS SECTION PRODUCES A VORTtX RING SYSTEM FOR THE LETT SIDE THAT
+C IS IDENTICAL TO THAT PREVIOUSLY PRODUCED FOR THE RIGHT SIDE.
+C
+C
+C*CAXxxnvAM4cxnx wxxttwxwkcxMnw*** w WM VSUM x»xx XXMM*
+cc TWICEKR"2«NUHRIHC
+THREENR"3«NurmiNC
+DO 28 IM.TVICEim
+Z<I»TWICENR)=Z(I
+•RR(I*TVICENR>=
+COORD(I+TWICEHR)* COORD(I
+28 CONTINUE
+C
+C
+C
+C
+C THIS SECTION SETS UP A CUTOFF'POINT REFERRING TO THE NUMBER OF
+C VORTEX RINGS THAT OCCUR OH THE RIGHT AND LEFT SIDE OF THE SYSTEM.
+C THESE CUTOFF POINTS AJXE LATER USED TO DETERMINE THE DISTANCES
+C BETVEEN POINTS AT WHICH THE AXIAL VELOCITIES ARE CALCULATED AND
+C THE APPROPRIATE VORTEX SYSTEM CEKTEIU.IME.
+C
+C
+IFCTNR.E0.36) THEN
+LS=I9
+ENDIF
+IF<Tim.EQ.4e> TDEfl
+RS=26
+LS-21
+ENDIF
+lF(TNR.EO.6a> THEN
+RS-34
+LS-33
+ENDIF
+1F(TNR.EQ.72) THEN
+RS'36
+LS'37
+ENDIF
+IFCTNH.EO.I28) THEN
+LS»*3
+END IF
+IF(TNH.EO.132) THEN.
+RS'66
+LS=67
+EHDIF
+IFITNR.EQ. 136) THEN
+R.S-68
+
+
+--- PDF_PAGE 105 ---
+96
+ORIGINAL PAGE IS
+OF POOR QUAUTY
+amir'cc
+ccC THIS SECTION IS THAT IB VH I CHI THE ACTUAL AXIAL VELOCITY COHPONEjrrg
+C ARE CALCULATED. THE SECTION CONSISTS OF A SERIES. OF IF/THEN STATE-
+C HERTS AND TWO NESTED DO LOOPS'.
+C THE PURPOSE OF THE IFXTHEN STATEMENTS IS TO SET THE CORRECT RELATION-
+C SHIPS REGARD INC THE DISTANCES THAT ARE NEEDED FOR: THE VELOCITY CAL-
+C CULATIONS.
+C THE CALCULATION BEGINS AT A POINT 35 FEET TOON THE AIRCRAFT LONGITUDINAL
+C CENTERLINE AND ENDS AT A POINT 33 FEET ON TOE OPPOSITE SIDE OF THE
+C CEHTEIILIHE. THE IF/THEN STATEMENTS SET THE PROPER DISTANCES BETWEEN
+C EACH SUCCESSIVE POINT. WHERE THE VELOCITIES ARE TO BE CALCULATED, AND
+C THE CEKTERL1HES OT THE TVO RESPECTIVE VORTEX SYSTEM CENTERLINES
+C (+/-I6.0833 FT). THE DISTANCES ARE ALSO DEPENDENT ON WHICH SET OF
+C VORTEX RINGS ARE BEING CONSIDERED RELATIVE TO THE LOCATION OF THE
+C POINT AT WHICH THE VELOCITIES ARE BEING CALCULATED.
+C WITH THE PROPER RELATIVE DISTANCES ESTABLISHED. THE RATIOS X IR1NC
+C DOWNSTREAM POSITION TO RING RADIUS) AND R (DISTANCE. FROFt THE POINT TO
+C THE CURRENT VORTEX RING SYSTEM CENTERLINE. TO RING RADIOS) ARE DETER-
+C MINED AND THE VELOCITY CALCULATION IS CARRIED OUT.
+C IF AN ICE HOVER CONDITION IS BE1NC ANALYZED. AN IF/THEN STATEMENT
+C CHANCES THE CIRCULATION SO AS TO HAKE IT NEGATIVE IN THE REFLECTED
+C VORTEX SYSTEM.
+C FINAL VELOCITY RESULTS ARE STORED IN THE DOUBLET SUBSCRIPTED ARRAY
+C V(H.N), ACCOHODATINC VELOCITIES FROM 71' POINTS AND TNR-VORTEX RINGS.
+C
+CC*mx**»»*x*xxx*»xx*xx»zi*x»**xi«xxsx»«ix«x*«sx**x»*«*x«»nx**x«*u»xn«**x*
+CC L--33
+DO 63 H'l .71
+C
+DO 7« KM .TWR
+RAD" 16. 0833
+IF((L.LT.e).AND. (N.LE.RS) ) THXH
+J--L
+RAD' 1 6. 6833
+ENDIF
+IFUL.LE.-I7).AND.(N.CE.LS» THEH
+j.-L
+RAD>-l«.eB33
+ENDIF
+IF((L.CE.-16).AND. (L.LT.O).AHD. (N.CE.LS)) THEN
+J = L
+RAD*I6.«B33
+ENDIF
+1F< (L.CT.«) .ANB.<N.CE.LS» THEN
+J = LRADM6.6B33
+ENDIF
+IF( (L.LE. 16) .AND. (L.CT.8) .AND. (N.LE.RS) ) THEN
+J«-L
+RAO- I 6. 8833
+' EKDIF
+IF( (L.CE. 17). AND. (N.LE.RS) ) THEN
+
+
+--- PDF_PAGE 106 ---
+97
+ORIGINAL PAGE FS
+OF POOR QUALITY
+RAD'-l6.e833
+END IF
+IF(L.DH.O) THEN
+J'L
+HAD* I 6. 0833
+EMDIF
+X*-COOHD<N>'RR(n>
+R«<RAO»J>/RR<N>
+S»<4.*a>x<Xxx2.-MR»l . >xx2. )
+T'ALOC(4.'< I .-S»**.5>
+U=T+< (T-l . )X4.)»CI.-S)+(9.XA4. >x(T-C7./6. ) >x<l .-S)»*2.
+EM .»< . 3«(T- .Sl»<l.-tf))»<3.xi6.l»<T-(l3.xl2.))»<l.-S))»^2
+B= i . /MXxx2.»cR»i . >»*::. )«»..•;
+C--< I . *( <2.»<R-I . ) )X(X>»2. -MR-I . )»*2. ) ) )
+D=U»C»E
+P=B*D
+A-ADSI/M
+IF< (uovEra>.HE.o.e>.AHD. (N.cT.rnmniNO.AND. (H.LE.TvicErm).on.<IIOVEJlD.NE.e.O).AKD.(H.CT.TIlIVEENn) .AND. (H.LE.T»n) ) TUEN
+A«-A
+EI«D1F
+v<n.M=cinc*p7B CONTINUE
+c
+L=L+1
+65 COITT I HUE
+cc
+C
+c
+C THE NEXT NESTED IX) LOOPS PERFOnM THE TASK OF SUMMING TIIF. VELOCITIES
+C AT EACH POINT DUE TO EACH OF THE III NCS . IIKNCC. FROM HtllE. THE TOTAL
+C VELOCITIES AT EACU OF 71 POINTS AJIE OBTAINED AIID STORED IN TUE ,UUUV
+C VTOT(J).
+C
+cC»XZXXXZXXZZXXX*X*XXXZXXXXXXXIXXZX>XZ» **««**»*** I »»»*Z*I**XX»*X*XX«-»»»*X*»I
+cc DO 75 JM .71
+DO 76 1 = 1 .Tim
+VTOT(J)»VTOT(J)»V(J. I )
+76 CONTINUE
+VT\lTEt«.B8>J.VTOT(J>
+08 FORrtAT(x.2X.5UVTOT( . J 2.2U ) = . F6 .2 .3X . 6DFTXSEC )
+73 CONTINUE
+C
+C
+C
+C
+C THIS SECTION OUTPUTS THE CHOSEN THRUST COEFFICIENT (CT). ROTOIX HEIGHT
+C ABOVE GROUND TO HOTOR DIAHETER O,\TIO (D/ni. THE ASSIGNED VALUE OF THE
+C VORTEX RING SPACING FACTOR (K) AND THE RESULTING NUMBER OF VORTEX RINGS
+C (TNR).
+C
+CCZXXXXXZZZZZZXXXXXXXX**ZZ*ZXXXXZZZZ*ZZXXXZXXXZZ»Z»»ZZ»XZXZZZZZZZZXXZZZZZZZZZX»
+
+
+--- PDF_PAGE 107 ---
+98
+cc LAC'23.
+HACTRD'ZAG'LAC
+VRITE<6.33>CT.HACTRD
+33 fORMATi".' FOR CT«' .F6.3.' .A TRUE H/D«% ,F4.2>
+IF(BOVERD.EO.e.e) THEN
+WRITE(6.34)
+34 FORMATC <HXD'8.ee SIGNIFIES AN OCE HOVER CONDITION! • I
+ENDIF
+WRITE(6.B3>K.TNB •
+89 FORMATC K='.F4.3.- AND'.IX.13.' VORTEX'RINGS' )
+C
+C
+C
+C
+C THE FOLLOWING DO LOOP PERFORMS A SERIES OF TASKS. FIRST. ONLY THE
+C COMPUTED VELOCITIES THAT LIE BETWEEN THE ROTOR CENTERLINES ARE CONDIDERED.
+C THIS BEING WHERE THE ACTUAL AIRCRAFT WING IS. STARTING ON TUE LEFT
+C HAND SIDE. EACH TWO SUCCESSIVE VELOCITIES ARE AVERAGED. TUE AVERAGED
+C VELOCITIES THEN BEING USED TO COMPUTE A DOWNLOAD. IF THE AREAS WHEJVE
+C THE VELOCITIES OCCUR ARE IN THE VICINITY OF TIIF. WINGS AND NOT THE
+C FUSELAGE. THE PREDETERMINED DRAG COEFFICIENT IS USED. IF THE AREAS
+c WHERE THE VELOCITIES OCCUR ARE IN THE VICINITY OF-THE FUSELAGE. TUEC DRAG COEFFICIENT IS-ASSUMED TO BE I. FOR WANT OF A BETTER VALUE.
+C TWO IF/THEN STATEMENTS TAKE CARE OF THIS DISTINCTION. TUE DOWNLOAD
+C COMPONENTS ARE THEN SUMMED TO ARRIVE AT A TOTAL DOWNLOAD. THIS FINAL
+C VAUJE (IN POUNDS) IS THEN OUTPUT ALONG'WITH TIIE CHOSEN FLAP SETTING.
+C
+C
+C
+C
+DO 699 1=26.52
+VBAR=<VTOT(I>*VTOT<I+I))/2.0
+IF( (I .CE.33).AND. (I .LE.39M THEN
+DVNLDt*.5*.»e237O*VBAB»»2.0«3.23
+ENDIF
+1F((I.LT.33).OR.<I.CT.39)) THEN
+DWNLD1c.5*.ee2378»VBAR**2.6*5.^3»CD.
+ENDIF
+DWNLD2«DWNLD2+DWRLDl
+699 CONTINUE
+VRITE(6.399 IDVNLD2
+399 FORMAT(' THE XV-1 3 ROTOR DOWNLOAD IS "'.F0.3.' LD. ' )
+WRITE(6.5B9)FLAPSET.CO
+589 FORHATC FORA FLAP' SETT1 NC OF' . I X. 13 . ' DECREES <Cd» ' .F4.2..' 1 . ' >
+C
+C
+C
+C
+C THE LAST SECTION CONSISTS OF TIIREF. IF/TTIF.N STATEMENTS AND HANDLES
+C TIIE TASK OF CALCULATING AND OUTPUTTINC THE FINAL TOTAL IIOWNLOAl) AS
+C A PERCENTAGE OF TOTAL ROTOR THRUST. SINCE THE TOTAL ROTOR THRUST
+C PRODUCED IS A FUNCTION OF TnE:TI!RUST COEFFICIENT. THE PREREQUISITE
+C FOR THE IF/THEN STATEMENTS IS-TIIE THRUST COEFFICI E.TT. EACH: IF/THE!*
+C STATEMENT DIVIDES THE TOTAL DOWNLOAD BY "THE APPROPRIATE TOTAL THRUST
+C AND OUTPUTS THIS PERCENTAGE VALUE.
+C
+
+
+--- PDF_PAGE 108 ---
+99
+ORIGINAL PAGE IS
+OF POOR QUALITY
+cc IF(CT.EQ..fl<»<»4) THF.N
+PRCKDLl' < DVNLD2X129S6. «2 1 * IOO .•
+VRITE(6.460)
+4»« FORHATC BASED ON A THRUST COEFFICIENT OF .00<>4> 1
+WRITE(6.4«I>PRCKDLl
+4«l FORWATC TUIS REPRESENTS',IX.F6.3.' r. OF TOTAL ROTOR THROST", )
+EHDIF
+C
+IFICT.EQ. .01 ) THEN
+PRCNDLI-(DWNLD2X137Q3.64 I*100.
+VRITE(«.403>
+403 FORMATC BASED ON A THRUST COEFFICIENT OF .01' )
+VHITEC 6.4O4> PRCNDLI
+404 FORHATC THIS REPRESENTS1 . IX.F6.3.' r: OF TOTAL ROTOR THRUST- )
+EKDIF
+C
+IF<CT.EO..OI05) THEN
+PRCNDLI = (DWNLD2XI4472.02I*100.
+VRITE(6.406)
+46* FORHAT<' BASED OK A THRUST COEFFICIENT OF .0105' )
+WR 1TE(6.407)PRCNDLI
+467 FORMATC THIS REPRESENTS' , IX. F6.3 .' 7. OF TOTAL ROTOR THRUST.)
+EHDIF
+C
+STOP
+END
+
+
+--- PDF_PAGE 109 ---
+Appendix F
+Calibration Version of Model Rotor
+Computer Program
+100
+
+
+--- PDF_PAGE 110 ---
+ORIGINAL PAGE IS 101
+OF POOR QUALITY
+ccC THIS PROGRAM IS DESIGNED TO SIMULATE THE MODEL ROTOR SYSTEM TEST
+C PERFORMANCE THROUGH THE DSE OF A VORTEX RIKC ANALYSIS. THE PROCRAH
+C 18 BASED OR A ROTOR THRUSTT COEFFICIENT: OF .««73 AND TIP SPEED OF
+C 83.29 FT/SEC. THIS PARTICULAR PROCRAH- VERSION HAS -DESIGNED TO :
+C CALIBRATE THE VORTEX RING SPACING FACTOR (K). THE VALUE FOR K IS
+C AN INPUT PARAMETER in THIS PROCRAH AHO' 18 VARIED UNTIL AN AVERAGE
+C INFLOW VELOCITY THROUGH THE ROTOR DISK THAT AGREES WITH THAT
+C PREDICTED BY MOMENTUM THEORY! IS OBTAINED. THE POINTS AT WHICH THE
+C VELOCITIES ARE CALCULATED LIE ALONG A LINE WHICH; IS COINCIDENTAL
+C WITH THE ROTOR PLANE.
+C
+CCxvznxz*xxz«xxzznzzxxuzzxnxz*sxxxxzxxxxxxzzzzzu*zzzxzzxxzzx*zxzrx-cxxzx
+C
+C
+C
+cC LIST OF VARIABLES: >.
+C
+C K ................. VORTEX RINC SPACING FACTOR
+C H ................. ROTOR SPEED (SECXREV)
+C F(I> .............. TIME BETWEEN VORTEX RINGS (SEC)
+C ETC I > ............. CORRECTED TIKE BETWEEN VORTEX RINGS (SECJ
+C <K*m»
+C Zll) .............. THE POSITION OF EACH VORTEX RIKC. DOWN-,
+C STREAM OF THE ROTOR DISK. AS A FUNCTION OF
+C CORRECTED TIME (FT)
+C RR(I) ............. VORTEX RINC RADIUS (FT)
+C (A FUNCTION OF ROTOR- GEOMETRY AND RINC
+C DOWNSTREAM' POSITION)
+C TNR ............... THE TOTAL NUMBER OF VORTEX RINGS CONSIDERED
+C IN THE ANALYSIS
+C A ................. THE VORTEX) RING CIRCULATION (FT««2/SEC> •
+C CT ................ THRUST COEFFICIENT (TURUSTx(RHO*AREA»Vi I p»z2 ) )
+C POINT ............. THE DISTANCE BETWEEN THE ROTOR AXIS AND THE
+C POINT WHERE THE AXIAL VELOCITIES ARE BEING
+C CALCULATED <FT)
+C RAD ............... THE ABSOLUTE VALUE OF POINT (FT)
+C X ................. THE RATIO OF VORTEX RINC DOWNSTREAM
+C POSITION TO RINC RADIUS (-2(1 >'RR< I »
+C R ................. THE RATIO OF POINT TO THE RINC RADIUS
+C (RAD/RR(I»
+C S.T.D.E. B.C. CIRC. .COMPONENTS OF THE EQUATION USED TO
+C DETERMINE THE AXIAL VELOCITY DUE TO EACH
+C RING (FROHK'AERODYIIAHICS OF PROPULSION'
+c CUCHEMANN a WEBER. i9sa>C P.D ............... INTERMEDIATE STORAGE I VARIABLES
+C V(M.N) ............ THE COMPONENT OF THE AXIAL VELOCITY-AT
+C POINT H DUE TO RINC N <FTxSEC>
+C VTOT(I)... ........ THE TOTAL AXIAL VELOCITY AT EACH OF/25
+C POINTS DUEITO SUMMING THE COMPONENTS FROM
+C EACH VORTEX RINC (FTXSEC)
+C VAVG .............. THE SUM OFlTHE AXIAL VELOCITIES ALONG THE
+C ROTOR DISK IFTxSEO
+C VDISX ............. THE AVERAGE INFLOW VELOCITY ALONG THE ROTOR
+C DISK (FT/SEC) •
+
+
+--- PDF_PAGE 111 ---
+102
+ccO
+C
+C
+REAL K.KT(72)
+INTEGER TWR
+DIHEJO1ON Z(144>.F<36>.RR(I44>.VTOT(7I>.V<7I .144)
+C
+C
+C jmw •**••** wxxxw ** xjt** * wxwxnwxxxzx^rx w * ******** *x * vm w wxwwfcwww
+ccC TBE VALUE TO BE USED FOR THE:VORTEX RING SPACING .FACTOR (K) IS •
+C FIRST READ IN
+C
+C
+C
+VRITEC6.4)
+4 FORHAT*' WHAT K VALUE VILL BE USED?' )
+R£AD(3.3)K
+3 rORNAT<F8.7>
+C
+C
+C*******-*******************************************************************
+C
+C
+C NEXT. BASED OH A ROTOR SPEED' OF 7O6 RPH. THE TIKE SPACING OF
+C TBE VORTEX RIRCS IS CALCULATED USING TUE RING SPACING FACTOR <K> .
+C
+CCw **•*•• XSA jns v w vxxx ws A WXXXXVXAAXXXXXXX xxs w* wws<x w *** VAX JIK<XJ> *>s ***
+cc H=.eas7DO 28 1=1 .72
+F<l )«l»H/-2.9
+KT( I )=K»F( I )
+2» CONTINUE
+C
+C
+CcC A FIFTH ORDER INTERPOLATING POLYHOHIAL. IS USED TO DETERMINE THE
+C DOWNSTREAM POSITION OF EACH VORTEX RING AS A FUNCTION OF TIHE.
+C EACH VORTEX RING'S RADIUS 18 ALSO CALCULATED AS A FUNCTION OF
+C RING DOWNSTREAH POSITION.
+C
+C
+cC
+23 DO 49 1*1 .72
+ZU )'3.S42l«KT(I)a»3.*13-.3269xKT(l >«4.-24 .BI87»KT( 1 )
+» »»3.»l2.8299xKT(l )xx2.«7 .2436x|CT( I )
+RR( I >'.B£274xSORT(l ./C . S* (2 . -EXP ( - I . 947*«Z( I ) » »
+4« CORTINUE
+TNR«72.
+C
+
+
+--- PDF_PAGE 112 ---
+103
+ORIGINAL PA6£ IS
+OF POOR QUALITY
+ccC THE VAUJtS OF THRUST COEITICIEHT <CT> . RINC CIRCULATION <A> ANO THE 1
+C POSITION OF THE FIRST POIBT. WITH RESPECT TO THE) ROTOR AXIS. (POINT):.
+C ARE HOW ENTERED.
+C
+C
+C
+C
+24 CT=.e873
+A'2.226
+POIBT'- I. B
+C
+C
+C
+cC TWO DO LOOPS ARE ROW DSEO TO CALCULATE EACH VORTEX RIBC'S AXIAL
+C VELOCITY CONPONTENT AT EACH POINT OF INTEREST. THE INNER LOOP
+C CALCULATES THE VELOCITIES FROM EACH OF THE RIRCS AND THE OUTER
+C LOOP INCREMENTS THE POINT AT' WHICH THE VELOCITIES ARE' CALCULATED.
+C
+C
+cc DO 63 H>l .23
+C
+C
+DO 7« l»«l .TNR
+IFtPOINT.LT.e.> RAD'-POINT
+iF(Poiirr.cr.e.) RAD=POINTX«-Z(N)xRR(N)
+S«(4.»R)x(X«»2.+(R»t . )»«2. )
+T»ALOC<4.'S«RTtl .-S»
+U=T»«T-I . )X4. )*< I .-S)'«( 9.^64. )«(T-<7./6.))»<! .-9)*»2.
+B-l .XSOJIT(X»»2.»(R»I ; )*»2. )
+D'U»C»E
+P'B»D
+ClRC=A/(2.»3.
+V<n.B)«CIRC»''
+7« CONTINUE
+C
+C
+POINT- POINT*. I 23
+63 CONTINUE
+C
+C
+C
+C
+C THE VELOCITY COHPORTTTS DUE TO EACH OF'THE VORTEX RINGS ARE NOW
+C SUWtED TO ARIVE ATIA TOTAL AXIAL VELOCITY AT EACH OF THE 23 POINTS
+C OF INTEREST.
+C
+
+
+--- PDF_PAGE 113 ---
+104
+cc DO 73 J*l .23
+C
+C
+DO ee 1 = 1 .TITOVTOT ( J ) « VTOT ( J ) + V ( J . I )
+ee conn HUEcc73 CONTINUE
+C
+c
+ccC THE TOTAL AXIAL VELOCITY AT EACH POINT OF INTEREST IS NOW PRINTED
+C OUT ALONG WITII THE ASSOCIATED VALUES OF THRUST COEFFICIENT (CT).
+C VORTEX RING SPACING FACTOR AND THE TOTAL NUMBER OF VORTEX RINGS
+C USED IN THE VELOCITY CALCULATIONS.
+C
+C
+C
+C
+TOIT£(6,33)CT
+33 FORMAT C FOR A THRUST OEFFICIEHT OF.CT'1 .F6.3)
+WUTE<6,83)K.TNR
+83 FORMATMX.1 K'-.FB.?.1 AND'.IX.12.' VORTEX RINGS' )
+VRITE<6.9e>
+*« FORMATUX.' THE TOTAL AXIAL VELOCITY AT EACH POINT ALONG A. LINT' )
+VRITEI6.95)
+93 FORMAT(IX.' COINCIDENTAL WITH TIJE PLANE OF THE ROTOIX IS:')
+C
+C
+DO 97 J'l.25
+wniTE(6.96) J.VTOT(J)
+9« FORMAT<x.2X.SHVTOT( , I 2.2B )« ,CI 2 . 5 .6HFIVSEC )
+97 CONTINUE
+C
+C
+C
+C
+C S1KCE FOR CALIBRATION PURPOSES THE AVERAGE VELOCITY ALONG THE
+C ROTOR DISK IS WHAT'S OF PRIME IMPORTANCE. THAT VALUE IS NOW
+C CALCULATED AND OUTPUT.
+C
+C
+Qxsscuxmx«s*x«BKXj>sx*XKXsxxxcvxxxvxxxxxxwxxxsxxxxxxs«sxxzyxxx*x
+cc DO tee 1=4.13VAVC«VAVC+VTOT(I)
+tee CONTINUEc
+WHITE) 6, I leiVDISK
+lie FORHATC.' THE AVERAGE INFLOW VELOC ITT IS' .IX. FO. 5.' FTxSEC')
+
+
+--- PDF_PAGE 114 ---
+105
+•TOP
+UD
+
+
+--- PDF_PAGE 115 ---
+Appendix G
+Download Version of Model Rotor
+Computer Program
+106
+
+
+--- PDF_PAGE 116 ---
+107
+ORIGINAL PAGE IS
+OF POOR QUALITY
+ccC THIS PROGRAM IS DESIGNED TO SIMULATE THE HODEL ROTOR SYSTEM TEST
+c PERFORMANCE THROUGH THE USE OF A VORTEX RIRC ANALYSIS. THE PROGRAMC IS BASED OR A ROTOR THRUST COEFFICIENT OF .*«73 AND TIP SPEED OF
+C 83.29 FT/SEC. UTILIZING THE! PREDETERMINED VORTEX RIRC SPACING
+C FACTOR K. THIS PROGRAM COMPUTES A DOWNLOAD BASED' ON THE MODEL VI HC
+C (CHORD • 4.r IN.. SPAN • 16.81 IN.) AT A POSITION 1.3 IN. DOWN-
+C STREAM OF THE ROTOR PLANE. THE COMPUTED AXIAL VELOCITIES ARE USED
+C TO DETERMINE A VALUE OF DYNAMIC PRESSURE <q>. VBICB WHEN MULTIPLIED
+C BY A SECTIONAL SURFACE AREA GIVES A DOWNLOAD COMPONENT.
+C
+C
+C
+CCxxxx»xxxxxzxxx*xxnaxxxxxxxxx«xxxxxxzxxxxxzxzxxzx*xxxxxxxxv*xzxxxxzxxxxxxzx>
+ccC LIST OF VARIABLES:
+C
+C K ................. VORTEX RIHC SPACING FACTOR
+C H ................. ROTOR SPEED (SECXHEV )
+C F( I ) .............. TIME BETWEEN ROTOR BLADE PASSAGES (SECxREV)
+C KT< I ) ............. CORRECTED TIME BETWEEN VORTEX RING SHEDDING
+C <K*F(I» (SECXREV)
+C Z< I ) .............. THE POSITION OF EACH VORTEX RING. DOWH-
+C STREAM OF THE ROTOR DISK. AS A FUNCTION OF
+C CORRECTED TIME (FT)
+C COORD! I) .......... THE DOWNSTREAM POSITION OF THE: VORTEX RINGS
+C WITH RESPECT TO A LINE TUAT IS COINCIDENTAL
+C WITH THE HODEL ROTOR'S WING (FT)
+C RRU) ............. VORTEX RING RADIUS (FT)
+C (A FUNCTION OF ROTOR. GEOMETRY AND VORTEX RING
+C DOWNSTREAM' POSITION)
+C NUMR1NC ........... THE NUMBER l OF VORTEX RINGS. FOR AN ICE HOVER
+C CONDITION. THAT. SATISFIES THE PRESCRIBED ROTOR HEIGHT
+C ABOVE GROUND PLANE TO ROTOR DIAMETER RATIO
+C TKR ............... THE TOTAL RUMBER OF VORTEX RINGS CONSIDERED
+C IN THE ANALYSIS
+C A ................. THE VORTEXiRINC CIRCULATION <FT*«2XSEC>
+C CT ................ THRUST COEFFICIENT (THRUSTx(RHO»AREAxVt Ipxx2> >
+C POINT ............. THE DISTANCE BETWEEN THE ROTOR AXIS AND THE
+C POINT WHERE TIIE AXIAL VELOCITIES ARE BEING
+C CALCULATED (FT)
+C RAD ............... THE ABSOLUTE VALUE OF POINT (FT)
+C X ................. THE RATIO OF VORTEX RING DOWNSTREAM
+C POSITION TO RING RADIUS (Z(l)xRR(l)>
+C R ................. THE RATIO OF POINT TO THE RING. RADIUS
+C (RADXRRII))
+C 8. T.D.E. B.C. CIRC.. COMPONENTS OF THE EQUATION USED TO
+C DETERMINE THE AXIAL VELOCITY DUE TO EACH
+C RING (FROM:: 'AERODYNAMICS OF PROPULSION*.
+C rUCBENANN 8 WEBER. 1933)
+C P,D ............... INTERMEDIATE STORAGE i VARIABLES
+C V<n.N) ............ THE COMPONENT OF TIIE AXIAL VELOCITY AT
+C ' POINT H DUE TO RING N ( FTxSEC )
+C VTOT(l) ........... THE TOTAL AXIAL VELOCITY AT EACH OF 25
+C POINTS DUEiTO SUMMING THE COMPONENTS FROM
+
+
+--- PDF_PAGE 117 ---
+108
+C EACH VORTEX RING (FT/SEC)
+C VBAft THE AVERAGE INFLOW VELOCITT BCIKUJ1 TWO
+c SUCCESSIVE POINTS AT WHICH THE AXIALC VELOCITIES WERE CALCULATED (FTXSEC)
+c DVHLDI THE DOWNLOAD COMPONENT FOR THE. AREA BETWEEHC TWO SUCCESSIVE POINTS AT WHICH THE AXIAL
+C VELOCITIES! WERE CALCULATED <LB>
+C DVNLD2 THE SUM OF'THE INDIVIDUAL DOWKLOAD
+C COMPONENTS-. I.e.. THE TOTAL DOWNLOAD (LB)
+C PKCIfTDL THE PERCENT OF ROTOR i THRUST THAT IS. DOWNLOAD
+C
+C
+C
+C
+REAL K.KT(72>
+INTEGER Y.TWR
+DIHEIISIOn Z<144>.COORDU44>,F(36>.RR<144>,VTOT<7I > .V(71 .144)
+C
+C
+C*
+C
+C
+C DUE TO THE FACT THAT THREE DIFFERENT ROTOR HEIGHT TO ROTORi
+C DIAMETER RATIOS WERE RUR WITH THE MODEL SYSTEM. THREE HxD
+C RATIOS CAN BE ANALYZED WITH THIS PROGRAM. TWO ARE IN GROUND
+C EFFECT <ICE) COHDITIOKS. H/D-6.3 a I.e. AND ONE IS AN OUT
+C OF GROUND EFFECT (OCE) CONDITION. BSD-INFINITY. THE SELECTION
+C FOR THE GROUND EFFECT CONDITION TO BE- ANALYZED IS HADE HERE.
+C
+C
+C
+c VRITEC6.I6)
+16 FORMAT! ' WHAT HxD RATIO WILL. BE USED?' )
+WRITE(6. 14)
+14 FORMAT C <8. 3. I.e. OR OCE HOVER)?' >
+WRITE(6.17)
+17 FORMAT* ' (ENTER e FOR OCE HOVER)' )
+READ(S.ia>HOVERD
+15 FORHAT(C12.S)
+C
+C
+C
+C
+C NEXT. BASED ON A ROTOR SPEED' OF loee RPH. THE TIME SPACING OF
+C THE VORTEX RINGS IS CALCULATED USING THE RING SPACING FACTOR (C).
+C
+C
+CC
+B'.eas?DO 2e i>i.72F( i >M»Bx2.eKTCI )*K«F( I I
+29 CONTINUE
+C
+
+
+--- PDF_PAGE 118 ---
+109
+cc _C A FIFTH ORDER I NTCRPOLATI NC PftLYHOHIALi IS TOED TO DETDU11NE THE
+C DOWNSTREAM POSITION OF EACH VORTEX RIKC AS A FUNCTION OF TIKE.
+C IP ONE OP THE ICE HOVER CONDITIONS 19 BEING ANALYZED THE CALCULATION
+C IS TERMINATED AT THE RIHC THAT COINCIDES WITH THE GROUND FLAKE AND
+C CONTROL IS TRANSFERRED TO STATEnEflT 26. EACH VORTEX RING'S RADIUS
+C IS ALSO CALCULATED* AS A FUNCTION OP DOWNSTREAM POSITION. .
+C
+C
+C »
+CC
+23 DO 4« 1*1.72
+ZU )«3.342l*CT( I >»«3.*lS-326<)*rr< I )«*4.-24.8ie7»KT« 1 )
++ ««3 . 4>| 2 .82W*XT( t >«2 . +7 . 243«»KT< I >
+RR< I )« .80274*8QRT< I .st .S»I2.-EXP<-I .«476*Z< I ) )) »
+COORDd >=ZU>-. 123
+IF«HOVERD.EQ.e.5).AND.(Z<I ).CE. I .133). OR.
+* (BOVERD.Ca.l.«>.AHD.<Z(I>.CE.2.27)>TDEN
+NUKRINC'l
+CO TO 26
+END IF
+4« CONTINUE
+TBR'72.
+CO TO 24
+C
+C
+C
+C
+C IN THE EVENT THAT ONE OF THE' ICE HOVER CONDITIONS IS BE I NC. AflALYZZD
+C THIS SECTION FORKS • THE HIRROR IflACE OFTD.E PREDETEHfll NED VORTEX
+C RING SYSTEM. IF THE OCE DOVER CONDITION IS BEING ANALYZED THIS
+C SECTION IS BYPASSED AND CONTROL IS TRANSFERRED TO STATEMENT 24.
+C
+C
+Qy^^^yTT^TTTgy^yyyT«y if ^T^^^yT** ••*••••**•• *TTT ** **»»T*T TTT T T***T * WT* ^^** Tfy yr*
+cc26 Y-NUHRINC*!
+Z<r>*Z<NUHUNC>
+RH(Y)«RR(NUMRINC)
+COORD ( V )• COORD ( NUHR I NC >
+C
+C
+DO 27 I«2,NUTBUBC
+LOPE-I+NUMR1HC
+LIP«Y-I
+Z(LOPE)«Z(Y)«(Z(Y)-Z<LIP) )
+RR(LOPE)'RH(LIP)
+COORD ( LOPE )«Z( LOPE)-. 1979
+27 CONTINUE
+C
+C
+C
+C
+C THE VALUE OF THT TOTAL NUMBER OF RINGS. -<TNR> FOR ICE BOVERS , THRUST
+
+
+--- PDF_PAGE 119 ---
+ORIGINAL PAGE ,s
+POOR QU-AL/TY
+c COEFFICIENT tcr). RING CIRCULATION «A)>Ain> THE POSITIOH ornraE FIRSTC POIIIT. VITH RESPECT TO THE ROTOR AXIS.. (POIIfT). ARC HOW ENTERED.
+C
+C _
+C
+C
+TNR»2.»NDT!RINC
+24 CT'.0«73
+A>2.226
+poiNT»-i.3cc
+ccC TWO DO LOOPS ARE NOW USED TO CALCULATE EACH VORTEX RING'S AXIAL
+C VELOCITY COHPONTENT AT EACH POINT OF INTEREST. THE INNER LOOP
+C CALCULATES THE VELOCITIES FROM EACH OF THE RINGS AND THE OUTER
+C LOOP INCREMENTS THE POINT AT WHICH THE VELOCITIES ARE CALCULATED.C
+C
+C
+c DO 63 H«l .23
+C
+C
+DO re N«I.TTOlF«POINT.LT.e.> RAD'-POINT
+iF<POiirr.cr.e.> RAD-POINTx- -COORD < n > XRR < N )R-RAO/HR<N)
+S=<4.»R)/'<X»»2.*<R+I . K»2. )
+T*ALOC<4./SORT<I .-S»
+U"T+( (T-l . )X4. )«(! .-S)»(9.X64. )*(T-(7./6. ) )<( 1 .-S)»»2.
+E«l .*( . S»<T-.S)»( I . -S) > + (3.x|fr. )»(T-(I3.XI2. ) >»< I . -S)»»2.
+B»l ./SftRT(X»*2.+(B«l . )x«2. )
+C«-< I .»C (2.»<R-I . ) )X<X»»2.»(R-I . )*»2. ) ) )
+D*U+C*E
+P-B»D
+A-ABS(A)
+IF( (BOVERDlNE. •.««). AND. (N.CE.Y)) THEN
+A- -AEND IF
+CIRC*AX(2.»3.14136*RR(N»
+V<H.N)»CIRC»P
+78 CONTINUE
+C
+C
+POINT«POINT».I23
+63 COHTIKUE
+C
+C _ ____ __C**"*****^*T"TirTTTTT*TT T'T'*** * • »~*rm~ • T ^^f T^frywy^ >T T MT^**M* *• • • ••• • • ••• jm^aAJm^*
+C
+C
+C THE VELOCITY COrtPONTNTS DUE TO EACH OPTHE VORTEX RINGS ARE NOW
+C SUMMED TO Afl I VE AT.'A TOTAL AXIAL VELOCITY AT EACH OF THE 23 POINTS
+C OF INTEREST.
+C
+
+
+--- PDF_PAGE 120 ---
+Ill
+cc DO 73 J«l .23
+C
+C
+DO ee 1 = 1 .nmVTOT(J)«VTOT(J)+V(J. I )
+a« CONTINUEcc75 CONTINUEcc
+C
+cC THE TOTAL AXIAL VELOCITY AT EACH POIBTOF INTEREST IS NOW PRINTED
+C OUT ALONG WITH THE ASSOCIATED VALUES OF ROTOR HEIGHT TO ROTOR
+C DIAMETER RATIO. THRUST COEFFICIENT. VORTEX RING SPACING FACTOR ABO
+C THE TOTAL NUMBER OF VORTEX RINGS USED IK THE VELOCITY CALCULATIONS.
+C
+CCVMWMiRAWWVXWW WWSVS9X VXWXXVX WWXXXXXV WX WWXXWX V WKXWSW W
+cc WR I TE C 6 . 33 > CT . HOVEHD
+33 FORWATC CT«'.F6.S.t BVD«'.F4.2>
+IF <BOVERD.EQ.e> THEN
+VRITE<6.34)
+34 FORHATC (HVD*«.«« SIGNIFIES AN OCE HOVER CONDITION)1)
+END IF
+WRITE(6.8S)K.TWR
+8S FORMATUX.' FOR Ks> .FB.7.1 AND', IX. 12.' VORTEX R I NCS ')
+WRITE(6.<>0)
+96 FORMATdX.' THE TOTAL AXIAL VELOCITY AT EACH POINT ALONC A.
+WRITE<6.95)
+95 FORHATdX.' COINCIDENTAL WITH THE PLANE OF TDE WING IS:')
+C
+C
+DO 97 J*l .23
+WRITE(6.96) J.VTOT(J)
+9* FORnAT(x.2X.5HVTOT( . 1 2 ,2H ) • ,C12. 3 , 6HFTXSEC)
+97 CONTINUE
+C
+C
+ccC DOWNLOAD COMPONENTS ARE NOW COMPUTED BASED ON THE AVERAGE AXIAL
+C VELOCITY BETWEEN TWO POINTS OF CONSIDERATION. 'THE TOTAL DOWN-
+C LOAD IS THE« COMPUTED AS THEiSUM OF THE COMPONENTS.
+C
+C
+C
+C
+DO «99 1=1.12
+VBAR«(VTOTCI)*VTOT<1*1»X2.0
+DVNLDl*.3».e02378»VBAR»»2.0».O4896»l.98
+
+
+--- PDF_PAGE 121 ---
+112
+ORIGINAL PAGE IS
+OF POOR QUALmr
+niruEcc
+ccC TOE FINAL RESULT FOR THE MODEL ROTOR SY9TEH. THEORETICAL DOWHLOAD IS
+c now otnrur.C
+C
+C
+C
+VR!TE< 6 . 396 ) DWHLD2::
+39« FORMATS.' THE MODEL ROTOR DOWNLOAD IS «'.CI2.S,' LB.')
+PRCHTDL* < DVHLB2X6 . 9 )» I ••
+WRITE* 6. 393)
+398 rORHATC BASED ON A THRUST COEFFICIENT: OF .6673 •)
+WRITE(6.4««)PRCim)L
+4«« rOHIUTC THIS REPRESENTS • . I X . F5 . 3.. • X OF ROTOR THRUST-)
+C
+C
+STOP
+CUD

@@ -1,16 +1,18 @@
 
 
---- PDF_PAGE 1 DOC_ID 19930091970 ---
+--- PDF_PAGE 1 ---
 t
 J_. ;- _< 1
  • ,'/"h-;;," ';'_'!7' ._._..._.e!- .: _,_._ REPRODUCED BY " _:k_rV':_Vs,._-7: _'_ :'_'__ .!7/
  :+.,, _:...: ._,.,,.._,._+. NFORMATION SERVICE __ ,_,.':+",_:::,_'.....'_-,,,,-_"<_<'_"_-'<_._,'m "_' , ,_ ........ .......... _ . " -_
 
 
---- PDF_PAGE 2 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 2 ---
 
 
---- PDF_PAGE 3 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 3 ---
 /q,qe __- TP,- ?_3
 NATIONAL ADVISORY COMMITTEE
 FOR AERONAUTICS
@@ -30,7 +32,8 @@ SPRINGFIELD, VA. 22161
 I
 
 
---- PDF_PAGE 4 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 4 ---
 National Advisory Committee for Aeronautics
 Headquarters, 172_ F Street NW, Washington 25, D. C.
 Created by act of Congress approved March 3, 1915, for the supervision and direction of the scientific study
@@ -97,7 +100,8 @@ Collection, classification, compilation, and dissemination of scientific and tec
 %
 
 
---- PDF_PAGE 5 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 5 ---
 //
 REPORT No. 903
 THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A-SERIES AIRFOII
@@ -191,7 +195,8 @@ _b airfoil design parameter (reference 1)
 1
 
 
---- PDF_PAGE 6 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 6 ---
 2 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
 THEORETICAL CHARACTERISTICS OF AIRFOILS
 Designation.--The system used for designating the new
@@ -253,7 +258,8 @@ FIG[_ItE l.--Comparison of theoretical pressure distribution at zero lift of the
 .9 LO
 
 
---- PDF_PAGE 7 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 7 ---
 ©
 _D
 ©
@@ -291,7 +297,8 @@ Z
 .<
 
 
---- PDF_PAGE 8 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 8 ---
 3_
 ©
 o
@@ -330,7 +337,8 @@ c_ cD
 <_
 
 
---- PDF_PAGE 9 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 9 ---
 I
 c_
 O_
@@ -360,7 +368,8 @@ m
 N
 
 
---- PDF_PAGE 10 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 10 ---
 ©
 ©
 _a G)
@@ -393,7 +402,8 @@ I
 co
 
 
---- PDF_PAGE 11 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 11 ---
 o
 7_
 o
@@ -449,7 +459,8 @@ _0
 0
 
 
---- PDF_PAGE 12 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 12 ---
 REPORT NO. 903--NATION-AL ADVISORY COMMITTEE FOR AERONAUTICS
 Mean line.--In order that the addition of camber not
 change the pressure gradients over the basic thickness form,
@@ -607,7 +618,8 @@ surfaces were obtained. The ordinates of the models tested
 are presented in tables I to VII.
 
 
---- PDF_PAGE 13 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 13 ---
 THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS
 TABLE I.--ORDINATES OF NACA 63A010 AIRFOIL
 SECTION
@@ -959,7 +971,8 @@ Slope of radius through L. E.: 0.095 i
 l
 
 
---- PDF_PAGE 14 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 14 ---
 I0 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
 TABLE V.--ORDINATES OF NACA 64A410 AIRFOIL
 SECTION
@@ -1275,7 +1288,8 @@ dynamic coefficients representing the lift, drag, and quarter-
 chord pitching-moment characteristics of the airfoil sections.
 
 
---- PDF_PAGE 15 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 15 ---
 UD
 o
 _D
@@ -1305,7 +1319,8 @@ O'J
 I'_ e_
 
 
---- PDF_PAGE 16 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 16 ---
 12 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
 J
 I
@@ -1341,7 +1356,8 @@ rD
 " i" I" i I t"
 
 
---- PDF_PAGE 17 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 17 ---
 THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS 13
 k)
 J I
@@ -1407,13 +1423,15 @@ I _c_. _'
 i L_
 
 
---- PDF_PAGE 18 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 18 ---
 I
 I
 _OI:L_IV_O_I_[V tIO,_ _,L,LIIAIlr4IoD X_tO,_IA(IV _IVhIOI&VhI--£06 "Oh[ Z_Od_t_ _
 
 
---- PDF_PAGE 19 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 19 ---
 t
 b_
 t
@@ -1448,7 +1466,8 @@ II
 _I _XOI_LD_ qlOzlHIV _XIH_{£--¥9 VDV_ ,frO HX_{I/_£I_ ¥ HO_I ¥_LV(] qV,LIEXI_IHXclXX (]NV 'IVDI_LXHOHH,L
 
 
---- PDF_PAGE 20 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 20 ---
 ,,.,:j
 I>
 r_
@@ -1460,7 +1479,8 @@ F_
 _DI,LI1VI'qOHXV HO_I XX_LIIA_IA!OD XHO_IA(IV "IVRIOI_LVN:--_06 "ON: ff,HOclXH 9"_
 
 
---- PDF_PAGE 21 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 21 ---
 I I
 b_ k
 Moment coe/'_lenf, C_,¢i 4
@@ -1476,7 +1496,8 @@ II
  [ SlqOl_LO_I_ rlIO_IHIV gStI_I_I_--¥9 VOVBI ¢IO H_IIAIfli_l¥ HOwl ¥_L¥(I "I¥_LikI_IIAIIH_(IXSI(IBIV rlVOI_L_IHO_IH3J
 
 
---- PDF_PAGE 22 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 22 ---
 18 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
 The calculated position of the aerodynamic center and the
 variation of the pitching-moment coefficient with lift coeffi-
@@ -1566,7 +1587,8 @@ FIGURE 11.--Variation n[lllinimtlnl section drag eoellicient with airfoil thickn
 condition _md with standard leading-edge roughness. R=6X1U6; flagged symbols indicate NACA 64A-series sections with standard roughness.
 
 
---- PDF_PAGE 23 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 23 ---
 THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS 19
 T,ift.--The section angle of zero lift as a function of thick-
 ncss ratio is shown in figure 12 for NACA 64- and 64A-series
@@ -1676,7 +1698,8 @@ and witlmut simulated split flaps and standard roughness. R_6X10_; flagged symbo
 indicate NACA fi4A-serics airfoils with standard roughness.
 
 
---- PDF_PAGE 24 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 24 ---
 2O REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
 A comparison of the maximum-lift data for NACA 64A-
 series airfoil sections, presented in figures 4 to 10, with
@@ -1801,7 +1824,8 @@ ratio for some NACA 64-series (reference 1) and 64A-series airfoil sections of d
 cambers. R=6XI0 _.
 
 
---- PDF_PAGE 25 DOC_ID 19930091970 ---
+
+--- PDF_PAGE 25 ---
 TI-IEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS
 reference 5 show important forward movements of the aero-
 dynamic center with increasing trailing-edge angle for a

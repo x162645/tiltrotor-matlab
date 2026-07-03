@@ -1,16 +1,16 @@
 function coverage = wing_wake_coverage(strips, rotorLeft, rotorRight, betaM, cgShift, P)
 %WING_WAKE_COVERAGE Estimate left/right rotor wake coverage per strip.
 % The geometry uses each rotor hub, rotor-axis direction, disk-wing
-% distance, wake radius and true strip span overlap. It is still a
-% provisional source-traced strip model, not a validated free-wake method.
+% distance, wake radius and true strip span overlap. It is a source-traced
+% strip projection model, not a validated free-wake method.
 
 coverage.left = zeros(strips.count, 1);
 coverage.right = zeros(strips.count, 1);
 coverage.total = zeros(strips.count, 1);
 coverage.leftVelocity = rotorLeft.inducedVelocity * rotorLeft.eT(:);
 coverage.rightVelocity = rotorRight.inducedVelocity * rotorRight.eT(:);
-coverage.model = 'ROTOR_AXIS_PROJECTED_STRIP_AREA_PROVISIONAL';
-coverage.sourceStatus = 'CR_114614_CR_176970_FORMULA_EXTRACTION_PARTIAL';
+coverage.model = 'ROTOR_AXIS_PROJECTED_STRIP_AREA_SOURCE_TRACED_V1';
+coverage.sourceStatus = 'CR_114614_LOCAL_EXTRACT_CR_176970_SOURCE_TRACED';
 
 leftGeom = rotor_wake_geometry(rotorLeft, -1, betaM, cgShift, P);
 rightGeom = rotor_wake_geometry(rotorRight, +1, betaM, cgShift, P);

@@ -1,14 +1,16 @@
 
 
---- PDF_PAGE 1 DOC_ID 19740025318 ---
+--- PDF_PAGE 1 ---
 FOR N 0
 
 
---- PDF_PAGE 2 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 2 ---
 1 1!_
 
 
---- PDF_PAGE 3 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 3 ---
 1. Report No. 2. Government Accession No. 3. Recipient's Catalog No.
 NASA TM X-3069
 4. Title and Subtitle
@@ -58,10 +60,12 @@ $4.5o
 *For sale by the National Technical Information Service, Springfield, Virginia 22151
 
 
---- PDF_PAGE 4 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 4 ---
 
 
---- PDF_PAGE 5 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 5 ---
 DEVELOPMENT OF A COMPUTER PROGRAM TO OBTAIN ORDINATES
 FOR NACA 6- AND 6A-SERIES AIRFOILS
 By Charles L. Ladson and Cuyler W. Brooks, Jr.
@@ -96,7 +100,8 @@ for the ordinates, use must be made of the ordinates published in references 1 t
 Also, the ordinates are not linear with variations in thickness-chord ratio so that airfoils
 
 
---- PDF_PAGE 6 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 6 ---
 obtainedby linearly increasing or decreasingthe ordinates of an originally derived shape
 will be approximate, as mentionedin reference 1. The published ordinates havebeen
 cross-plotted as a function of thickness andpublishedin reference 5, but the values must
@@ -129,7 +134,8 @@ local inclination of camber line (or mean line)
 ii
 
 
---- PDF_PAGE 7 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 7 ---
 e airfoil parameter, _b - 0
 complex variable in airfoilplane
  angular coordinate of z'
@@ -160,7 +166,8 @@ the equations presented in references 1 and 7. Thus, for each prescribed velocit
 bution, a set of basic airfoil parameters is obtained. However, as stated in reference 1,
 
 
---- PDF_PAGE 8 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 8 ---
 it is possible to define a set of basic parameters _/ and e which could be multiplied by a
 constant factor to obtain airfoils of various thickness-chord ratios while maintaining the
 minimum pressure at the same chordwise location. Thus, for each NACA 6-series air-
@@ -203,7 +210,8 @@ x/c = 0.1000 to the trailing edge.
  !
 
 
---- PDF_PAGE 9 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 9 ---
 Calculation of the Leading-Edge Radius
 The values of leading-edge radius of these airfoils, published in references 1 to 3,
 were initially determined by plotting the ordinates to a large scale and fairing in the best
@@ -241,7 +249,8 @@ tan5secS+ (_)-t (y)t(_)tan5
 is assumed to be negative
 
 
---- PDF_PAGE 10 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 10 ---
 and
  ._/ = t _c/t\dx]
 1 sec 6 + (d_) tan 6 +(Y)t d(_ )t c
@@ -277,7 +286,8 @@ show graphically the capabilities of the program, sample computer plots are pres
 6
 
 
---- PDF_PAGE 11 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 11 ---
 in figures 2 to 9. The subscript designationsof the lift-coefficient range of minimum
 drag for these airfoils, as described in references 1to 3, havebeendeletedin the com-
 puter plots andtables. Figure 2 illustrates the possibility of changingthe thickness-
@@ -315,7 +325,8 @@ The best result for these airfoils can be obtained by using the ordinate and slo
 x/c = 0.95 and extrapolating to the trailing edge.
 
 
---- PDF_PAGE 12 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 12 ---
 Card Input Format
 The input to the program is in a card format as follows:
 CARD 1 - Tabulated data title card. Any designation may be used in columns 2 to 80.
@@ -354,7 +365,8 @@ NACA 6A-series
  8
 
 
---- PDF_PAGE 13 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 13 ---
 CARD3 - Airfoil parameter card. (Notethat cards 3 to 6 are in floating point mode.
 Numbers are entered with a decimal point.)
 Description Variable Columns
@@ -414,7 +426,8 @@ columns 1 to 80.
 Any designation may be used in
 
 
---- PDF_PAGE 14 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 14 ---
 CONCLUDINGREMARKS
 A computer program has been developed to calculate rapidly the ordinates for air-
 foils of any thickness, thickness distribution, or camber in the NACA 6- and 6A-series.
@@ -433,7 +446,8 @@ Hampton, Va., June 25, 1974.
  11
 
 
---- PDF_PAGE 15 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 15 ---
 APPENDIX
 COMPUTER PROGRAM FOR ORDINATES OF NACA 6- AND
 6A-SERIES AIRFOILS
@@ -451,7 +465,8 @@ approximately 12 seconds to execute on the Control Data 6400 computer system.
 11
 
 
---- PDF_PAGE 16 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 16 ---
 APPENDIX
 00000000000000000000000000_000000000000000
 000000000000000000000000000000000000000000
@@ -474,7 +489,8 @@ O0 0 0000 000 000
 OO 0 0000 000 000
 
 
---- PDF_PAGE 17 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 17 ---
 APPENDIX
 ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo oo ooo ooooooooooooo888 88 8 °0000000000
 0000000000000000000000000000000000000000000
@@ -484,7 +500,8 @@ oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 13
 
 
---- PDF_PAGE 18 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 18 ---
 ooooooooooooooooooooooooooooooooooooooooooooooooooo
 oooo_oo_ooo_o_o0000 O0 000 0 0
 00000000000000000
@@ -504,7 +521,8 @@ _J_ _
 !
 
 
---- PDF_PAGE 19 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 19 ---
 APPENDIX
 0000000000000000000000000000
 0000000000000000000000000000
@@ -560,7 +578,8 @@ _--_!I___X_N_II
 15
 
 
---- PDF_PAGE 20 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 20 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOO
@@ -584,7 +603,8 @@ _ _._ _ ,0_ 0 _N_ ,_ _ _
 O _O OOOOO OO O OO O O O O _ OO
 
 
---- PDF_PAGE 21 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 21 ---
 A PPE NDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -641,7 +661,8 @@ O 04"0
 C:) ,'900
 
 
---- PDF_PAGE 22 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 22 ---
 APPENDIX
 0000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000
@@ -653,7 +674,8 @@ ogooooo o_oooo ooooo_o ooo_8 °°° °ooog gg_gooo o oooo ooo ooo_ _ _oo_°°g0 
 18
 
 
---- PDF_PAGE 23 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 23 ---
 000
 000
 000
@@ -733,7 +755,8 @@ O OOOO OO
 19
 
 
---- PDF_PAGE 24 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 24 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOO
@@ -795,7 +818,8 @@ _" 4" 4"
  l
 
 
---- PDF_PAGE 25 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 25 ---
 APPENDIX
 D_OOOOOOOOOOOO
 OOOOOOOOOOOOOO
@@ -816,7 +840,8 @@ OOOOO
 21
 
 
---- PDF_PAGE 26 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 26 ---
 APPENDIX
 OOOOOOOOOO OO
 OOOOOOOOOOO_
@@ -867,7 +892,8 @@ _,__
  22
 
 
---- PDF_PAGE 27 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 27 ---
 APPENDIX
 OOOOOOOOO
 llllltlll
@@ -897,7 +923,8 @@ U_ O
 23
 
 
---- PDF_PAGE 28 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 28 ---
 OQO
 000
 000
@@ -966,7 +993,8 @@ O0 O0 090 00000
 O0 O0 000 00000
 
 
---- PDF_PAGE 29 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 29 ---
 APPENDIX
 OOOOOOOOOOOOOOC
 OOOOOOOOOOOOOOO
@@ -987,7 +1015,8 @@ O_J
 25
 
 
---- PDF_PAGE 30 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 30 ---
 APPENDIX
 OOOO
 OoOO
@@ -1028,7 +1057,8 @@ OOOOO
 : 26
 
 
---- PDF_PAGE 31 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 31 ---
 0000000
 OO0_O00
 0000000
@@ -1072,7 +1102,8 @@ O OOOOOOOOOOOOOOOOOOOOOOOOOOOO
 9.7
 
 
---- PDF_PAGE 32 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 32 ---
 28
 APPENDIX
 OOOOOO
@@ -1091,7 +1122,8 @@ OOOOO _
 OOOOOO
 
 
---- PDF_PAGE 33 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 33 ---
 APPENDIX
 0000
 0000
@@ -1121,7 +1153,8 @@ _3 V_O
 29
 
 
---- PDF_PAGE 34 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 34 ---
 3O
 00
 00
@@ -1190,7 +1223,8 @@ II
 ]
 
 
---- PDF_PAGE 35 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 35 ---
 APPENDIX
 000000000000000000000000
 000000000000000000000000
@@ -1253,7 +1287,8 @@ NNNNNNNNNNNNN N N
 31
 
 
---- PDF_PAGE 36 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 36 ---
 APPENDIX
 OOOO OO
 _OOO OO
@@ -1277,7 +1312,8 @@ IIII III
  I
 
 
---- PDF_PAGE 37 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 37 ---
 APPENDIX
 _oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooooooooooooooooooooooooooooooooooo
 °°°°°8_8_° ooooooooooooo88888 _°°°ooooo ogOOOOOOOOOOOOO oooo888_88888
@@ -1319,7 +1355,8 @@ OOO O O O
 33
 
 
---- PDF_PAGE 38 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 38 ---
 APPENDIX
 ooooooo_oo_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooo_oooooooooooooooooooooooooooooooooooooooooooo_oo o oo oooooooooooooooooo oggoggggg °°°
 @@@@e le @m • @ @@@ • @ •
@@ -1328,7 +1365,8 @@ ooooooo_oo_ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 L
 
 
---- PDF_PAGE 39 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 39 ---
 APPENDIX
 OOOOOOOOOOOO
 OOOOOOOOOOOO
@@ -1351,7 +1389,8 @@ OOOOO
 35
 
 
---- PDF_PAGE 40 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 40 ---
 APPENDIX
 O00000000000000000000000000000000000000000
 000000000000000000000000000000000000000000
@@ -1380,7 +1419,8 @@ eerie
  li
 
 
---- PDF_PAGE 41 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 41 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -1395,7 +1435,8 @@ O O O O
 37
 
 
---- PDF_PAGE 42 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 42 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -1455,7 +1496,8 @@ OOOOO
 OOOOO
 
 
---- PDF_PAGE 43 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 43 ---
 APPENDIX
 000000000000000000000000000000000000000000
 000000000000000000000000000000000000000000
@@ -1487,7 +1529,8 @@ Ooo_o_o_O_ O_O_O_O_o_ O_O_OOOOO_ O_O_O
 39
 
 
---- PDF_PAGE 44 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 44 ---
 APPENDIX
 ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 oooogoooooooooooooooooooooooooooooo_ooo_o_o0000 000000000000000000000000000000 000 0 0
@@ -1507,7 +1550,8 @@ F-- F--
 40
 
 
---- PDF_PAGE 45 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 45 ---
 APPENDIX
 OOO O OOO O OOOO
 OOOOOOOO(D_OO
@@ -1532,7 +1576,8 @@ OOOOO
 41
 
 
---- PDF_PAGE 46 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 46 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 o  gooo ooooooooo oooooooooo ooooo oo gooo0 000 000000000 0000000000 00000 O0 000
@@ -1567,7 +1612,8 @@ II lI II
 42
 
 
---- PDF_PAGE 47 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 47 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_oooooooooooooooooooooooooooo
 ooog_oooo_oooooooooo_oo8oooooooo8_8ooooo_o _OOO OOOO OOOOOOOOOOOOO OOOOOOOO OOOOO O
@@ -1612,7 +1658,8 @@ O O O O
 43
 
 
---- PDF_PAGE 48 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 48 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 8ooooooo8_oooooooo8_ooooooooooooo 0000000 00000000 0000000000000
@@ -1645,7 +1692,8 @@ OOOOO
 OOOOO
 
 
---- PDF_PAGE 49 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 49 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo°ooooooooooooooo°ooooo°o=oooooooo°oooooo
 ooo8_8oooooo_o o °°°8°0°° o o oooo oooooooSo°ooo oooo_S °oooo°°°8_8_8gS °°ooOO O
@@ -1672,7 +1720,8 @@ OOO O O O
 45
 
 
---- PDF_PAGE 50 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 50 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -1691,7 +1740,8 @@ O O O O
 O O .'D (D
 
 
---- PDF_PAGE 51 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 51 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo°°°°°°°°
 ooo_o_o_ooooo_oooooooooo8_oooooooOOO O O OOOOOOOOOOOOOOOO OOOOOOO
@@ -1745,7 +1795,8 @@ OOOOO
 4'7
 
 
---- PDF_PAGE 52 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 52 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 000000000000000000000000000000000000000000
@@ -1757,7 +1808,8 @@ ozz d ..................................
 48
 
 
---- PDF_PAGE 53 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 53 ---
 APPENDIX
 0_000 00_0_0_0_0 _0_0_0_0_ 0 _0_0_0_0_0 _0_0
 _'% u0, /% u'%
@@ -1769,7 +1821,8 @@ C) 0 0 o
 49
 
 
---- PDF_PAGE 54 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 54 ---
 APPENDIX
 0000 O0 ..._ Oe, JO e'Q 0 en 0.4- 0 ur_Ou"_ 0,00 cO 000
  _ _ _ d '_ _ '_ _ '_ '_ "_ '_'
@@ -1798,7 +1851,8 @@ _-_ _ _ _ _ _
 5O
 
 
---- PDF_PAGE 55 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 55 ---
 APPENDIX
 000000000000000000000000000000000000000000
 000000000000000000000000000000000000000000
@@ -1831,7 +1885,8 @@ u'% u'% u% _ U'% I/%
 51
 
 
---- PDF_PAGE 56 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 56 ---
 APPENDIX
 O000000000000000000000000000000000000000000
 O0 O0000 O00000000000000000000000000000 O00000
@@ -1851,7 +1906,8 @@ O O O O
 O <9 O O
 
 
---- PDF_PAGE 57 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 57 ---
 APPENDIX
 000000000000
 000000000000
@@ -1872,7 +1928,8 @@ OOOOO
 53
 
 
---- PDF_PAGE 58 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 58 ---
 APPENDIX
 oooooooooooo_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_oooooooooooooooooo
 OOOOO OOOOOo OOO OOOOOOOOOO OOO
@@ -1894,7 +1951,8 @@ OOO O O O
 OOO O O O
 
 
---- PDF_PAGE 59 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 59 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 ooooooooooooo_o_ooooooooooooo_ooooooooooooooooooooooooooooooooooooooooooo6oooooooooooo
@@ -1918,7 +1976,8 @@ O O O O
 55
 
 
---- PDF_PAGE 60 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 60 ---
 APPENDIX
 oooooooooooooo_ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 ooo oooSS_8888_88_g88
@@ -1977,7 +2036,8 @@ OOOOO
 ri
 
 
---- PDF_PAGE 61 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 61 ---
 APPENDIX
 • • . . . . . . . . . . o • . . . . . . . . . . . .-- .-- . -- .-- • .
 O("4
@@ -2008,7 +2068,8 @@ OOO O <D O
 57
 
 
---- PDF_PAGE 62 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 62 ---
 APPEND_
 oooooooooooooooooooooooooooooooooooooooooooooo_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 oggooooogooooooo_ooooooooooSooo_oooooooooooO OOOOO OOOOOOO OOOOOOOOOO OOO OOOOOOOOOOO
@@ -2033,7 +2094,8 @@ _ _ __ _ _ 0
  I
 
 
---- PDF_PAGE 63 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 63 ---
 APPENDIX
 OOOOOOOOOOOO
 OOOOOOOOOOOO
@@ -2069,7 +2131,8 @@ OOOOO
 59
 
 
---- PDF_PAGE 64 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 64 ---
 APPENDIX
 000000000000000000 O000000000000000000000 O0
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -2096,7 +2159,8 @@ OOO O O O
 OO(D O "9 O
 
 
---- PDF_PAGE 65 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 65 ---
 APPENDIX
 lille eteeelllll OlllOllele eleeetoooo leel
 O O O O
@@ -2107,7 +2171,8 @@ O O O O
 61
 
 
---- PDF_PAGE 66 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 66 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooooo
 4 _ 4 _ _ _ _ _ ''''' .....
@@ -2141,7 +2206,8 @@ OOOOO
  B2
 
 
---- PDF_PAGE 67 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 67 ---
 APPENDIX
 000000000000000000000000000000000000000000
 O0 O0 O0 O0 O0 O00 O0 O0 O000 O000000-0 _000 O0 O000 O00
@@ -2157,7 +2223,8 @@ U'% U'% _ U'% _ U'%
 63
 
 
---- PDF_PAGE 68 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 68 ---
 APPENDIX
 ooooo0ooooooooooooooooooooooooooooooooooooo
 ooooooooooooooooooooooooooooooooooooooooooo
@@ -2166,7 +2233,8 @@ ooo_oooooooooooooooooooooooooooooo_ooooooooooo ooooooooooooooooooooooQooooooo oo
 64
 
 
---- PDF_PAGE 69 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 69 ---
 APPENDIX
 OOOOOO OO O OOO
 OOOOOOOOOOOO
@@ -2182,7 +2250,8 @@ OOOOO
 65
 
 
---- PDF_PAGE 70 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 70 ---
 APPENDIX
 OOOOOOOOOOOOOOOoOOOOoOoOOOOOOooOOOOoOOOooo
 OOOOOOOOOOOOooooOOOOOOOOoOOOOoOOOOoOoOOoOO
@@ -2217,7 +2286,8 @@ OC) O (9 0 0
 66
 
 
---- PDF_PAGE 71 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 71 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOO_OOOOOOOOOO_OOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO_OOOOOOOOOOOO
@@ -2236,7 +2306,8 @@ U'% u% _ tm
 67
 
 
---- PDF_PAGE 72 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 72 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 oooooooooooooooooooooo_ooooo_oo_oo0000000000000000000000 00000 O0 O0
@@ -2249,7 +2320,8 @@ oooooooooooooooooooooo_ooooo_oo_oo0000000000000000000000 00000 O0 O0
 0 0 00000
 
 
---- PDF_PAGE 73 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 73 ---
 APPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=ooooooo
 oo_sooooooooo ooooooo_ °°°ooo88_8_°°°8_8°°°°°°°ooo ooooooo_ooo°°°_°o
@@ -2280,7 +2352,8 @@ oee@@
 69
 
 
---- PDF_PAGE 74 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 74 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOCOOOOOOOO
@@ -2326,7 +2399,8 @@ O O O O
  II
 
 
---- PDF_PAGE 75 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 75 ---
 APPENDIX
 ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_oooooooo0ooooo000o0o0ooooooooo06o_00o000
 o oooo_oooo oo_o ooooooooooo_o_8oooo 0000800 o_oooooooooooo_
@@ -2357,7 +2431,8 @@ o00oo
 71
 
 
---- PDF_PAGE 76 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 76 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOO_OOOOOOOOOOOOOOOOOOOOOO
 O_ OOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -2371,7 +2446,8 @@ i -
 _2
 
 
---- PDF_PAGE 77 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 77 ---
 APPENDIX
 ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooooooooooooooooooooooooooooooooooo
 oooooo888o0oo0oo0 ooooo oooooo_oooooo oooooooo_ooooo8_oooooo 8S88 °°°°°°°ooooooo
@@ -2381,7 +2457,8 @@ _NNNNN_N_NNNN_NN_NN_N_N_NNNNN_NNN_N_N
 73
 
 
---- PDF_PAGE 78 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 78 ---
 APPENDIX
 0000000000000000000000000000000000
 0000000000000000000000000000_00000
@@ -2405,7 +2482,8 @@ OOOOO
 O_OOO
 
 
---- PDF_PAGE 79 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 79 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOOOOOOOOOOOOOO_OO_OOOOOOO_OO
@@ -2440,7 +2518,8 @@ OOC) O O O
 75
 
 
---- PDF_PAGE 80 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 80 ---
 PPENDIX
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooo_oooooooooooooooooooooooooooooooooooooooooooooo
 oo_oooo8oooooooooooooooooooooooooo_ooooooooO0 0000 00000000000000000000000000 00000000
@@ -2472,7 +2551,8 @@ _'- "D -00
 70
 
 
---- PDF_PAGE 81 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 81 ---
 APPENDIX
 OOOOOOOOOOOO
 O_OOOOOOOOOO
@@ -2495,7 +2575,8 @@ OOOOO
 77
 
 
---- PDF_PAGE 82 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 82 ---
 APPENDIX
 OOOOOOOOOOOOOOOOOOOOOOOOO_OOOOOOOOOOOOOOOO
 O_OOOOOOOOOOOOOOOOOOOOOOOOOOO_ OOOOOOOOOOOO
@@ -2512,7 +2593,8 @@ z_
 _8
 
 
---- PDF_PAGE 83 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 83 ---
 APPENDIX
 0000000000000000000000000000000000000000000
 00000000000000000_000000000_0000000_0000000
@@ -2531,7 +2613,8 @@ u'% u'% _ u'%
 ';9
 
 
---- PDF_PAGE 84 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 84 ---
 APPENDIX
 00000000000000000000000000_0000000
 0000000000000000000000000000000000
@@ -2550,7 +2633,8 @@ e_
 'D 0
 
 
---- PDF_PAGE 85 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 85 ---
 REFERENCES
 1. Abbott, Ira H.; Von Doenhoff, Albert E.; and Stivers, Louis S., Jr.: Summary of Air-
 foil Data. NACA Rep. 824, 1945. (Supersedes NACA WR L-560.)
@@ -2577,7 +2661,8 @@ Dimensional Multi-Component Airfoils in Viscous Flow. NASA CR-1843, 1971.
 81
 
 
---- PDF_PAGE 86 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 86 ---
 _)
 o
 o
@@ -2619,7 +2704,8 @@ r_
 82
 
 
---- PDF_PAGE 87 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 87 ---
 >.
 o ooooo oooooooogog __
 0000000000000000000000000000000000000000000
@@ -2638,7 +2724,8 @@ O000000000000000000000000000000000000000000
 83
 
 
---- PDF_PAGE 88 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 88 ---
 )-
 e_oeeeeeoeeeeeoeegoeooeOoee|eeooeeoooeeeeoe
 X
@@ -2653,7 +2740,8 @@ O_ 0_0_0_0_0_ 0_0_0_ 0_0 _0_000 00000000_00000
 84
 
 
---- PDF_PAGE 89 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 89 ---
 >.
 0000000000 O'DO000000000000000 000000 000000000
 0000000 000 000000000 000000000000 000 000000000
@@ -2673,7 +2761,8 @@ I I I I I I I I I I I I I i I I I I I I I I I I I I I J I J I I
 85
 
 
---- PDF_PAGE 90 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 90 ---
 )-
 X
 OoOoOo OOO ooOoOoOOO OOOOOOOOO OOoO
@@ -2688,7 +2777,8 @@ X _ _ _O _ _ O_ _ _ _ _ __O_ _ON_
 86
 
 
---- PDF_PAGE 91 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 91 ---
 _r3
 0
 0
@@ -2759,7 +2849,8 @@ _000 O000_Ou
 87
 
 
---- PDF_PAGE 92 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 92 ---
 IIIillllllllllltlll;lllllll|llltllllltlltlllllllllIIIIII
 _e_o,_ .a _ o_ _ ._ ,o ,_ _ 0o _o _0 _ o _,_ _ _ _ 0 i o_'_ _ •_0 _ _ ,o _ _o_
 ,_ _"_O o e_ _ _'__ _t__ O h" O_ _ ,._'_"_ O" _" O O _ ,_"_ .._00 ,_. _-_ _ ,_ e_ e_ _ _ _ _ _0 _ _0 _--O,00_ _' ,_ _ 0_,_,,t .-_,--__'
@@ -2780,7 +2871,8 @@ OOOOo OO ............ O0i_eeel IIee iee i_eo_ioeo_I • • •
 88
 
 
---- PDF_PAGE 93 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 93 ---
 OOOOOOOO OOO_!z_ gg ggsIIIIIIOIIglIO Ill I!tlltll
 illllllllllllllllllllllll
  Ie i° ' Il i° t t • i' i' _" I' I' i' t' J' _" u" _" o' I o' ne _" _" _" _ o' o o" _' ; o' oe u' ue o"
@@ -2829,7 +2921,8 @@ _oo_ooo oo oooooo ooooooooo ooo°o°°°o°[_o°°o°o° o°_o°°o°°°° o_oo
 89
 
 
---- PDF_PAGE 94 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 94 ---
 .... _ , .
 .,.-i ._00 _'_ ,,00 ,0 ,,t,
 o.o o. oo o oo . . .__
@@ -2869,7 +2962,8 @@ OOO 00000
  _e_oeeoeee_e_eil._eeee_oeeeeeee_
 
 
---- PDF_PAGE 95 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 95 ---
 z- plane
 II
 z -plane
@@ -2887,7 +2981,8 @@ pressure distribution. (From ref. 1.)
 91
 
 
---- PDF_PAGE 96 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 96 ---
 z
 C:)
 I
@@ -2937,7 +3032,8 @@ c_
 92
 
 
---- PDF_PAGE 97 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 97 ---
 .=I
 I
 0
@@ -2970,7 +3066,8 @@ II
 93
 
 
---- PDF_PAGE 98 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 98 ---
 L
 !
 C_m •
@@ -3001,7 +3098,8 @@ z
 g4
 
 
---- PDF_PAGE 99 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 99 ---
 U
 C_
 ..q
@@ -3038,7 +3136,8 @@ Z
 95
 
 
---- PDF_PAGE 100 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 100 ---
 I
 0
 m •
@@ -3087,7 +3186,8 @@ _ ,_4tD
 96
 
 
---- PDF_PAGE 101 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 101 ---
 !
 U
 oi •
@@ -3132,7 +3232,8 @@ Z0
 97
 
 
---- PDF_PAGE 102 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 102 ---
 (:3 C_
 C:)
 I
@@ -3150,7 +3251,8 @@ U
 _ 98
 
 
---- PDF_PAGE 103 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 103 ---
 .,-, _ I
 -- ,e..V. X
 c)
@@ -3226,7 +3328,8 @@ I
 99
 
 
---- PDF_PAGE 104 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 104 ---
 I 0
 o
 >-
@@ -3317,7 +3420,8 @@ I
 100
 
 
---- PDF_PAGE 105 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 105 ---
 r
 ! I
  J
@@ -3342,4 +3446,5 @@ o
 NASA-Langley, 1974 L-9558 101
 
 
---- PDF_PAGE 106 DOC_ID 19740025318 ---
+
+--- PDF_PAGE 106 ---

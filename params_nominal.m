@@ -147,7 +147,7 @@ P.wing.fullAngleDatabaseFile = fullfile('data','wing_full_angle', ...
 P.wing.fullAngleStripCount = 24;
 P.wing.fullAngleWakeContraction = 1.0;
 P.wing.fullAngleInterpolationMethod = 'pchip';
-P.wing.fullAngleDatabaseDimensionPolicy = 'reduced_alpha_only_provisional';
+P.wing.fullAngleDatabaseDimensionPolicy = 'multidimensional_nearest_Re_Mach_flap_slice';
 P.wing.fullAngleControlSurfacePolicy = 'database_only_no_legacy_linear_aileron';
 
 %% Fuselage
