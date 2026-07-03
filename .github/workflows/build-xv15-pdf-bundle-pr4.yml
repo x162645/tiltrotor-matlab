@@ -1,0 +1,61 @@
+name: Diagnose XV-15 PDF downloads
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - name: Try all PDF downloads without early exit
+        shell: bash
+        run: |
+          mkdir -p bundle logs
+          getpdf() {
+            id="$1"; out="$2"
+            ok=0
+            for url in \
+              "https://ntrs.nasa.gov/api/citations/${id}/downloads/${id}.pdf?attachment=true" \
+              "https://ntrs.nasa.gov/api/citations/${id}/downloads/${id}.pdf" \
+              "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/${id}.pdf"; do
+              echo "Trying $url" | tee -a "logs/${id}.txt"
+              curl -sS -L --retry 2 -A 'Mozilla/5.0' -D "logs/${id}.headers" "$url" -o "bundle/$out.tmp" || true
+              if [ -f "bundle/$out.tmp" ]; then
+                printf 'bytes=' >> "logs/${id}.txt"; stat -c %s "bundle/$out.tmp" >> "logs/${id}.txt"
+                head -c 120 "bundle/$out.tmp" | strings | head -3 >> "logs/${id}.txt" || true
+                if [ "$(head -c 5 "bundle/$out.tmp")" = '%PDF-' ]; then
+                  mv "bundle/$out.tmp" "bundle/$out"; ok=1; break
+                fi
+              fi
+            done
+            echo "result=$ok" >> "logs/${id}.txt"
+          }
+          getpdf 19730022217 NASA_CR_114614.pdf
+          getpdf 19740025318 NASA_TM_X_3069.pdf
+          getpdf 19970008124 NASA_TM_4741.pdf
+          getpdf 19930091970 NACA_TR_903.pdf
+          getpdf 19870005749 NASA_TM_88373.pdf
+          getpdf 19860020297 NASA_CR_176970.pdf
+          printf 'filename,pages,size_bytes,sha256\n' > bundle/MANIFEST.csv
+          for f in bundle/*.pdf; do
+            [ -e "$f" ] || continue
+            pages=$(pdfinfo "$f" 2>/dev/null | awk '/^Pages:/ {print $2}')
+            size=$(stat -c %s "$f")
+            sha=$(sha256sum "$f" | awk '{print toupper($1)}')
+            printf '%s,%s,%s,%s\n' "$(basename "$f")" "$pages" "$size" "$sha" >> bundle/MANIFEST.csv
+          done
+          cp -r logs bundle/download_logs
+          cat bundle/MANIFEST.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: XV15_PDF_download_diagnostic
+          path: bundle/
+          if-no-files-found: warn
+          retention-days: 7
