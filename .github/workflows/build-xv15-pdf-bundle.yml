@@ -1,0 +1,234 @@
+name: Build XV-15 wing-model PDF bundle
+
+on:
+  push:
+    branches:
+      - tools/xv15-pdf-bundle-20260703
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
+      - name: Download and verify PDFs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import csv
+          import hashlib
+          import requests
+          import subprocess
+          import time
+
+          out = Path('bundle')
+          out.mkdir(exist_ok=True)
+
+          docs = [
+              {
+                  'filename': 'NASA_CR_114614_Bell_Model_301_Mathematical_Model.pdf',
+                  'report': 'NASA CR-114614',
+                  'document_id': '19730022217',
+                  'purpose': 'Rotor-wake/airframe interaction, immersed wing area, local angle of attack and dynamic pressure',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19730022217/downloads/19730022217.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19730022217.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NASA_TM_X_3069_NACA_6_6A_Ordinates_Program.pdf',
+                  'report': 'NASA TM-X-3069',
+                  'document_id': '19740025318',
+                  'purpose': 'Original NACA 6- and 6A-series ordinate generation program',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19740025318/downloads/19740025318.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19740025318.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NASA_TM_4741_NACA_Airfoil_Ordinates_Program.pdf',
+                  'report': 'NASA TM-4741',
+                  'document_id': '19970008124',
+                  'purpose': 'Portable NACA airfoil ordinate program including 6/6A series',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19970008124/downloads/19970008124.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19970008124.pdf',
+                      'https://www.pdas.com/refs/tm4741.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NACA_TR_903_6A_Series_Data.pdf',
+                  'report': 'NACA TR-903',
+                  'document_id': '19930091970',
+                  'purpose': 'Published theoretical and experimental NACA 6A-series geometry/data for validation',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19930091970/downloads/19930091970.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19930091970.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NACA_TN_4322_NACA_Airfoil_Ordinates.pdf',
+                  'report': 'NACA TN-4322',
+                  'document_id': '19930085124',
+                  'purpose': 'NACA airfoil ordinate construction and cross-check source',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19930085124/downloads/19930085124.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19930085124.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NASA_TR_R_84_NACA_Airfoil_Ordinates.pdf',
+                  'report': 'NASA TR R-84',
+                  'document_id': '19980223594',
+                  'purpose': 'Additional NACA ordinate construction and validation source',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19980223594/downloads/19980223594.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19980223594.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NASA_TM_88373_Near_Vertical_Wing_Flap_Aerodynamics.pdf',
+                  'report': 'NASA TM-88373',
+                  'document_id': '19870005749',
+                  'purpose': 'NACA 64A223 near-vertical-flow CL/CD/Cm and flap data',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19870005749/downloads/19870005749.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19870005749.pdf',
+                  ],
+              },
+              {
+                  'filename': 'NASA_CR_176970_XV15_Rotor_Wing_Download.pdf',
+                  'report': 'NASA CR-176970',
+                  'document_id': '19860020297',
+                  'purpose': 'XV-15 rotor wake and wing download geometry/integration validation',
+                  'urls': [
+                      'https://ntrs.nasa.gov/api/citations/19860020297/downloads/19860020297.pdf',
+                      'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19860020297.pdf',
+                  ],
+              },
+          ]
+
+          session = requests.Session()
+          session.headers.update({
+              'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36',
+              'Accept': 'application/pdf,application/octet-stream;q=0.9,*/*;q=0.8',
+          })
+
+          rows = []
+          failures = []
+
+          for doc in docs:
+              target = out / doc['filename']
+              ok = False
+              last_error = ''
+              used_url = ''
+              for url in doc['urls']:
+                  for attempt in range(1, 4):
+                      try:
+                          response = session.get(url, timeout=120, allow_redirects=True)
+                          data = response.content
+                          content_type = response.headers.get('content-type', '')
+                          if response.status_code == 200 and data.startswith(b'%PDF-') and len(data) > 10000:
+                              target.write_bytes(data)
+                              used_url = response.url
+                              ok = True
+                              break
+                          last_error = f'HTTP {response.status_code}; type={content_type}; bytes={len(data)}; prefix={data[:40]!r}'
+                      except Exception as exc:
+                          last_error = repr(exc)
+                      time.sleep(attempt * 2)
+                  if ok:
+                      break
+
+              if not ok:
+                  failures.append(f"{doc['report']}: {last_error}")
+                  continue
+
+              raw = target.read_bytes()
+              sha = hashlib.sha256(raw).hexdigest().upper()
+              pages = ''
+              title = ''
+              try:
+                  proc = subprocess.run(['pdfinfo', str(target)], text=True, capture_output=True, check=True)
+                  for line in proc.stdout.splitlines():
+                      if line.startswith('Pages:'):
+                          pages = line.split(':', 1)[1].strip()
+                      elif line.startswith('Title:'):
+                          title = line.split(':', 1)[1].strip()
+              except Exception as exc:
+                  last_error = f'pdfinfo failed: {exc!r}'
+
+              rows.append({
+                  'filename': doc['filename'],
+                  'report': doc['report'],
+                  'document_id': doc['document_id'],
+                  'purpose': doc['purpose'],
+                  'download_url': used_url,
+                  'size_bytes': len(raw),
+                  'pages': pages,
+                  'sha256': sha,
+                  'pdf_header': raw[:5].decode('ascii', errors='replace'),
+                  'pdfinfo_title': title,
+              })
+
+          with (out / 'MANIFEST.csv').open('w', newline='', encoding='utf-8-sig') as f:
+              fields = ['filename','report','document_id','purpose','download_url','size_bytes','pages','sha256','pdf_header','pdfinfo_title']
+              writer = csv.DictWriter(f, fieldnames=fields)
+              writer.writeheader()
+              writer.writerows(rows)
+
+          readme = [
+              '# XV-15 / Full-Angle Wing Model Reference PDF Bundle',
+              '',
+              'This bundle contains the source PDFs needed for the current full-angle wing-model workflow.',
+              '',
+              '## Contents',
+          ]
+          for row in rows:
+              readme.append(f"- {row['report']}: {row['filename']} ({row['pages']} pages, SHA256 {row['sha256']})")
+          readme += [
+              '',
+              '## Intended use',
+              '- NASA CR-114614: rotor-wake/airframe interaction and immersed-area/local-flow equations.',
+              '- NASA TM-X-3069, TM-4741, NACA TR-903, TN-4322, TR R-84: traceable NACA 6/6A ordinate generation and validation.',
+              '- NASA TM-88373: NACA 64A223 near-vertical-flow and flap aerodynamic data.',
+              '- NASA CR-176970: XV-15 rotor/wing download geometry and strip-integration validation.',
+              '',
+              'All PDFs are public NASA/NACA technical reports. Verify the SHA256 values in MANIFEST.csv after copying.',
+          ]
+          (out / 'README.md').write_text('\n'.join(readme) + '\n', encoding='utf-8')
+
+          if failures:
+              print('\n'.join(failures))
+              raise SystemExit('One or more required PDFs could not be downloaded and verified.')
+
+          if len(rows) != len(docs):
+              raise SystemExit(f'Expected {len(docs)} PDFs, verified {len(rows)}.')
+
+          print(f'Verified {len(rows)} PDFs.')
+          PY
+
+      - name: List bundle
+        run: |
+          ls -lh bundle
+          cat bundle/MANIFEST.csv
+
+      - name: Upload PDF bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: XV15_full_angle_wing_reference_PDFs
+          path: bundle/
+          if-no-files-found: error
+          retention-days: 7
