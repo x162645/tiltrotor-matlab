@@ -1,0 +1,64 @@
+name: Build XV-15 PDF bundle on PR
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - name: Download PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle
+          getpdf() {
+            local id="$1" out="$2"
+            for url in \
+              "https://ntrs.nasa.gov/api/citations/${id}/downloads/${id}.pdf" \
+              "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/${id}.pdf"; do
+              echo "Trying $url"
+              if curl -fL --retry 4 --retry-delay 3 -A 'Mozilla/5.0' "$url" -o "bundle/$out.tmp"; then
+                if head -c 5 "bundle/$out.tmp" | grep -q '%PDF-'; then
+                  mv "bundle/$out.tmp" "bundle/$out"
+                  return 0
+                fi
+              fi
+            done
+            echo "Failed $id" >&2
+            return 1
+          }
+          getpdf 19730022217 NASA_CR_114614_Bell_Model_301_Mathematical_Model.pdf
+          getpdf 19740025318 NASA_TM_X_3069_NACA_6_6A_Ordinates_Program.pdf
+          getpdf 19970008124 NASA_TM_4741_NACA_Airfoil_Ordinates_Program.pdf
+          getpdf 19930091970 NACA_TR_903_6A_Series_Data.pdf
+          getpdf 19930085124 NACA_TN_4322_NACA_Airfoil_Ordinates.pdf
+          getpdf 19980223594 NASA_TR_R_84_NACA_Airfoil_Ordinates.pdf
+          getpdf 19870005749 NASA_TM_88373_Near_Vertical_Wing_Flap_Aerodynamics.pdf
+          getpdf 19860020297 NASA_CR_176970_XV15_Rotor_Wing_Download.pdf
+          printf 'filename,pages,size_bytes,sha256\n' > bundle/MANIFEST.csv
+          for f in bundle/*.pdf; do
+            pages=$(pdfinfo "$f" | awk '/^Pages:/ {print $2}')
+            size=$(stat -c %s "$f")
+            sha=$(sha256sum "$f" | awk '{print toupper($1)}')
+            printf '%s,%s,%s,%s\n' "$(basename "$f")" "$pages" "$size" "$sha" >> bundle/MANIFEST.csv
+          done
+          cat > bundle/README.txt <<'EOF'
+          XV-15 / full-angle wing-model source PDFs.
+          Includes CR-114614, TM-X-3069, TM-4741, TR-903, TN-4322,
+          TR R-84, TM-88373 and CR-176970.
+          Verify files against MANIFEST.csv after copying.
+          EOF
+          cat bundle/MANIFEST.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XV15_full_angle_wing_reference_PDFs
+          path: bundle/
+          if-no-files-found: error
+          retention-days: 7
