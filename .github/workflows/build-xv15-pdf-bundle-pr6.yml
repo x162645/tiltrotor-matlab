@@ -1,0 +1,74 @@
+name: Build XV-15 PDF bundle diagnostic final
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: task/full-wing-model-autonomous-20260702
+          path: source
+      - name: Assemble sources and diagnose CR-114614
+        shell: bash
+        run: |
+          mkdir -p bundle
+          cp source/references/wing_full_angle/NASA_TM_88373.pdf bundle/NASA_TM_88373.pdf
+          cp source/references/wing_full_angle/NASA_CR_176970.pdf bundle/NASA_CR_176970.pdf
+          cp source/references/wing_full_angle/naca_geometry/NASA_TM_X_3069.pdf bundle/NASA_TM_X_3069.pdf
+          cp source/references/wing_full_angle/naca_geometry/NASA_TM_4741.pdf bundle/NASA_TM_4741.pdf
+          cp source/references/wing_full_angle/naca_geometry/NACA_TR_903.pdf bundle/NACA_TR_903.pdf
+          cp source/references/wing_full_angle/naca_geometry/NASA_TR_R_84.pdf bundle/NASA_TR_R_84.pdf
+          python - <<'PY' > bundle/CR114614_download_log.txt 2>&1
+          from pathlib import Path
+          from urllib.parse import quote
+          import requests
+          target=Path('bundle/NASA_CR_114614.pdf')
+          raw='https://ntrs.nasa.gov/api/citations/19730022217/downloads/19730022217.pdf'
+          urls=[
+            raw,
+            raw+'?attachment=true',
+            'https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19730022217.pdf',
+            'https://api.allorigins.win/raw?url='+quote(raw,safe=''),
+            'https://corsproxy.io/?url='+quote(raw,safe=''),
+            'https://thingproxy.freeboard.io/fetch/'+raw,
+          ]
+          s=requests.Session(); s.headers.update({'User-Agent':'Mozilla/5.0','Accept':'application/pdf,*/*;q=0.8'})
+          for u in urls:
+            try:
+              r=s.get(u,timeout=60,allow_redirects=True)
+              data=r.content
+              print('URL',u)
+              print('status',r.status_code,'final',r.url,'type',r.headers.get('content-type'),'bytes',len(data),'prefix',repr(data[:80]))
+              if r.status_code==200 and data.startswith(b'%PDF-') and len(data)>100000:
+                target.write_bytes(data)
+                print('SUCCESS',u)
+                break
+            except Exception as e:
+              print('ERROR',u,repr(e))
+          print('target_exists',target.exists())
+          PY
+          sudo apt-get update >/dev/null
+          sudo apt-get install -y poppler-utils >/dev/null
+          printf 'filename,pages,size_bytes,sha256\n' > bundle/MANIFEST.csv
+          for f in bundle/*.pdf; do
+            [ -e "$f" ] || continue
+            pages=$(pdfinfo "$f" 2>/dev/null | awk '/^Pages:/ {print $2}')
+            size=$(stat -c %s "$f")
+            sha=$(sha256sum "$f" | awk '{print toupper($1)}')
+            printf '%s,%s,%s,%s\n' "$(basename "$f")" "$pages" "$size" "$sha" >> bundle/MANIFEST.csv
+          done
+          cat bundle/MANIFEST.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: XV15_PDF_bundle_with_CR_diagnostic
+          path: bundle/
+          if-no-files-found: error
+          retention-days: 7
