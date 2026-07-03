@@ -17,6 +17,7 @@ if area <= 0 || V < 1e-8
     data.Cm = 0;
     data.controlSurfaceModel = 'no_load_zero_area_or_velocity';
     data.aileronAerodynamicsMode = 'UNMODELED_NO_CREDIBLE_FULL_ANGLE_AILERON_DATA';
+    data.outOfRangeClamped = false;
     return;
 end
 alpha = atan2(Vlocal(3), Vlocal(1));
@@ -50,6 +51,7 @@ data.Cm = Cm;
 data.databaseId = coeff.databaseId;
 data.dimensionPolicy = coeff.dimensionPolicy;
 data.dimensionReductionActive = coeff.dimensionReductionActive;
+data.outOfRangeClamped = coeff.outOfRangeClamped;
 end
 
 function Re = local_reynolds(V, chord, P)

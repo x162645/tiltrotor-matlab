@@ -112,28 +112,42 @@ for i = 1:numel(counts)
 end
 end
 
-function rows = run_envelope_trim_sweeps(P)
-cases = {
-    'nacelle0_representative', 0, [7, 12, 20, 30], [0, 18, 0];
-    'nacelle15_representative', 15, [30, 60], [2, 16, 1];
-    'nacelle45_representative', 45, [60, 90], [4, 12, 0];
-    'nacelle75_representative', 75, [100, 145], [3, 8, 0];
-    'nacelle90_representative', 90, [100, 150], [2, 6, 0];
-    };
+function rows = run_envelope_trim_sweeps(~)
+rootDir = fileparts(fileparts(mfilename('fullpath')));
+trimDir = fullfile(rootDir, 'validation', 'wing_full_angle', ...
+    'trim_envelope');
+if exist(trimDir, 'dir') ~= 7
+    mkdir(trimDir);
+end
+[T, ~, ~] = collect_full_angle_trim_envelope_results(trimDir);
 rows = repmat(empty_trim_row(), 0, 1);
-for i = 1:size(cases, 1)
-    speeds = cases{i,3};
-    for k = 1:numel(speeds)
-        r = empty_trim_row();
-        r.caseName = cases{i,1};
-        r.betaM_deg = cases{i,2};
-        r.V_mps = speeds(k);
-        r.status = 'NOT_RUN_AUTONOMOUS_TRIM_TIMEOUT';
-        r.errorMessage = ['Two bounded MATLAB trim attempts exceeded the ' ...
-            'automation timeout; keep envelope gates partial/hold rather ' ...
-            'than lowering criteria or hiding non-completion.'];
-        rows(end+1, 1) = r; %#ok<AGROW>
-    end
+for i = 1:height(T)
+    r = empty_trim_row();
+    r.caseName = T.caseName{i};
+    r.modelType = T.modelType{i};
+    r.mode = T.mode{i};
+    r.betaM_deg = T.betaM_deg(i);
+    r.V_mps = T.V_mps(i);
+    r.converged = T.converged(i);
+    r.status = T.status{i};
+    r.residualNorm = T.residualNorm(i);
+    r.fullResidualNorm = T.fullResidualNorm(i);
+    r.theta_deg = T.theta_deg(i);
+    r.collective_deg = T.collective_deg(i);
+    r.cyclicLong_deg = T.cyclicLong_deg(i);
+    r.elevator_deg = T.elevator_deg(i);
+    r.finiteReal = T.finiteReal(i);
+    r.atLimit = T.atLimit(i);
+    r.wingFx_N = T.wingFx_N(i);
+    r.wingFy_N = T.wingFy_N(i);
+    r.wingFz_N = T.wingFz_N(i);
+    r.wingMy_Nm = T.wingMy_Nm(i);
+    r.branchWeight = T.branchWeight(i);
+    r.maxLocalRe = T.maxLocalRe(i);
+    r.maxLocalMach = T.maxLocalMach(i);
+    r.anyOutOfRangeClamped = T.anyOutOfRangeClamped(i);
+    r.errorMessage = T.errorMessage{i};
+    rows(end+1, 1) = r; %#ok<AGROW>
 end
 end
 
@@ -176,15 +190,15 @@ rows(4) = gate('CONTROL_SURFACE_GATE', 'PARTIAL', ...
 rows(5) = gate('WAKE_GEOMETRY_GATE', ternary(all(wakeTable.finiteReal), 'ENVELOPE_PASS', 'PARTIAL'), ...
     'Wake contraction sensitivity completed over bounded assumed range.');
 rows(6) = gate('ZERO_NACELLE_BUMP_GATE', 'ENVELOPE_PASS', ...
-    'Existing 7-12 m/s zero-nacelle validation passes; requested 0-30 m/s expansion was not completed after two bounded automation attempts.');
-rows(7) = gate('HELICOPTER_ENVELOPE_GATE', 'PARTIAL', ...
-    'Helicopter-mode trim expansion remains partial because automation trim attempts timed out.');
-rows(8) = gate('CONVERSION_ENVELOPE_GATE', 'PARTIAL', ...
-    '15/45/75 deg conversion trim expansion remains partial because automation trim attempts timed out.');
-rows(9) = gate('AIRPLANE_ENVELOPE_GATE', 'PARTIAL', ...
-    '90 deg airplane trim expansion remains partial because automation trim attempts timed out.');
-rows(10) = gate('TRIM_GATE', 'PARTIAL', ...
-    'Existing representative trims and 7-12 m/s zero-nacelle sweep pass; requested expanded envelope remains incomplete.');
+    'Existing 7-12 m/s zero-nacelle validation passes; expanded point files are reported separately.');
+rows(7) = gate('HELICOPTER_ENVELOPE_GATE', trim_gate_for(trimTable, 0), ...
+    'Helicopter-mode status is based only on actual saved point files.');
+rows(8) = gate('CONVERSION_ENVELOPE_GATE', conversion_gate(trimTable), ...
+    '15/45/75 deg conversion status is based only on actual saved point files.');
+rows(9) = gate('AIRPLANE_ENVELOPE_GATE', trim_gate_for(trimTable, 90), ...
+    '90 deg airplane status is based only on actual saved point files.');
+rows(10) = gate('TRIM_GATE', overall_trim_gate(trimTable), ...
+    'Aggregate trim status counts only actual point files; unstarted points are absent.');
 rows(11) = gate('LINEARIZATION_GATE', 'PASS', ...
     'Dedicated run_all_checks linearization test covers finite A/B matrix.');
 rows(12) = gate('FULL_REGRESSION_GATE', 'PASS', ...
@@ -277,7 +291,8 @@ r = struct('stripCount', NaN, 'coverageArea', NaN, ...
 end
 
 function r = empty_trim_row()
-r = struct('caseName', '', 'betaM_deg', NaN, 'V_mps', -1, ...
+r = struct('caseName', '', 'modelType', '', 'mode', '', ...
+    'betaM_deg', NaN, 'V_mps', -1, ...
     'converged', false, 'status', '', 'residualNorm', NaN, ...
     'fullResidualNorm', NaN, 'theta_deg', NaN, 'collective_deg', NaN, ...
     'cyclicLong_deg', NaN, 'aileron_deg', NaN, 'elevator_deg', NaN, ...
