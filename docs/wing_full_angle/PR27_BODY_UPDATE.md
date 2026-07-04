@@ -47,3 +47,14 @@ Regression checks:
 - `run_full_angle_zero_nacelle_validation`: PASS.
 - `check_article_trends`: diagnostic run completed; not a strict reproduction proof.
 - `run_all_checks`: PASS, 33/33 checks passed.
+
+## Zero Helicopter Common-Cause Audit
+
+Conclusion: `ZERO_HELI_COMMON_CAUSE_AUDIT_PARTIAL`.
+
+- `CYCLIC_MAPPING_GATE = PASS_IF_SIGN_OR_EQUIVALENT_EXPLAINS`
+- `COLLECTIVE_REVERSAL_GATE = MIXED_OR_UNRESOLVED`
+- `COMMON_CAUSE_CLASSIFICATION = CYCLIC_OUTPUT_MAPPING_LIKELY`
+- `FINAL_RECOMMENDATION = DO_NOT_MODIFY_MODEL_YET_MAPPING_AUDIT_FIRST`
+- This audit is diagnostic only. It does not modify model equations, default parameters, or legacy/full-angle defaults.
+- Report: `docs/wing_full_angle/ZERO_HELICOPTER_COMMON_CAUSE_AUDIT_REPORT.md`

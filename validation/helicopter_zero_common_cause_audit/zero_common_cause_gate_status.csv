@@ -1,0 +1,7 @@
+gate,status,evidence,notes
+ZERO_HELI_AUDIT_DATA_GATE,PARTIAL,"Saved 0 deg legacy/full_angle trim points and baseline component data were available; switch-case retrims were not run.",Component closure cases are marked NOT_AVAILABLE without explicit enable switches.
+CYCLIC_MAPPING_GATE,PASS_IF_SIGN_OR_EQUIVALENT_EXPLAINS,"full_angle cyclicLong trend=decreasing; -cyclicLong trend=increasing; disk equivalent was available.",Do not change model sign before confirming NUAA vertical-pitch variable mapping.
+COLLECTIVE_REVERSAL_GATE,MIXED_OR_UNRESOLVED,"Saved full_angle collective trend=decreasing. Existing visual CSV mismatch with raw values=1.",The previously reported collective increase is not reproduced by strict numeric saved-point trend checks.
+COMPONENT_SWITCH_GATE,NOT_AVAILABLE,"No dedicated component enable switches were found; no parameter-zero retrim was performed.",Baseline component slopes are still recorded for force/moment diagnosis.
+COMMON_CAUSE_CLASSIFICATION,CYCLIC_OUTPUT_MAPPING_LIKELY,"The cyclic sign-reversed candidate gives the opposite trend, while collective reversal is not reproduced in saved numeric data.",This classification is limited by missing true component-switch retrims.
+FINAL_RECOMMENDATION,DO_NOT_MODIFY_MODEL_YET_MAPPING_AUDIT_FIRST,"Audit supports checking plot/output variable mapping before touching production model equations.",Keep full-angle opt-in and legacy default.

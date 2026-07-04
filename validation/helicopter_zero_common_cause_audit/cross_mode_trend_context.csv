@@ -1,0 +1,7 @@
+figure,betaM_deg,mode,mainLongitudinalControl,legacyTrend,fullAngleTrend,hasReversalProblem,notes
+Fig.5(a),0,helicopter_longitudinal,collective,increasing,increasing,1,context copied from existing overlay diagnostics; no NUAA digitization
+Fig.5(a),0,helicopter_longitudinal,longitudinal cyclic / vertical pitch,discontinuous,decreasing,1,context copied from existing overlay diagnostics; no NUAA digitization
+Fig.6(a),15,conversion_longitudinal,collective,decreasing,increasing,0,context copied from existing overlay diagnostics; no NUAA digitization
+Fig.6(a),15,conversion_longitudinal,longitudinal cyclic / vertical pitch,nonmonotonic,decreasing,0,context copied from existing overlay diagnostics; no NUAA digitization
+Fig.6(b),75,conversion_longitudinal,elevator,increasing,increasing,0,context copied from existing overlay diagnostics; no NUAA digitization
+Fig.5(b),90,airplane_longitudinal,elevator,increasing,increasing,0,context copied from existing overlay diagnostics; no NUAA digitization
