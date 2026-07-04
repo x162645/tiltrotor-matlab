@@ -2,77 +2,30 @@
 
 Status: keep this PR open, Draft, and unmerged.
 
+## Owner-Facing Conclusion
+
+可以保留为 Draft 的有限包线研究模型
+
+Recommendation: continue to keep the PR as Draft; do not merge; do not switch the default model.
+
 ## Current Gate
 
 `FULL_WING_MODEL_GATE = READY_FOR_LIMITED_ENVELOPE_USE`
 
-The expanded trim-envelope evidence is now real and resumable, but the overall gate is not upgraded to final owner review because:
+Reasons this is not ready to merge or become default:
 
 - `CONTROL_SURFACE_GATE = PARTIAL`; no validated differential aileron aero model was added.
 - `BRIDGE_MODEL_GATE = ENVELOPE_PASS`; deep-stall bridge rows remain unvalidated.
+- `WAKE_GEOMETRY_GATE = ENVELOPE_PASS`; wake contraction remains an engineering assumption.
 - Legacy remains the default model.
 
-## New Evidence Added
+## Evidence Summary
 
-- Added atomic point execution: `analysis/run_full_angle_trim_point.m`.
-- Added resumable envelope runner: `analysis/run_full_angle_trim_envelope_resumable.m`.
-- Added aggregate collector: `analysis/collect_full_angle_trim_envelope_results.m`.
-- Removed the previous `NOT_RUN_AUTONOMOUS_TRIM_TIMEOUT` placeholder-row path from the final evidence flow.
-- Added tests for schema, resume, hash skip, no placeholder rows, actual execution, mode definitions, and legacy/full-angle pairing.
+- Trim envelope: 84 attempted, 84 completed, 84 converged, 0 timeout, 0 failed, 0 placeholder rows.
+- Legacy identity: PASS, max force error 0.000e+00, max moment error 0.000e+00.
+- Full-angle opt-in: common coefficient law 1, complete-result branch blend removed 1, branchWeightInNew 0.
+- Requested MATLAB checks all passed: 1.
 
-## Trim Envelope Results
+## Owner Review Packet
 
-Output root:
-
-`validation/wing_full_angle/trim_envelope/`
-
-Aggregates:
-
-- `full_angle_trim_envelope_results.csv`
-- `full_angle_trim_envelope_summary.csv`
-- `full_angle_trim_envelope_gate_status.csv`
-
-Point evidence:
-
-- 84 actual point rows.
-- 84 converged.
-- 0 timeout.
-- 0 failed.
-- 0 placeholder/unrun rows.
-
-Coverage:
-
-| betaM deg | speeds covered | models |
-|---:|---|---|
-| 0 | 0, 5, 10, 12, 15, 20, 25, 30 | legacy, full_angle |
-| 15 | 10, 20, 30, 40, 50, 60 | legacy, full_angle |
-| 45 | 35, 50, 60, 65, 70, 75, 80, 95 | legacy, full_angle |
-| 75 | 70, 85, 100, 115, 125, 130, 135, 140, 145 | legacy, full_angle |
-| 90 | 70, 85, 100, 115, 120, 125, 130, 135, 140, 145, 150 | legacy, full_angle |
-
-## Tests
-
-MATLAB R2021a:
-
-- Focused full-angle checks: PASS.
-- `run_full_angle_zero_nacelle_validation`: PASS.
-- `check_article_trends`: finite diagnostic.
-- New trim-envelope checks: PASS.
-- `run_all_checks`: 33/33 PASS.
-
-## Gate Table
-
-| Gate | Status |
-|---|---|
-| TM88373_DATA_GATE | PASS_FOR_SELECTED_FIGURE6A_GRAPH_DIGITIZATION |
-| BRIDGE_MODEL_GATE | ENVELOPE_PASS |
-| FULL_ANGLE_DATABASE_GATE | ENVELOPE_PASS |
-| CONTROL_SURFACE_GATE | PARTIAL |
-| WAKE_GEOMETRY_GATE | ENVELOPE_PASS |
-| ZERO_NACELLE_BUMP_GATE | ENVELOPE_PASS |
-| HELICOPTER_ENVELOPE_GATE | ENVELOPE_PASS |
-| CONVERSION_ENVELOPE_GATE | ENVELOPE_PASS |
-| AIRPLANE_ENVELOPE_GATE | ENVELOPE_PASS |
-| TRIM_GATE | ENVELOPE_PASS |
-| LINEARIZATION_GATE | PASS |
-| FULL_REGRESSION_GATE | PASS |
+`docs/wing_full_angle/OWNER_REVIEW_PACKET.md`
