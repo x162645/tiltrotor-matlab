@@ -1,0 +1,13 @@
+figure,mode,betaM_deg,variable,nuaa_expected_visual_trend,legacy_visual_trend,full_angle_visual_trend,legacy_obvious_issue,full_angle_obvious_issue,manual_owner_judgement,notes
+Fig.5(a),helicopter_longitudinal,0,collective,OWNER_VISUAL_CHECK_REQUIRED,increasing,increasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.5(a),helicopter_longitudinal,0,longitudinal cyclic / vertical pitch,OWNER_VISUAL_CHECK_REQUIRED,discontinuous,decreasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.5(a),helicopter_longitudinal,0,pitch angle,OWNER_VISUAL_CHECK_REQUIRED,discontinuous,decreasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.5(b),airplane_longitudinal,90,collective,OWNER_VISUAL_CHECK_REQUIRED,increasing,increasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.5(b),airplane_longitudinal,90,elevator,OWNER_VISUAL_CHECK_REQUIRED,increasing,increasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.5(b),airplane_longitudinal,90,pitch angle,OWNER_VISUAL_CHECK_REQUIRED,decreasing,decreasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.6(a),conversion_longitudinal,15,collective,OWNER_VISUAL_CHECK_REQUIRED,decreasing,increasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.6(a),conversion_longitudinal,15,longitudinal cyclic / vertical pitch,OWNER_VISUAL_CHECK_REQUIRED,nonmonotonic,decreasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.6(a),conversion_longitudinal,15,pitch angle,OWNER_VISUAL_CHECK_REQUIRED,decreasing,decreasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.6(b),conversion_longitudinal,75,collective,OWNER_VISUAL_CHECK_REQUIRED,increasing,increasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.6(b),conversion_longitudinal,75,elevator,OWNER_VISUAL_CHECK_REQUIRED,increasing,increasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.
+Fig.6(b),conversion_longitudinal,75,pitch angle,OWNER_VISUAL_CHECK_REQUIRED,decreasing,decreasing,none_auto_detected,none_auto_detected,OWNER_TO_FILL,NUAA curve is image reference only; no digitization.

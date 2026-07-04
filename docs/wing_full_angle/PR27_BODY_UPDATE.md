@@ -29,3 +29,21 @@ Reasons this is not ready to merge or become default:
 ## Owner Review Packet
 
 `docs/wing_full_angle/OWNER_REVIEW_PACKET.md`
+
+## NUAA Trim Trend Visual Overlay
+
+Conclusion: `VISUAL_OVERLAY_READY_FOR_OWNER_REVIEW`.
+
+- NUAA Fig.5(a), Fig.5(b), Fig.6(a), and Fig.6(b) were used as screenshot references only.
+- No NUAA curve digitization and no pointwise NUAA-model error calculation were performed.
+- Existing legacy/full_angle trim envelope results were reused; no parameter tuning was performed.
+- Legacy remains the default model; this PR remains Draft and unmerged.
+
+Report: `docs/wing_full_angle/NUAA_TRIM_TREND_VISUAL_OVERLAY_REPORT.md`
+
+Regression checks:
+
+- `check_wing_legacy_identity`: PASS.
+- `run_full_angle_zero_nacelle_validation`: PASS.
+- `check_article_trends`: diagnostic run completed; not a strict reproduction proof.
+- `run_all_checks`: PASS, 33/33 checks passed.
