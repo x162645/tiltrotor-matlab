@@ -1,25 +1,25 @@
-figure,mode,betaM_deg,modelType,variable,sourceColumn,allConverged,finite,anyAtLimit,maxAbsFirstDiff,maxAbsSecondDiff,hasJump,hasLocalBump,visualTrend,fullAngleSmootherThanLegacy,branchWeightZero
-Fig.5(a),helicopter_longitudinal,0,legacy,collective,collective_deg,1,1,0,0.505632328341299,0.262590732331695,0,0,increasing,0,1
-Fig.5(a),helicopter_longitudinal,0,legacy,longitudinal cyclic / vertical pitch,cyclicLong_deg,1,1,0,0.537831068227352,0.281485297759665,0,1,discontinuous,0,1
-Fig.5(a),helicopter_longitudinal,0,legacy,pitch angle,theta_deg,1,1,0,1.53936586014472,1.59712232545237,0,1,discontinuous,0,1
-Fig.5(a),helicopter_longitudinal,0,full_angle,collective,collective_deg,1,1,0,0.451590668553802,0.311001158726503,0,0,increasing,0,1
-Fig.5(a),helicopter_longitudinal,0,full_angle,longitudinal cyclic / vertical pitch,cyclicLong_deg,1,1,0,1.47392583677888,0.545419519718629,0,0,decreasing,0,1
-Fig.5(a),helicopter_longitudinal,0,full_angle,pitch angle,theta_deg,1,1,0,0.78285665264899,0.70951502777892,0,1,decreasing,1,1
-Fig.5(b),airplane_longitudinal,90,legacy,collective,collective_deg,1,1,0,4.5112996184066,2.634115409283,0,0,increasing,0,1
-Fig.5(b),airplane_longitudinal,90,legacy,elevator,elevator_deg,1,1,0,8.97909959665499,4.78581028548339,0,0,increasing,0,1
-Fig.5(b),airplane_longitudinal,90,legacy,pitch angle,theta_deg,1,1,0,5.8163405017853,3.14672630795488,0,0,decreasing,0,1
-Fig.5(b),airplane_longitudinal,90,full_angle,collective,collective_deg,1,1,0,4.4625757714343,2.6274533282117,0,0,increasing,1,1
-Fig.5(b),airplane_longitudinal,90,full_angle,elevator,elevator_deg,1,1,0,8.56228337944068,5.39780281944388,0,0,increasing,0,1
-Fig.5(b),airplane_longitudinal,90,full_angle,pitch angle,theta_deg,1,1,0,6.42428792645761,4.44141323081048,0,0,decreasing,0,1
-Fig.6(a),conversion_longitudinal,15,legacy,collective,collective_deg,1,1,0,1.1233272818421,0.564854737085099,0,1,decreasing,0,1
-Fig.6(a),conversion_longitudinal,15,legacy,longitudinal cyclic / vertical pitch,cyclicLong_deg,1,1,0,3.84307360326829,1.6869445518458,0,1,nonmonotonic,0,1
-Fig.6(a),conversion_longitudinal,15,legacy,pitch angle,theta_deg,1,1,0,2.44907831645881,0.649580407126922,0,0,decreasing,0,1
-Fig.6(a),conversion_longitudinal,15,full_angle,collective,collective_deg,1,1,0,0.580365846661202,0.2476706710467,0,1,increasing,1,1
-Fig.6(a),conversion_longitudinal,15,full_angle,longitudinal cyclic / vertical pitch,cyclicLong_deg,1,1,0,5.60817775225508,2.71101680958278,0,1,decreasing,0,1
-Fig.6(a),conversion_longitudinal,15,full_angle,pitch angle,theta_deg,1,1,0,2.81315713992246,0.96967689355186,0,0,decreasing,0,1
-Fig.6(b),conversion_longitudinal,75,legacy,collective,collective_deg,1,1,0,4.8477226696303,1.5030212939452,0,0,increasing,0,1
-Fig.6(b),conversion_longitudinal,75,legacy,elevator,elevator_deg,1,1,0,8.17387731652954,4.19568498834006,0,0,increasing,0,1
-Fig.6(b),conversion_longitudinal,75,legacy,pitch angle,theta_deg,1,1,0,5.34289629451515,2.78703931325445,0,0,decreasing,0,1
-Fig.6(b),conversion_longitudinal,75,full_angle,collective,collective_deg,1,1,0,4.9076982161276,1.48978443557981,0,0,increasing,1,1
-Fig.6(b),conversion_longitudinal,75,full_angle,elevator,elevator_deg,1,1,0,8.10733776367953,5.01794999485538,0,0,increasing,0,1
-Fig.6(b),conversion_longitudinal,75,full_angle,pitch angle,theta_deg,1,1,0,6.29100829889192,4.3335702915523,0,0,decreasing,0,1
+figure,mode,betaM_deg,modelType,variable,sourceColumn,allConverged,finite,anyAtLimit,maxAbsFirstDiff,maxAbsSecondDiff,hasJump,hasLocalBump,visualTrend,fullAngleSmootherThanLegacy,branchWeightZero,mappingRefresh
+Fig.5(a),helicopter_longitudinal,0,legacy,collective,collective_deg,1,1,0,0.505632328341299,0.262590732331695,0,0,decreasing,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.5(a),helicopter_longitudinal,0,legacy,Vertical pitch mapped: -cyclicLong_deg,verticalPitchMapped_deg,1,1,0,0.537831068227352,0.281485297759665,0,1,nonmonotonic,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.5(a),helicopter_longitudinal,0,legacy,pitch angle,theta_deg,1,1,0,1.53936586014472,1.59712232545237,0,1,discontinuous,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.5(a),helicopter_longitudinal,0,full_angle,collective,collective_deg,1,1,0,0.451590668553802,0.311001158726503,0,0,decreasing,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.5(a),helicopter_longitudinal,0,full_angle,Vertical pitch mapped: -cyclicLong_deg,verticalPitchMapped_deg,1,1,0,1.47392583677888,0.545419519718629,0,0,increasing,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.5(a),helicopter_longitudinal,0,full_angle,pitch angle,theta_deg,1,1,0,0.78285665264899,0.70951502777892,0,1,discontinuous,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.5(b),airplane_longitudinal,90,legacy,collective,collective_deg,1,1,0,4.5112996184066,2.634115409283,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.5(b),airplane_longitudinal,90,legacy,elevator_deg,elevator_deg,1,1,0,8.97909959665499,4.78581028548339,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.5(b),airplane_longitudinal,90,legacy,pitch angle,theta_deg,1,1,0,5.8163405017853,3.14672630795488,0,0,decreasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.5(b),airplane_longitudinal,90,full_angle,collective,collective_deg,1,1,0,4.4625757714343,2.6274533282117,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.5(b),airplane_longitudinal,90,full_angle,elevator_deg,elevator_deg,1,1,0,8.56228337944068,5.39780281944388,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.5(b),airplane_longitudinal,90,full_angle,pitch angle,theta_deg,1,1,0,6.42428792645761,4.44141323081048,0,0,decreasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.6(a),conversion_longitudinal,15,legacy,collective,collective_deg,1,1,0,1.1233272818421,0.564854737085099,0,1,discontinuous,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.6(a),conversion_longitudinal,15,legacy,Vertical pitch mapped: -cyclicLong_deg,verticalPitchMapped_deg,1,1,0,3.84307360326829,1.6869445518458,0,1,discontinuous,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.6(a),conversion_longitudinal,15,legacy,pitch angle,theta_deg,1,1,0,2.44907831645881,0.649580407126922,0,0,decreasing,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.6(a),conversion_longitudinal,15,full_angle,collective,collective_deg,1,1,0,0.580365846661202,0.2476706710467,0,1,nonmonotonic,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.6(a),conversion_longitudinal,15,full_angle,Vertical pitch mapped: -cyclicLong_deg,verticalPitchMapped_deg,1,1,0,5.60817775225508,2.71101680958278,0,1,discontinuous,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.6(a),conversion_longitudinal,15,full_angle,pitch angle,theta_deg,1,1,0,2.81315713992246,0.96967689355186,0,0,decreasing,0,1,Vertical pitch is compared using mapped candidate variable: -cyclicLong_deg.
+Fig.6(b),conversion_longitudinal,75,legacy,collective,collective_deg,1,1,0,4.8477226696303,1.5030212939452,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.6(b),conversion_longitudinal,75,legacy,elevator_deg,elevator_deg,1,1,0,8.17387731652954,4.19568498834006,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.6(b),conversion_longitudinal,75,legacy,pitch angle,theta_deg,1,1,0,5.34289629451515,2.78703931325445,0,0,decreasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.6(b),conversion_longitudinal,75,full_angle,collective,collective_deg,1,1,0,4.9076982161276,1.48978443557981,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.6(b),conversion_longitudinal,75,full_angle,elevator_deg,elevator_deg,1,1,0,8.10733776367953,5.01794999485538,0,0,increasing,0,1,Elevator mapping rechecked; no remapping applied.
+Fig.6(b),conversion_longitudinal,75,full_angle,pitch angle,theta_deg,1,1,0,6.29100829889192,4.3335702915523,0,0,decreasing,0,1,Elevator mapping rechecked; no remapping applied.

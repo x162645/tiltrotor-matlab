@@ -58,3 +58,14 @@ Conclusion: `ZERO_HELI_COMMON_CAUSE_AUDIT_PARTIAL`.
 - `FINAL_RECOMMENDATION = DO_NOT_MODIFY_MODEL_YET_MAPPING_AUDIT_FIRST`
 - This audit is diagnostic only. It does not modify model equations, default parameters, or legacy/full-angle defaults.
 - Report: `docs/wing_full_angle/ZERO_HELICOPTER_COMMON_CAUSE_AUDIT_REPORT.md`
+
+
+
+## NUAA Trim Trend Mapping Refresh
+
+Conclusion: `NUAA_MAPPING_REFRESH_READY`.
+
+- Fig.5(a) and Fig.6(a) Vertical pitch comparison now uses `-cyclicLong_deg`.
+- Fig.5(b) and Fig.6(b) elevator mapping was rechecked; no remapping applied.
+- This is a validation-overlay mapping refresh only; no model equations, default parameters, or legacy/full-angle defaults changed.
+- Report: `docs/wing_full_angle/NUAA_TRIM_TREND_MAPPING_REFRESH_REPORT.md`
