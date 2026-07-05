@@ -47,6 +47,8 @@ constraint logic.
 | Rotor | `P.rotor.R` | 25.0 ft diameter | `3.81 m` | Radius from diameter/2 |
 | Rotor | `P.rotor.Nb` | 3 blades/proprotor | `3` | Blade count |
 | Rotor | `P.rotor.chord` | 14.0 in | `0.3556 m` | Constant chord |
+| Rotor derived | `P.rotor.Ib` | not an XV-15 public value | `P.rotor.bladeMass * P.rotor.R^2 / 3` | Recomputed from assumed blade mass and public radius only |
+| Rotor derived | `P.rotor.Sblade` | not an XV-15 public value | `P.rotor.bladeMass * P.rotor.R / 2` | Recomputed from assumed blade mass and public radius only |
 | Rotor | `P.rotor.solidityReference` | 0.089 | `0.089` | Reference field |
 | Rotor | `P.rotor.diskLoadingReference_lb_ft2` | 13.2 lb/sq ft | `13.2 lb/sq ft` | Kept in source units as label/reference |
 | Rotor | `P.rotor.OmegaHelicopter` | 589 rpm | `61.68018 rad/s` | Reference schedule value |
@@ -62,14 +64,18 @@ constraint logic.
 | Powerplant | `P.powerplant.helicopterModeTransmissionLimit_shp` | 1160 SHP | `1160 shp` | Reference only |
 | Control | `P.control.flapMax` | 75 deg | `1.30899694 rad` | Added reference field |
 | Control | `P.control.flaperonMax` | 47 deg | `0.82030475 rad` | Added reference field; does not overwrite `aileronLim` |
-| Nacelle | `P.nacelle.sourceAngleConvention` | 90 deg helicopter, 0 deg airplane | char label | Source convention |
+| Nacelle | `P.nacelle.sourceAngleConvention` | 90 deg helicopter, 0 deg airplane | char label | SP-2000-4517 conversion description |
 | Nacelle | `P.nacelle.modelAngleConvention` | code betaM convention | char label | Code convention remains unchanged |
-| Nacelle | `P.nacelle.rateNormal` | 7.5 deg/s | `0.13089969 rad/s` | Reference field |
-| Nacelle | `P.nacelle.rateSlow` | 1.5 deg/s | `0.02617994 rad/s` | Reference field |
+| Nacelle | `P.nacelle.rateNormal` | 7.5 deg/s | `0.13089969 rad/s` | SP-2000-4517 conversion description |
+| Nacelle | `P.nacelle.rateSlow` | 1.5 deg/s | `0.02617994 rad/s` | SP-2000-4517 conversion description |
 
 The wing sweep and dihedral fields are stored as public metadata. The current
 aerodynamic force-coordinate calculations do not use these fields yet, so they
 are stored but not yet applied.
+
+`P.rotor.Ib` and `P.rotor.Sblade` are still not XV-15 public parameters. They
+are recomputed only to keep the retained assumed blade-mass model internally
+consistent after `P.rotor.R` is replaced by the public XV-15 rotor radius.
 
 ## Parameters Not Yet Publicly Confirmed
 
@@ -81,7 +87,9 @@ assumed, calibrated, derived from assumed values, or reference-pending:
 - Rotor hub and nacelle geometry: `P.rotor.RH_hub`, `P.rotor.pivotX`,
   `P.rotor.pivotY`, `P.rotor.pivotZ`.
 - Blade dynamic parameters: `P.rotor.bladeMass`, `P.rotor.Ib`,
-  `P.rotor.Sblade`.
+  `P.rotor.Sblade`. `Ib` and `Sblade` are recomputed from the assumed blade
+  mass and public rotor radius, but remain non-XV-15-sourced derived
+  assumptions.
 - Wing aerodynamic coefficients and control derivatives:
   `P.wing.CL0`, `P.wing.CLalpha`, `P.wing.CLmax`, `P.wing.CD0`,
   `P.wing.kInduced`, `P.wing.Cm0`, `P.wing.Cmalpha`,

@@ -106,6 +106,10 @@ P.vtail.retainedConceptStatus = struct( ...
 P.rotor.R = 0.5 * 25.0 * ft_to_m;
 P.rotor.Nb = 3;
 P.rotor.chord = 14.0 * in_to_m;
+P.rotor.Ib = P.rotor.bladeMass * P.rotor.R^2 / 3;
+P.rotor.Sblade = P.rotor.bladeMass * P.rotor.R / 2;
+P.rotor.derivedAssumptionStatus = ...
+    'RECOMPUTED_FROM_ASSUMED_BLADE_MASS_AND_PUBLIC_RADIUS_NOT_XV15_SOURCED';
 P.rotor.solidityReference = 0.089;
 P.rotor.diskLoadingReference_lb_ft2 = 13.2;
 P.rotor.OmegaHelicopter = 589 * 2*pi / 60;
@@ -151,5 +155,5 @@ P.nacelle.modelAngleConvention = 'CODE: betaM=0 helicopter, betaM=pi/2 airplane'
 P.nacelle.rateNormal = 7.5 * d2r;
 P.nacelle.rateSlow = 1.5 * d2r;
 P.nacelle.publicReferenceSource = ...
-    'NASA_TM_81177_NOTATION_AND_SUMMARY_PDF_4_6';
+    'NASA_SP_2000_4517_APPENDIX_A_XV15_CHARACTERISTICS_AND_CONVERSION_DESCRIPTION';
 end
