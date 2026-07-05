@@ -1,0 +1,23 @@
+# Gate 0 Runtime And Default Report
+
+|check|status|notes|
+|-|-|-|
+|startup_path|PASS|audit added required paths|
+|params_nominal_load|PASS|params_nominal returned without error|
+|legacy_default|PASS|P.wing.modelType|
+|full_angle_opt_in|PASS|P.wing.fullAngleModelEnabled|
+|run_all_checks_entry_exists|PASS|entry exists|
+|protected_production_paths_clean|PASS|git status params/model/app|
+
+
+
+
+
+
+
+
+
+
+
+
+Gate 0 checks startup reachability, default model protection, and protected-path cleanliness.

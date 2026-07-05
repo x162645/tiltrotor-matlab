@@ -1,0 +1,28 @@
+function enums = validation_model_evidence_enums()
+%VALIDATION_MODEL_EVIDENCE_ENUMS Central enum lists for validation evidence.
+
+enums.comparisonType = { ...
+    'NUMERIC_MAGNITUDE'
+    'SIGN_CHECK'
+    'TREND_CHECK'
+    'CONTINUITY_CHECK'
+    'DERIVATIVE_SIGN'
+    'DERIVATIVE_MAGNITUDE'
+    'INTERNAL_BALANCE'
+    'NON_COMPARABLE'
+    'OWNER_VISUAL_REVIEW_ONLY'};
+
+enums.evidenceStrength = { ...
+    'HARD'
+    'SEMI_HARD'
+    'SOFT'
+    'INTERNAL_ONLY'
+    'NON_COMPARABLE'};
+
+enums.finalConclusion = { ...
+    'MODEL_VALIDATION_READY_FOR_OWNER_REVIEW'
+    'MODEL_VALIDATION_PARTIAL_WITH_LIMITATIONS'
+    'MODEL_VALIDATION_BLOCKED_BY_HARD_GATE_FAILURE'
+    'MODEL_VALIDATION_BLOCKED_BY_MISSING_EVIDENCE'
+    'MODEL_VALIDATION_BLOCKED_BY_RUNTIME_ERROR'};
+end

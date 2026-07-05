@@ -1,0 +1,29 @@
+# Owner Gate Summary
+
+|gate_no|gate|status|hard_gate|runtime_s|cache_action|notes|
+|-|-|-|-|-|-|-|
+|0|GATE0_RUNTIME_DEFAULT|PASS|1|3.09224|RUN|Gate0 checks passed 6/6.|
+|1|GATE1_TRIM_CLOSURE|PASS|1|0.63642|RUN|Trim rows read from existing envelope: 84.|
+|2|GATE2_COMPONENT_BALANCE|PASS|1|0.433542|RUN|Component balance checked on 5 saved trim points.|
+|3|GATE3_ROTOR_CONTROL|PASS|0|0.818239|RUN|Rotor/control derivatives computed at one representative hover state.|
+|4|GATE4_WING_WAKE|PASS|0|0.987771|RUN|Full-angle wing path checked without changing defaults.|
+|5|GATE5_TRIM_TREND_COMPARABILITY|PASS_WITH_LIMITATIONS|0|0.308967|RUN|0 deg partial, 15 deg non-comparable, 75/90 deg soft comparable.|
+|6|GATE6_LINEARIZATION_STABILITY|PASS|1|2.83092|RUN|Linearization checked on 3 saved trim points.|
+|7|GATE7_NUMERICAL_ROBUSTNESS|PASS_WITH_LIMITATIONS|0|3.80024|RUN|Local step-size sensitivity completed; broad sweeps are not rerun here.|
+|8|GATE8_OWNER_PACKAGE|PASS|0|0.0088478|RUN|Owner package manifest generated.|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Owner package gate status table.

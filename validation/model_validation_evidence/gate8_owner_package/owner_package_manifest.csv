@@ -1,0 +1,7 @@
+artifact,purpose
+evidence_matrix,owner evidence index
+gate_summary,gate status
+hard_gate_failures,hard failure filter
+non_comparable_items,non comparable filter
+soft_reference_comparisons,soft reference filter
+unresolved_items,manual follow-up filter

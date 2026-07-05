@@ -1,0 +1,7 @@
+variable,minValue,maxValue,finiteReal
+alpha_deg,-180,180,1
+Re,600000,1400000,1
+Mach,0,0.1,1
+CL,-1.0817,1.22,1
+CD,0.00728,1.69505,1
+Cm,-0.55,0.55,1

@@ -1,0 +1,5 @@
+source_figure,model_case,comparability,comparison_type,evidence_strength,reason
+Fig.5(a),0 deg,PARTIAL_COMPARABLE,TREND_CHECK,SOFT,collective and pitch angle may be trend context; vertical pitch/cyclic are not hard gates.
+Fig.6(a),15 deg,NON_COMPARABLE_OR_UNRESOLVED,NON_COMPARABLE,NON_COMPARABLE,conversion_longitudinal pitchCommand allocation differs from the paper manipulation method.
+Fig.6(b),75 deg,SOFT_COMPARABLE,OWNER_VISUAL_REVIEW_ONLY,SOFT,elevator chain is screenshot-level trend context only.
+Fig.5(b),90 deg,SOFT_COMPARABLE,OWNER_VISUAL_REVIEW_ONLY,SOFT,elevator chain is screenshot-level trend context only.
