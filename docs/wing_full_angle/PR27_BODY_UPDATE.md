@@ -69,3 +69,14 @@ Conclusion: `NUAA_MAPPING_REFRESH_READY`.
 - Fig.5(b) and Fig.6(b) elevator mapping was rechecked; no remapping applied.
 - This is a validation-overlay mapping refresh only; no model equations, default parameters, or legacy/full-angle defaults changed.
 - Report: `docs/wing_full_angle/NUAA_TRIM_TREND_MAPPING_REFRESH_REPORT.md`
+
+## NUAA Trim Trend Layout Fix
+
+Conclusion: `NUAA_LAYOUT_FIX_READY`.
+
+- Standard entry comparison boards were regenerated in place under `validation/nuaa_trim_trend_overlay/comparison_boards/`.
+- The overview board is now a clean 4 row x 2 column layout: NUAA screenshot on the left and computed model trend on the right.
+- The four single comparison boards are now clean 1 row x 2 column layouts.
+- The 0 deg and 15 deg vertical pitch comparison uses `-cyclicLong_deg`; the 15 deg mapping remains a best visual candidate and is not uniquely confirmed.
+- This is a validation image layout fix only: no parameter tuning, no `params_nominal.m` change, no `model/` production change, no default switch, and no PR merge.
+- Report: `docs/wing_full_angle/NUAA_TRIM_TREND_LAYOUT_FIX_REPORT.md`

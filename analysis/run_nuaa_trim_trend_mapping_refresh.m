@@ -47,13 +47,12 @@ for i = 1:numel(cases)
     refreshModelPaths{i} = fullfile(refreshDir, cases(i).refreshModelPlotName);
     refreshComparisonPaths{i} = fullfile(refreshDir, cases(i).refreshComparisonName);
     modelPlotPaths{i} = write_model_plot(T, cases(i), refreshModelPaths{i});
-    comparisonPaths{i} = write_comparison_board(cases(i), refreshModelPaths{i}, ...
-        refreshComparisonPaths{i}, diagnostics);
+    comparisonPaths{i} = write_comparison_board(T, cases(i), ...
+        refreshComparisonPaths{i});
     copyfile(refreshModelPaths{i}, fullfile(plotDir, cases(i).standardModelPlotName));
     copyfile(refreshComparisonPaths{i}, fullfile(boardDir, cases(i).standardComparisonName));
 end
-overviewRefreshPath = write_overview_board(cases, refreshModelPaths, ...
-    refreshDir, diagnostics, mappingDecision);
+overviewRefreshPath = write_overview_board(T, cases, refreshDir);
 overviewStandardPath = fullfile(boardDir, 'nuaa_trim_trend_overlay_overview.png');
 copyfile(overviewRefreshPath, overviewStandardPath);
 
@@ -417,38 +416,12 @@ end
 end
 
 function path = write_model_plot(T, c, path)
-figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 980 660]);
-hold on;
-colors = lines(4);
-models = {'legacy','full_angle'};
-lineStyles = {'-','--'};
-markers = {'o','s'};
-for j = 1:numel(models)
-    mask = T.betaM_deg == c.betaM_deg & strcmp(T.modelType, models{j});
-    S = sortrows(T(mask, :), 'V_mps');
-    for k = 1:numel(c.variables)
-        y = S.(c.variables{k});
-        plot(S.V_mps, y, 'LineStyle', lineStyles{j}, ...
-            'Marker', markers{j}, 'Color', colors(k,:), 'LineWidth', 1.4, ...
-            'MarkerSize', 5, 'DisplayName', ...
-            sprintf('%s %s', models{j}, c.displayNames{k}));
-    end
-    if c.betaM_deg == 0 || c.betaM_deg == 15
-        plot(S.V_mps, S.cyclicLong_deg, ':', 'Color', [0.45 0.45 0.45], ...
-            'LineWidth', 1.0, 'DisplayName', sprintf('%s raw cyclicLong audit', models{j}));
-    end
-end
-grid on;
-xlabel('V (m/s)');
-ylabel('angle (deg)');
+figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 980 620]);
+plot_model_curves(T, c, 11);
 title(sprintf('%s mapping-refreshed model trends, betaM = %.0f deg', ...
     c.label, c.betaM_deg), 'Interpreter', 'none');
 subtitle_text(c.subtitle);
-legend('Location', 'bestoutside');
-text(0.02, 0.02, 'NUAA screenshot is an image reference only; no curve digitization.', ...
-    'Units', 'normalized', 'FontSize', 9, 'BackgroundColor', [1 1 1], ...
-    'EdgeColor', [0.7 0.7 0.7], 'Interpreter', 'none');
-set(gca, 'FontName', 'Arial');
+legend('Location', 'eastoutside', 'Interpreter', 'none');
 print(gcf, path, '-dpng', '-r180');
 close(gcf);
 end
@@ -461,47 +434,80 @@ catch
 end
 end
 
-function path = write_comparison_board(c, modelPlotPath, path, diagnostics)
+function path = write_comparison_board(T, c, path)
 paper = imread(c.cropPath);
-model = imread(modelPlotPath);
-figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1550 790]);
-subplot('Position', [0.03 0.20 0.45 0.74]);
+figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1600 720]);
+subplot('Position', [0.04 0.16 0.43 0.76]);
 image(paper); axis image off;
-title([c.label ' NUAA screenshot'], 'FontWeight', 'bold');
-subplot('Position', [0.52 0.20 0.45 0.74]);
-image(model); axis image off;
-title('mapping-refreshed model curves', 'FontWeight', 'bold');
-annotation('textbox', [0.04 0.02 0.92 0.13], 'String', ...
-    case_summary_text(c, diagnostics), 'Interpreter', 'none', ...
-    'FontSize', 11, 'EdgeColor', [0.7 0.7 0.7], ...
-    'BackgroundColor', [0.96 0.96 0.96]);
+title([c.label ' NUAA screenshot'], 'FontWeight', 'bold', ...
+    'Interpreter', 'none');
+subplot('Position', [0.54 0.18 0.42 0.72]);
+plot_model_curves(T, c, 10);
+title([c.label ' computed trend'], 'FontWeight', 'bold', ...
+    'Interpreter', 'none');
+legend('Location', 'northoutside', 'Orientation', 'horizontal', ...
+    'NumColumns', 3, 'Interpreter', 'none', 'FontSize', 8);
+annotation('textbox', [0.04 0.025 0.92 0.045], 'String', ...
+    board_note(c), 'Interpreter', 'none', 'FontSize', 10, ...
+    'EdgeColor', 'none', 'HorizontalAlignment', 'center');
 print(gcf, path, '-dpng', '-r160');
 close(gcf);
 end
 
-function path = write_overview_board(cases, modelPlotPaths, refreshDir, diagnostics, mappingDecision)
+function path = write_overview_board(T, cases, refreshDir)
 path = fullfile(refreshDir, 'nuaa_trim_trend_overlay_overview_refreshed.png');
-figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1850 1950]);
+figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1650 3000]);
 for i = 1:numel(cases)
     paper = imread(cases(i).cropPath);
-    model = imread(modelPlotPaths{i});
     y0 = 0.98 - i*0.235;
-    subplot('Position', [0.02 y0 0.31 0.20]);
+    subplot('Position', [0.035 y0 0.42 0.205]);
     image(paper); axis image off;
-    title([cases(i).label ' NUAA'], 'FontSize', 11);
-    subplot('Position', [0.35 y0 0.38 0.20]);
-    image(model); axis image off;
-    title('mapping-refreshed model curves', 'FontSize', 11);
-    annotation('textbox', [0.75 y0+0.03 0.22 0.15], ...
-        'String', case_summary_text(cases(i), diagnostics), ...
-        'Interpreter', 'none', 'FontSize', 10, ...
-        'EdgeColor', [0.7 0.7 0.7], 'BackgroundColor', [0.96 0.96 0.96]);
+    title([cases(i).label ' NUAA screenshot'], 'FontSize', 12, ...
+        'Interpreter', 'none');
+    subplot('Position', [0.525 y0+0.015 0.42 0.175]);
+    plot_model_curves(T, cases(i), 8);
+    title([cases(i).label ' computed trend'], 'FontSize', 12, ...
+        'Interpreter', 'none');
+    legend('Location', 'northoutside', 'Orientation', 'horizontal', ...
+        'NumColumns', 3, 'Interpreter', 'none', 'FontSize', 7);
 end
-annotation('textbox', [0.02 0.005 0.96 0.035], ...
-    'String', overview_mapping_text(mappingDecision), ...
-    'Interpreter', 'none', 'FontSize', 11, 'EdgeColor', 'none');
+set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [0 0 11 20], ...
+    'PaperSize', [11 20]);
 print(gcf, path, '-dpng', '-r150');
 close(gcf);
+end
+
+function plot_model_curves(T, c, fontSize)
+hold on;
+colors = [0.00 0.00 0.00; 0.85 0.10 0.10; 0.10 0.65 0.10];
+models = {'legacy','full_angle'};
+modelNames = {'legacy','full-angle'};
+lineStyles = {'-','--'};
+markers = {'o','s'};
+for j = 1:numel(models)
+    mask = T.betaM_deg == c.betaM_deg & strcmp(T.modelType, models{j}) & ...
+        T.converged == 1 & T.finiteReal == 1;
+    S = sortrows(T(mask, :), 'V_mps');
+    for k = 1:numel(c.variables)
+        plot(S.V_mps, S.(c.variables{k}), ...
+            'LineStyle', lineStyles{j}, 'Marker', markers{j}, ...
+            'Color', colors(k,:), 'LineWidth', 1.7, 'MarkerSize', 4.8, ...
+            'DisplayName', sprintf('%s %s', modelNames{j}, ...
+            c.displayNames{k}));
+    end
+end
+grid on;
+box on;
+xlabel('Airspeed V (m/s)');
+ylabel('Angle (deg)');
+set(gca, 'FontName', 'Arial', 'FontSize', fontSize, 'LineWidth', 0.8);
+end
+
+function text = board_note(c)
+text = 'NUAA curve is screenshot reference only; no formal digitization.';
+if strcmp(c.id, 'fig6a')
+    text = [text ' Vertical pitch: best visual candidate; not uniquely confirmed.'];
+end
 end
 
 function text = case_summary_text(c, diagnostics)

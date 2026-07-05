@@ -40,6 +40,7 @@ resultsPath = fullfile(rootDir, 'validation', 'wing_full_angle', ...
 summaryPath = fullfile(rootDir, 'validation', 'wing_full_angle', ...
     'trim_envelope', 'full_angle_trim_envelope_summary.csv');
 T = readtable(resultsPath, 'FileType', 'text');
+T.verticalPitchMapped_deg = -T.cyclicLong_deg;
 S = readtable(summaryPath, 'FileType', 'text');
 report.resultsPath = resultsPath;
 report.summaryPath = summaryPath;
@@ -59,8 +60,8 @@ comparisonPaths = cell(numel(cases), 1);
 for i = 1:numel(cases)
     modelPlotPaths{i} = write_model_plot(T, cases(i), plotDir);
     if report.pdfFound
-        comparisonPaths{i} = write_comparison_board(cases(i), ...
-            modelPlotPaths{i}, boardDir, diagnostics);
+        comparisonPaths{i} = write_comparison_board(T, cases(i), ...
+            boardDir);
     else
         comparisonPaths{i} = '';
     end
@@ -69,8 +70,7 @@ report.modelPlotPaths = modelPlotPaths;
 report.comparisonPaths = comparisonPaths;
 report.overviewPath = '';
 if report.pdfFound
-    report.overviewPath = write_overview_board(cases, modelPlotPaths, ...
-        comparisonPaths, boardDir, diagnostics);
+    report.overviewPath = write_overview_board(T, cases, boardDir);
 end
 
 report.cropsComplete = report.pdfFound && all(cellfun(@(p) exist(p, 'file') == 2, ...
@@ -139,8 +139,8 @@ cropDir = fullfile(outRoot, 'crops');
 cases = repmat(empty_case(), 4, 1);
 cases(1) = make_case('fig5a', 'Fig.5(a)', 0, ...
     'helicopter_longitudinal', [0 5 10 12 15 20 25 30], ...
-    {'collective_deg','cyclicLong_deg','theta_deg'}, ...
-    {'collective','longitudinal cyclic / vertical pitch','pitch angle'}, ...
+    {'collective_deg','verticalPitchMapped_deg','theta_deg'}, ...
+    {'collective','vertical pitch candidate (-cyclicLong)','pitch angle'}, ...
     'model_fig5a_beta0_trim_trend.png', ...
     'compare_fig5a_beta0.png', ...
     fullfile(cropDir, 'nuaa_fig5a_crop.png'), ...
@@ -155,8 +155,8 @@ cases(2) = make_case('fig5b', 'Fig.5(b)', 90, ...
     [890 250 740 620]);
 cases(3) = make_case('fig6a', 'Fig.6(a)', 15, ...
     'conversion_longitudinal', [10 20 30 40 50 60], ...
-    {'collective_deg','cyclicLong_deg','theta_deg'}, ...
-    {'collective','longitudinal cyclic / vertical pitch','pitch angle'}, ...
+    {'collective_deg','verticalPitchMapped_deg','theta_deg'}, ...
+    {'collective','vertical pitch candidate (-cyclicLong)','pitch angle'}, ...
     'model_fig6a_beta15_trim_trend.png', ...
     'compare_fig6a_beta15.png', ...
     fullfile(cropDir, 'nuaa_fig6a_crop.png'), ...
@@ -468,82 +468,90 @@ end
 
 function path = write_model_plot(T, c, plotDir)
 path = fullfile(plotDir, c.modelPlotName);
-figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 900 620]);
-hold on;
-colors = lines(3);
-models = {'legacy','full_angle'};
-lineStyles = {'-','--'};
-markers = {'o','s'};
-for j = 1:numel(models)
-    mask = T.betaM_deg == c.betaM_deg & strcmp(T.modelType, models{j});
-    S = sortrows(T(mask, :), 'V_mps');
-    for k = 1:numel(c.variables)
-        y = S.(c.variables{k});
-        plot(S.V_mps, y, 'LineStyle', lineStyles{j}, ...
-            'Marker', markers{j}, 'Color', colors(k,:), 'LineWidth', 1.4, ...
-            'MarkerSize', 5, 'DisplayName', ...
-            sprintf('%s %s', models{j}, c.displayNames{k}));
-    end
-end
-grid on;
-xlabel('V (m/s)');
-ylabel('angle (deg)');
+figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 980 620]);
+plot_model_curves(T, c, 11);
 title(sprintf('%s model trim trends, betaM = %.0f deg, %s', ...
     c.label, c.betaM_deg, strrep(c.mode, '_', '\_')));
-legend('Location', 'bestoutside');
-text(0.02, 0.02, ['NUAA figure is shown as image reference only; ' ...
-    'no curve digitization in this task.'], 'Units', 'normalized', ...
-    'FontSize', 9, 'BackgroundColor', [1 1 1], ...
-    'EdgeColor', [0.7 0.7 0.7]);
-set(gca, 'FontName', 'Arial');
+legend('Location', 'eastoutside', 'Interpreter', 'none');
 print(gcf, path, '-dpng', '-r180');
 close(gcf);
 end
 
-function path = write_comparison_board(c, modelPlotPath, boardDir, diagnostics)
+function path = write_comparison_board(T, c, boardDir)
 path = fullfile(boardDir, c.comparisonName);
 paper = imread(c.cropPath);
-model = imread(modelPlotPath);
-figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1500 760]);
-subplot('Position', [0.03 0.19 0.45 0.76]);
+figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1600 720]);
+subplot('Position', [0.04 0.16 0.43 0.76]);
 image(paper); axis image off;
-title([c.label ' NUAA screenshot'], 'FontWeight', 'bold');
-subplot('Position', [0.52 0.19 0.45 0.76]);
-image(model); axis image off;
-title('current model curves: legacy and full-angle', 'FontWeight', 'bold');
-txt = case_summary_text(c, diagnostics);
-annotation('textbox', [0.04 0.02 0.92 0.12], 'String', txt, ...
-    'Interpreter', 'none', 'FontSize', 11, 'EdgeColor', [0.7 0.7 0.7], ...
-    'BackgroundColor', [0.96 0.96 0.96]);
+title([c.label ' NUAA screenshot'], 'FontWeight', 'bold', ...
+    'Interpreter', 'none');
+subplot('Position', [0.54 0.18 0.42 0.72]);
+plot_model_curves(T, c, 10);
+title([c.label ' computed trend'], 'FontWeight', 'bold', ...
+    'Interpreter', 'none');
+legend('Location', 'northoutside', 'Orientation', 'horizontal', ...
+    'NumColumns', 3, 'Interpreter', 'none', 'FontSize', 8);
+annotation('textbox', [0.04 0.025 0.92 0.045], 'String', ...
+    board_note(c), 'Interpreter', 'none', 'FontSize', 10, ...
+    'EdgeColor', 'none', 'HorizontalAlignment', 'center');
 print(gcf, path, '-dpng', '-r160');
 close(gcf);
 end
 
-function path = write_overview_board(cases, modelPlotPaths, comparisonPaths, ...
-        boardDir, diagnostics)
+function path = write_overview_board(T, cases, boardDir)
 path = fullfile(boardDir, 'nuaa_trim_trend_overlay_overview.png');
-figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1800 1900]);
+figure('Visible', 'off', 'Color', 'w', 'Position', [100 100 1650 3000]);
 for i = 1:numel(cases)
     paper = imread(cases(i).cropPath);
-    model = imread(modelPlotPaths{i});
     y0 = 0.98 - i*0.235;
-    subplot('Position', [0.02 y0 0.31 0.20]);
+    subplot('Position', [0.035 y0 0.42 0.205]);
     image(paper); axis image off;
-    title([cases(i).label ' NUAA'], 'FontSize', 11);
-    subplot('Position', [0.35 y0 0.38 0.20]);
-    image(model); axis image off;
-    title('model curves', 'FontSize', 11);
-    annotation('textbox', [0.75 y0+0.03 0.22 0.15], ...
-        'String', case_summary_text(cases(i), diagnostics), ...
-        'Interpreter', 'none', 'FontSize', 10, ...
-        'EdgeColor', [0.7 0.7 0.7], 'BackgroundColor', [0.96 0.96 0.96]);
+    title([cases(i).label ' NUAA screenshot'], 'FontSize', 12, ...
+        'Interpreter', 'none');
+    subplot('Position', [0.525 y0+0.015 0.42 0.175]);
+    plot_model_curves(T, cases(i), 8);
+    title([cases(i).label ' computed trend'], 'FontSize', 12, ...
+        'Interpreter', 'none');
+    legend('Location', 'northoutside', 'Orientation', 'horizontal', ...
+        'NumColumns', 3, 'Interpreter', 'none', 'FontSize', 7);
 end
-annotation('textbox', [0.02 0.005 0.96 0.025], ...
-    'String', ['NUAA panels are screenshots only. No curve digitization, ' ...
-    'no pointwise NUAA-model error calculation, and no parameter tuning.'], ...
-    'Interpreter', 'none', 'FontSize', 11, 'EdgeColor', 'none');
+set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [0 0 11 20], ...
+    'PaperSize', [11 20]);
 print(gcf, path, '-dpng', '-r150');
 close(gcf);
+end
+
+function plot_model_curves(T, c, fontSize)
+hold on;
+colors = [0.00 0.00 0.00; 0.85 0.10 0.10; 0.10 0.65 0.10];
+models = {'legacy','full_angle'};
+modelNames = {'legacy','full-angle'};
+lineStyles = {'-','--'};
+markers = {'o','s'};
+for j = 1:numel(models)
+    mask = T.betaM_deg == c.betaM_deg & strcmp(T.modelType, models{j}) & ...
+        T.converged == 1 & T.finiteReal == 1;
+    S = sortrows(T(mask, :), 'V_mps');
+    for k = 1:numel(c.variables)
+        plot(S.V_mps, S.(c.variables{k}), ...
+            'LineStyle', lineStyles{j}, 'Marker', markers{j}, ...
+            'Color', colors(k,:), 'LineWidth', 1.7, 'MarkerSize', 4.8, ...
+            'DisplayName', sprintf('%s %s', modelNames{j}, ...
+            c.displayNames{k}));
+    end
+end
+grid on;
+box on;
+xlabel('Airspeed V (m/s)');
+ylabel('Angle (deg)');
+set(gca, 'FontName', 'Arial', 'FontSize', fontSize, 'LineWidth', 0.8);
+end
+
+function text = board_note(c)
+text = 'NUAA curve is screenshot reference only; no formal digitization.';
+if strcmp(c.id, 'fig6a')
+    text = [text ' Vertical pitch: best visual candidate; not uniquely confirmed.'];
+end
 end
 
 function text = case_summary_text(c, diagnostics)
