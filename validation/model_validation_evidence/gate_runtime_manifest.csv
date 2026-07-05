@@ -1,0 +1,28 @@
+gate,inputHash,status,runtime_s,notes,completed_at
+GATE0_RUNTIME_DEFAULT,4122f0b60c0d92a24e125598059f8543,PASS,4.6748047,"Gate0 checks passed 6/6.",2026-07-05 11:29:37
+GATE1_TRIM_CLOSURE,59532c0f8ab7daae7f1799cad05f1f09,PASS,2.2166542,"Trim rows read from existing envelope: 84.",2026-07-05 11:29:40
+GATE2_COMPONENT_BALANCE,fe16c6054e4e67df601cdc953069d107,PASS,0.5333127,"Component balance checked on 5 saved trim points.",2026-07-05 11:29:40
+GATE0_RUNTIME_DEFAULT,4122f0b60c0d92a24e125598059f8543,PASS,3.3093511,"Gate0 checks passed 6/6.",2026-07-05 11:30:09
+GATE1_TRIM_CLOSURE,59532c0f8ab7daae7f1799cad05f1f09,PASS,0.6499956,"Trim rows read from existing envelope: 84.",2026-07-05 11:30:11
+GATE2_COMPONENT_BALANCE,fe16c6054e4e67df601cdc953069d107,PASS,0.4457983,"Component balance checked on 5 saved trim points.",2026-07-05 11:30:12
+GATE3_ROTOR_CONTROL,c65f2281f46dd58ed4343b9ef5f8dedc,RUNTIME_ERROR,0.4187068,"无法识别的字段名称 ""power""。",2026-07-05 11:30:12
+GATE4_WING_WAKE,012e12df29162735a7a778c197550b69,PASS,0.8725809,"Full-angle wing path checked without changing defaults.",2026-07-05 11:30:14
+GATE5_TRIM_TREND_COMPARABILITY,472e1fed1d79b0f2834e0800faf96adb,PASS_WITH_LIMITATIONS,0.6259113,"0 deg partial, 15 deg non-comparable, 75/90 deg soft comparable.",2026-07-05 11:30:14
+GATE6_LINEARIZATION_STABILITY,9632b19a4bf48f56cee0ee22c828c65d,PASS,2.963188,"Linearization checked on 3 saved trim points.",2026-07-05 11:30:18
+GATE7_NUMERICAL_ROBUSTNESS,e91bceec99195af99aa31ffcd30197e5,PASS_WITH_LIMITATIONS,4.4952297,"Local step-size sensitivity completed; broad sweeps are not rerun here.",2026-07-05 11:30:22
+GATE0_RUNTIME_DEFAULT,4122f0b60c0d92a24e125598059f8543,PASS,3.0699466,"Gate0 checks passed 6/6.",2026-07-05 11:31:24
+GATE1_TRIM_CLOSURE,59532c0f8ab7daae7f1799cad05f1f09,PASS,0.612728,"Trim rows read from existing envelope: 84.",2026-07-05 11:31:26
+GATE2_COMPONENT_BALANCE,fe16c6054e4e67df601cdc953069d107,PASS,0.3922453,"Component balance checked on 5 saved trim points.",2026-07-05 11:31:27
+GATE3_ROTOR_CONTROL,c65f2281f46dd58ed4343b9ef5f8dedc,PASS,0.766428,"Rotor/control derivatives computed at one representative hover state.",2026-07-05 11:31:28
+GATE4_WING_WAKE,012e12df29162735a7a778c197550b69,PASS,0.9521167,"Full-angle wing path checked without changing defaults.",2026-07-05 11:31:29
+GATE5_TRIM_TREND_COMPARABILITY,472e1fed1d79b0f2834e0800faf96adb,PASS_WITH_LIMITATIONS,0.2932923,"0 deg partial, 15 deg non-comparable, 75/90 deg soft comparable.",2026-07-05 11:31:29
+GATE6_LINEARIZATION_STABILITY,9632b19a4bf48f56cee0ee22c828c65d,PASS,2.6610667,"Linearization checked on 3 saved trim points.",2026-07-05 11:31:32
+GATE7_NUMERICAL_ROBUSTNESS,e91bceec99195af99aa31ffcd30197e5,PASS_WITH_LIMITATIONS,3.8683919,"Local step-size sensitivity completed; broad sweeps are not rerun here.",2026-07-05 11:31:36
+GATE0_RUNTIME_DEFAULT,4122f0b60c0d92a24e125598059f8543,PASS,3.0922437,"Gate0 checks passed 6/6.",2026-07-05 11:38:25
+GATE1_TRIM_CLOSURE,59532c0f8ab7daae7f1799cad05f1f09,PASS,0.6364196,"Trim rows read from existing envelope: 84.",2026-07-05 11:38:27
+GATE2_COMPONENT_BALANCE,fe16c6054e4e67df601cdc953069d107,PASS,0.4335416,"Component balance checked on 5 saved trim points.",2026-07-05 11:38:28
+GATE3_ROTOR_CONTROL,c65f2281f46dd58ed4343b9ef5f8dedc,PASS,0.8182392,"Rotor/control derivatives computed at one representative hover state.",2026-07-05 11:38:29
+GATE4_WING_WAKE,012e12df29162735a7a778c197550b69,PASS,0.9877712,"Full-angle wing path checked without changing defaults.",2026-07-05 11:38:30
+GATE5_TRIM_TREND_COMPARABILITY,472e1fed1d79b0f2834e0800faf96adb,PASS_WITH_LIMITATIONS,0.3089669,"0 deg partial, 15 deg non-comparable, 75/90 deg soft comparable.",2026-07-05 11:38:30
+GATE6_LINEARIZATION_STABILITY,9632b19a4bf48f56cee0ee22c828c65d,PASS,2.8309155,"Linearization checked on 3 saved trim points.",2026-07-05 11:38:33
+GATE7_NUMERICAL_ROBUSTNESS,e91bceec99195af99aa31ffcd30197e5,PASS_WITH_LIMITATIONS,3.8002396,"Local step-size sensitivity completed; broad sweeps are not rerun here.",2026-07-05 11:38:37

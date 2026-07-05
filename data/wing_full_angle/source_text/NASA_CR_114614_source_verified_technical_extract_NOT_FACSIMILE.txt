@@ -1,0 +1,179 @@
+
+
+--- PDF_PAGE 1 ---
+NASA CR-114614 source-verified technical extract - not a facsimile
+Page 1
+ NASA CR-114614
+ V/STOL Tilt Rotor Study - Volume V
+A Mathematical Model for Real-Time Flight Simulation of the Bell Model 301 Tilt Rotor Research Aircraft
+SOURCE STATUS
+The original NASA PDF download endpoint currently returns HTTP 404 to ordinary download clients. This file is a
+source-verified technical extract reconstructed from the NASA NTRS indexed full text and citation record. It is not a
+facsimile copy and does not preserve every figure, equation layout, or scan artifact. Use it for model-structure and
+parameter-traceability work; do not use it for graphical digitization.
+Report number
+NASA-CR-114614; Bell 301-099-001, Volume V
+Publication date
+13 April 1973
+Authors
+P. B. Harendra; M. J. Joglekar; T. M. Gaffey; R. L. Marr
+Contract
+NAS2-6599
+NASA document ID
+19730022217
+NTRS citation
+https://ntrs.nasa.gov/citations/19730022217
+Original PDF name
+19730022217.pdf
+Indexed extent
+268 PDF pages in the NTRS indexed copy
+Distribution
+Public; NTRS citation states public use permitted
+Purpose of this extract
+This extract preserves the parts needed for the current full-angle wing-model workflow: the separation of freestream and
+rotor-wake wing loads, wake-immersed area, local flow quantities, left/right asymmetry, high-negative-angle aerodynamic
+data, and the limits of the original Model 301 empirical representation.
+
+
+
+--- PDF_PAGE 2 ---
+NASA CR-114614 source-verified technical extract - not a facsimile
+Page 2
+1. Model architecture relevant to the new wing model
+Separate load paths
+The report computes aerodynamic forces and moments caused by the rotor wake separately from the forces and
+moments caused by freestream flow. This is the key architectural point: wake and freestream regions are spatial regions
+with different local flow, not two complete aerodynamic laws blended by flight speed.
+Wake-immersed wing region
+For the portion of the wing inside a rotor wake, the model determines the immersed area, local angle of attack, and local
+dynamic pressure before computing lift and drag.
+Freestream remainder
+The wing area outside the wake is evaluated with the freestream local-flow quantities. The two area contributions are
+then combined as physical area integrals.
+Large negative incidence
+At low speed, rotor wake can drive the wing to large negative incidence. The report states that lift and drag tables are
+defined to approximately 90 degrees in magnitude for this regime.
+Asymmetric operation
+Left and right wakes are treated separately. Unequal wake coverage during asymmetric flight naturally produces roll and
+yaw moments.
+Project implication
+The replacement wing model should use one common full-angle coefficient database for every strip. Wake and
+freestream portions may differ through local velocity, angle of attack, Reynolds number, Mach number, dynamic pressure,
+covered area, and moment arm. They should not be represented by a speed-dependent blend of complete FNear and
+FLiftLine force/moment results.
+2. Minimum mathematical form
+For each left/right wake and each wing strip, define the wake-covered area SiW and local flow state. A modern
+implementation consistent with the report structure can be written as:
+qiW = 0.5 rho |ViW|2
+LiW = qiW SiW CL(alphaiW, ReiW, MiW, delta)
+DiW = qiW SiW CD(alphaiW, ReiW, MiW, delta)
+Mc/4,iW = qiW SiW c Cm(alphaiW, ReiW, MiW, delta)
+The freestream part uses Sfree = Sstrip - SiW and the same coefficient law evaluated at the freestream local state. Total
+strip force and moment are the sum of the physical area contributions.
+These equations are a clean modern restatement of the report architecture. They are not claimed to reproduce every symbol or empirical
+constant in the 1973 implementation.
+
+
+
+--- PDF_PAGE 3 ---
+NASA CR-114614 source-verified technical extract - not a facsimile
+Page 3
+3. Wake coverage variables identified by CR-114614
+Quantity
+Role in the original representation
+Recommended project treatment
+Wake radius
+Defines the cross-section of the contracted
+wake at the wing.
+Parameterize wake radius at the wing plane; derive from
+rotor radius, contraction model, and disk-to-wing distance.
+Conversion / mast
+angle
+Changes rotor-axis direction and therefore the
+wake centerline intersection with the wing.
+Use the actual rotor-axis unit vector and intersect the
+wake tube with the wing-strip geometry.
+Wake angle of attack
+Changes the orientation of the wake relative to
+the wing.
+Compute from local velocity vector, not a model-switch
+weight.
+Fuselage sideslip
+Changes left/right immersed areas and
+asymmetric loads.
+Treat left and right wakes and half-wings independently.
+Vertical distance
+below disk
+The report notes wing and stabilizer surfaces
+are about 0.4R below the rotor disk.
+Keep distance parameterized; use source-traceable
+geometry in validation cases.
+Induced velocity
+Varies with speed and mast tilt; original
+constants K_i came from powered-model data.
+Prefer the current rotor model output. Do not copy Model
+301-specific K_i without evidence.
+The report states that contracted wake stability was observed down to the wing and horizontal-stabilizer surfaces and
+simplified the hover wake-radius relation because these surfaces were located at approximately 0.4 rotor radius below
+the disk.
+4. Source limitations that must remain visible
+• The 1973 model was constrained by real-time computing limits and used simplified rotor aerodynamics and uniform
+inflow.
+• The rotor-wake/airframe interaction model relied on limited powered-model data.
+• The induced-velocity constants were specific empirical fits, not universal tiltrotor constants.
+• The report itself recommends extending airframe aerodynamics to plus/minus 180 degrees and improving above-stall
+downwash representation.
+• A modern full-angle wing database should therefore use CR-114614 for structural guidance and geometry definitions,
+while using XFOIL, TM-88373, and explicit post-stall extensions for the coefficient data chain.
+
+
+
+--- PDF_PAGE 4 ---
+NASA CR-114614 source-verified technical extract - not a facsimile
+Page 4
+5. Traceability map for the current workflow
+Workflow item
+Primary source
+Status enabled by this extract
+Separate wake and freestream area
+loads
+CR-114614 Section II.D and Appendix A
+Direct structural evidence
+Wake area variables
+CR-114614 Section II.D / Figure II-15
+description
+Direct variable list
+Disk-to-wing scale near 0.4R
+CR-114614 Section II.D
+Direct geometric scale
+Left/right asymmetry
+CR-114614 Section II.D
+Direct physical requirement
+High-negative-angle tables to near 90
+deg
+CR-114614 Section II.D
+Direct range statement
+Near-vertical CL/CD/Cm curves
+NASA TM-88373
+Use original PDF in this bundle
+Rotor/wing download strip validation
+NASA CR-176970
+Use original PDF in this bundle
+NACA 6/6A ordinate generation
+NASA TM-X-3069 and TM-4741
+Use original PDFs in this bundle
+Published 6A validation tables
+NACA TR-903
+Use original PDF in this bundle
+6. Codex use instructions
+Treat this document as an authenticated technical extract, not as a graphical facsimile. It is adequate to unblock source
+tracing and implementation of the wake-strip architecture. For any task that requires reading Figure II-15 geometry, exact
+scanned equations, or numerical tables not reproduced here, retain the gate as PARTIAL until the original scan becomes
+downloadable or another authenticated copy is obtained.
+Do not restart browser DOM inspection or repeatedly request the broken direct endpoint. Continue all independent work
+using the verified architecture above and the original TM-88373, CR-176970, TM-X-3069, TM-4741, and TR-903 files in
+the bundle.
+7. Official source reference
+NASA Technical Reports Server citation record: https://ntrs.nasa.gov/citations/19730022217
+Original file name listed by NTRS: 19730022217.pdf. Normal download clients returned HTTP 404 during package construction on 3 July 2026,
+while the indexed NTRS full text remained available to the search service.

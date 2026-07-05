@@ -1,0 +1,9 @@
+source_path,archive_path,status
+data\wing_full_angle\airfoils\naca64a223_surrogate.dat,data\wing_full_angle\surrogate_v0\airfoils\naca64a223_surrogate.dat,ARCHIVED_FILE
+data\wing_full_angle\xfoil,data\wing_full_angle\surrogate_v0\xfoil,ARCHIVED_DIR
+data\wing_full_angle\full_angle_selected,data\wing_full_angle\surrogate_v0\full_angle_selected,ARCHIVED_DIR
+data\wing_full_angle\airfoil_geometry_checks.csv,data\wing_full_angle\surrogate_v0\airfoil_geometry_checks.csv,ARCHIVED_FILE
+data\wing_full_angle\airfoil_candidate_scores.csv,data\wing_full_angle\surrogate_v0\airfoil_candidate_scores.csv,ARCHIVED_FILE
+validation\wing_full_angle\full_angle,validation\wing_full_angle\surrogate_v0\full_angle,ARCHIVED_DIR
+validation\wing_full_angle\zero_nacelle_bump,validation\wing_full_angle\surrogate_v0\zero_nacelle_bump,ARCHIVED_DIR
+validation\wing_full_angle\xfoil_probe,validation\wing_full_angle\surrogate_v0\xfoil_probe,ARCHIVED_DIR

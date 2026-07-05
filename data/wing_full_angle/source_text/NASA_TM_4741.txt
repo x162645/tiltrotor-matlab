@@ -1,0 +1,4367 @@
+
+
+--- PDF_PAGE 1 ---
+NASA Technical Memorandum 4741
+/ a / ""
+Computer Program To Obtain Ordinates for
+NACA Airfoils
+Charles L. Ladson, Cuyler W. Brooks, Jr., Acquilla S. Hill, and Darrell W. Sproles
+December 1996
+
+
+
+--- PDF_PAGE 2 ---
+NASA Technical Memorandum 4741
+Computer Program To Obtain Ordinates for
+NACA Airfoils
+Charles L. Ladson, Cuyler W. Brooks, Jr., and Acquilla S. Hill
+Langley Research Center • Hampton, Virginia
+Darrell W. Sproles
+Computer Sciences Corporation • Hampton, Virginia
+National Aeronautics and Space Administration
+Langley Research Center • Hampton, Virginia 23681-0001
+December 1996
+
+
+
+--- PDF_PAGE 3 ---
+The use of trademarks or names of manufacturers in this report is for
+accurate reporting and does not constitute an official endorsement,
+either expressed or implied, of such products or manufacturers by the
+National Aeronautics and Space Administration.
+Available electronically at the following URL address: http://techreports.larc.nasa.gov/ltrs/ltrs.html
+Computer program is available electronically from the Langley Software Server
+Printed copies available from the following:
+NASA Center for AeroSpace Information
+800 Elkridge Landing Road
+Linthicum Heights, MD 21090-2934
+(301) 621-0390
+National Technical Information Service (NTIS)
+5285 Port Royal Road
+Springfield, VA 22161-2171
+(703) 487-4650
+
+
+
+--- PDF_PAGE 4 ---
+Abstract
+Computer programs to produce the ordinates for airfoils of any thickness, thick-
+ness distribution, or camber in the NACA airfoil series were developed in the early
+1970's and are published as NASA TM X-3069 and TM X-3284. For analytic airfoils,
+the ordinates are exact. For the 6-series and all but the leading edge of the 6A-series
+airfoils, agreement between the ordinates obtained from the program and previously
+published ordinates is generally within 5 × 10 -5 chord. Since the publication of these
+programs, the use of personal computers and individual workstations has prolifer-
+ated. This report describes a computer program that combines the capabilities of the
+previously published versions. This program is written in ANSI FORTRAN 77 and can
+be compiled to run on DOS, UNIX, and VMS based personal computers and work-
+stations as well as mainframes. An effort was made to make all inputs to the program
+as simple as possible to use and to lead the user through the process by means of a
+menu.
+Introduction bi
+Although modern high-speed aircraft generally make
+use of advanced NASA supercritical airfoil sections, c (C, CHD)
+there is still a demand for information on the NACA Cl,i (CLI)
+series of airfoil sections, which were developed over di
+50 years ago. Computer programs were developed in the dx
+early 1970's to produce the ordinates for airfoils of any
+thickness, thickness distribution, or camber in the NACA
+airfoil series. These programs are published in refer- d(x/c), dy, d_
+ences 1 and 2. These programs, however, were written in I
+the Langley Research Center version of FORTRAN IV
+and are not easily portable to other computers. The pur- kl, k2
+pose of this paper is to describe an updated version of m
+these programs. The goal was to combine both programs
+into a single program that could be executed on a wide
+variety of personal computers and workstations as well P
+as mainframes. The analytical design equations for both R
+symmetrical and cambered airfoils in the NACA 4-digit- Rle (RLE)
+series, 4-digit-modified-series, 5-digit-series, 5-digit-
+modified-series, 16-series, 6-series, and 6A-series airfoil r
+families have been implemented. The camber-line desig-
+nations available are the 2-digit, 3-digit, 3-digit-reflex,
+6-series, and 6A-series. The program achieves portability t
+by limiting machine-specific code. An effort was made x (X)
+to make all inputs to the program as simple as possible to
+use and to lead the user through the process by means of Y (Y)
+a menu.
+Symbols
+The symbols in parentheses are the ones used in the
+computer program and in the computer-generated listings
+(.rpt file).
+A
+ai
+camber-line designation, fraction of
+chord from leading edge over which
+design load is uniform
+constants in airfoil equation, i = 0, 1 ..... 4
+Z
+Zt
+0
+constants in camber-line equation, i = 0,
+1,2
+airfoil chord
+design section lift coefficient
+constants in airfoil equation, i = 0, 1, 2, 3
+derivative of x; also basic selectable
+interval in profile generation
+derivatives of x/c, y, and
+leading-edge radius index number
+constants
+chordwise location for maximum ordi-
+nate of airfoil or camber line
+maximum ordinate of 2-digit camber line
+radius of curvature
+leading-edge radius
+chordwise location for zero value of sec-
+ond derivative of 3-digit or 3-digit-reflex
+camber-line equation
+thickness
+distance along chord
+airfoil ordinate normal to chord, positive
+above chord
+complex variable in circle plane
+complex variable in near-circle plane
+local inclination of camber line
+airfoil parameter, @- 0
+complex variable in airfoil plane
+angular coordinate of z'
+angular coordinate of z
+airfoil parameter determining radial coor-
+dinate of z'
+
+
+
+--- PDF_PAGE 5 ---
+Ilt0 average value of _t, _ _/de
+Subscripts:
+cam cambered
+1 (L) lower surface
+N forward portion of camber line
+T aft portion of camber line
+t thickness
+u (U) upper surface
+x derivative with respect to x
+Computer Listing Symbols
+For reasons having to do with code portability, the
+computer-generated listing (.rpt file) will always have
+the alphabetic characters in upper case. The following
+list is intended to eliminate any confusion.
+A camber-line designation, fraction of chord
+from leading edge over which design load
+is uniform
+A0 ..... A4 constants in airfoil equation
+CHD, C airfoil chord
+CLI design section lift coefficient
+CMB maximum camber in chord length,
+y(m)p- c
+CMBNMR number of camber lines to be combined in
+6- and 6A-series multiple camber-line
+option
+CMY m, location of maximum camber
+CRAT cumulative scaling of EPS, PSI,
+17 RAT(I), I = 1 --+ IT
+DO..... D3 constants in airfoil equation
+DX basic selectable interval in profile
+generation
+dy
+DY/DX first derivative of y with respect to x, d---x
+D2Y/DX2 second derivative of y with respect to x,
+d2y
+dx 2
+EPS airfoil parameter, a -- _ - 0
+IT number of iterations to converge 6-series
+profile
+K1, K2 3-digit-reflex camber parameters, k 1 and k2
+PHI _, angular coordinate of z
+PSI _, airfoil parameter determining radial
+coordinate of z'
+RAT(I)
+RC
+RK2OK1
+RLE
+RNP
+SF
+TOC
+X
+XMT
+XT(12),
+YT(12),
+YTP(12)
+XU, XL
+XTP
+XYM
+Y
+YM
+YMAX
+YU, YL
+ith iterative scaling of a,
+radius of curvature at maximum thickness
+for 4-digit modified profile
+k2
+3-digit reflex camber parameter ratio, kl
+leading-edge radius
+radius of curvature at origin
+ratio of input t/c to converged t/c after
+scaling
+thickness-chord ratio
+distance along chord
+m, location of maximum thickness for
+4-digit modified profile
+location and slope of ellipse nose fairing
+for 6- and 6A-series thickness
+profiles
+upper and lower surface locations of x
+x/c location of slope sign change for
+6- and 6A-series thickness profile
+m, location of maximum thickness for
+6- and 6A-series profiles or chordwise
+location for maximum ordinate of airfoil
+or camber line
+airfoil ordinate normal to chord, positive
+above chord
+y/c location of slope sign change for 6- and
+6A-series thickness profile
+y(m), maximum ordinate of thickness
+distribution
+upper and lower surface y ordinate
+Analysis
+Thickness Distribution Equations for Analytic
+Airfoils
+The design equations for the analytic NACA airfoils
+and camber lines have been presented in references 3
+to 7. They are repeated herein to provide a better under-
+standing of the computer program and indicate the use of
+different design variables. A summary of some of the
+design equations and ordinates for many airfoils from
+these families is also presented in references 8 to 10.
+The traditional NACA airfoil designations are short-
+hand codes representing the essential elements (such as
+thickness-chord ratio, camber, design lift coefficient)
+controlling the shape of a profile generated within a
+given airfoil type. Thus, for example the NACA 4-digit-
+series airfoil is specified by a 4-digit code of the form
+pmxx, where p and m represent positions reserved for
+
+
+
+--- PDF_PAGE 6 ---
+specification of the camber and xx allows for specifica-
+tion of the thickness-chord ratio as a percentage, that is,
+"pml2" designates a 12-percent-thick (t/c = 0.12) 4-digit
+airf6il.
+NACA 4-digit-series airfoils. Symmetric airfoils in
+the 4-digit-series family are designated by a 4-digit num-
+ber of the form NACA 00xx. The first two digits indicate
+a symmetric airfoil; the second two, the thickness-chord
+ratio. Ordinates for the NACA 4-digit airfoil family
+(ref. 2) are described by an equation of the form:
+Y -a (x'_l/2 a (X_+a (x-_2 Ixl 3 (x14c - O_cJ + l_cJ 2kcJ + a3 c + a4
+The constants in the equation (for t/c= 0.20) were
+determined from the following boundary conditions:
+Maximum ordinate:
+_x = 0.30 -Y = 0.10 dy = 0
+c c dx
+Ordinate at trailing edge:
+x y_- = 1.0 - - 0.002
+C C
+Magnitude of trailing-edge angle:
+x- = 1.0 = 0.234
+C
+Nose shape:
+x y_- = 0.10 - - 0.078
+C C
+The following coefficients were determined to meet
+these constraints very closely:
+a 0 = 0.2969 a I = -0.1260
+a 2 = -0.3516 a 3 = 0.2843
+a 4 = -0.1015
+To obtain ordinates for airfoils in the family with a
+thickness other than 20 percent, the ordinates for the
+model with a thickness-chord ratio of 0.20 are multiplied
+by the ratio (t/c) 0.20. The leading-edge radius of
+this family is defined as the radius of curvature of the
+basic equation evaluated at x/c = 0. Because of the term
+ao(X/C ) 1/2 in the equation, the radius of curvature is finite
+at x/c = 0 and can be shown to be (see appendix)
+2
+a0(,/c?R le = -2 _,-O---,_J
+by taking the limit as x approaches zero of the standard
+expression for radius of curvature:
+R = [ 1 + (dy/dx)2] 3/2
+d2y /d x 2
+To define an airfoil in this family, the only input neces-
+sary to the computer program is the desired thickness-
+chord ratio.
+One might expect that this leading-edge radius R(0),
+found in the limit as x _ 0 to depend only on the a 0
+term of the defining equation, would also be the mini-
+mum radius on the profile curve. This is not true in gen-
+eral; for the NACA 0020 airfoil, for example, a slightly
+smaller radius (R = 0.0435 as compared to R(0) =
+0.044075) is found in the vicinity ofx = 0.00025.
+NACA 4-digit-modified-series airfoils. The 4-digit-
+modified-series airfoils are designated by a 4-digit num-
+ber followed by a dash and a 2-digit number (such as
+NACA 0012-63). The first two digits are zero for a sym-
+metrical airfoil and the second two digits indicate the
+thickness-chord ratio. The first digit after the dash is a
+leading-edge-radius index number, and the second is the
+location of maximum thickness in tenths of chord aft of
+the leading edge.
+The design equation for the 4-digit-series airfoil
+family was modified (ref. 4) so that the same basic shape
+was retained but variations in leading-edge radius and
+chordwise location of maximum thickness could be
+made. Ordinates for these airfoils are determined from
+the following equations:
+y __ a (x_ll2+al(x]+ x 2c- - 0_,cJ a2(c) +a3(X) 3
+from leading edge to maximum thickness, and
+y = do+dl( l_x]+d2(l_x]2+d3(l_x) 3
+from maximum thickness to trailing edge.
+The constants in these equations (for t/c= 0.20) can
+be determined from the following boundary conditions:
+Maximum ordinate:
+x y_ dy_- = m - - 0.10 -- - 0
+c c dx
+Leading-edge radius:
+2
+x ao-=0 R=--
+c 2
+3
+
+
+
+--- PDF_PAGE 7 ---
+Radiusof curvature at maximum thickness:
+x (1 -m) 2-=m R=
+c 2d 1(1 - m) - 0.588
+Ordinate at trailing edge:
+x y_
+- = 1.0 - - d o = 0.002c c
+Magnitude of trailing-edge angle:
+_x = 1.0 -" = d 1 = f(m)c dx
+Thus, the maximum ordinate, slope, and radius
+of curvature of the two portions of the surface match at
+x/c = m. The values of d 1 were chosen, as stated in refer-
+ence 4, to avoid reversals of curvature and are given in
+ the following table:
+m d 1
+0.2 0.200
+0.3 0.234
+0.4 0.315
+0.5 0.465
+0.6 0.700
+By use of these constraints, equations were written
+for each of the constants (except a 0 and dl) in the equa-
+tion for the airfoil family and are included in the com-
+puter program. As in the 4-digit-series airfoil family,
+ordinates vary linearly with variations in thickness-chord
+ratio and any desired thickness shape can be obtained by
+scaling the design ordinates by the ratio of the desired
+thickness-chord ratio to the design thickness-chord ratio.
+The leading-edge index is an arbitrary number
+assigned to the leading-edge radius in reference 4 and is
+proportional to a o. The relationship between leading-
+edge radius Rle and index number I is as follows:
+t/c I 2
+Rle = 0.5(0.29690-_ _)
+Thus, an index of 0 indicates a sharp leading edge
+(radius of zero) and an index of 6 corresponds to
+a 0 = 0.2969, the normal design value for the 20-percent-
+thick 4-digit airfoil. A value of leading-edge index of 9
+for a three times normal leading-edge radius was arbi-
+trarily assigned in reference 4, but I = 9 cannot be used in
+this equation. In reference 4, the index I is not used
+in computation. Instead, the index I = 9 was assigned to
+an airfoil where a 0 = 0.29694r3 = 0.514246, which2
+(because Rle = a0/2) thus has a three times normal
+leading-edge radius. The computer program is written so
+that the desired value of leading-edge radius or the index
+I is the input parameter. The value of a 0 is then computed
+in the program.
+NACA 16-series airfoils. The NACA 16-series air-
+foil family is described in references 6 and 7. From the
+equation for the ordinates in reference 7, this series is a
+special case of the 4-digit-modified family although this
+is not directly stated in the references. The 16-series air-
+foils are thus defined as having a leading-edge index of 4
+and a location of maximum thickness at 0.50 chord. The
+designation NACA 16-012 airfoil is equivalent to an
+NACA 0012-45.
+Thickness Distribution Equations for Derived
+Airfoils
+NACA 6-series airfoils. As described in references 9
+and 10, the basic symmetrical NACA 6-series airfoils
+were developed by means of conformal transformations.
+The use of these transformations to relate the flow about
+an arbitrary airfoil to that of a near circle and then to a
+circle had been developed earlier, and the results are pre-
+sented in reference 11. The basic airfoil parameters
+and e are derived as a function of _, where 0 - _ is
+defined as -e. Figure 1, taken from reference 10, shows
+the relationship between these variables in the complex
+plane. These parameters are used to compute both the
+airfoil ordinates and the potential flow velocity distribu-
+tion around the airfoil. For the NACA 6-series airfoils,
+the shape of the velocity distribution and the longitudinal
+location of maximum velocity (or minimum pressure)
+were prescribed. The airfoil parameters _ and e which
+give the desired velocity distribution were obtained
+through an iterative process. Then the airfoil ordinates
+can be calculated from these parameters by use of the
+equations presented in references 10 and 11. Thus, for
+each prescribed velocity distribution, a set of basic airfoil
+parameters is obtained. However, as stated in refer-
+ence 10, it is possible to define a set of basic parameters
+ and e which can be multiplied by a constant factor to
+obtain airfoils of various thickness-chord ratios while
+maintaining the minimum pressure at the same chord-
+wise location. Thus, for each NACA 6-series airfoil fam-
+ily (i.e., 63-, 64-, or 65-series), there is one basic set of
+values for _ and a.
+NACA 6A-series airfoils. The NACA 6-series airfoil
+sections were developed in the early 1940's. As aircraft
+speeds increased, more attention was focused on the thin-
+ner airfoils of this series. However, difficulties were
+encountered in the structural design and fabrication of
+these thinner sections because of the very thin trailing
+edges. As a result, the NACA 6A-series airfoil sections
+were developed, and details of these have been published
+in reference 12. Essentially, the modification consisted of
+
+
+
+--- PDF_PAGE 8 ---
+z-plane
+z'-plane
+Z r_ = e(_-_o)+i (O-¢p)
+Z
+_ = Z' q- --
+Z = ae _O+i _
+Z I
+a 2
+Z'
+= ae_+iO
+y ;=x+iy
+Figure 1. Illustration of transformations used to derive airfoils and
+calculate pressure distribution. From reference 1; a is basic
+length, usually considered unity.
+a near-constant slope from about the 80-percent-chord
+station to the trailing edge and an increase in the trailing-
+edge thickness from zero to a finite value.
+Calculation procedure. For each NACA 6-series
+airfoil family, a unique curve of _ and e exists as a func-
+tion of q_.This curve can be scaled by a constant factor to
+provide airfoils of different thickness within this family.
+A computer program could therefore be developed to cal-
+culate the airfoil ordinates for given values of _ and a.
+Although the values of these basic airfoil parameters
+were not published, tabulated values existed in files or
+could be computed by the method of reference 11 from
+published airfoil ordinates. To provide more values of
+and e for storage in a computer subroutine, a fit to the
+original values was made with a parametric-linked cubic-
+spline-fit program, and nine additional values were
+obtained between each of the original values. This pro-
+cess was carried out for each airfoil series, and the results
+were stored in the computer program as two arrays for
+each airfoil family (one for e as a function of _) and one
+for _ as a function of _). For the new program, the
+enrichment was completely redone and the q_ array is
+stored in the program only once for all 6- and 6A-series
+profiles.
+To calculate the ordinates for an arbitrary airfoil, the
+program first determines which airfoil series is desired
+and calls for the subroutine for this series. The airfoil
+represented by the stored values of _ and e is calculated
+and its maximum thickness-chord ratio is determined.
+The ratio of the desired value to that obtained in this
+determination is calculated. Then, _g and _ and are multi-
+plied by this ratio to arrive at a new airfoil thickness-
+chord ratio. The iteration is repeated until the computed
+thickness-chord ratio is within 0.01 percent of the desired
+value or until 10 iterations have been performed. Usually
+convergence occurs within four iterations. After the iter-
+ative process has converged within the limit established,
+any residual difference between the computed thickness-
+chord ratio and that desired is eliminated by linearly scal-
+ing the y ordinate and its first and second derivatives by
+the appropriate scale factor. The first and second deriva-
+tives of the airfoil ordinates as a function of chord are
+computed by a subroutine labeled "DERV" in the pro-
+gram. Although these ordinates and slopes are calculated
+at more than 200 internally controlled chord stations, a
+subroutine is used to interpolate between these points (by
+use of a piecewise cubic curve fit labeled "NTRP") so
+that the output will be in specified increments of chord
+stations.
+Calculation of leading-edge radius. The values of
+leading-edge radius of the derived airfoils, published in
+references 9 to 12, were initially determined by plotting
+the ordinates to a large scale and fairing in the best circle
+fit by hand. Values of the tangency point between the cir-
+cle and airfoil surface obtained in this manner were not
+published. To provide smooth analytic ordinates around
+the leading edge for the computer program, a tilted
+ellipse has been used. (See fig. 2.) This tilted ellipse is
+described by the basic ellipse function plus an additive
+term, linear in x, which vanishes at the origin. The tilted
+ellipse expression thus has three arbitrary constants,
+which are determined in the procedure. The resulting fit
+to the airfoil ordinates is exact for the ordinate itself and
+the first derivative and quite close for the second deriva-
+tive, though examination of the second derivative in the
+region of tangency generally reveals a small discrepancy
+(even smaller in the current version than in the original
+computer program (ref. 1)). The ellipse is defined so that
+it has the same ordinate and slope as the airfoil surface at
+the 12th (of 201) tabulated value of _ in the airfoil
+parameter subroutine. (The l lth stored point, which is
+actually the second point of the original tabulated values,
+was used in ref. 1.) This tangency point is usually located
+at about 0.005 chord but varies with airfoil thickness and
+
+
+
+--- PDF_PAGE 9 ---
+.02 .10
+y(x) .01
+I
+I
+I
+I
+I
+I
+I
+I
+I
+I
+Curves match at
+12th point _,,
+,, I --°"
+li "/'"'
+_I......... 6 series
+.,°--r
+,°,-°°° i
+i
+Tilted ellipse ,
+I
+I
+.010
+x/c
+ Ellipse, y(x)
+[2]-----------_Profile, y(x)
+............ Radius, R(x)
+/-°
+°.°
+°.-"
+o/
+°°,.°°
+o/'
+°,°'°
+profile
+(a) 12-percent-thick example, NACA 64012 airfoil.
+.05
+0
+.020
+R(x)
+y(x)
+.03
+.02
+.01
+0
+I
+I
+Curves match at I
+12th point
+ //°'"
+I ,,/"
+I /"
+ . ....o"('°
+.....-'"'"'° I
+Tilted ellipse I
+[]
+/
+°/
+o/"
+/
+o/
+_rofile
+I
+.010 .010
+X/C
+ Ellipse, y(x)
+D-----g3 Profile, y(x)
+............ Radius, R(x)
+(b) 24-percent-thick example, NACA 64024 airfoil.
+Figure 2. Leading-edge fairing for 6-series and 6A-series profiles.
+.09
+0
+.020
+.06
+.03
+R(x)
+6
+
+
+
+--- PDF_PAGE 10 ---
+series. By use of this method, a smooth transition
+between airfoil and ellipse is produced, the tangency
+point is known, and there is a continuous variation of
+leading-edge shape with thickness-chord ratio. The non-
+dimensional radius of curvature of the ellipse at the air-
+foil origin is also calculated in the program, and its value
+is in close agreement with the published values of the
+leading-edge radius for known airfoils.
+Camber-Line Equations
+2-digit. The 2-digit camber line is designated by a
+2-digit number and, when used with a 4-digit airfoil,
+would have the form NACA pmxx where p is the maxi-
+mum camber in percent chord, m is the chordwise loca-
+tion of maximum camber in tenths of chord, and xx is the
+airfoil thickness in percent chord. The NACA 2-digit
+camber line is described in reference 3. This camber line
+is formed by two parabolic segments which have a gen-
+eral equation of the form:
+-Y=c bO+ bl(X/+b2(X) 2
+The constants for the two equations are determined
+from the following boundary conditions:
+Camber-line extremities:
+x y_ x y_- = 0 - - 0 - = 1.0 -- 0
+C C C C
+Maximum ordinate:
+x y_ dy_-=m --p ---0c c dx
+From these conditions, the camber-line equations
+then become
+-Y: P(2mX__ (x/2
+c m2_, c)
+forward of the maximum ordinate and
+Y m
+P ( c(l-m) 2[ 1-2m)+2mx-/x)21
+aft of the maximum ordinate. Both the ordinate and slope
+of the two parabolic segments match at x/c = m. Tables
+of ordinates for some of these camber lines are tabulated
+in references 9 and 10. The ordinates are linear with
+amount of camber p and these can be scaled up or down
+as desired.
+3-digit. To provide a camber line with a very far for-
+ward location of the maximum camber, the 3-digit cam-
+ber line was developed and presented in reference 5. The
+first digit of the 3-digit camber-line designation is
+defined as two thirds of the design lift coefficient (in
+tenths, i.e., 2 denotes Cl,i = 0.3); the second digit, as twice
+the longitudinal location of maximum camber in tenths
+of chord; and the third digit of zero indicates a non-
+reflexed trailing edge.
+This camber line is also made up of two equations so
+that the second derivative decreases to zero at a point r
+aft of the maximum ordinate and remains zero from this
+point to the trailing edge. The equations for these condi-
+tions are as follows:
+d2y- kl( c-x r)
+dx 2
+from x/c = 0 to x/c = r, and
+d2y - 0
+dx 2
+from x/c = r to x/c = 1.0. The boundary conditions are as
+follows:
+Camber-line extremities:
+x y_ x y_- : 0 -- 0 - : 1.0 -- 0
+C C C C
+At the junction point:
+x_ : r (Y)N = (Y) (d-_xxlN = (d-_xx)c T T
+The equation for the camber line then becomes
+y kl _ 3r(X/2 + r)X 1C - 6I(X/3 r2(3-
+from x/c = 0 to x/c = r, and
+from x/c = r to x/c = 1.0. These equations were then
+solved for values of r which would give longitudinal
+locations of the maximum ordinate of 5, 10, 15, 20, and
+25 percent chord. The value of k 1 was adjusted so that a
+theoretical design lift coefficient of 0.3 was obtained at
+the ideal angle of attack. The value of k 1 can be linearly
+scaled to give any desired design lift coefficient. Values
+7
+
+
+
+--- PDF_PAGE 11 ---
+of k 1 and r and the camber-line designation were taken
+from reference 5 and are presented in the following table:
+Camber-line
+designation m
+210 0.05
+220 0.10
+230 0.15
+240 0.20
+250 0.25
+r k 1
+0.0580 361.400
+0.1260 51.640
+0.2025 15.957
+0.2900 6.643
+0.3910 3.230
+3-digitreflex. The camber-line designation for the
+3-digit-reflex camber line is the same as that for the
+3-digit camber line except that the last digit is changed
+from 0 to 1 to indicate the reflex characteristic, which is
+the normally negative camber-line curvature, becomes
+positive in the aft segment.
+For some applications, for example, rotorcraft main
+rotors, to produce an airfoil with a quarter-chord
+pitching-moment coefficient of zero may be desirable.
+The 3-digit-reflexed camber line was thus designed to
+have a theoretical zero pitching moment as described in
+reference 5. The forward part of the camber line is identi-
+cal to the 3-digit camber line but the aft portion was
+changed from a zero curvature segment to a segment
+with positive curvature. The equation for the aft portion
+of the camber line is expressed by
+d2y-- = k21 c -x r)>0
+dx 2 (xr)
+By using the same boundary conditions as were used for
+the 3-digit camber line, the equations for the ordinates
+are
+ k2 _r)3_x_ 3x 1
+klI(x - 3_ +r 3
+-Yc= 6L\c-r _1(1 c r -c
+from x/c = 0 to x/c = r and
+y ]c = -ffL \c- r/3- _1 (1 -r)3X-c r c3X* r 3
+for x/c = r to x/c = 1.0. The ratio k2/k 1 is expressed as
+_ 3k2 3 (r- m) 2- r
+k 1 1 -r
+Values of k 1, k2/k 1, and m for several camber-line
+designations from reference 5 are presented in the fol-
+lowing table:
+Camber-line
+designation m
+221 0.10
+231 0.15
+241 0.20
+251 0.25
+r k1 k2/k 1
+0.1300 51.990 0.000764
+0.2170 15.793 0.00677
+0.3180 6.520 0.0303
+0.4410 3.191 0.1355
+g-series. The equations for the 6-series camber lines
+are presented in reference 9. The camber lines are a func-
+tion of the design lift coefficient Cl,i and the chordwise
+extent of uniform loading A. The equation for these cam-
+ber lines is as follows:
+ 1 1y_ Cl, i i__._ I_ (A _ _Xc/2log2(A _x )c 2n(A + 1)
+_x/2loge(1
+-_(A-X)21 -x- l°geX+g-hX}cc
+where
+1 IA2(_ logeA __)+_1g= 1-A
+1AI_(1-A) 2 loge(1-A)-_(1-A)21+gh- 1 -
+As was true in reference 1, the program is capable of
+combining (by cumulative addition of y/c) up to 10 cam-
+ber lines of this series to provide many types of loading.
+16-series. The 16-series cambered airfoils, as
+described in reference 6, are derived by using the 6-series
+camber-line equation with the mean-line loading A set
+equal to 1.0, which is
+Y- Cl, i(l _X)21Oge(l _X Ic 4_\
+This equation is the one for the standard mean line
+for this series.
+6A-series. The 6A-series cambered airfoils, as
+described in reference 12, are derived by using a special
+form of the 6-series camber-line equation. This special
+form is designated as "the A = 0.8 modified mean line."
+The modification basically consists of holding the slope
+of the mean line constant from about the 85-percent-
+chord station to the trailing edge. As the reference indi-
+cates, this mean-line loading should always be used for
+the 6A-series airfoils. This camber-line equation is given
+
+
+
+--- PDF_PAGE 12 ---
+asoneof theoptionsin sdectionof meanlinesin the
+program.
+Calculation of Cambered Airfoils
+To calculate ordinates for a cambered airfoil (includ-
+ing the limiting cases of zero camber (Ycam(X) = O) and
+zero thickness (yt(x) = 0)), the desired mean (camber)
+line is first computed and then the ordinates of the sym-
+metrical airfoil are measured normal to the mean line at
+the same chord station. This procedure leads to a set of
+parametric equations where (y/c)t, (y/C)cam, and 8 are all
+functions of the original independent variable x/c. The
+upper surface ordinates on the cambered airfoil (x/C)u
+and (y/C)u are given by
+= - sin 8
+Y (c)t cos 8(Y)u = (c ]cam + y
+where 8 is the local inclination of the camber line and
+(y/c)t is assumed to be negative to obtain the lower sur-
+face ordinates (x/c)l and (y/c)l. This procedure is also
+described in reference 10.
+The local slopes of the cambered airfoil are
+and
+(dY)u tan8 sec 8 + - k.cJtL d \cJJ
+y d8 x
+see( )tan
+(dY)t +(Y-] Fd6(Xltan 8tan 8 sec 8 - dx \c Jt L d \c JJ
+(dY)l = y d8 x
+sec 8 + (d_/ttan 8 + (c )t I-_- (c )]
+by parametric differentiation of (x/C)u,l and (y/C)u,l with
+respect to the original x/c and use of the relationship
+(dY)u d(y/C)u/d(x/c)d-x = d(x/C)u/d(x/c )
+Although specific camber lines are generally used
+with specific thickness distributions, this program has
+been written in a general format. As a result, any camber
+line can be used with either type thickness distribution so
+that any shape desired can be generated.
+The user should understand that these equations for
+combining a thickness distribution with a mean line,
+while mathematically stable, can produce profiles that
+are geometrically discontinuous and aerodynamically
+useless. An NACA 2224 airfoil, for example, will have a
+small region on the lower surface where (y/c)l is triple
+valued.
+The density of the final output of the procedure (as in
+tables I and II) is determined by the user-supplied value
+of the basic x/c interval dx. As the leading edge is
+approached, the increments become smaller to provide
+good definition of the leading edge of a blunt profile.
+Ordinates are printed at increments of dr/40 chord from
+the leading edge to x/c = 0.01250, at increments of dx/4
+chord from x/c = 0.01250 to 0.1000, and at increments of
+dr chord from x/c = 0.1000 to the trailing edge. The user
+is offered the option of setting dr and the smaller incre-
+ments for x/c less than 0.1 will be reset in the same ratio.
+This procedure is devised to provide rational x values for
+dr = 0.01, 0.05, and 0.10.
+Results and Discussion
+Program Capabilities
+AIRFOLS is the computer program which was
+developed to provide the airfoil shapes described in the
+section "Analysis." AIRFOLS, the NACA Airfoil Ordi-
+nate Generator, is the result of merging two previous
+efforts reported in references 1 and 2. This program cal-
+culates and then reports the ordinates and surface slope
+for airfoils of any thickness, thickness distribution, or
+camber in the designated NACA series. AIRFOLS is a
+portable, ANSI FORTRAN 77 code with limited plat-
+form dependencies. Parameters describing the desired
+airfoil are entered into the software with menu and
+prompt driven input. Output consists of a report file and a
+data file.
+Provisions have been made in the AIRFOLS pro-
+gram to combine basic airfoil shapes and camber lines
+from different series so that nonstandard as well as stan-
+dard airfoils can be generated. The analytical design
+equations for both symmetrical and cambered airfoils in
+the NACA 4-digit-series, 4-digit-series modified, 5-digit-
+series, 5-digit-series modified, 16-series, 6-series, and
+6A-series airfoil families have been implemented. The
+camber-line designations available are the 2-digit,
+3-digit, 3-digit-reflex, 6-series, and 6A-series. The pro-
+gram achieves portability by limiting machine-specific
+code. The two exceptions are a compiler-specific format
+edit descriptor and a terminal-specific (display device)
+set of screen control codes. The user's targets, selected
+from the available platform configuration and terminal
+device choices, are communicated to the software
+enabling the machine-specific setup to be performed
+internally with coded logic. The program attempts to be
+completely self-guiding and to reduce required input to
+9
+
+
+
+--- PDF_PAGE 13 ---
+theminimumnecessaryfor therequestedairfoilsection
+andmeanline.Theconventionusedfor thetwooutput
+file namesconsistof combiningauser-suppliedfile pre-
+fix respectivelysuffixedwith".rpt" and".dta."Theout-
+putreport(.rpt)isanASCIIfile containingthetabulated
+nondimensionalanddimensionalairfoilordinatesaswell
+asotherinputandoutputparameters.Theoutputdata
+(.dta)is an ASCIIfile of X-Y pairsrepresentingthe
+dimensionalairfoilordinates.
+To executeAIRFOLS,entertheappropriatecom-
+mandthenfollow the programprompts.A message
+printedby theprogramat thebeginningof execution
+shouldreiteratethe platform,operatingsystem,and
+FORTRANcompilerto whichthepresentexecutableis
+targeted.Examplesof thesupportedplatformconfigura-
+tionoptionsare
+CONVEXC2usingCONVEXFORTRANcompiler
+IBM compatiblePC using IBM FORTRAN/2
+compiler
+Sun-3usingSunFORTRANcompiler
+VAX 780usingVAX FORTRANcompiler
+IRIS-4D using Silicon Graphics FORTRAN
+compiler
+Sun-4usingSunFORTRANcompiler
+Gateway2000PCusingLaheyFORTRANcompiler
+Generic,useonlyif otherdevicesunavailable
+Theprogram'sinitialrequestis for identificationof
+thedisplaydevicebeingused.Examplesofthesupported
+displaydeviceoptionsare
+ANSIterminaloremulator
+IBMpersonalcomputerorcompatible
+TEKTRONIX4107
+SunMicrosystemsworkstationconsole
+DECVT terminal50
+DECVT terminal100
+DECVT terminal200
+DECVT terminal240withREGIS
+IBMpersonalcomputerVTERMpackage
+TherearetwoformsofinputforcontrollingtheAIR-
+FOLSprogram.Theprogrampromptstheuserto enter
+textualinformationor selecta choicefromamenu.The
+primarytechnicalinputrequeststhatauserseesare
+Choiceof standardornonstandardairfoil
+Selectionfromairfoilsectionoptions
+10
+Choiceof airfoilwithcamberornocamber
+Selectionfrommean-lineoptions
+Promptforairfoiltitle
+Promptforoutputfileprefix
+Prompts for specific airfoil and mean-line
+parameters
+Theprogramalsomakesavailablea nontechnical
+tutorialin theformof a genericmenuexampleto show
+theuseof menucontrol.To viewthetutorialreply"F"
+(false)to themenuquery:"USERIS EXPERIENCED
+WITH AIRFOLS."Replyingto anymenuquerywith
+"/EX" (respondwithexample)will alsoexecutethetuto-
+rial. Thetutorialinterruptstheuser'sinteractivecontrol
+to executetheexamplemenutypequery.Thedesired
+repliesareenteredby thetutorial,alleviatingrequire-
+mentsfor userinteraction.Eachreplyproducesa pro-
+gram responseand a tutorial explanationof that
+response.Programcontrolis returnedto theuserwhen
+theexampleterminates.Thetutorialexamplewill dis-
+playtheprogram'sresponseto anumberof correctand
+incorrectentries.Theresponsesto theprogramcontrol
+charactersprintedwitheachmenuarecoveredaswell.
+Theprogramcontrolcharactersandthetypicalresponse
+toexpectare
+cr (orEnter)
+/
+Clears screen then redisplays menu
+Responds with system prompt options
+menu
+? Provides additional details on prompted
+request
+E (or e) Exits from submenu to previous menu
+level
+Q (or q) Terminates program execution
+AIRFOLS was written with emphasis on user friend-
+liness, self-direction, and informative error processing
+with the goal of producing a valuable software tool for
+the researcher.
+Accuracy of Results
+Analytical airfoils. All the airfoils and camber lines
+generated by this program are defined by closed analyti-
+cal expressions and no approximations have been made
+in the program. Thus, all results are exact. Many cases
+have been run and compared with previously published
+results to check the procedure, and for all cases the
+comparisons were exact except for occasional differ-
+ences beyond the fifth digit caused by rounding
+differences.
+
+
+
+--- PDF_PAGE 14 ---
+Derived airfoils. In reference 1, about 25 cases,
+including several from each airfoil family, were com-
+puted for thickness-chord ratios from 0.06 to 0.15, and
+the results were compared with the values published in
+references 9, 10, and 12. For the NACA 6-series airfoils,
+the agreement was generally within 5 x 10 -5 chord. The
+NACA 6A-series airfoils show differences of as much as
+9 x 10 -5 chord near the leading edge, but from about
+x/c = 0.10 to 0.95 the accuracy is about the same as for
+the 6-series. The equations for the 6-series airfoil geome-
+try dictate that the trailing-edge thickness be zero; how-
+ever, the 6A-series airfoils have a finite trailing-edge
+thickness. For the 6A-series airfoils, the profiles obtained
+from the program are not useful past x/c = 0.95. For con-
+struction or grid generation, the user would probably
+modify the last 5 percent of the chord by using the ordi-
+nate and slope at x/c = 0.95 and extrapolating to the trail-
+ing edge.
+Early Release Version
+A version of this program (0.A, March 31, 1992)
+already in use produces the same results for actual con-
+struction of an airfoil from the output coordinates. How-
+ever, this early version does display small discrepancies
+in the second derivative of the thickness distribution
+upstream of 0.5 percent chord. In the current version, this
+problem has been corrected by allowing the tilted ellipse
+fit loop to go one step further and by replacing the inter-
+polation subroutine NTRP with an improved procedure.
+Users concerned about very small perturbations, as in
+grid generation, may want to be sure they have the ver-
+sion documented in this report (1.01, April 1996).
+respectively. Printed at the top of the first page for each
+table is the airfoil and camber-line family selected, the
+airfoil designation, and a list of the input parameters for
+both airfoil shape and camber line. Both nondimensional
+and dimensional ordinates are listed. The dimensional
+quantities have the same units as the input value of the
+chord, which is also listed at the top of the page. First and
+second derivatives of the surface ordinates are also pre-
+sented for symmetrical airfoils, but only first derivatives
+are tabulated for the cambered airfoils.
+Concluding Remarks
+Computer programs to produce the ordinates for air-
+foils of any thickness, thickness distribution, or camber
+in the NACA airfoil series were developed in the early
+1970's and are published as NASA TM X-3069 and
+TM X-3284. For analytic airfoils, the ordinates are exact.
+For the 6-series and all but the leading edge of the 6A-
+series airfoils, agreement between the ordinates obtained
+from the program and previously published ordinates is
+generally within 5 x 10 -5 chord. Since the publication of
+these programs, the use of personal computers and
+individual workstations has proliferated. This report
+describes a computer program that combines the capabil-
+ities of the previously published versions. This program
+is written in ANSI FORTRAN 77 and can be compiled to
+run on DOS, UNIX, and VMS based personal computers
+and workstations as well as mainframes. An effort was
+made to make all inputs to the program as simple as pos-
+sible to use and to lead the user through the process by
+means of a menu.
+Sample Output Tabulations
+Sample computed ordinates for both a symmetric
+and a cambered airfoil are presented in tables I and II,
+NASA Langley Research Center
+Hampton, VA 23681-0001
+August 29, 1996
+11
+
+
+
+--- PDF_PAGE 15 ---
+Appendix
+Convergence of Leading-Edge Radius of
+NACA 4-Digit and 4-Digit-Modified Series
+Airfoils
+The demonstration follows that in the limit as
+x _ 0, the radius of curvature at the nose of the NACA
+4-digit-series airfoil profile (or the 4-digit-modified,
+which has the same equation at the leading edge) is finite
+and equal to a2/2, where a 0 is the coefficient of the1/2
+x term in the defining equation:
+1/2 2 3 4
+y : aOx + alx + a2x + a3x + a4x
+1 -1/2
+Yx = 72a0 x + al + 2a2x + 3a3 x2 + 4a4 x3
+1 -3/2 2
+Yxx = -_aOx + 2a2 + 6a3x + 12a4x
+The leading-edge radius is the radius of curvature at
+x = 0 (Rle = R(0)):
+2 3/2
+(1 + Yx)
+R(x) -
+Yxx
+2 3 x=0
+R(X)2 = (1 2yx)
+Yxx
+This expression for the radius of curvature cannot be
+evaluated at x = 0 by direct substitution. Evaluating the
+numerator and denominator separately in the limit as
+x --_ 0, where all terms in x e>O must vanish and all con-
+stant terms become negligible compared with the terms
+in x e<O, gives
+For the numerator,
+2 1 2-1 -1/2
+l+Yx = _aOx +alaOX
+2 3 (1) 3 6 -3 ,,//1) 2 5 -5/2
+(1 + Yx) : _.]l) aOx + J_.4) alaOX
+,,('1) 2 4-2 3 3 -3/2
++ J_ala0x +alaOX
+For the denominator,
+2 fl) 2 2 -3 ,,¢'1) -3/2
+Yxx : _,_) aOx - z_._)a2aox
+,,(3) -1/2
+-  l.Ty3a°x
+Multiplying both numerator and denominator by X 3
+gives:
+R(x) 2 : (1/4) 3a6 + 3(1/4)2ala5x 1/2
+(1/4)2a 2 ...
+where the ellipses represent vanishing terms in X e>O.
+Thus,
+1 4
+R(0) 2 = _a 0
+1 2
+R(O) = _a 0
+This result clearly depends on the a 0 term in the original
+equation with its fractional power of the independent
+variable. This term prevents the first and second deriva-
+tives from vanishing at the origin. Instead, both the first
+and second derivatives increase without limit at the ori-
+gin but in such a way that the radius of curvature is finite.
+As x _ 0, the variation of R(x) is such that
+dR -1/2
+dx ala°x
+so that even though R(0) is finite, Rx(O) is not. As a2 • •
+result, R(x) does not appear to converge to ao/2 unnl x is
+very near zero, and then the curve for R(x) approaches
+a2/2 along the axis x = 0. Furthermore, because a 1 < 0
+(for 4-digit or 4-digit-modified airfoil), Rx(O) < 0 and
+thus R(x) must have a minimum Rmin(X ) < R(0). A gen-
+eral expression for this minimum is probably not worth
+the labor of the derivation. For the NACA 0020 airfoil, it
+is approximately Rmi n = R(0.000345) = 0.04304 com-
+pared with R(0) = a2/2 = 0.044075 in nondimen-
+sional coordinates.
+12
+
+
+
+--- PDF_PAGE 16 ---
+References
+1. Ladson, Charles L.; and Brooks, Cuyler W., Jr.: Development
+of a Computer Program To Obtain Ordinates for NACA 6- and
+6A-Series Airfoils. NASA TM X-3069, 1974.
+2. Ladson, Charles L.; and Brooks, Cuyler W., Jr.: Development
+of a Computer Program To Obtain Ordinates for NACA
+4-Digit, 4-Digit Modified, 5-Digit, and 16-Series Airfoils.
+NASA TM-3284, 1975.
+3. Jacobs, Eastman N.; Ward, Kenneth E.; and Pinkerton,
+Robert M.: The Characteristics of 78 Related Airfoil Sections
+From Tests in the Variable-Density Wind Tunnel. NACA
+Rep. 460, 1933.
+4. Stack, John; and Von Doenhoff, Albert E.: Tests of 16 Related
+Airfoils at High Speeds. NACA Rep. 492, 1934.
+5. Jacobs, Eastman N.; and Pinkerton, Robert M.: Tests in the
+Variable-Density Wind Tunnel of Related Airfoils Having the
+Maximum Camber Unusually Far Forward. NACA Rep. 537,
+1935.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+Stack, John: Tests of Airfoils Designed To Delay the Com-
+pressibility Burble. NACA Rep. 763, 1943.
+Lindsey, W. E; Stevenson, D. B.; and Daley, Bernard N.: Aero-
+dynamic Characteristics of 24 NACA 16-Series Airfoils at
+Mach Numbers Between 0.3 and 0.8. NACA TN 1546, 1948.
+Riegels, Friedrich Wilhelm (D. G. Randall, transl.): Aerofoil
+Sections. Butterworth & Co. (Publ.), Ltd., 1961.
+Abbott, Ira H.; and Von Doenhoff, Albert E.: Theory of Wing
+Sections. Dover Publ., Inc., 1959.
+Abbott, Ira H.; Von Doenhoff, Albert E.; and Stivers, Louis S.,
+Jr.: Summary of Airfoil Data. NACA Rep. 824, 1945.
+Theodorsen, Theodore: Theory of Wing Sections of Arbitrary
+Shape. NACA Rep. 411, 1931.
+Loftin, Laurence K., Jr.: Theoretical and Experimental Data
+for a Number of NACA 6A-Series Airfoil Sections. NACA
+Rep. 903, 1948.
+13
+
+
+
+--- PDF_PAGE 17 ---
+Table I. Sample Computer File "64012.rpt" for Symmetric Airfoil
+AIRFOLS ORDINATE INFORMATION REPORT
+for 64012 airfoil
+PROFILE: 6-SERIES CAMBER:
+PROFILE PARAMETERS:
+0.120000 = THICKNESS / CHORD (TOC)
+0.010000 = BASIC X INTERVAL (DX)
+6.000000 = MODEL CHORD (CHD)
+RAT(I) = 1.000000 0.581272
+OF ITERATIONS (IT)
+T/C RATIO, INPUT TO COMPUTED
+CUMULATIVE SCALING OF EPS,PSI
+MAXIMUM Y/C (YMAX)
+PEAK LOCATION (XYM)
+.060000 = SLOPE SIGN CHANGE LOCATION
+: NUMBER
+999994 :
+571965 =
+060000 =
+375975 =
+374842 0
+006717 =
+011216 =
+780074 =
+010034 =
+X/C
+000000 0
+000250 0
+000500 0
+000750 0
+001000 0
+001250 0
+001500 0
+001750 0
+002000 0
+002250 0
+002500 0
+002750 0
+003000 0
+003250 0
+003500 0
+003750 0
+004000 0
+004250 0
+004500 0
+004750 0
+005000 0
+005250 0
+005500 0
+005750 0
+006000 0
+006250 0
+006500 0
+006750 0
+O07000 0
+007250 0
+007500 0
+007750 0
+008000 0
+008250 0
+X/C FIT OF ELLIPSE
+Y/C FIT OF ELLIPSE
+SLOPE FIT OF ELLIPSE
+RADIUS OF ELLIPSE,
+Y/C X
+000000 0 000000
+002217 0 001500
+003153 0 003000
+003861 0 004500
+004446 0 006000
+004972 0 007500
+005434 0 009000
+005867 0 010500
+006262 0 012000
+006633 0 013500
+006986 0 015000
+007316 0 016500
+007631 0 018000
+007935 0 019500
+008224 0 021000
+008501 0 022500
+008770 0 024000
+009030 0 025500
+009279 0 027000
+009521 0 028500
+009758 0 030000
+009987 0 031500
+010209 0 033000
+010425 0 034500
+010637 0 036000
+010843 0 037500
+011045 0 039000
+011241 0 040500
+011433 0 042000
+011621 0 043500
+011806 0 045000
+011987 0 046500
+012164 0 048000
+012337 0 049500
+none -
+0.984284 0.999700
+(SF)
+(CRAT)
+(XTP,YM)
+(XT(12))
+(YT(12))
+(YTP(12))
+ORIGIN TO
+Y
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+XT(12)/C,YT(12)/C
+DY/DX
+000000
+013300
+018918
+023166
+026674
+029834
+032604
+035199
+037571
+039798
+041916
+043893
+045788
+047611
+049344
+051005
+052620
+054180
+055675
+057127
+058545
+059923
+061256
+062550
+063819
+065061
+066271
+067446
+068595
+069726
+070836
+071923
+072983
+074022
+4.582653
+3.151760
+2.557617
+2.218630
+1.960144
+1.791810
+1.646746
+1.535877
+1.443982
+1.361467
+1.295341
+1.236006
+1.181388
+1.134461
+1.093128
+1.053807
+1o017726
+0.986034
+0.956632
+0.928518
+0 902220
+0 878265
+0 856161
+0 834813
+0 814474
+0 795407
+0 777865
+0 761235
+0 745170
+0 729842
+0 715419
+0 702071
+0 689594
+(RNP)
+D2Y/DX2
+-10133.497070
+-3253
+-1787
+-1187
+-813
+-637
+-497
+-408
+991943
+510742
+118042
+015991
+092957
+648315
+647339
+-346.249725
+-291 917206
+-255 805206
+-225 954163
+-199 190826
+-178 795593
+-162 901077
+-147 842957
+-134 695694
+-124 466530
+-115 500816
+-106 995934
+-99 390312
+-93 122375
+-87 877068
+-82 808548
+-78 015030
+-73 602821
+-69 673355
+-65 977486
+-62 376503
+-58 941341
+-55 742962
+-52 852318
+-50 213284
+14
+
+
+
+--- PDF_PAGE 18 ---
+0 008500
+0 008750
+0 009000
+0 009250
+0 009500
+0 009750
+0 010000
+0 012500
+0 015000
+0.017500
+0 020000
+0 022500
+0 025000
+0 027500
+0 030000
+0 032500
+0 035000
+0 037500
+0 040000
+0 042500
+0 045000
+0 047500
+0 050000
+0 052500
+0 055000
+0 O5750O
+0 060000
+0 062500
+0 065000
+0 067500
+0 070000
+0 072500
+0 075000
+0 077500
+0 080000
+0 082500
+0 085000
+0 087500
+0 090000
+0 092500
+0 O95OOO
+0 097500
+0 i00000
+0 ii0000
+0 120000
+0 130000
+0 140000
+0 150000
+0 160000
+0 170000
+0 180000
+0 190000
+0 200000
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+012508
+012676
+012842
+013004
+013163
+013320
+013475
+014909
+016179
+017331
+018394
+019392
+020338
+021242
+022109
+022944
+023748
+024527
+025282
+026014
+026724
+027414
+028084
+028736
+029371
+029989
+030591
+031178
+031752
+032313
+032862
+033400
+033925
+034440
+034946
+035443
+035930
+036408
+036878
+037340
+037794
+038241
+038681
+040368
+041955
+043446
+044851
+046174
+047421
+048594
+049701
+050742
+051721
+0.051000
+0.052500
+0 054000
+0 055500
+0 057000
+0 058500
+0 060000
+0 075000
+0 090000
+0 105000
+0 120000
+0 135000
+0 150000
+0 165000
+0.180000
+0.195000
+0.210000
+0.225000
+0.240000
+0.255000
+0.270000
+0.285000
+0.300000
+0.315000
+0 330000
+0 345000
+0 360000
+0 375000
+0 390000
+0 405000
+0 420000
+0 435000
+0 450000
+0 465000
+0 480000
+0 495000
+0 510000
+0 525000
+0 540000
+0 555000
+0 570000
+0 585000
+0 600000
+0 660000
+0 720000
+0 780000
+0 840000
+0 900000
+0 960000
+1.020000
+1.080000
+1.140000
+1.200000
+Table I. Continued
+0 075048
+0 076058
+0 077051
+0 078026
+0 078981
+0 079921
+0 080850
+0 089454
+0 097075
+0 103985
+0 110366
+0 116349
+0 122027
+0 127449
+0 132653
+0 137662
+0 142490
+0 147161
+0 151690
+0 156082
+0 160345
+0 164481
+0 168504
+0 172417
+0 176224
+0 179933
+0 183545
+0 187069
+0 190512
+0 193879
+0 197174
+0.200398
+0 203550
+0 206640
+0 209678
+0 212660
+0 215580
+0 218446
+0 221268
+0 224037
+0 226761
+0 229444
+0 232084
+0 242209
+0 251727
+0 260673
+0 269105
+0 277045
+0 284524
+0 291562
+0 298208
+0 304450
+0 310329
+0 677483
+0 665794
+0 654589
+0 643933
+0 633884
+0 624186
+0 614691
+0 536935
+0 482244
+0 441078
+0 410865
+0 387887
+0 369581
+0 353842
+0 340221
+0 327704
+0 316412
+0 306573
+0 297353
+0 288415
+0 279875
+0 271898
+0 264468
+0 257319
+0 250416
+0 243961
+0 237823
+0 232108
+0 226970
+0 222084
+0 217262
+0 212446
+0.208084
+0.204270
+0.200514
+0.196759
+0.193007
+0.189404
+0.186288
+0 183229
+0 180203
+0 177304
+0 174424
+0 163658
+0 153665
+0 144683
+0 136288
+0 128548
+0 120930
+0 113927
+0 107368
+0 100969
+0 094978
+-47.681225
+-45.311497
+-43.162434
+-41.292366
+-39.757317
+-38.392265
+-37.067284
+-25.528528
+-18.988861
+-14.018546
+-10.439953
+-8.075612
+-6 734070
+-5 837592
+-5 192567
+-4 773360
+-4.212404
+-3 777347
+-3 617945
+-3 505087
+-3 305694
+-3 064729
+-2 922085
+-2 802585
+-2 674942
+-2 528763
+-2 358885
+-2 180O8O
+-2 010549
+-i 917779
+-i 948437
+-i 813631
+-i 664815
+-i 503816
+-i 480895
+-i 525902
+-i 444046
+-i 350303
+-i 246098
+-i 189765
+-i 180359
+-I 181516
+-I 176315
+-0 964989
+-0 953014
+-0 846358
+-0 839168
+-0 769506
+-0 740389
+-0 645912
+-0 689126
+-0 582494
+-0 631849
+15
+
+
+
+--- PDF_PAGE 19 ---
+Table I. Continued
+0
+0
+0
+0
+210000
+220000
+230000
+240000
+0 250000
+0 260000
+0.270000
+0.280000
+0.290000
+0.300000
+0.310000
+0.320000
+0.330000
+0.340000
+0.350000
+0.360000
+0.370000
+0.380000
+0.390000
+0.400000
+0.410000
+0.420000
+0.430000
+0.440000
+0.450000
+0.460000
+0.470000
+0.480000
+0.490000
+0.50OOOO
+O.510000
+0.520000
+0.530000
+0.540000
+0.550000
+0.560000
+0 570000
+0 580000
+0 590000
+0 600000
+0 610000
+0 620000
+0 630000
+0 640000
+0 650000
+0 660000
+0 670000
+0 680000
+0 690000
+0 700000
+0 710000
+0 720000
+0 730000
+0 052639
+0 053499
+0 054302
+0 055048
+0 055739
+0 056377
+0 056960
+0 057493
+0 057972
+0 058400
+0 058781
+0 059112
+0 059395
+0 059628
+0 059809
+0 059931
+0 059993
+0 059991
+0 059916
+0 059772
+0 059548
+0 059260
+0 058897
+0 058475
+0 057991
+0 057450
+0 056858
+0 056218
+0 055534
+0 054806
+0 054032
+0 053222
+0 052372
+0 051484
+0 050561
+0 049607
+0 048621
+0 047601
+0 046553
+0 045476
+0 044374
+0 043249
+0 042098
+0 040923
+0 039733
+0 038520
+0 037287
+0 036040
+0 034776
+0 033499
+0 032206
+0 030905
+0 029592
+1 260000
+1 320000
+1 380000
+1 440000
+1 500000
+1 560000
+1 620000
+1 680000
+1 740000
+1 800000
+1 860000
+1 920000
+1 980000
+2 040000
+2 i00000
+2 160000
+2.220000
+2.279999
+2.339999
+2.399999
+2.459999
+2 519999
+2 579999
+2 639999
+2 699999
+2 759999
+2 819999
+2 879999
+2.939999
+3.000000
+3.060000
+3.120000
+3.180000
+3.240000
+3.300000
+3.360000
+3.420000
+3.480000
+3.539999
+3.599999
+3 659999
+3 719999
+3 779999
+3 839999
+3 899999
+3 959999
+4 019999
+4 079999
+4 139999
+4 199999
+4 259999
+4 319999
+4 379999
+0 315837
+0 320993
+0 325812
+0 330291
+0 334436
+0 338264
+0 341760
+0 344957
+0 347833
+0 350401
+0 352689
+0 354675
+0 356368
+0 357769
+0 358853
+0 359588
+0 359957
+0 359948
+0 359499
+0 358630
+0 357290
+0 355559
+0 353381
+0 350849
+0 347946
+0 344698
+0 341145
+0 337309
+0 333204
+0 328834
+0 324192
+0 319330
+0 314233
+0 308906
+0 303368
+0 297639
+0 291726
+0 285605
+0 279317
+0 272859
+0 266245
+0.259491
+0.252586
+0.245540
+0.238400
+0.231121
+0.223724
+0°216239
+0.208654
+0.200992
+0.193236
+0.185431
+0.177554
+0
+0
+0
+0
+0
+0
+0
+0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+0 088733
+0 083079
+0 077596
+0 071720
+0 066492
+0 060994
+0 055913
+0 050420
+0 045442
+040442
+035488
+030786
+025781
+020854
+015181
+009271
+003000
+003694
+010928
+018412
+025435
+032712
+039309
+045457
+051196
+056922
+061447
+066273
+070572
+075264
+079229
+082976
+086970
+090484
+094048
+096797
+100354
+103489
+106118
+109077
+111324
+113851
+116378
+118140
+120230
+122256
+124178
+125457
+127102
+128568
+129713
+130663
+131876
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+.591514
+.560491
+.569729
+.567787
+.525667
+.569880
+.508531
+.557001
+.506901
+.474289
+.500163
+.465019
+.488108
+.534137
+.583586
+.618653
+.617353
+.728268
+.686004
+.779822
+.657702
+.775743
+.598958
+.617973
+.567208
+.501878
+.466768
+.467965
+.444957
+.459214
+.360220
+.400605
+.369812
+.352421
+.310705
+.298187
+.364253
+269771
+299605
+263943
+229142
+262963
+237618
+161841
+234471
+197908
+142382
+160029
+142993
+157516
+076584
+132782
+048956
+16
+
+
+
+--- PDF_PAGE 20 ---
+Table I. Concluded
+740000
+750000
+760000
+770000
+780000
+790000
+800000
+810000
+820000
+830000
+840000
+850000
+860000
+870000
+880000
+890000
+900000
+910000
+920000
+930000
+940000
+950000
+960000
+970000
+980000
+990000
+000000
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+028272
+026946
+025617
+024285
+022952
+021622
+020294
+018974
+017665
+016366
+015084
+013819
+012574
+011354
+010160
+008996
+007864
+006772
+005721
+004720
+003771
+002884
+002073
+001351
+000739
+000264
+000000
+4
+4
+4
+4
+4
+4
+4
+4
+4
+4
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+.439999
+.499999
+559999
+619998
+679998
+739998
+799998
+859998
+919998
+979998
+039998
+099998
+159998
+219998
+279998
+339998
+399998
+459998
+519998
+579998
+639997
+699997
+759997
+819997
+879997
+939997
+999997
+0.169634
+0.161675
+0.153701
+0.145708
+0 137712
+0 129730
+0 121766
+0 113846
+0 105989
+0 098198
+0 090504
+0 082913
+0 075443
+0 068122
+0 060962
+0 053979
+0 047186
+0 040631
+0 034324
+0 028319
+0 022626
+0 017303
+0 012437
+0 008106
+0 004435
+0 001581
+0 000000
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+132190
+133017
+132997
+133368
+133111
+133023
+132388
+131488
+130493
+129051
+127493
+125490
+123375
+120714
+118055
+114893
+111270
+107152
+102876
+097767
+092050
+085061
+076628
+066925
+055016
+039331
+001854
+-0.071199
+-0.014410
+-0.020850
+0.003955
+0.023193
+0.039957
+0.072903
+0.116263
+0.107131
+0.177069
+0.174549
+0.201894
+0.252569
+0.275818
+0.318184
+0.301135
+0.392689
+0.412245
+0.584972
+0.498944
+0 584660
+0 725263
+0 904850
+1 038957
+1 359224
+1 985244
+21 079264
+17
+
+
+
+--- PDF_PAGE 21 ---
+_ Table II. Sample Computer File "64412.rpt" for Cambered Airfoil
+6-SERIES
+0.984284 0.999700
+AIRFOLS ORDINATE INFORMATION REPORT
+for 64412 airfoil
+PROFILE: 6-SERIES CAMBER:
+PROFILE PARAMETERS:
+0.120000 : THICKNESS / CHORD (TOC)
+0.010000 = BASIC X INTERVAL (DX)
+6.000000 : MODEL CHORD (CHD)
+RAT(I) = 1.000000 0.581272
+4 = NUMBER OF ITERATIONS (IT)
+0.999994 = T/C RATIO, INPUT TO COMPUTED (SF)
+0.571965 = CUMULATIVE SCALING OF EPS,PSI (CRAT)
+0.060000 = MAXIMUM Y/C (YMAX)
+0.375975 = PEAK LOCATION (XYM)
+0.374842 0.060000 = SLOPE SIGN CHANGE LOCATION (XTP,YM)
+0.006717 = X/C FIT OF ELLIPSE (XT(12))
+0.011216 : Y/C FIT OF ELLIPSE (YT(12))
+0.780074 = SLOPE FIT OF ELLIPSE (YTP(12))
+0.010034 = RADIUS OF ELLIPSE, ORIGIN TO XT(12)/C,YT(12)/C
+CAMBER PARAMETERS:
+1 : NUMBER OF CAMBER LINES TO SUM (CMBNMR )
+CLI(I) = 0.400000
+A(I) = 1.000000
+UNCAMBERED
+X/C XU/C YU/C XU
+0.000000 0.000000 0.000000 0.000000
+0.000250 -0.000119 0.002260 -0.000712
+0.000500 -0.000024 0.003246 -0.000146
+0.000750 0.000108 0.004003 0.000648
+0.001000 0.000261 0.004635 0.001565
+0.001250 0.000423 0.005209 0.002540
+0.001500 0.000597 0.005717 0.003579
+0.001750 0.000775 0.006194 0.004648
+0.002000 0.000959 0.006634 0.005754
+0.002250 0.001147 0.007049 0.006884
+0.002500 0.001339 0.007445 0.008032
+0.002750 0.001534 0.007817 0.009204
+0.003000 0.001732 0.008175 0.010390
+0.003250 0.001931 0.008521 0.011587
+0.003500 0.002133 0.008851 0.012799
+0.003750 0.002337 0.009169 0.014024
+0.004000 0.002543 0.009478 0.015256
+0.004250 0.002749 0.009778 0.016497
+0.004500 0.002958 0.010067 0.017749
+0.004750 0.003168 0.010349 0.019008
+0.005000 0.003379 0.010624 0.020273
+0.005250 0.003606 0.010895 0.021634
+UPPER SURFACE VALUES
+YU
+0 000000
+0 013558
+0 019476
+0 024017
+0 027813
+0 031253
+0 034300
+0 037165
+0 039804
+0 042293
+0.044671
+0.046904
+0.049052
+0.051125
+0.053105
+0.055011
+0 056869
+0 058669
+0 060403
+0 062091
+0 063743
+0 065369
+(RNP)
+DYU/DXU
+-5 929416
+19 701138
+6 884831
+4 681640
+3 733716
+3 117455
+2 756694
+2 468120
+2 260172
+2 095460
+1 953106
+1 842616
+1 746078
+1 659309
+1 586308
+1 523163
+1 464067
+1 410659
+i 364378
+1 321960
+1 208261
+1 172252
+LOWER SURFACE
+XL/C YL/C XL
+0.000000 0.000000 0.000000
+0.000619 -0.002112 0.003712
+0.001024 -0.002972 0.006146
+0.001392 -0.003612 0.008352
+0.001739 -0.004132 0.010435
+0.002077 -0.004597 0.012460
+0.002403 -0.005000 0.014421
+0.002725 -0.005376 0.016352
+0.003041 -0.005716 0.018246
+0.003353 -0.006032 0.020116
+0.003661 -0.006333 0.021968
+0.003966 -0.006610 0.023796
+0.004268 -0.006875 0.025610
+0.004569 -0.007129 0.027413
+0.004867 -0.007368 0.029201
+0.005163 -0.007597 0.030976
+0.005457 -0.007818 0.032744
+0.005751 -0.008031 0.034503
+0.006042 -0.008233 0.036251
+0.006332 -0.008429 0.037992
+0.006621 -0.008620 0.039727
+0.006894 -0.008807 0.041366
+VALUES
+YL
+0 000000
+-0 012671
+-0 017833
+-0 021670
+-0 024792
+-0 027584
+-0.030002
+-0.032254
+-0.034293
+-0.036195
+-0.037995
+-0.039661
+-0.041251
+-0.042773
+-0.044211
+-0.045580
+-0.046908
+-0.048184
+-0.049400
+-0.050575
+-0.051719
+-0.052842
+DYL/DXL
+-5 929416
+-2 468801
+-i 928516
+-i 651175
+-i 475005
+-I 330605
+-i 231427
+-i 142463
+-i 072166
+-i 012317
+-0.957306
+-0 912326
+-0 871268
+-0 832875
+-0 799420
+-0 769589
+-0 740886
+-0 714266
+-0 690659
+-0 668566
+-0 691887
+-0 672141
+
+
+
+--- PDF_PAGE 22 ---
+Table II. Continued
+0.005500
+0.005750
+0.006000
+0.006250
+0.006500
+0.006750
+0.007000
+0.007250
+0.007500
+0.007750
+0.008000
+0.008250
+0.008500
+0.008750
+0.009000
+0 009250
+0 009500
+0 009750
+0 010000
+0 012500
+0 015000
+0 017500
+0 020000
+0 022500
+0 025000
+0 027500
+0 030000
+0 032500
+0 035000
+0 037500
+0 040000
+0 042500
+0 045000
+0 047500
+0 050000
+0 052500
+0 055000
+0 057500
+0 060000
+0 062500
+0 065000
+0 067500
+0 070000
+0 072500
+0 075000
+0 077500
+0.003834
+0.004063
+0.004292
+0.004523
+0.004754
+0.004986
+0.005219
+0.005452
+0.005686
+0.005920
+0.006155
+0.006391
+0.006627
+0.006863
+0.007099
+0.007336
+0.007574
+0.007812
+0.008050
+0.010446
+0.012864
+0 015296
+0 017739
+0 020189
+0 022644
+0 025104
+0 027569
+0 030036
+0 032507
+0 034980
+0 037455
+0 039933
+0 042413
+0 044895
+0 047379
+0 049865
+0 052352
+0 054841
+0 057331
+0 059822
+0 062315
+0 064809
+0 067303
+0 069799
+0 072296
+0 074793
+0.011158
+0.011414
+0.011666
+0.011913
+0.012154
+0.012390
+0.012621
+0.012848
+0.013072
+0.013291
+0.013506
+0.013718
+0.013926
+0.014132
+0.014335
+0.014535
+0.014731
+0.014924
+0 015116
+0 016906
+0 018517
+0 019996
+0 021375
+0 022679
+0 023922
+0 025115
+0 026264
+0 027373
+0 028446
+0 029487
+0 030499
+0 031483
+0 032440
+0 033372
+0 034280
+0 035166
+0 036031
+0 036875
+0 037699
+0 038505
+0 039294
+0 040067
+0 040825
+0 041568
+0 042296
+0 043011
+0.023002
+0.024376
+0.025754
+0.027137
+0.028524
+0.029917
+0.031313
+0.032713
+0.034115
+0.035522
+0.036931
+0.038344
+0.039759
+0.041177
+0 042596
+0 044018
+0 045443
+0 046870
+0 048299
+0 062677
+0 077183
+0 091776
+0 106431
+0 121132
+0 135866
+0 150627
+0 165411
+0 180216
+0 195040
+0 209879
+0 224733
+0 239600
+0 254480
+0 269373
+0 284276
+0 299189
+0 314113
+0 329045
+0 343986
+0 358934
+0 373890
+0 388852
+0 403820
+0 418794
+0 433774
+0 448759
+0.066947
+0.068485
+0.069996
+0.)71478
+0.072927
+0.074338
+0.075724
+0.077088
+0.078430
+0.079748
+0.081038
+0.082305
+0.083557
+0.084793
+0 086010
+0 087208
+0 088385
+0 089546
+0 090695
+0 101435
+0 iiii00
+0 119975
+0 128253
+0 136073
+0 143533
+0 150689
+0 157582
+0 164239
+0 170678
+0 176924
+0 182994
+0 188898
+0 194642
+0 200232
+0 205683
+0 210998
+0 216183
+0 221247
+0 226193
+0 231028
+0 235763
+0 240403
+0 244951
+0 249409
+0 253778
+0 258068
+1.139723
+1.109937
+1.081424
+1.054469
+1.029364
+1 006378
+0 )84707
+0 963901
+0 944149
+0 925636
+0 908545
+0 892608
+0 877205
+0 862395
+0 848242
+0 834814
+0 822171
+0 810003
+0 798130
+0 701787
+0 634606
+0 584201
+0 546903
+0 518194
+0 495051
+0 475074
+0 457689
+0 441755
+0 427353
+0 414682
+0 402833
+0 391434
+0 380586
+0 370446
+0 360983
+0 351909
+0 343177
+0 334988
+0 327200
+0 319913
+0 313279
+0 306958
+0 300754
+0 294604
+0 288962
+0 283920
+0.007166
+0.007437
+0.007708
+0.007977
+0.008246
+0.008514
+0.008781
+0.009048
+0.009314
+0.009580
+0.009845
+0.010109
+0.010373
+0.010637
+0.010901
+0.011164
+0.011426
+0.011688
+0.011950
+0.014554
+0.017136
+0.019704
+0.022261
+0.024811
+0.027356
+0.029896
+0.032431
+0.034964
+0.037493
+0.040020
+0.042545
+0.045067
+0.047587
+0.050105
+0.052621
+0.055135
+0.057648
+0.060159
+0.062669
+0.065178
+0.067685
+0.070191
+0.072697
+0.075201
+0.077704
+0.080207
+-0.008987
+-0.009161
+-0.009331
+-0.009497
+-0.009658
+-0.009814
+-0.009965
+-0.010114
+-0.010260
+-0.010402
+-0.010540
+-0.010675
+-0.010807
+-0.010938
+-0.011066
+-0.011191
+-0.011313
+-0.011432
+-0.011551
+-0.012628
+-0.013558
+-0.014384
+-0.015134
+-0.015828
+-0.016480
+-0.017097
+-0.017686
+-0.018249
+-0.018788
+-0.019307
+-0.019807
+-0.020291
+-0.020757
+-0.021207
+-0.021643
+-0.022064
+-0.022472
+-0.022867
+-0.023250
+-0.023621
+-0.023983
+-0.024335
+-0.024678
+-0.025012
+-0.025338
+-0.025656
+0.042998
+0.044624
+0.046246
+0.047863
+0.049476
+0.051083
+0.052687
+0.054287
+0.055885
+0.057478
+0.059069
+0.060656
+0.062241
+0.063823
+0.065404
+0.066982
+0.068557
+0.070130
+0.071701
+0.087323
+0.102817
+0.118224
+0.133568
+0.148868
+0.164134
+0.179373
+0.194589
+0.209784
+0.224960
+0.240121
+0.255267
+0.270400
+0.285520
+0.300627
+0.315724
+0.330811
+0.345887
+0.360955
+0.376014
+0.391066
+0.406110
+0.421148
+0.436180
+0.451206
+0.466226
+0.481241
+-0.053921
+-0.054965
+-0.055987
+-0.056982
+-0.057949
+-0.058882
+-0.059792
+-0.060685
+-0.061559
+-0.062412
+-0.063240
+-0.064049
+-0.064845
+-0.065627
+-0.066394
+-0.067144
+-0.067876
+-0.068595
+-0.069304
+-0.075768
+-0.081351
+-0.086306
+-0.090805
+-0.094967
+-0.098878
+-0.102583
+-0.106114
+-0.109492
+-0.112727
+-0.115840
+-0.118844
+-0.121743
+-0.124542
+-0.127242
+-0.129855
+-0.132384
+-0.134830
+-0.137201
+-0.139498
+-0.141727
+-0.143895
+-0.146008
+-0.148068
+-0.150074
+-0.152026
+-0.153935
+-0.654041
+-0.637241
+-0.620886
+-0.605199
+-0.590415
+-0.576767
+-0.563769
+-0.551145
+-0.539048
+-0.527631
+-0.517052
+-0.507151
+-0.497503
+-0.488160
+-0.479181
+-0.470628
+-0.462557
+-0.454751
+-0.447082
+-0.383874
+-0.339260
+-0.305722
+-0.281486
+-0.263426
+-0.249329
+-0.237316
+-0.227034
+-0.217565
+-0.209067
+-0.201791
+-0.194959
+-0.188266
+-0.181836
+-0.175846
+-0.170291
+-0.164922
+-0.159714
+-0.154872
+-0.150274
+-0.146030
+-0.142297
+-0.138761
+-0.135243
+-0.131686
+-0.128535
+-0.125888
+
+
+
+--- PDF_PAGE 23 ---
+ba Table II. Continuedo
+0.080000
+0.082500
+0.085000
+0.087500
+0.090000
+0.092500
+0.095000
+0.097500
+0.i00000
+0.ii0000
+0.120000
+0.130000
+0.140000
+0.150000
+0.160000
+0.170000
+0.180000
+0.190000
+0.200000
+0.210000
+0.220000
+0.230000
+0.240000
+0.250000
+0.260000
+0.270000
+0.280000
+0.290000
+0.300000
+0.310000
+0.320000
+0.330000
+0.340000
+0.350000
+0.360000
+0.370000
+0.380000
+0.390000
+0.400000
+0.410000
+0.420000
+0.430000
+0.440000
+0.450000
+0.460000
+0.470000
+0.077291
+0.079790
+0.082290
+0.084790
+0.087291
+0.089793
+0.092295
+0.094798
+0.097301
+0.107319
+0.117345
+0.127376
+0.137413
+0.147454
+0.157500
+0.167550
+0.177604
+0.187661
+0.197720
+0.207782
+0.217846
+0.227913
+0.237982
+0.248052
+0.258124
+0.268198
+0.278272
+0.288348
+0.298425
+0.308503
+0.318582
+0.328661
+0.338741
+0.348822
+0.358903
+0.368984
+0.379065
+0.389147
+0.399229
+0.409310
+0.419391
+0.429471
+0.439551
+0.449629
+0.459707
+0.469782
+0.043715
+0.044406
+0.045085
+0.045751
+0.046408
+0.047054
+0.047690
+0.048317
+0.048934
+0.051309
+0.053550
+0.055665
+0.057666
+0.059559
+0.061350
+0.063043
+0.064648
+0.066165
+0.067599
+0.068952
+0.070227
+0.071428
+0.072553
+0.073605
+0.074587
+0.075497
+0.076341
+0.077116
+0.077823
+0.078469
+0.079049
+0.079566
+0.080020
+0.080406
+0.080720
+0.080959
+0.081122
+0.081197
+0.081189
+0.081089
+0.080911
+0.080645
+0.080307
+0.079894
+0.079411
+0.078863
+0.463748
+0.478742
+0.493740
+0.508743
+0.523749
+0.538758
+0.553772
+0.568788
+0.583808
+0.643916
+0.704067
+0.764255
+0.824476
+0.884726
+0.945003
+1.005303
+1.065623
+1.125963
+1.186319
+1.246692
+1.307079
+1.367478
+1.427890
+1.488312
+1.548744
+1.609185
+1.669634
+1.730090
+1.790553
+1.851020
+1.911492
+1.971968
+2.032448
+2.092930
+2.153415
+2.213902
+2.274391
+2.334881
+2.395371
+2.455860
+2.516346
+2.576829
+2.637306
+2.697777
+2.758240
+2.818694
+0 262288
+0 266437
+0 270507
+0 274509
+0 278450
+0 282326
+0 286141
+0.289901
+0.293604
+0.307854
+0.321300
+0.333992
+0.345999
+0.357356
+0.368100
+0.378260
+0.387891
+0.396988
+0.405597
+0.413715
+0.421365
+0.428566
+0.435317
+0.441630
+0.447522
+0.452983
+0.458047
+0.462694
+0.466940
+0.470814
+0.474296
+0.477397
+0.480118
+0.482437
+0.484322
+0.485756
+0.486731
+0.487184
+0.487136
+0.486537
+0.485466
+0.483870
+0.481841
+0.479363
+0.476463
+0.473180
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+O.
+--0.
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+278975
+274066
+269193
+264503
+260338
+256258
+252237
+248368
+244544
+230216
+216959
+204963
+193763
+183395
+173302
+163956
+155171
+146648
+138624
+130426
+122893
+115594
+107964
+101032
+093881
+087189
+080128
+073616
+067116
+060692
+054547
+048126
+041807
+034767
+027513
+019917
+011919
+003398
+005358
+013647
+022178
+030027
+037426
+044414
+051386
+057165
+0.082709
+0.085210
+0.087710
+0.090210
+0.092709
+0.095207
+0.097705
+0.100202
+0.102699
+0.112681
+0.122655
+0.132624
+0.142587
+0.152546
+0.162500
+0.172449
+0.182396
+0.192339
+0.202280
+0.212218
+0.222154
+0.232087
+0 242018
+0 251948
+0 261876
+0 271802
+0 281728
+0 291652
+0 301574
+0 311497
+0 321418
+0 331338
+0 341259
+0 351178
+0 361097
+0.371016
+0.380935
+0.390853
+0.400771
+0.410690
+0.420609
+0.430528
+0.440449
+0.450370
+0.460293
+0.470217
+-0.025968
+-0.026273
+-0.026571
+-0.026862
+-0.027148
+-0.027428
+-0.027703
+-0.027973
+-0.028239
+-0.029249
+-0.030191
+-0.031067
+-0.031886
+-0.032649
+-0.033360
+-0.034021
+-0.034639
+-0.035211
+-0.035743
+-0.036233
+-0.036683
+-0.037096
+-0.037470
+-0.037806
+-0.038105
+-0.038366
+-0.038593
+-0.038782
+-0.038934
+-0.039056
+-0.039142
+-0.039193
+-0.039210
+-0.039188
+-0.039122
+-0.039009
+-0.038846
+-0.038623
+-0.038344
+-0.037999
+-0.037602
+-0.037144
+-0.036639
+-0.036086
+-0.035487
+-0.034851
+0.496252
+0.511258
+0.526260
+0.541257
+0.556251
+0.571241
+0.586228
+0.601212
+0.616192
+0.676083
+0.735933
+0.795744
+0.855523
+0.915273
+0.974997
+1.034697
+1.094377
+1.154037
+1.213681
+1.273308
+1.332922
+1.392522
+1.452111
+1.511688
+1.571256
+1.630815
+1.690366
+1.749909
+1.809447
+1.868979
+1.928507
+1.988031
+2.047552
+2.107069
+2.166584
+2.226097
+2.285608
+2.345118
+2.404628
+2.464138
+2.523652
+2.583169
+2.642692
+2.702221
+2.761758
+2.821304
+-0.155806
+-0.157638
+-0.159424
+-0.161172
+-0.162890
+-0.164570
+-0.166219
+-0.167840
+-0.169432
+-0.175495
+-0.181145
+-0.186403
+-0.191314
+-0.195893
+-0.200158
+-0.204124
+-0.207832
+-0.211264
+-0.214457
+-0.217398
+-0.220101
+-0.222577
+-0.224820
+-0.226834
+-0.228630
+-0.230195
+-0.231555
+-0.232689
+-0.233607
+-0.234335
+-0.234849
+-0.235158
+-0.235261
+-0.235130
+-0.234734
+-0.234054
+-0.233078
+-0.231741
+-0.230065
+-0.227996
+-0.225614
+-0.222863
+-0.219835
+-0.216514
+-0.212924
+-0.209105
+-0 123263
+-0 120608
+-0 117923
+-0 115358
+-0 113247
+-0 111167
+-0.109096
+-0.107128
+-0.105158
+-0.097827
+-0.090992
+-0.084936
+-0.079273
+-0.074097
+-0.068901
+-0.064193
+-0.059821
+-0.055511
+-0.051525
+-0.047204
+-0.043408
+-0.039720
+-0.035581
+-0.032040
+-0.028181
+-0.024699
+-0.020763
+-0.017310
+-0.013802
+-0.010311
+-0.007047
+-0.003453
+0.000086
+0.004397
+0.008966
+0.013916
+0.019307
+0.025257
+0.031471
+0.037231
+0 043255
+0 048599
+0 053497
+0 057986
+0 062465
+0 065736
+
+
+
+--- PDF_PAGE 24 ---
+Table II. Continued
+0.480000
+0.490000
+0.5OO0OO
+0.510000
+0.520000
+0.530000
+0.540000
+0.550000
+0.560000
+O.570OO0
+0.580000
+0.590000
+0.600000
+0.610000
+0.620000
+0.630000
+0.640000
+0.650000
+0.660000
+0.670000
+0.680000
+0.690000
+0.700000
+0.710000
+0.720000
+0.730000
+0.740000
+0.750000
+0.760000
+0.770000
+O.78OO00
+0.790000
+0.800000
+0.810000
+0.820000
+0.830000
+0.840000
+0.850000
+0.860000
+0.870000
+0.880000
+0.890000
+0.900000
+0.910000
+0.920000
+0.930000
+0.479857
+0.489929
+0.500000
+0.510069
+0.520136
+0.530200
+0.540263
+0.550323
+0.560381
+0.570436
+0.580489
+0.590539
+0.600587
+0.610632
+0.620674
+0.630713
+0.640749
+0.650783
+0.660813
+0.670840
+0.680864
+0.690885
+0.700903
+0.710917
+0.720928
+0.730936
+0.740941
+0.750941
+0.760939
+0.770933
+0.780924
+0.790911
+0.800894
+0.810875
+0.820851
+0.830825
+0.840795
+0.850761
+0.860725
+0.870685
+0.880643
+0.890597
+0.900548
+0.910497
+0.920443
+0.930387
+0.078256
+0.077591
+0.076869
+0.076089
+0.075260
+0.074378
+0.073445
+0.072464
+0.071439
+0.070370
+0.069253
+0.068095
+0.066895
+0.065657
+0.064381
+0.063067
+0.061715
+0.060335
+0.058916
+0.057464
+0.055983
+0.054471
+0.052931
+0.051360
+0.049765
+0.048143
+0.046498
+0.044829
+0.043141
+0.041432
+0.039705
+0.037962
+0.036203
+0.034431
+0.032649
+0.030857
+0.029058
+0.027253
+0.025443
+0.023632
+0.021820
+0.020007
+0.018193
+0.016384
+0.014577
+0.012777
+2.879139
+2.939574
+3.000000
+3.060413
+3.120813
+3.181201
+3.241576
+3.301937
+3.362285
+3.422617
+3.482934
+3.543235
+3.603521
+3.663790
+3.724042
+3.784277
+3.844495
+3.904696
+3.964878
+4.025041
+4.085186
+4.145311
+4.205418
+4.265504
+4.325571
+4.385617
+4.445643
+4.505649
+4.565634
+4.625598
+4.685542
+4.745465
+4.805367
+4.865247
+4.925108
+4.984948
+5.044768
+5.104569
+5.164350
+5.224113
+5.283856
+5.343582
+5.403290
+5.462982
+5.522658
+5.582321
+0.469537
+0.465547
+0.461215
+0.456535
+0.451558
+0.446268
+0.440672
+0.434786
+0.428634
+0.422218
+0.415516
+0.408569
+0.401372
+0.393940
+0.386287
+0.378401
+0.370292
+0.362007
+0.353498
+0.344786
+0.335900
+0.326826
+0.317585
+0.308160
+0.298593
+0.288860
+0.278986
+0.268975
+0.258846
+0.248595
+0.238233
+0.227773
+0.217218
+0.206586
+0.195896
+0.185141
+0.174349
+0 163518
+0 152660
+0 141793
+0 130917
+0 120039
+0 109157
+0 098302
+0 087462
+0 076665
+-0.063242
+-0.068796
+0.000000
+-0.079969
+-0.084982
+-0.090246
+-0.095037
+-0.099886
+-0.103931
+-0.108789
+-0.113238
+-0.117193
+-0.121490
+-0.125091
+-0.128987
+-0.132898
+-0.136064
+-0.139576
+-0.143045
+-0 146434
+-0 149204
+-0 152366
+-0 155379
+-0 158101
+-0 160661
+-0 163523
+-0 165522
+-0 168079
+-0 169832
+-0 172031
+-0 173654
+-0 175511
+-0 176884
+-0 178067
+-0 179239
+-0 180054
+-0 180858
+-0 181335
+-0 181835
+-0 181943
+-0 182239
+-0 182244
+-0 182042
+-0 181656
+-0 181501
+-0 181001
+0 480143
+0 490071
+0 500000
+0 509931
+0 519864
+0 529800
+0 539737
+0 549677
+0 559619
+0 569564
+0 579511
+0 589461
+0 599413
+0 609368
+0 619326
+0 629287
+0 639251
+0 649217
+0 659187
+0.669160
+0.679135
+0.689114
+0.699097
+0.709082
+0.719071
+0.729063
+0.739059
+0.749058
+0.759061
+0.769066
+0.779076
+0.789089
+0.799105
+0.809125
+0.819148
+0.829175
+0.839205
+0.849238
+0.859274
+0.869314
+0.879357
+0.889402
+0.899451
+0.909502
+0.919556
+0.929612
+-0 034180
+-0 033477
+-0 032742
+-0 031975
+-0 031183
+-0 030366
+-0 029522
+-0 028656
+-0 027771
+-0 026869
+-0 025944
+-0 025005
+-0 024050
+-0 023083
+-0 022105
+-0 021116
+-0 020117
+-0 019117
+-0 018107
+-0 017091
+-0 016076
+-0.015058
+-0.014042
+-0.013026
+-0.012017
+-0.011012
+-0.010016
+-0.009030
+-0.008058
+-0.007101
+-0.006161
+-0.005243
+-0.004346
+-0.003477
+-0.002639
+-0.001834
+-0.001068
+-0.000342
+0.000338
+0.000966
+0.001540
+0.002053
+0.002503
+0.002877
+0.003170
+0.003370
+880858
+940423
+000000
+059587
+119186
+178798
+238423
+298062
+357715
+417382
+477065
+536764
+596478
+656209
+715956
+775721
+835503
+3 895302
+3.955120
+4.014957
+4.074812
+4.134686
+4.194580
+4.254494
+4.314426
+4.374380
+4.434354
+4.494349
+4.554363
+4.614398
+4.674455
+4.734532
+4.794630
+4.854749
+4.914888
+4.975048
+5.035228
+5.095427
+5.155646
+5.215883
+5.276139
+5.336413
+5.396706
+5.457014
+5.517337
+5.577674
+-0 205080
+-0 200861
+-0 196453
+-0 191848
+-0 187101
+-0 182193
+-0 177132
+-0 171937
+-0 166628
+-0.161211
+-0.155663
+-0.150028
+-0.144300
+-0.138497
+-0.132633
+-0.126698
+-0.120705
+-0.114701
+-0.108641
+-0.102548
+-0.096454
+-0.090347
+-0.084252
+-0.078155
+-0.072101
+-0.066071
+-0.060094
+-0.054179
+-0.048349
+-0.042606
+-0.036968
+-0.031456
+-0.026078
+-0.020863
+-0.015836
+-0.011005
+-0.006407
+-0.002055
+0.002025
+0.005797
+0.009238
+0.012320
+0.015015
+0.017260
+0.019021
+0.020218
+0.069311
+0.072354
+0.000000
+0.078496
+0.080977
+0.083703
+0.085940
+0.088221
+0.089674
+0.091933
+0.093757
+0.095062
+0.096686
+0.097583
+0.098747
+0.099895
+0.100259
+0.100933
+0.101523
+0.101987
+0.101784
+0.101921
+0.101851
+0.101431
+0.100783
+0.100362
+0.099005
+0.098118
+0.096340
+0.094902
+0.092784
+0.090773
+0.088150
+0.085190
+0.082053
+0.078379
+0.074485
+0.070031
+0.065329
+0.059930
+0.054349
+0.048055
+0.041047
+0.033235
+0.024877
+0.015202
+
+
+
+--- PDF_PAGE 25 ---
+__000000"0
+60L90T O- IET600"O
+ISL890 O- E[EgTO'O
+60LE#O O- LL9LIO'O
+Z099_O O- IOL6TO'O
+_08800 O- 9890[0"0
+#L_#O0 0 8080_0"0
+L66666"S
+89L6E6"S
+_$96L8"S
+90T6T8"S
+99L8SL'S
+_8E869"S
+E[O8E9"S
+000000"0
+8_SIO0"O
+L8£ZO0"O
+9_6_00"0
+_8Z£00"0
+899E00"0
+899_00"0
+O00000"T
+T96686"0
+6066L6"0
+IS8696"0
+I6L6S6"0
+0£L696"0
+TL96E6"O
+__000000 0
+60_981 O- 19EZTO 0
+8_96LI O- 9_I£Z0 0
+18E8LT O- I6LEEO 0
+9998LI O- 699990 0
+9L96LI O- CgTSSO 0
+L££08I O- 888S90 0
+L66666
+9_096
+E9S088
+6880_8 S
+69_I9L S
+ZT9IOL S
+_/6199 S
+S 000000
+S EgO[O0
+S 9S8E00
+Z£9S00 0
+809L00 0
+061600 0
+T860TO 0
+0 O00000"I
+0 8E0066"0
+0 060086"0
+89TOL6"O
+80Z096"0
+69ZOS6"0
+6_E096"0
+O00000"I
+000066"0
+000086"0
+O000L6"O
+000096"0
+0000S6"0
+000096"0
+p_pnlouoo "II _lqe,L
+
+
+
+--- PDF_PAGE 26 ---
+Form Approved
+REPORT DOCUMENTATION PAGE OMB NO. 0704-0188
+Publicreportingburdenfor this collectionof informationis estimatedto average 1 hourper response,includingthe timefor reviewinginstructions,searchingexistingdata sources,
+gatheringand maintainingthe data needed, and completingand reviewingthe collection of information.Send commentsregardingthis burdenestimateor anyother aspect ofthis
+collectionof information,includingsuggestionsfor reducingthis burden,to WashingtonHeadquartersServices,Directoratefor InformationOperationsand Reports,1215 Jefferson
+Davis Highway,Suite 1204, Arlington,VA22202-4302, andto the Officeof Managementand Budget,PaperworkReductionProject(0704-0188), Washington,DC 20503.
+1. AGENCY USE ONLY (Leave blank) 2. REPORT DATE 3. REPORT TYPE AND DATES COVERED
+December 1996 Technical Memorandum
+4. TITLE AND SUBTITLE 5. FUNDING NUMBERS
+Computer Program To Obtain Ordinates for NACA Airfoils
+6. AUTHOR(S)
+Charles L. Ladson, Cuyler W. Brooks, Jr., Acquilla S. Hill, and Darrell W.
+Sproles
+7. PERFORMINGORGANIZATIONNAME(S)ANDADDRESS(ES)
+NASA Langley Research Center
+Hampton, VA 23681-0001
+9. SPONSORING/MONITORING AGENCY NAME(S) AND ADDRESS(ES)
+National Aeronautics and Space Administration
+Washington, DC 20546-0001
+WU 505-59-10-31
+8. PERFORMING ORGANIZATION
+REPORT NUMBER
+L-17509
+10. SPONSORING/MONITORING
+AGENCY REPORT NUMBER
+NASA TM-4741
+11. SUPPLEMENTARY NOTES
+Ladson, Brooks, and Hill: Langley Research Center, Hampton, VA; Sproles: Computer Sciences Corp., Hampton,
+VA.
+Computer program is available electronically from the Langley Software Server
+12a. DISTRIBUTION/AVAILABILITY STATEMENT
+Unclassified-Unlimited
+Subject Category 02
+Availability: NASA CASI (301) 621-0390
+i12b. DISTRIBUTION CODE
+13. ABSTRACT (Maximum 200 words)
+Computer programs to produce the ordinates for airfoils of any thickness, thickness distribution, or camber in the
+NACA airfoil series were developed in the early 1970's and are published as NASA TM X-3069 and TM X-3284.
+For analytic airfoils, the ordinates are exact. For the 6-series and all but the leading edge of the 6A-series airfoils,
+agreement between the ordinates obtained from the program and previously published ordinates is generally within
+5 x 10 -5 chord. Since the publication of these programs, the use of personal computers and individual workstations
+has proliferated. This report describes a computer program that combines the capabilities of the previously pub-
+fished versions. This program is written in ANSI FORTRAN 77 and can be compiled to run on DOS, UNIX, and
+VMS based personal computers and workstations as well as mainframes. An effort was made to make all inputs to
+the program as simple as possible to use and to lead the user through the process by means of a menu.
+14. SUBJECT TERMS
+NACA airfoils; 4-digit; 6-series; Platform-independent; FORTRAN
+17. SECURITY CLASSIFICATION
+OF REPORT
+Unclassified
+18. SECURITY CLASSIFICATION
+OF THIS PAGE
+Unclassified
+NSN 7540-01-280-5500
+19. SECURITY CLASSIFICATION
+OF ABSTRACT
+Unclassified
+15. NUMBER OF PAGES
+23
+16. PRICE CODE
+A03
+20. LIMITATION
+OF ABSTRACT
+;tandard Form 298 (Rev. 2-89)
+Prescribedby ANSI Std. Z39-18
+298-102
+
+
+
+--- PDF_PAGE 27 ---

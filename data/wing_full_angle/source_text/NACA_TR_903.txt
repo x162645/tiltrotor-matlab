@@ -1,0 +1,1887 @@
+
+
+--- PDF_PAGE 1 ---
+t
+J_. ;- _< 1
+ • ,'/"h-;;," ';'_'!7' ._._..._.e!- .: _,_._ REPRODUCED BY " _:k_rV':_Vs,._-7: _'_ :'_'__ .!7/
+ :+.,, _:...: ._,.,,.._,._+. NFORMATION SERVICE __ ,_,.':+",_:::,_'.....'_-,,,,-_"<_<'_"_-'<_._,'m "_' , ,_ ........ .......... _ . " -_
+
+
+
+--- PDF_PAGE 2 ---
+
+
+
+--- PDF_PAGE 3 ---
+/q,qe __- TP,- ?_3
+NATIONAL ADVISORY COMMITTEE
+FOR AERONAUTICS
+REPORT No. 903
+THEORETICAL AND EXPERIMENTAL DATA FOR A
+NUMBER OF NACA 6A-SERIES AIRFOIL SECTIONS
+By LAURENCE K. LOFTIN, Jr.
+Langley Memorial Aeronautical Laboratory
+Langley Field, Va.
+]
+1948
+I_PRoDUCED BY ......
+NATIONAL TECHNICAL
+INFORMATION SERVICE
+U. S. DEPARTMENT OF COMMERCE
+SPRINGFIELD, VA. 22161
+I
+
+
+
+--- PDF_PAGE 4 ---
+National Advisory Committee for Aeronautics
+Headquarters, 172_ F Street NW, Washington 25, D. C.
+Created by act of Congress approved March 3, 1915, for the supervision and direction of the scientific study
+of the problems of flight (U. S. Code, title 50, sec. 151). Its membership was increased to 17 by act approved
+May 25, 1948. (Public Law 549, 80th Congress). The members are appointed by the President, and serve as
+such without compensation.
+JEROME C. HUNSAKER, SC. D., Cambridge, Mass., Chairman
+ALEXANDER WETMORE, Sc D., Secretary, Smithsonian Institution, Vice Chairntan
+HON. JOHN R. ALISON, Assistant Secretary of Commerce.
+DETLEV W. BRONK, PH.D., President, Johns Hopkins University.
+KARL T. COMFTON, PH.D. Chairman, Research and Development
+Board, National Military Establishment.
+EDWARD U. CONDON, PH.D., Director, National Bureau of
+Standards.
+JAMES H. DOOLITTLE, SC. D., Vice President, Shell Union Oil
+Corp.
+R. M, HAZEN, B. S., Director of Engineering, Allison Division,
+General Motors Corp.
+WILLIAM LITTLEWOOD, M. E., Vice President, Engineering,
+American Airlines, Inc.
+THEODORE C. LONNQUEST, Rear Admiral, United States Navy,
+Assistant Chief for Research and Development, Bureau of
+Aeronautics.
+EDWARD M. PO'_VERS, Major General, United States Air Force,
+Assistant Chief of Air Staff-4.
+JOHN D. PRICE, Vice Admiral, United States Navy, Deputy
+Chief of Naval Operations (Air).
+ARTHUR E. RAYMOND, M. S., Vice President, Engineering,
+Douglas Aircraft Co., Inc.
+FRANCIS W. REICHELDERFER, SC. D., Chief, United States
+Weather Bureau.
+HON. DELOS W. RENTZEL, Administrator of Civil Aeronautics,
+Department of Commerce.
+HOYT S. VANDENBERG, General, Chief of Staff, United States Air
+Force.
+THSODORE P. WRIGHT, SC. D., Vice President for Research,
+Cornell University.
+HUGH L. DRYDEN, PH.D., Director of Aeronautical Research
+JOHN W. CROWLEY, JR., B. S., Associate Director of Aeronautical Research
+JOHN F. VICTORY, LL.M., Executive Secretary
+E. H. CHAMBERLIN, Executive O_cer
+HENRY J. E. REID, Eng. D., Director, Langley Aeronautical Laboratory, Langley Field, Va.
+SMITH J. DEFRANCE, B. S., Director, Ames Aeronautical Laboratory, Moffett Field, Calif.
+EDWARD R. SHARP, SC. D., Director, Lewis Flight Propulsion Laboratory, Cleveland Airport, Cleveland, Ohio
+TECHNICAL COMMITTEES
+AERODYNAMICS OPERATING PROBLEMS
+POWER PLANTS FOR AIRCRAFT INDUSTRY CONSULTING
+AIRCRAFT CONSTRUCTION
+Coordination of Research Needs of Military and Civil Aviation
+Preparation of Research Programs
+Allocation of Problems
+Prevenlion of Duplication
+Consideration of Inventions
+LANGLEY AERONAUTICAL LABORATORY,
+Langley Field, Va.
+LEwis FIAGHT PROPUI,SION LABORATORY,
+Cleveland L;.port, Cleveland, Ohio
+AMES AERONAUTICAL LABORATORY,
+Moffett Field, Calif.
+Conduct, under unified control, for all agencies, of scientific research on the fundamental problems of flight
+OFFICE OF AERONAUTICAL INTELLIGENCE,
+Washington, D. C.
+Collection, classification, compilation, and dissemination of scientific and technical information on aeronautics
+%
+
+
+
+--- PDF_PAGE 5 ---
+//
+REPORT No. 903
+THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A-SERIES AIRFOII
+SECTIONS
+By LAURENCE K. LOFTIN, Jr.
+SUMMARY
+The NACA 6A-series airfoil sections were designed to
+eliminate the trailing-edge cusp which is characteristic of the
+NACA 6-series sections. Theoretical data are presented for
+NACA 6A-series basic thickness .forms having the position of
+minimum pressure at 30, _0, and 50 percent chord and with
+thickness ratios varying .from 6 percent to 15 percent. Also
+presented are data for a mean line designed to maintain straight
+sides on the cambered sections.
+The experimental results of a two-dimensional wind-tunnel
+investigation of the aerodynamic characteristics of five NACA
+6_A-series airfoil sections and two NACA 63A-series airfoil
+sections are presented. An analysis of these results, which
+were obtained at Reynolds numbers of 3X106, 6X108, and
+9 X 108, indicates that the section minimum-drag and maximum-
+lift characteristics of comparable NACA 6-series and 6A-series
+airfoil sections are essentially the same. The quarter-chord
+pitching-moment coey_cients and angles of zero lift of NACA
+6A-series airfoil sections are slightly more negative than those
+of corresponding NACA 6-series airfoil sections. The posi-
+tion of the aerodynamic center and the lift-curve slope of smooth
+NA CA 6A-series airfoil sections appear to be essentially inde-
+pendent of airfoil thickness ratio in contrast to the trends
+shown by NACA 6-series sections. The addition of standard
+leading-edge roughness causes the lift-curve slope of the newer
+sections to decrease with increasing airfoil thickness ratio.
+INTRODUCTION
+Much interest is being shown in airfoil sections having
+smM1 thickness ratios because of their high critical Mach
+numbers. The NACA 6-series airfoil sections of small thick-
+ness have relatively high critical Mach numbers but have
+the disadvantage of being very thin near the trailing edge,
+particularly when the sections considered have the position
+of minimum pressure well forward on the basic thickness
+form. The thin trailing-edge portions lead to difficulties in
+structural design and fabrication. In order to overcome
+these difficulties, the trailing-edge cusp has been removed
+from a number of NACA 6-series basic thickness forms and
+the sides of the airfoil sections made straight from approxi-
+mately 80 percent chord to the trailing edge. These new
+sections are designated NACA 6A-series airfoil sections. A
+special mean line, designated the a=0.8 (modified) mean
+line, has also been designed to maintain straight sides on th,
+cambered sections.
+This paper presents theoretical pressure-distribution dat_
+and ordinates for NACA 6A-series basic thickness form
+covering a range of thickness ratios extending from 6 to 1.
+percent and a range of positions of minimum pressure extend
+ing from 30 percent to 50 percent chord.
+The aerodynamic characteristics of seven NACA 6A-serie
+airfoil sections as determined in the Langley two-dimensiona
+low-turbulence pressure tunnel are also presented. Thes
+data are analyzed and compared with similar data fo
+NACA 6-series airfoil sectiohs of comparable thickness an,
+design lift coefficient.
+COEFFICIENTS AND SYMBOLS
+cd section drag coefficient
+c_m_ minimum section drag coefficient
+c_ section lift coefficient
+cz_ design section lift coefficient
+cz_a_ maximum section lift coefficient
+cm_, section pitching-moment coefficient about aerody_¢ami
+center
+c_/4 section pitching-moment coefficient about quarte_
+chord point
+a0 section angle of attack
+a, section angle of attack corresponding to design lil
+coefficient
+dc_
+_/-ao section lift-curve slope
+V free-stream velocity
+v local velocity
+hv increment of local velocity
+Av_ increment of local velocity caused by additional type (
+load distribution
+Pn resultant pressure coefficient; difference between loc:
+upper-surface and lower-surface pressure coefficien
+R Reynolds number
+c airfoil chord length
+x distance along chord from leadin, g edge
+y distance perpendicular to chord
+y_ mean:line ordinate
+a mean-line designation; fraction of chord from leadir
+edge over which design load is uniform
+_b airfoil design parameter (reference 1)
+1
+
+
+
+--- PDF_PAGE 6 ---
+2 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
+THEORETICAL CHARACTERISTICS OF AIRFOILS
+Designation.--The system used for designating the new
+airfoil sections is the same as that employed for the NACA
+6-series sections (reference 1) except that the capital letter
+"A" is substituted for the dash which appears between .the
+digit denoting the position of minimum pressure and that
+denoting the ideal lift coefficient. For example, the NACA
+641-212 becomes the NACA 64_A212 when the cusp is
+removed from the trailing edge. In the absence of any
+further modification of the designation, the cambered airfoils
+are to be considered as having the a----0.8 (modified) mean line.
+Basic thickness forms.--The theoretical methods by which
+the basic thickness forms of the NACA 6-series family of
+airfoil sections were derived in order to have pressure dis-
+tributions of a specified type are described in reference 1.
+Removing the trailing-edge cusp was accomplished by in-
+creasing the value of the airfoil design parameter ¢ (reference 1)
+corresponding to the rear portion of the airfoil until the
+airfoil ordinates formed a straight line from approximately
+80 percent chord to the trailing edge. Once the final form
+of the ¢ curves was established, the new pressure distribu-
+tions corresponding to the modified thickness forms were
+calculated by the usual methods as described in reference t.
+A comparison of the theoretical pressure distributions of an
+NACA 64_-012 airfoil section and an NACA 64_A012 airfoil
+section (fig. 1) indicates that removing the trailing-edge
+cusp has little effect upon the velocities around the section.
+A slight reduction of the peak negative pressure and flatter
+pressure gradient over the forward and rearward portions
+of the airfoil section seem to be the principal effects. The
+theoretical calculations also indicate the presence ot a
+trailing-edge stagnation point caused by the finite trailing-
+edge angle of the NACA 6A-series sections. This stagnation
+point is, of course, never realized experimentally.
+Ordinates and theoretical pressure-distribution data for
+NACA 6A-series basic thickness forms having the position
+of minimum pressure at 30, 40, and 50 percent chord are
+presented in figure 2 for airfoil thickness ratios of 6, 8, 10, 12,
+and 15 percent. If intermediate thickness ratios involving
+a change in thickness of not more than 1 to 2 percent are
+desired, the ordinates of the basic thickness forms may be
+scaled linearly without seriously altering the gradients of
+the theoretical pressure distribution.
+/.4-
+/.2
+/.0
+*2 .8
+0
+0
+ NACA 64,A012
+...... /VACA 641-0/2
+.--.....
+.4
+.£
+.I .2 o3 .4 .5 .6 .7 .8
+Chordw/se posiffon, x/c
+FIG[_ItE l.--Comparison of theoretical pressure distribution at zero lift of the NACA 641-012 and the NACA t)41A012airfoil sections.
+.9 LO
+
+
+
+--- PDF_PAGE 7 ---
+©
+_D
+©
+©
+©
+_'I'_MMNNNMNNMNNMN_ .... _ 
+N_
+._._
+_ NN
+"M
+/
+c5 _
+II t.
+k _...-2
+©
+©
+b_
+o
+0
+<1
+.-g
+• _
+.--2_..=
+II
+O
+\/ %
+©
+o
+Z
+.............................. !!!
+,--- !
+2g ] -_
+.H
+/
+.<
+
+
+
+--- PDF_PAGE 8 ---
+3_
+©
+o
+m
+o
+o
+d
+o
+m.l
+++ _ ............. _-.._
+++
+ +:: /I_/// 1,,<
+ tJ
+c
+i++ 0
+©
+r/3
+r_
+e_
+_N
++.
+©
+r_
+Z
+//
++3
+i
+t,+-
+++
+o)
+II
+/
+(3
+<D
+c_ cD
+<_
+
+
+
+--- PDF_PAGE 9 ---
+I
+c_
+O_
+0
+t_
+__ m
+ ............ __,._
+O>
+O_
+&
+0
+o_
+...___..._
+_...___._
+>
+,'o
+E
+N
+.N
+, ©
+N
+e _
+N N
+N _
+m
+©
+N
+
+
+
+--- PDF_PAGE 10 ---
+©
+©
+_a G)
+©
+e_
+©
+0
+0
+0
+C_
+¢.0
+(
+t
+._._
+I
+©
+r_
+m
+L) I
+z
+_.-p,
+•,¢+'_
+©
+0
+<_
+,_'''___N_''"
+]+
+i
+I
+co
+
+
+
+--- PDF_PAGE 11 ---
+o
+7_
+o
+F_
+o
+-'1
+©
+c"
+o • "___ • - _
+._!
+----+-_
+----V-_ '
+--L_- -_
+_m---- --t.
+I i., •
+!
+i
+i
+i
+i
+\\ '
+i
+i
+©
+Z
+_'____'"
+• o
+L.----- u
+---_
+N
+/
+/
+I
+I
+A'
+"M
+//
+l/
+©
+.<
+_g
+v
+. !
+I
+t0
+"_" __ _ _
+,.,,:
+<i:
+t
+N
+(_
+_0
+0
+
+
+
+--- PDF_PAGE 12 ---
+REPORT NO. 903--NATION-AL ADVISORY COMMITTEE FOR AERONAUTICS
+Mean line.--In order that the addition of camber not
+change the pressure gradients over the basic thickness form,
+a mean line should be used which causes uniform load to be
+carried from the leading edge to a point at least as far back
+as the position of minimum pressure on the basic thickness
+form. The usual practice is to camber NACA 6-series air-
+foil sections with the a= 1.0 type of mean line because this
+mean line appears to be best for high maximum lift coeffi-
+cients and, contrary to theoretical predictions, does not
+cause excessive quarter-chord pitching-moment coefficients.
+The a----1.0 type mean line was not considered desirable,
+however, for the NACA 6A-series basic thickness forms be-
+cause the surfaces of the cambered airfoil sections would be
+curved near the trailing edge. The type of mean line best
+suited for maintaining straight sMes on these newer sections
+would he one that is straight from 80 percent chord to the
+trailing edge. Such a camber line could be obtained by
+modifying an a=0.7 mean line. Consideration of the effect
+of mean-line loading upon the maximum lift coefficient
+indicated, however, that a mean line having a uniform load
+distribution as far back along the chord as possible was
+desirable. It was found that the a----0.8 type mean line
+could be made straight from approximately 85 percent
+chord to the trailing edge without causing a sharp break in
+the mean line and with very little curvature between the 80-
+percent- and 85-percent-chord stations. The aerodynamic
+advantages of using this mean line in preference to one
+having uniform load to 70 percent chord were considered to
+he more important than the slight cflrvature existing in the
+modified a=0.8 mean line. For this reason, all cambered
+NACA 6A-series ah'foil sections have employed the a=0.8
+(modified) mean line.
+The ordinates and load-distribution data corresponding
+to a design lift coefficient of 1.0 are presented in figure 3 for
+the a=0.8 (modified) mean line. The ordinates of a mean
+line having any arbitrary design lift coefficient may be
+obtained simply by multiplying the ordinates presented by
+the desired design lift coefficient.
+Cambered airfoils.--The method used for cambering the
+basic thickness distributions of figure 2 with the mean line
+of figure 17 is described and discussed in references 1 and 2.
+It consists essentially in laying out the ordinates of the basic
+thickness forms normal to the mean line at corresponding
+stations. A discussion of the method employed for com-
+bining the theoretical pressure-distribution data, presented
+in figures 2 and 3 for the mean-line and basic-thickness dis-
+tributions, to give the approximate theoretical pressure dis-
+tribution about a cambered or symmetrical airfoil section
+at any lift (.oefIicient is given in reference I.
+APPARATUS AND TESTS
+Wind tunnel.--All the tests described herein were con-
+ducted in the Langley two-dimensional low-turbulence
+.pressure tunnel. The test section of this tunnel measures
+3 feet by 7.5 feet. The models completely spanned the
+3-foot dimension with the gaps between the model and tunnel
+2.5
+/.0
+p_
+0
+.2
+c
+'\
+0 .2 .,/ .6 .8 /.0
+x/c
+C+._ 1.0 a¢_ 1.4O ° C,%1_=0.219
+.t: Ye
+(percent c) (percent c)
+00
+.5
+.75
+1.2,5
+2.5
+5.0
+7.5
+10
+15
+2O
+25
+30
+35
+40
+,t5
+50
+55
+6O
+65
+70
+75
+80
+85
+9O
+95
+1OO
+• 281 O. 47539
+• 396 .44004
+• 603 .39531
+I. 055 .33404
+1. 803 .27149
+2. 432 .23378
+2.981 .20618
+3. 903 .16546
+4. 651 .134.52
+5.2,_7 .10873
+5. 742 .08595
+6.120 .06498
+6. 394 .04507
+6. 571 . 02,559
+6. 6,51 .00607
+6. _31 --. 01404
+6. 508 --. 03537
+6. 274 --. (_5887
+5. 913 --. 08610
+5. 401 --. 120,58
+4. 673 --. 18034
+3. 607 --. 23430
+2. 452 --. 24521
+1. 226 --. 24521
+0 --. 24521
+AV Pn
+dy_/dx pn I "_--4-
+........................................
+I. 092 0. 273
+I. 096 .274
+ 1.100 .275
+f / I. 104 .276
+I. 108 .277
+I. I()S .277
+I. ] 12 .278
+1. t12 .278
+• 840 .210
+.588 .147
+• 368 .092
+0 0
+FIGURE 3.--Data for NACA mean line a=0.8 (modified).
+walls sealed to prevent air leakage. IMt measurements
+were made by taking the difference between the pressure
+reaction upon the floor and ceiling of the tunnel, drag results
+were obtained by the wake-survey metho(l, and pitctfing
+moments were determined with a torque balance. A more
+complete description of the tunnel and the method of obtain-
+ing and reducing the data are contained in reference 1.
+Models.--The seven airfoil sections for which the experi-
+mental aerodynamic characteristi('s were obtained are:
+NACA 63A0 l0
+NACA 63A210
+NACA 64A010
+NACA 64A210, NACA 64_A212, NACA 64:A215
+NACA 64A410
+The models representing the airfoil sections were of 24-inch
+chord and were constructed of laminated mahogany. The
+models were painted with lacquer and then sanded with
+No. 400 carborundum paper until aerodynamically smooth
+surfaces were obtained. The ordinates of the models tested
+are presented in tables I to VII.
+
+
+
+--- PDF_PAGE 13 ---
+THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS
+TABLE I.--ORDINATES OF NACA 63A010 AIRFOIL
+SECTION
+]stations and ordinates given in percent of airfoil chord]
+ill)per surface Lower surface
+St,_.tion Ordinate
+0
+.5
+• 75
+1.25
+2.5
+5.0
+7.5
+10
+15
+2O
+25
+30
+35
+4O
+45
+50
+55
+60
+65
+70
+75
+8O
+85
+930
+95
+100
+Ordinate Station
+0 0
+• 810 .5
+.983 .75
+1.250 1.25
+1. 737 2. 5
+2. 412 5. 0
+2.917 7.5
+:3. 324 10
+3. 950 15
+,L 4(XI 20
+4. 714 25
+4. 913 :_
+4. 995 35
+-L 968 40
+4. 837 45
+4. 613 f_l
+4.3tl 55
+3. 943 60
+3. 517 t{5
+3. 044 70
+2. 545 75
+2. 040 80
+I, 535 85
+1• 030 (30
+• 525 95
+• 021 100
+0
+--.816
+--. 983
+--1.2,50
+--1.7:37
+--2. 412
+--2. 917
+--3. 324
+--3. 950
+-- 4.49O
+--4. 714
+--4. 913
+--4. 995
+--4. 968
+--4. 837
+--4. 613
+--4.311
+--3. 943
+--3. 517
+-- 3. 044
+--2. 545
+--2.040
+-- i. 535
+--1.030
+--. 525
+--. 021
+L. E. radius: 0.742
+T. E. radus: 0.023
+TABLE II.--ORDINATES OF NACA 63A210 A[RFOIL
+SECTION
+]Stations and ordinates given in percent of airfoil chord]
+Upper surface Lower snrface
+Station Ordinate
+0
+• 423
+.664
+1.151
+2. 384
+4. 869
+7. 364
+9. 863
+14. 869
+19. 882
+24. 89!/
+29. 916
+34. 935
+39, 955
+44. 975
+49. 994
+55.012
+60. {)28
+65. 04i
+70.052
+75. 061
+80. 074
+85.072
+(30.050
+95. 026
+10{). [g)0
+i '
+i
+ L.E. radius: 0.742i
+ T. E. radius: 0.023 " Slope of radius thrtalgh L. E.: 0.095
+I
+Ordinate Station
+0 0
+.868 .577
+1. 058 .836
+1. 367 1. 349
+1. 944 2. 616
+2. 769 5. 131
+3. 400 7.6.36
+3. 917 10. t37
+4. 729 15.131
+5.328 20. I18
+5. 764 25.102
+6. 06O 30. 084
+0. 219 35. 065
+6. 247 40. 045
+6. 151 45. 025
+5. 943 _. 006
+5. 637 54. 988
+5. 245 59. 972
+4. 772 64. 959
+4. 227 69. 948
+3. 624 74. 939
+2. 974 79. 926
+2. 254 84. 928
+1. 519 89. 950
+• 769 94. 974
+.021 1O0. (}_)
+O
+-. 756
+--.900
+--1. 125
+-- 1. 522
+--2. 047
+--2. 428
+--2. 725
+--3. 167
+--3. 4(_
+--3. fi62
+--3. 761
+--3. 771
+--3. 689
+--3. 523
+--3.28:{
+-- 2. 985
+--2. 641
+--2. 262
+-- l, 86l
+-- 1. 464
+-- 1. 104
+--. 812
+--. 539
+--. 279
+--. 021
+TABLE III.--OR.DINATES OF NACA 64A010 AIRFOIL
+SECTION
+[Stations and ordinates given in percent of airfoil chord]
+Upper surface Lower surface
+Station Ordinate Station Ordinate
+O
+.5
+.75
+1.25
+2.5
+5.0
+7.5
+l0
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+8O
+S5
+90
+95
+19O
+0 0
+.804 .5
+• 969 .75
+1.225 1•25
+1.688 2.5
+2.327 5.0
+2. 805 7. 5
+3. 199 10
+3.813 15
+4. 272 20
+4. 606 25
+4. 837 30
+4. 968 35
+4. 995 40
+4. 894 45
+4. 684 50
+4. 388 55
+4. 021 60
+3. 597 65
+3.127 70
+2. 623 75
+2.103 80
+1..582 85
+l. 062 90
+.541 95
+• 02t I(X)
+0
+--. 804
+--. 969
+-- I. 225
+-- 1.688
+--2. 327
+--2. 805
+--3. 199
+--3.813
+--4. 272
+--4. 606
+--4. 837
+--4.99S
+--4. 995
+--4. 894
+--4. 684
+--4. 388
+--4. 021
+--3. 597
+--3.127
+--2. 623
+--2. 103
+--1.582
+--1.062
+--. 54I
+--. 02l
+L. E. radius: 0.687
+T. E. radius: 0.023
+TABLE IV.--ORDINATES OF NACA 64A210 AIRFOIL
+SECTION
+]Stations and ordinates given in percent of airfoil chord]
+Upper surface Lower surface
+Station Ordinate
+0
+.424
+•665
+1.153
+2•387
+4.874
+7.369
+9.868
+14.874
+19.885
+24.9{_1
+29.917
+34.935
+39.955
+44.975
+49.994
+55.012
+60.028
+65.042
+70.054
+75.063
+8{1.076
+85.074
+90.052
+95.027
+100. 0_)
+Ordinate Station
+0 0
+.856 .576
+1.044 .835
+1. 342 1. 347
+1.895 2. 613
+2.685 5. t26
+3.288 7.63l
+3.792 I0.132
+4.592 15.126
+5.200 20.115
+5. 656 25. 100
+5.984 30.083
+6.192 35.065
+6.274 40.045
+6.208 45.025
+6.014 50.000
+5. 714 54.988
+5.323 59.972
+4. 852 64. 958
+4. 31[) 69. 946
+3.702 74.937
+3.{137 79.924
+2.301 84.926
+• 1.551 89.948
+.785 94.974
+.021 100.9O0
+0
+--. 744
+--. 886
+--1.19O
+-- 1.473
+-- 1.963
+--2. 316
+--2. 600
+--3. 030
+--3. 340
+--3. 554
+--3. 688
+--3. 744
+--3. 716
+--3. 580
+-3. 354
+--3. O62
+--2. 710
+--2. 342
+-- I. 944
+-- 1. 542
+--1. 167
+--. 859
+--. 571
+--. 295
+--. 021
+L. E. radius: 0•687
+T. E. radius: 0.023
+Slope of radius through L. E.: 0.095 i
+l
+
+
+
+--- PDF_PAGE 14 ---
+I0 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
+TABLE V.--ORDINATES OF NACA 64A410 AIRFOIL
+SECTION
+[Stations and ordinates given in percent of airfoil chord]
+Upper surface Lower surface
+Station
+0
+.350
+.582
+1.059
+2.276
+4.749
+7. 230
+9.737
+14.748
+19.770
+24.800
+20.834
+34.871
+39.910
+44.950
+49.989
+55.025
+60.057
+65.085
+70.108
+75.126
+80.151
+85.148
+90.104
+95. 053
+100.000
+Ordinate
+0 O
+.902 .050
+1.112 .918
+1. 451 1. 441
+2.695 2.724
+3.034 5.251
+3. 865 7. 770
+4.380 10.263
+5. 366 15. 252
+6.126 20. 230
+6. 705 25. 200
+7.131 30.166
+7. 414 35.129
+7. 552 40. 090
+7. 522 45. 050
+7.344 50.011
+7. 040 54. 975
+6. 624 59. 943
+6.106 64. 915
+5.490 69.892
+4. 780 74. 874
+3. 967 79. 849
+3. 018 84. 852
+2. 038 89. 896
+I.028 94. 947
+.021 100. 000
+Stat ion Ordinate
+0
+--. 078
+--. 796
+--. 969
+-- 1. 251
+--1.592
+--1.919
+--1.996
+--2.244
+--2.406
+--2. 499
+-- 2. 537
+-- 2. 518
+--2. 436
+--2. 266
+--2. 024
+--1.736
+--1. 418
+--1.086
+--. 760
+--. 460
+--.2'29
+--. 132
+--. 076
+--. 048
+_. 021
+L. E. radius: 0.687
+T. E. radius: 0.023
+Slope of radius through L.E.: 0.190
+TABLE VI.--ORDINATES OF NACA 641A212 AIRFOIL
+SECTION
+[Stations and ordinates given in percent of airfoil chord]
+Upper surface Lower surface
+Station
+0
+.409
+.648
+1.135
+2.365
+4.849
+7.343
+9. 842
+14.849
+19.802
+24.880
+29.900
+34. 922
+39.946
+44.970
+49. 903
+55. 015
+60. 034
+65. 050
+70. 064
+75. 075
+80.090
+85. 088
+90. 062
+95. 032
+100.000
+Ordinate Station
+0
+1.013
+1.233
+1.580
+2._5
+3.145
+3. 846
+4. 432
+5. 3_
+0.060
+6.584
+6.9_
+7.1_
+7._2
+7.177
+6. 035
+6.5_
+6.103
+5. 544
+4. 033
+4.197
+3.403
+2.001
+1.751
+.888
+.0_
+0
+.591
+.852
+1. 365
+2. 635
+5.151
+7. 657
+10.158
+15.151
+20.138
+25.120
+80.100
+35. 078
+40. 054
+45. 030
+,50.0007
+54. 985
+59. 966
+64. 900
+69. 930
+74. 925
+79. 910
+84.912
+89. 038
+94.968
+100.000
+Ordinate
+O
+-.901
+-1.075
+-1.338
+-1.8o3
+-2. 423
+-- 2. 874
+--3.240
+--3. 796
+--4.200
+-4.482
+--4.000
+--4.741
+-4. 714
+--4. 549
+--4.275
+--3. 918
+--3. 499
+--3.034
+--2. 537
+--2.037
+--1.503
+--1.159
+--. 771
+--. 398
+--. 025
+L. E. radius: 0.994
+T. E. radius: 0.028
+Slope of radius through L. E.: 0.695
+TABLE VII.--ORDINATES OF NACA 642A215 AIRFOIL
+SECTION
+[Stations and ordinates given in percent of airfoil chordl
+Upper surface Lower surface
+Station
+o
+.388
+.624
+1.107
+2.333
+4.811
+7.304
+9. 802
+14.811
+19. 827
+24. 849
+29. 875
+34..003
+39. 933
+44.963
+49. 992
+55. O18
+6O. 042
+65. 003
+70. 079
+75. 093
+80. Ill
+85.109
+90, 076
+95. 039
+100. 000
+Ordinate
+0 0
+1. 243 .612
+1. 509 .876
+1.930 1.393
+2. 713 2. 667
+3. 833 5. ! 80
+4. 683 7. 690
+5. 391 10. 198
+6. 510 15.189
+7. 351 20.173
+7. 975 25.151
+8. 417 30. 125
+8. 686 35. 097
+8. 766 40. 067
+8. 627 45. 037
+8. 308 50. (108
+7. 843 54. 982
+7. 258 59. 958
+6. 566 64. 937
+5. 782 69. 921
+4. 926 74. 907
+4. 017 79. 889
+;L 039 84. 891
+2. 946 89. 924
+1.039 94.961
+.032 100. 000
+Station Ordinate
+O
+--1.131
+--1.351
+-1.688
+--2. 29l
+--3.111
+--3. 711
+--4.199
+--4. 948
+--5. 491
+--5. 873
+--0.121
+--6. 238
+--6. 208
+--5. 999
+--5. 648
+--5.19l
+--4. 654
+--4. 056
+--3. 416
+--2. 766
+--2.147
+-- 1.507
+-I. O66
+--.549
+--, 0,32
+L. E. radius: 1.561
+T. E. radius: 0.037
+Slope of radius through L. E.: 0.003
+Tests.--The tests of each smooth airfoil section consisted
+in measurements of the lift, drag, and quarter-chord pitching-
+moment coefficients at Reynolds numbers of 3 X 106, 6 X 106,
+and 9X106. In addition, the lift and drag characteristics
+of each section were determined at a Reynolds number of
+6X 106 with standard roughness applied to the leading edge
+of the model. The standard roughness employed on these
+24-inch-chord models consisted of 0.011-inch-diameter car-
+borundum grains spread over a surface length of 8 percent
+of the chord back from the leading edge on the upper _nd
+lower surfaces. The grains were thinly spread to cover from
+5 to 10 percent of this area. In an effort to obtain some
+idea of the effectiveness of the airfoil sections when equipped
+with trailing-edge high-lift devices, each section was fitted
+with a simulated split flap deflected 60 °. Lift measurements
+with the split flap were made at a Reynolds number of
+6 X 10_ with the airfoil leading edge both smooth and rough.
+RESULTS
+The results obtained from tests of the seven airfoil sections
+are presented in figures 4 to 10 in the form of standard aero-
+dynamic coefficients representing the lift, drag, and quarter-
+chord pitching-moment characteristics of the airfoil sections.
+
+
+
+--- PDF_PAGE 15 ---
+UD
+o
+_D
+_Q
+_D
+¢o
+{D
+o
+,r..ra
+N
+Z
+N
+©
+N
+N
+N
+N
+M
+N
+Z
+r4
+0
+N
+N
+O'J
+8
+I'_ e_
+
+
+
+--- PDF_PAGE 16 ---
+12 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
+J
+I
+p
+i
+i
+I
+Z
+/
+\l
+I t
+i f
+[ I
+i i
+I I
+I I
+I I
+I
+i
+i
+, i
+, i
+ii
+i
+i
+I
+J:
+I"
+_J
+!I
+ I" " I" I"
+rD
+" i" I" i I t"
+
+
+
+--- PDF_PAGE 17 ---
+THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS 13
+k)
+J I
+•.¢.
+L. (O
+i
+• °
+I
+q)
+I I
+i
+I ,
+!i 1i i
+I
+I I
+i
+1-4
+ ,'x .
+\,
+a,
+' jt
+i
+i
+p_ ',4u_!o_E_Zeoo 60-Jp uo/4oas
+cb co
+i
+I
+I'
+! ,
+i
+I
+t
+(:b
+i
+t
+]
+i
+i
+i
+t
+I
+i
+(
+i i !_.
+1
+• I' I I"
+ao
+1
+-_' - 4--4_
+I"
+.=
+"=
+r_
+li
+_ g _"
+I" I" I"
+_l°_a _lua/o_JlaOO lu_uJOl/V
+II I_
+1i
+I
+I _c_. _'
+ i _'g
+i L_
+
+
+
+--- PDF_PAGE 18 ---
+I
+I
+_OI:L_IV_O_I_[V tIO,_ _,L,LIIAIlr4IoD X_tO,_IA(IV _IVhIOI&VhI--£06 "Oh[ Z_Od_t_ _
+
+
+
+--- PDF_PAGE 19 ---
+t
+b_
+t
+Q
+ L LO0 - ,
+"_ -7.
+i
+Mornen/ coe/7"/c/en/, c_c/4
+°1 I I
+% r,o _--
+.'.trb
+!J_
+l-
+_r
+-4-
+i
+4
+I
+_4--4---+
+_5
+i
+%
+/
+\
+)
+t
+\
+i !
+I
+Ii
+II
+_I _XOI_LD_ qlOzlHIV _XIH_{£--¥9 VDV_ ,frO HX_{I/_£I_ ¥ HO_I ¥_LV(] qV,LIEXI_IHXclXX (]NV 'IVDI_LXHOHH,L
+
+
+
+--- PDF_PAGE 20 ---
+,,.,:j
+I>
+r_
+m
+_z
+F_
+5"o
+/
+_DI,LI1VI'qOHXV HO_I XX_LIIA_IA!OD XHO_IA(IV "IVRIOI_LVN:--_06 "ON: ff,HOclXH 9"_
+
+
+
+--- PDF_PAGE 21 ---
+I I
+b_ k
+Moment coe/'_lenf, C_,¢i 4
+ t t
+4_
+'il r
+[I
+I
+I
+II
+' /' II I I
+' [ 'I I,
+ [ SlqOl_LO_I_ rlIO_IHIV gStI_I_I_--¥9 VOVBI ¢IO H_IIAIfli_l¥ HOwl ¥_L¥(I "I¥_LikI_IIAIIH_(IXSI(IBIV rlVOI_L_IHO_IH3J
+
+
+
+--- PDF_PAGE 22 ---
+18 REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
+The calculated position of the aerodynamic center and the
+variation of the pitching-moment coefficient with lift coeffi-
+cient about this point are also included in these data. The
+influence of the tunnel boundaries has been removed from
+all the aerodynamic data by means of the following equa-
+tions (developed in reference 1):
+cd_O.990Cd'
+Cl=0.973CL
+cm_:4=0.951c,_/4_
+no: 1.015ao'
+where the primed quantities denote the measured coefficients.
+DISCUSSION
+Although the amount of systematic aerodynamic data pre-
+sented for NACA 6A-series airfoil sections is not large, it is
+enough to indicate the relative merits of the NACA 6A-
+series airfoil sections as compared with the NACA 6-series
+sections. The variation of the important aerodynamic char-
+acteristics of the five NACA 64A-series airfoils with the
+pertinent geometrical parameters of the airfoils is shown in
+figures 11 to 17, together with comparable data for NACA
+64-series airfoils. The curves shown in figures 11 to 17 are
+for the NACA 64-series airfoil sections and are taken from
+the faired data of reference 1. The experimental points
+which appear on these figures represent the results obtained
+for the NACA 64A-series airfoil sections in the present
+investigation. Since only two NACA 63A-series sections
+were tested, comparative results are not presented for them.
+The effect of removing the cusp from the NACA 63-series
+.012
+Io ,,I
+o }--- 13 ,2
+<> .4
+Srnoofh_
+..... Rough j
+NACA 64A-ser?es
+I I
+NACA 64-series-
+I
+.Ol 0
+F.
+._ .008
+_ . 006
+._.
+ .004
+._.
+sections is about the same as that of removing the cust
+from the NACA 64-series sections.
+The comparative data showing the effects upon the aero-
+dynamic characteristics of removing the trailing-edge cus_
+from NACA 6-series airfoil sections should be used witl
+caution if the cusp removal is affected in some manner othel
+than that indicated earlier in this paper. For example, il
+_he cusp should be removed fl'om a cambered airfoil by meam
+of a straight-line fairing of the airfoil surfaces, the amount ol
+camber would be decreased near the trailing edge. Naturall:y
+the effect upon the aerodynamic characteristics of removin_
+the cusp in such a manner would not be the same as in-
+dicated by the comparative results presented for NACA
+6-series and 6A-series airfoils.
+Drag.--The variation of section minimum drag coefficien|
+with airfoil thickness ratio at a Reynolds number of 6X 10 _
+is shown in figure 11 for NACA 64-series and NACA 64A-
+series airfoil sections of various cambers, both smooth and
+with standard leading-edge roughness. As with the NACA
+64-series sections (reference 1), the minimum drag coeffi-
+cients of the NACA 64A-series sections show no consistent
+variation with camber. Comparison of the data of figure 11
+indicates that removing the cusp from the trailing edge has
+no appreciable effect upon the minimum drag coefficients of
+the airfoils, either smooth or with standard leading-edge
+roughness.
+Increasing the Reynolds number from 3X106 to 9X 106
+has about the same effect upon the minimum drag coefficient
+of NACA 64A-series airfoils (figs. 4 to 10) as that indicated
+in reference 1 for the NACA 64-series airfoils.
+Some differences exist in the drag coefficients of NACA
+64- and 64A-series airfoils outside the low-drag range of lift
+coefficients but these differences are small and do not show
+any consistent trends (figs. 4 to 10 and reference 1).
+_....._.-----_I I
+1 I
+.002
+0 2 4 6 8 I0 12 14 16 18 BO 2,-°
+A/rfo// fh/'Chness_ percent of"chord
+FIGURE 11.--Variation n[lllinimtlnl section drag eoellicient with airfoil thickness for some N ACA 6.l-series (reference I) and NAC A 64A-series airfoil sections of various etinlhers ill the smooth
+condition _md with standard leading-edge roughness. R=6X1U6; flagged symbols indicate NACA 64A-series sections with standard roughness.
+
+
+
+--- PDF_PAGE 23 ---
+THEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS 19
+T,ift.--The section angle of zero lift as a function of thick-
+ncss ratio is shown in figure 12 for NACA 64- and 64A-series
+airfoil sections of various cambers. These results show that
+the angle of zero lift is nearly independent of thickness and
+is primarily dependent upon the amount of camber for a
+particular type of mean line. Theoretical calculations made
+by use of the mean-line data of figm'e 3 and reference 1
+indicate that airfoils with the a=0.8 (modified) mean line
+should have angles of zero lift less negative than those with
+the a= 1.0 mean line. Actually, the reverse appears to be
+the case, and this effect is due mainly to the fact that air-
+foils having the a= 1.0 type of mean line have angles of zero
+lift which are only about 74 percent of their theoretical value
+(reference 1), and those having the a----0.8 (modified) mean
+lines have angles of zero lift larger than indicated by theory•
+The measured lift-curve slopes corresponding to the NACA
+64-series and NACA 64A-series airfoils of various cambers
+are presented in figure 13 as a function of airfoil thickness
+ratio. No consistent variation of lift-curve slope with
+camber or Reynolds number is shown by either type of air-
+foil. The increase in traihng-edge angle which accompanies
+removal of the cusp would be expected to reduce the lift-
+curve slope by an amount which increases with airfoil thick-
+ness ratio (references 3 and 4). Because the present data
+for the NACA 6A-series sections show essentially no varia-
+tion in lift-curve slope with thickness ratio, it appears that
+the effect of increasing the trailing-edge angle is about
+3`2
+ " - (/VACA
+_ 0----
+_4
+ -2
+_-4 0
+0 0 2r_ ..0
+0:4"
+.2
+(
+o
+.. -_4
+4 8 /2 /6 20 24
+A/r-foE fh/c/<ness_ percent of chord
+F[nURE 12.--Variation of section angle of zero lift with airfoil thickn_s ratio and camber for
+some NACA 64-series (reference 1) and NACA 64A-series airfoil sections. R=6Xll_ 6.
+./4,
+ s,
+ ./,2
+L
+Q ./6
+ .oo --
+L
+"4 .06
+0
+el)
+__ o O
+B .2 _ NACA 6#h-ser/ex
+o ., I ISmooth_
+.... Rough J NAC, 64-series--
+I I , I I I4 8 / 2 16 20 24
+A/rfoH th/cktless_ percent of chord
+Fn_uBl_ 13. Variation of lift-curve slopc with airfoil thickness ratio for some NACA 64-scrio_
+(reference I) and N A ('A 64A-sl!rics airfoil sections of w_rious camhcrs hoth in the smooth
+condition and with standard leading-edge roughness. R=6X10"; flagged symbols indicattl
+NACA 64A-series sections with standard roughness.
+balanced by the increase in lift-curve slope with thickness
+ratio shown by NACA 6-series sections. The value of the
+lift-curve slope for smooth NACA 64A-series airfoil sections
+is very close to that predicted from thin airfoil theory (27r
+per red|an or 0.110 per degree). Removing the trailing-
+edge cusp from an airfoil section with standard leading-edge
+roughness causes the lift-curve slope to decrease quite
+rapidly with increasing airfoil thickness ratio.
+The variation of the maximum section lift coefficient with
+airfoil thickness ratio and camber at a Reynolds number
+of 6X108 is.shown in figure 14 for NACA 64-series and
+NACA 64A-series airfoil sections with and without standard
+leading-edge roughness and simulated split flaps deflected
+60 °. A comparison of these data indicates that the char-
+acter of the variation of maximum lift coefficient with airfoil
+thickness ratio and camber is nearly the same for the NACA
+64-series and NACA 64A-series airfoil sections. The magni-
+tude of the maximum lift coefficient appears to be slightly
+less for the plain NACA 64A-series airfoils and slightly
+higher for the NACA 64A-series airfoils with split flaps than
+corresponding values for the NACA 64-series airfoils. These
+differences are small, however, and for engineering applica-
+tions the maximum-lift characteristics of NACA 64-series
+and 64A-series airfoil sections of comparable thickness and
+design lift coefficient may be considered practically the same.
+0
+I(b)
+0 4
+ !I (?'zi 1,
+NACA 64-series
+- o .4 .... _! - -
+/ ..... _--
+.... "1"--'1 - - -.
+•2}NACA 64A-ser,'es ............
+..¢t I I '
+,2 I2 IG 20 Z4
+A/rfoH /h/c/_ness_ per'cent of chord
+(a) Airfoil with simulated split flap deflected 60".
+(b) Plain airfoil•
+I,'o;_sRt,: 14. -Variation of maxinmm section lift cocllieicnt with airfoil thickness ratio and
+camber for some NACA 64-series (reference 1) and NACA 64A-serit,s airfoil sections with
+and witlmut simulated split flaps and standard roughness. R_6X10_; flagged symbols
+indicate NACA fi4A-serics airfoils with standard roughness.
+
+
+
+--- PDF_PAGE 24 ---
+2O REPORT NO. 903--NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS
+A comparison of the maximum-lift data for NACA 64A-
+series airfoil sections, presented in figures 4 to 10, with
+siinilar data for NACA 64-series airfoil sections indicates
+that the scale-effect characteristics of tile two types of section
+are essentially the same for the range of Reynolds number
+from 3 X l06 to 9 X 106.
+Pitohing moment--Thin-airfoil theory provides a means
+for calculating the theoretical quarter-chord pitching-moment
+coefficients of airfoil sections having various amounts and
+./
+J
+"1,-_ 0
+(D
+0 -./
+"_ -_3
+I I% I I
+fNACA 64A-ser/es]__
+o 0
+o .2
+--0 .4
+"-'-'-2
+I I {_li
+(NACA G4-ser/es)
+Iu I
+_ "'.4
+-'4o 4 8 /2 /6 20 24
+Aii,"*foi/ 7'/"t/ck,"'tes$ t percent of c_oi."d
+(a) Plain airfoil. ,,
+(b) Airfoil with simulated split flap deflected 60°,
+FIGURE 15,--Variation of section quarter-chord pitching-moment coefficient at zero angle of
+attack with airfoil thickness ratio and camber for some NACA 64-series (reference 1) and
+NAOA 64A-series airfoil sections with and without split flaps. R=6X 106; flagged symbo]s
+Indicate NAC.& 64A.series airfoils with 60 ° simulated split flap,
+' -./O
+% "-,08o
+_ -.06
+d -.04
+_ :02
+E
+0
+J
+_]ACA 64A2/0 .... /
+,v,4cAe3Az, .......
+,v,,cA64,A2/z---I !i:oNACA 64aA2/5--
+/
+/
+/, -.02
+11 /NACA 64A410---- /
+/
+ NA CA
+/
+....... YVACA 64-2/0
+....... _VACA 641-2)2
+ ...IVACA 642-215
+y-
+-.04 -.06 _ 08
+T/Teore f/col moment coe?_'clenf for o/rfoil
+meo,,"t //'me obouf querfer-chord pofHf
+641-4/2 /
+"-,'/0
+FIGtT:a'R.16.--Comparison of theoretical and measured pitching-moment coefficients for some
+NACA 64-series and 64A-series airfoil sections. R=6XI06.
+types of camber. Calculations were made according to thes
+methods for airfoils having the a= 1.0 and a=0.8 (modified
+mean lines by using the theoretical mean-line data presente,
+in figure 3 and in reference 1. The results of these calcula
+tions indicate that the quarter-chord pitching-moment coeffi
+cients of the NACA 64A-series airfoil sections having th
+a=0.8 (modified) mean line should be only about 87 percen
+of those for the NACA 64-series airfoil sections with th
+a=l.0 mean line. The experimental relationship betwee:
+the quarter-chord pitching-moment coefficient and airfoi
+thickness ratio and camber, shown in figure 15, discloses tha
+the plain NACA 64A-series airfoils have pitching-momen
+coefficients which are slightly more negative than those fo
+the plain NACA 64-series airfoils. The increase in th
+magnitude of the pitching-moment coefficient of NACA 64A
+series airfoils as compared witlt NACA 64-series airfoil
+becomes greater when the airfoils are eq uipped with simulate,
+split flaps deflected 60 °. A comparison of the theoretic_
+and measured pitching-moment coefficients is shown in figur
+16 for NACA 64-series and 64A-series airfoil sections. Thes
+comparative data indicate that the NACA 64A-series section
+much more nearly realize their theoretical moment coefficient
+than do the 64-series airfoil sections. Similar trends hay
+been shown to result when mean lines such as the a=0.
+type are employed with NACA 6-series airfoils (reference 1)
+_erodynamic eenter.--The position of the aerodynami
+center and the variation of the moment coefficient with lif
+coefficient about this point were calculated from the quarter
+chord pitching-moment'data for each of the seven airfoil
+tested. The variation of the chordwise position of the nero
+dynamic center with airfoil thickness ratio is shown in figur
+17 for the NACA 64-series and 64A-series airfoil section.,
+Since the data for the NACA 64-series airfoils showed n
+consistent variation with camber, the results are represente,
+by a single faired curve for all cambers. Following this sam
+trend, the position of the aerodynamic center for the NAC_
+64A-series airfoils shows no consistent variation with cambe_
+The data of figures 4 to 10 show that the variations in th
+Reynolds number have no consistent effect upon the chord
+wise position of the aerodynamic center.
+Perfect fluid theory indicates that the position of th
+aerodynamic center should move rearward with increasin
+airfoil thickness and the experimental results for the NAC_
+64-series airfoil sections follow this trend. The data, c
+ _. .28
+ 27
+ ._ .26
+o 0
+I _i' I
+--- a .2 _ _CA 64A-se_/es
+--NACA _4-_er/e_ .....i-I""I
+I
+L__
+fIf
+]2 4 6 8 /0 12 14 /6 /8 20 2,
+A/rfo_7 f/_/ckmess, percent chord
+FIGURE 17.--Variation of chordwise position of aerodynamic center with airfoil thicknc
+ratio for some NACA 64-series (reference 1) and 64A-series airfoil sections of differc_
+cambers. R=6XI0 _.
+
+
+
+--- PDF_PAGE 25 ---
+TI-IEORETICAL AND EXPERIMENTAL DATA FOR A NUMBER OF NACA 6A--SERIES AIRFOIL SECTIONS
+reference 5 show important forward movements of the aero-
+dynamic center with increasing trailing-edge angle for a
+given airfoil thickness ratio. The results obtained for tile
+NACA 24-, 44-, and 230-series airfoil sections (reference 1)
+reveal that the effect of increasing trailing-edge angle pre-
+dominates over the effect of increasing thickness because the
+position of the aerodynamic center moves forward with
+increasing thickness ratio for these airfoil sections. For the
+NACA 64A-series airfoils (fig. 17) the aerodynamic center is
+slightly behind the quarter-chord point and does not appear
+to vary with increasing thickness. These results suggest
+that the effect of increasing thickness is counterbalanced by
+increasing trailing-edge angle for these airfoil sections.
+CONCLUSIONS
+From a two dimensional wind-tunnel investigation of the
+aerodynamic characteristics of five NACA 64A-series and
+two NACA 63A-series airfoil sections the following conclu-
+sions based upon data obtained at Reynolds numbers of
+3X106, 6X106, and 9X106 may be drawn:
+1. The section minimum drag and maximum lift coef-
+ficients of corresponding NACA 6-series and 6A-series airfoil
+sections are essentially the same.
+2. The lift-curve slopes of smooth NACA 6A-series airfoil
+sections appear to be essentially independent of airfoil
+thickness ratio, in contrast to the trends shown by NACA
+6-series airfoil sections. The addition of standard leading-
+edge roughness causes the lift-curve slope to decrease with
+increasing airfoil thickness ratio for NACA 6A-series airfoil
+sections.
+3. Tile section angles of zero lift of NACA 6A-seri(
+airfoil sections are slightly more negative than those (
+comparable NACA 6-series airfoil sections.
+4. The section quarter-chord pitching-moment coeificient
+of NACA 6A-series airfoil sections are slightly more negativ
+than those of comparable NACA 6-series airfoil sectiom
+The position of the aerodynamic center is essentially ind¢
+pendent of airfoil thickness ratio for NACA 6A-series airfo
+sections.
+LANGLEY _EMOR1AL AERONAUTICAL LABORATORY,
+NATIONAL ADVISORY COMMITTEE FOR AERONAUTICS,
+LANGLEY FIELD, VA., _l/iay 6, 1957.
+REFERENCES
+1. Abbott, Ira H., Von Doenhoff, Albert E., and Stivers, Louis S
+Jr.: Summary of Airfoil Data. NACA Rep. No. 824, 1945.
+2. Jacobs, Eastman N., Ward, Kenneth E., and Pinkerton, Robert M.
+The Characteristics of 78 Related Airfoil Sections from Tests i_
+the Variable-Density Wind Tunnel. NACA Rep. No. 460, 1933
+3. Purser, Paul E., and McKee, John W.: Wind-Tunnel InvestigatioJ
+of a Plain Aileron with Thickened and Beveled Trailing Edges ol
+a Tapered Low-Drag Wing. NACA ACR. Jan. 1943.
+4. Jones, Robert T., and Ames, Milton B., Jr. : Wind-Tunnel Investiga
+tion of Control-Surface Characteristics. V--The Use of
+Beveled Tl'ailing Edge to Reduce the Hinge Moment of a Contro
+Surface. NACA ARR, March 1942.
+5. Purser, Paul E., and Johnson, Harold S.: Effects of Trailing-Edg(
+Modifications on Pitching-Moment Characteristics of Airfoils
+NACA CB No. L4130, 1944.
+u. s. GOVERNMENT PRINTING O.:FICE: 1950

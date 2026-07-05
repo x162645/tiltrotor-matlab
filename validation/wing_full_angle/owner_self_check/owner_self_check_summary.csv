@@ -1,0 +1,22 @@
+section,item,result,value,note
+PR 安全状态,当前分支,PASS,"task/full-wing-model-autonomous-20260702",
+PR 安全状态,当前 HEAD,INFO,"faaca9268d8a75f9ae8aff4a1560697fd7577559",
+PR 安全状态,base 分支,INFO,"feature/nuaa-equation-17",
+PR 安全状态,工作树 clean 或仅含本次产物,PASS,"true",脚本运行期间本次报告产物会使工作树暂时变脏；最终提交后需复查完整 clean。
+PR 安全状态,本地远端 0 0,PASS,"0	0",
+默认模型,legacy 默认,PASS,"legacy",fullAngleModelEnabled 必须为 0。
+legacy 安全,legacy identity,PASS,"force 0.000e+00, moment 0.000e+00",
+full-angle opt-in,默认仍走 legacy,PASS,"true",
+full-angle opt-in,手动启用走新路径,PASS,"true",
+full-angle opt-in,无完整结果动态混合,PASS,"true",
+full-angle opt-in,branchWeightInNew,PASS,"0",
+配平包线,attempted/completed/converged,INFO,"84/84/84",
+配平包线,timeout/failed/placeholder,PASS,"0/0/0",
+配平包线,实际点文件一致,PASS,"mat files 84, rows 84",
+配平包线,90 度 cyclicLong 固定,PASS,"true",
+配平包线,full-angle branchWeight=0,PASS,"true",
+配平包线,NaN/Inf/复数输出,PASS,"false",false 表示未发现。
+限制项,CONTROL_SURFACE_GATE,PARTIAL,"PARTIAL",
+限制项,BRIDGE_MODEL_GATE,PASS,"ENVELOPE_PASS",BRIDGE_MODEL 79.917%
+限制项,WAKE_GEOMETRY_GATE,PASS,"ENVELOPE_PASS",wake contraction 1 assumed
+测试,全部指定测试,PASS,"true",

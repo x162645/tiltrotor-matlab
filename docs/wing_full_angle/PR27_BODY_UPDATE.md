@@ -1,0 +1,82 @@
+# PR #27 Body Update
+
+Status: keep this PR open, Draft, and unmerged.
+
+## Owner-Facing Conclusion
+
+可以保留为 Draft 的有限包线研究模型
+
+Recommendation: continue to keep the PR as Draft; do not merge; do not switch the default model.
+
+## Current Gate
+
+`FULL_WING_MODEL_GATE = READY_FOR_LIMITED_ENVELOPE_USE`
+
+Reasons this is not ready to merge or become default:
+
+- `CONTROL_SURFACE_GATE = PARTIAL`; no validated differential aileron aero model was added.
+- `BRIDGE_MODEL_GATE = ENVELOPE_PASS`; deep-stall bridge rows remain unvalidated.
+- `WAKE_GEOMETRY_GATE = ENVELOPE_PASS`; wake contraction remains an engineering assumption.
+- Legacy remains the default model.
+
+## Evidence Summary
+
+- Trim envelope: 84 attempted, 84 completed, 84 converged, 0 timeout, 0 failed, 0 placeholder rows.
+- Legacy identity: PASS, max force error 0.000e+00, max moment error 0.000e+00.
+- Full-angle opt-in: common coefficient law 1, complete-result branch blend removed 1, branchWeightInNew 0.
+- Requested MATLAB checks all passed: 1.
+
+## Owner Review Packet
+
+`docs/wing_full_angle/OWNER_REVIEW_PACKET.md`
+
+## NUAA Trim Trend Visual Overlay
+
+Conclusion: `VISUAL_OVERLAY_READY_FOR_OWNER_REVIEW`.
+
+- NUAA Fig.5(a), Fig.5(b), Fig.6(a), and Fig.6(b) were used as screenshot references only.
+- No NUAA curve digitization and no pointwise NUAA-model error calculation were performed.
+- Existing legacy/full_angle trim envelope results were reused; no parameter tuning was performed.
+- Legacy remains the default model; this PR remains Draft and unmerged.
+
+Report: `docs/wing_full_angle/NUAA_TRIM_TREND_VISUAL_OVERLAY_REPORT.md`
+
+Regression checks:
+
+- `check_wing_legacy_identity`: PASS.
+- `run_full_angle_zero_nacelle_validation`: PASS.
+- `check_article_trends`: diagnostic run completed; not a strict reproduction proof.
+- `run_all_checks`: PASS, 33/33 checks passed.
+
+## Zero Helicopter Common-Cause Audit
+
+Conclusion: `ZERO_HELI_COMMON_CAUSE_AUDIT_PARTIAL`.
+
+- `CYCLIC_MAPPING_GATE = PASS_IF_SIGN_OR_EQUIVALENT_EXPLAINS`
+- `COLLECTIVE_REVERSAL_GATE = MIXED_OR_UNRESOLVED`
+- `COMMON_CAUSE_CLASSIFICATION = CYCLIC_OUTPUT_MAPPING_LIKELY`
+- `FINAL_RECOMMENDATION = DO_NOT_MODIFY_MODEL_YET_MAPPING_AUDIT_FIRST`
+- This audit is diagnostic only. It does not modify model equations, default parameters, or legacy/full-angle defaults.
+- Report: `docs/wing_full_angle/ZERO_HELICOPTER_COMMON_CAUSE_AUDIT_REPORT.md`
+
+
+
+## NUAA Trim Trend Mapping Refresh
+
+Conclusion: `NUAA_MAPPING_REFRESH_READY`.
+
+- Fig.5(a) and Fig.6(a) Vertical pitch comparison now uses `-cyclicLong_deg`.
+- Fig.5(b) and Fig.6(b) elevator mapping was rechecked; no remapping applied.
+- This is a validation-overlay mapping refresh only; no model equations, default parameters, or legacy/full-angle defaults changed.
+- Report: `docs/wing_full_angle/NUAA_TRIM_TREND_MAPPING_REFRESH_REPORT.md`
+
+## NUAA Trim Trend Layout Fix
+
+Conclusion: `NUAA_LAYOUT_FIX_READY`.
+
+- Standard entry comparison boards were regenerated in place under `validation/nuaa_trim_trend_overlay/comparison_boards/`.
+- The overview board is now a clean 4 row x 2 column layout: NUAA screenshot on the left and computed model trend on the right.
+- The four single comparison boards are now clean 1 row x 2 column layouts.
+- The 0 deg and 15 deg vertical pitch comparison uses `-cyclicLong_deg`; the 15 deg mapping remains a best visual candidate and is not uniquely confirmed.
+- This is a validation image layout fix only: no parameter tuning, no `params_nominal.m` change, no `model/` production change, no default switch, and no PR merge.
+- Report: `docs/wing_full_angle/NUAA_TRIM_TREND_LAYOUT_FIX_REPORT.md`

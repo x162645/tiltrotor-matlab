@@ -1,0 +1,4 @@
+control,metric,derivative_per_rad,finiteReal,sign,comparisonMode
+collective,Fz_N,-299975.269747352,1,-1,SIGN_CHECK_ONLY
+cyclicLong,My_Nm,-25303.486160987,1,-1,SIGN_CHECK_ONLY
+elevator,My_Nm,0,1,0,SIGN_CHECK_ONLY

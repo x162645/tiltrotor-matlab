@@ -1,15 +1,19 @@
 function P = params_nominal()
-%PARAMS_NOMINAL 倾转旋翼机名义参数。
-% 所有单位使用 SI；所有内部角度使用弧度。
-% 当前参数为自洽概念参数，并非完整 XV-15 型号数据库。
+%PARAMS_NOMINAL Nominal tiltrotor parameters.
+% All units are SI; all internal angles are radians.
+% Current parameters are self-consistent concept values, not an XV-15 database.
 
 d2r = pi / 180;
 
-%% 环境
+%% Environment
 P.env.rho = 1.225;
 P.env.g   = 9.80665;
+% Standard sea-level constants used only for Reynolds/Mach diagnostics in
+% the provisional full-angle wing path.
+P.env.mu  = 1.7894e-5;
+P.env.a   = 340.3;
 
-%% 质量、重心和惯量
+%% Mass, center of gravity, and inertia
 P.mass.m     = 6000.0;
 % mNac is the combined moving mass of the left and right tilting
 % nacelle/rotor assemblies. It is not a per-side mass.
@@ -25,10 +29,10 @@ P.mass.I0 = [18000,     0,  -800;
                  0, 30000,     0;
               -800,     0, 45000];
 
-% I(betaM) = I0 - betaM * KI；KI 按每弧度解释。
+% I(betaM) = I0 - betaM * KI; KI is interpreted per radian.
 P.mass.KI = diag([300, 500, 400]);
 
-%% 旋翼/螺旋桨
+%% Rotor/propeller
 P.rotor.R              = 3.80;
 P.rotor.Nb             = 3;
 P.rotor.Omega          = 62.0;
@@ -41,7 +45,7 @@ P.rotor.CLmax          = 1.35;
 P.rotor.CD0            = 0.011;
 P.rotor.kCD            = 0.012;
 
-% 短舱转轴基准位置。左右旋翼的 y 坐标由 side 决定。
+% Nacelle tilt-axis reference point. Rotor y coordinate is set by side.
 P.rotor.pivotX         = 0.0;
 P.rotor.pivotY         = 5.0;
 P.rotor.pivotZ         = 0.0;
@@ -92,10 +96,10 @@ P.rotor.flapDivergenceAngle = 80.0*d2r;
 % do not read this multiplier.
 P.rotor.wakeFactor     = 1.60;
 
-% 可选旋翼陀螺项。缺乏可信转动惯量时默认关闭。
+% Optional rotor gyroscopic term. Off by default without sourced rotor inertia.
 P.rotor.Jpolar         = 0.0;
 
-%% 机翼
+%% Wing
 P.wing.S               = 18.0;
 P.wing.b               = 10.0;
 P.wing.c               = 1.50;
@@ -135,8 +139,23 @@ P.wing.normalFlowRatio = 0.35;
 % Width 0.15 is a provisional concept value selected from continuity,
 % blend-coverage and sensitivity checks, not literature or test data.
 P.wing.normalFlowBlendHalfWidth = 0.15;
+% Full-angle strip model is opt-in. Legacy model remains the default.
+P.wing.modelType = 'legacy';
+P.wing.fullAngleModelEnabled = 0;
+P.wing.fullAngleDatabaseFile = fullfile('data','wing_full_angle', ...
+    'full_angle_selected','wing_full_angle_database.csv');
+P.wing.fullAngleStripCount = 24;
+P.wing.fullAngleWakeContraction = 1.0;
+P.wing.fullAngleInterpolationMethod = 'pchip';
+P.wing.fullAngleDatabaseDimensionPolicy = 'multidimensional_linear_Re_Mach_flap_pchip_alpha';
+P.wing.fullAngleOutOfRangePolicy = 'clamp';
+P.wing.fullAngleFlapInterpolationPolicy = 'plain_flap_family_linear_only';
+P.wing.fullAngleDefaultRe = 1.0e6;
+P.wing.fullAngleDefaultMach = 0.0;
+P.wing.fullAngleControlSurfacePolicy = ...
+    'longitudinal_full_angle_baseline_no_lateral_aileron_aero';
 
-%% 机身
+%% Fuselage
 P.fuselage.S           = 8.0;
 P.fuselage.b           = 3.0;
 P.fuselage.c           = 4.0;
@@ -162,7 +181,7 @@ P.fuselage.Cnbeta      = 0.12;
 P.fuselage.Cnp         = -0.04;
 P.fuselage.Cnr         = -0.30;
 
-%% 平尾
+%% Horizontal tail
 P.htail.S              = 4.5;
 P.htail.c              = 1.0;
 P.htail.rAC            = [-5.0; 0.0; 0.15];
@@ -185,7 +204,7 @@ P.htail.kInduced       = 0.060;
 P.htail.Cm0            = 0.0;
 P.htail.Cmelevator     = -0.08;
 
-%% 双垂尾
+%% Twin vertical tails
 P.vtail.SEach          = 1.6;
 P.vtail.c              = 0.8;
 P.vtail.xAC            = -4.20;
@@ -196,14 +215,14 @@ P.vtail.CD0            = 0.020;
 P.vtail.CYbeta         = -2.20;
 P.vtail.CYrudder       = 0.70;
 
-%% 控制限制
+%% Control limits
 P.control.collectiveLim = [0, 70]*d2r;
 P.control.cyclicLim     = [-35, 35]*d2r;
 P.control.aileronLim    = [-30, 30]*d2r;
 P.control.elevatorLim   = [-20, 20]*d2r;
 P.control.rudderLim     = [-30, 30]*d2r;
 
-%% 配平
+%% Trim
 P.trim.residualTolerance = 5.0e-3;
 P.trim.maxIterations      = 600;
 P.trim.display            = 'off';
@@ -213,7 +232,7 @@ P.trim.display            = 'off';
 % rule, this gives initial physical steps of about [0.1; 0.9; 0.1] deg.
 P.trim.variableScale      = [2; 18; 2]*(pi/180);
 
-%% 线性化差分步长
+%% Linearization finite-difference steps
 P.linear.dx = [0.05; 0.05; 0.05; ...
                1e-3; 1e-3; 1e-3; ...
                1e-4; 1e-4; 1e-4];

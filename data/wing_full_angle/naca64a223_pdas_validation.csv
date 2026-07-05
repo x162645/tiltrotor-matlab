@@ -1,0 +1,4 @@
+airfoil,reference,rms_error_chord,max_abs_error_chord,point_count,status
+NACA 64A010,NACA TR-903 Tables III/V or OCR-assisted table entries,5.64751528952532e-05,0.00020997537103015663,52,PASS
+NACA 64A210,NACA TR-903 Tables III/V or OCR-assisted table entries,0.00012788197217920204,0.0007980174115956775,52,PASS
+NACA 64A410,NACA TR-903 Tables III/V or OCR-assisted table entries,0.0008662483897205612,0.006066322678157718,52,REVIEW

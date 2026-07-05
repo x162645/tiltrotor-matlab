@@ -1,0 +1,13 @@
+gate,status,reason
+TM88373_DATA_GATE,PASS_FOR_SELECTED_FIGURE6A_GRAPH_DIGITIZATION,Existing graph digitization artifacts remain selected.
+BRIDGE_MODEL_GATE,ENVELOPE_PASS,Bridge audit remains finite; deep-stall rows are still unvalidated.
+FULL_ANGLE_DATABASE_GATE,ENVELOPE_PASS,Database is finite and point rows report source classes.
+CONTROL_SURFACE_GATE,PARTIAL,No production differential aileron model was added.
+WAKE_GEOMETRY_GATE,ENVELOPE_PASS,Wake sensitivity evidence remains bounded and parameterized.
+ZERO_NACELLE_BUMP_GATE,ENVELOPE_PASS,Status is based only on real 0 deg trim point files.
+HELICOPTER_ENVELOPE_GATE,ENVELOPE_PASS,0 deg envelope uses helicopter_longitudinal definitions.
+CONVERSION_ENVELOPE_GATE,ENVELOPE_PASS,15/45/75 deg envelope uses conversion_longitudinal definitions.
+AIRPLANE_ENVELOPE_GATE,ENVELOPE_PASS,90 deg envelope uses airplane_longitudinal with cyclicLong fixed at zero.
+TRIM_GATE,ENVELOPE_PASS,Aggregate trim gate counts only actual point evidence.
+LINEARIZATION_GATE,PASS,Existing run_all_checks linearization coverage is retained.
+FULL_REGRESSION_GATE,PASS,run_all_checks passed with the trim-envelope schema and resume checks.

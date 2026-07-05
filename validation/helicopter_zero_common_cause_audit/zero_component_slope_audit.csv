@@ -1,0 +1,37 @@
+modelType,component,quantity,slope_per_mps,firstValue,lastValue,delta,trend,suspectLevel,interpretation
+legacy,rotor,Fx_N,37.8835489772186,-3.61200614057422e-06,1136.50646570455,1136.50646931656,increasing,INFO,component trend recorded for diagnosis
+legacy,rotor,Fz_N,0.251141884776007,-60305.6150627436,-60298.0808062003,7.53425654328021,nearly_flat,MEDIUM,rotor vertical-force trend is relevant to forward-flight efficiency and inflow
+legacy,rotor,My_Nm,-28.412661732914,2.70900460543066e-06,-852.379849278414,-852.379851987419,decreasing,MEDIUM,pitching-moment trend is relevant to cyclicLong/qdot closure
+legacy,wing,Fx_N,13.0918205978011,0,392.754617934032,392.754617934032,discontinuous,INFO,component trend recorded for diagnosis
+legacy,wing,Fz_N,-7.52351290926914,1465.71506397912,1240.00967670104,-225.705387278074,discontinuous,MEDIUM,wing vertical-force trend is relevant to wake download or lift relief
+legacy,wing,My_Nm,-14.540655579627,0,-436.219667388811,-436.219667388811,decreasing,MEDIUM,pitching-moment trend is relevant to cyclicLong/qdot closure
+legacy,htail,Fx_N,-1.70828184783355,0,-51.2484554350065,-51.2484554350065,decreasing,INFO,component trend recorded for diagnosis
+legacy,htail,Fz_N,8.80164384977851,0,264.049315493355,264.049315493355,increasing,INFO,component trend recorded for diagnosis
+legacy,htail,My_Nm,43.7519769717175,0,1312.55930915153,1312.55930915153,increasing,MEDIUM,pitching-moment trend is relevant to cyclicLong/qdot closure
+legacy,fuselage,Fx_N,-11.7655441152999,0,-352.966323458997,-352.966323458997,decreasing,INFO,component trend recorded for diagnosis
+legacy,fuselage,Fz_N,-1.1710689195317,0,-35.132067585951,-35.132067585951,decreasing,INFO,component trend recorded for diagnosis
+legacy,fuselage,My_Nm,-0.94234062762365,0,-28.2702188287095,-28.2702188287095,decreasing,INFO,component trend recorded for diagnosis
+legacy,vtail,Fx_N,-1.17579828309218,0,-35.2739484927654,-35.2739484927654,decreasing,INFO,component trend recorded for diagnosis
+legacy,vtail,Fz_N,-0.0217806675168973,0,-0.65342002550692,-0.65342002550692,decreasing,INFO,component trend recorded for diagnosis
+legacy,vtail,My_Nm,0.143680853047467,0,4.31042559142401,4.31042559142401,increasing,INFO,component trend recorded for diagnosis
+legacy,total,Fx_N,36.3257453287941,-3.61200614057422e-06,1089.77235625182,1089.77235986382,discontinuous,INFO,component trend recorded for diagnosis
+legacy,total,Fz_N,0.336423238236845,-58839.8999987645,-58829.8073016174,10.0926971471054,nonmonotonic,INFO,component trend recorded for diagnosis
+legacy,total,My_Nm,-1.15399639618689e-07,2.70900460543066e-06,-7.52984583130001e-07,-3.46198918856067e-06,nearly_flat,INFO,component trend recorded for diagnosis
+full_angle,rotor,Fx_N,-73.3774346470629,2356.89664006167,155.573600649778,-2201.32303941189,decreasing,INFO,component trend recorded for diagnosis
+full_angle,rotor,Fz_N,-125.563504006795,-62682.2174196187,-66449.1225398226,-3766.90512020384,nonmonotonic,MEDIUM,rotor vertical-force trend is relevant to forward-flight efficiency and inflow
+full_angle,rotor,My_Nm,55.0330759852972,-1767.67248004625,-116.680200487333,1650.99227955892,increasing,MEDIUM,pitching-moment trend is relevant to cyclicLong/qdot closure
+full_angle,wing,Fx_N,50.895066242334,427.662695624263,1954.51468289428,1526.85198727002,nonmonotonic,INFO,component trend recorded for diagnosis
+full_angle,wing,Fz_N,119.390856750014,3908.24306203962,7489.96876454003,3581.72570250041,nonmonotonic,MEDIUM,wing vertical-force trend is relevant to wake download or lift relief
+full_angle,wing,My_Nm,-87.0272472790112,1767.67247524696,-843.14494312338,-2610.81741837034,decreasing,MEDIUM,pitching-moment trend is relevant to cyclicLong/qdot closure
+full_angle,htail,Fx_N,-1.70827694982905,0,-51.2483084948714,-51.2483084948714,decreasing,INFO,component trend recorded for diagnosis
+full_angle,htail,Fz_N,6.59473596141222,0,197.842078842367,197.842078842367,increasing,INFO,component trend recorded for diagnosis
+full_angle,htail,My_Nm,32.7174382645868,0,981.523147937603,981.523147937603,increasing,MEDIUM,pitching-moment trend is relevant to cyclicLong/qdot closure
+full_angle,fuselage,Fx_N,-11.7730171399029,0,-353.190514197087,-353.190514197087,decreasing,INFO,component trend recorded for diagnosis
+full_angle,fuselage,Fz_N,-1.79573435051233,0,-53.8720305153699,-53.8720305153699,decreasing,INFO,component trend recorded for diagnosis
+full_angle,fuselage,My_Nm,-0.818154843887823,0,-24.5446453166347,-24.5446453166347,decreasing,INFO,component trend recorded for diagnosis
+full_angle,vtail,Fx_N,-1.17552602713154,0,-35.2657808139462,-35.2657808139462,decreasing,INFO,component trend recorded for diagnosis
+full_angle,vtail,Fz_N,-0.0333850196396557,0,-1.00155058918967,-1.00155058918967,decreasing,INFO,component trend recorded for diagnosis
+full_angle,vtail,My_Nm,0.0948881229397538,0,2.84664368819262,2.84664368819262,increasing,INFO,component trend recorded for diagnosis
+full_angle,total,Fx_N,-37.1391885215924,2784.55933568593,1670.38368003816,-1114.17565564777,discontinuous,INFO,component trend recorded for diagnosis
+full_angle,total,Fz_N,-1.40703066552063,-58773.9743575791,-58816.1852775447,-42.2109199656188,nonmonotonic,INFO,component trend recorded for diagnosis
+full_angle,total,My_Nm,2.4992469323711e-07,-4.79929303764948e-06,2.69844775946382e-06,7.49774079711329e-06,nearly_flat,INFO,component trend recorded for diagnosis

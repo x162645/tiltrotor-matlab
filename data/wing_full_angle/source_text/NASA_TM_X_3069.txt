@@ -1,0 +1,3450 @@
+
+
+--- PDF_PAGE 1 ---
+FOR N 0
+
+
+
+--- PDF_PAGE 2 ---
+1 1!_
+
+
+
+--- PDF_PAGE 3 ---
+1. Report No. 2. Government Accession No. 3. Recipient's Catalog No.
+NASA TM X-3069
+4. Title and Subtitle
+DEVELOPMENT OF A COMPUTER PROGRAM TO OBTAIN
+ORDINATES FOR NACA 6- AND 6A-SERIES AIRFOILS
+7. Author(s)
+Charles L. Ladson and Cuyler W. Brooks, Jr.
+9. Performing Organization Name and Address
+NASA Langley Research Center
+Hampton, Va. 23665
+12. Sponsoring Agency Name and Address
+National Aeronautics and Space Administration
+Washington, D.C. 20546
+5. Report Date
+September 1974
+6. Performing Organization Code
+8. Performing Organization Report No.
+L-9558
+10. Work Unit No.
+501-06-05-07
+'11. Contract or Grant No.
+13. Type of Report and Period Covered
+Technical Memorandum
+14. Sponsoring Agency Code
+15. Supplementary Notes
+16. Abstract
+A computer program was developed to produce the ordinates for airfoils of any thick-
+ness, thickness distribution, or camber in the NACA 6- and 6A-series. For the 6-series
+and for all but the leading edge of the 6A-series, agreement between the ordinates obtained
+from the new program and previously published values is generally within 5 x 10 -5 chord.
+Near the leading edge of the 6A-series airfoils, differences up to 3.5 × 10 -4 chord are found,
+17. Key Words (Suggested by Author(s))
+Airfoils
+Wings
+Rotorcraft
+19. Security Classif. (of this report)
+Unclassified
+20. Security Classif. (of this page}
+Unclassified
+18. Distribution Statement
+Unclassified - Unlimited
+STAR Category 01
+21. No. of Pages
+101
+22. Price°
+$4.5o
+*For sale by the National Technical Information Service, Springfield, Virginia 22151
+
+
+
+--- PDF_PAGE 4 ---
+
+
+
+--- PDF_PAGE 5 ---
+DEVELOPMENT OF A COMPUTER PROGRAM TO OBTAIN ORDINATES
+FOR NACA 6- AND 6A-SERIES AIRFOILS
+By Charles L. Ladson and Cuyler W. Brooks, Jr.
+Langley Research Center
+SUMMARY
+A computer program was developed to produce the ordinates for airfoils of any
+thickness, thickness distribution, or camber in the NACA 6- and 6A-series. For the
+6-series and for all but the leading edge of the 6A-series, agreement between the ordi-
+nates obtained from the new program and previously published values is generally within
+5 x 10 -5 chord. Near the leading edge of the 6A-series airfoils, differences up to
+3.5 x 10 -4 chord are found. The program which is given in the appendix will also produce
+plots of the nondimensional 'airfoil ordinates and a punch card output of ordinates in the
+input format of a readily available program for determining the pressure distributions of
+arbitrary airfoils in subsonic potential viscous flow.
+INTRODUCTION
+The NACA 6-series airfoil sections were developed in the early 1940's, and discus-
+sions of the method of the derivations and the resulting ordinates have been published in
+references 1 and 2. As aircraft speeds increased, more attention was focused on the
+thinner airfoils of this series. However, difficulties were encountered in the structural
+design and fabrication of these thinner sections because of the very thin trailing edges.
+As a result, the NACA 6A-series airfoil sections were developed, and details of these
+have been published in reference 3. Essentially, the modification consisted of a near-
+constant slope from about the 80-percent chord station to the trailing edge and an increase
+in the trailing-edge thickness from zero to a finite value.
+Recently, parametric theoretical studies have been made to investigate the use of
+these airfoil sections for both rotorcraft and conventional aircraft. The results of one
+investigation are presented in reference 4 and show advantages of an NACA 6-series
+cambered airfoil for use as a tail rotor on helicopters. It was tedious and expensive to
+make these studies because no method was available for calculating the desired ordinates
+rapidly and accurately. Because the 6-series airfoils do not have an analytic expression
+for the ordinates, use must be made of the ordinates published in references 1 to 3.
+Also, the ordinates are not linear with variations in thickness-chord ratio so that airfoils
+
+
+
+--- PDF_PAGE 6 ---
+obtainedby linearly increasing or decreasingthe ordinates of an originally derived shape
+will be approximate, as mentionedin reference 1. The published ordinates havebeen
+cross-plotted as a function of thickness andpublishedin reference 5, but the values must
+be read off the graphs and only 26 longitudinal locations from noseto tail were available.
+An attempt, using a derivative of the NACA4-digit series, to provide a computer
+program for ordinates of the NACA 6-series airfoils was madein reference 6. However,
+as stated in the reference, the resulting accuracy of only 3.5 x 10-3 chord is not sufficient
+for manyapplications.
+The purpose of this paper is to review the basic designprocedure for the NACA
+6-series airfoils and to describe a program which will generate sufficiently accurate
+ordinates for airfoils of anythickness, thickness distribution, or camber with an accept-
+able expenditure of computer time.
+SYMBOLS
+a basic length, usually considered unity
+A mean-line designation, fraction of chord from leading edge over which design
+load is uniform
+c airfoil chord
+C airfoil chord on computer-generated plots
+CLI design sectionliftcoefficient
+X distance along chord
+X distance along chord on computer-generated plots
+airfoil ordinate normal to chord, positive above chord
+Y airfoil ordinate normal to chord on computer-generated plots
+complex variable in circle plane
+Z _
+5
+complex variable in near-circle plane
+local inclination of camber line (or mean line)
+2
+ii
+
+
+
+--- PDF_PAGE 7 ---
+e airfoil parameter, _b - 0
+complex variable in airfoilplane
+ angular coordinate of z'
+_b angular coordinate of z
+ airfoil parameter determining radial coordinate of z
+average value of @, _ _.1r _ dq5
+z,77t_ o
+Subscripts:
+u upper surface
+I lower surface
+t thickness
+cam cambered
+ANALYSIS
+Basic Airfoil Derivation
+As described in references 1 and 2, the basic symmetrical NACA 6-series airfoils
+were developed by means of conformal transformations. The use of these transforma-
+tions to relate the flow about an arbitrary airfoil to that of a near circle and then to a
+circle had been developed earlier and the results are presented in reference 7. The
+basic airfoil parameters _ and e are derived as a function of G where 0 - _b is
+defined as -E. Figure 1, taken from reference 1, shows the relationship between these
+variables in the complex plane. These parameters are used to compute both the airfoil
+ordinates and the potential flow velocity distribution around the airfoil. For the NACA
+6-series airfoils, the shape of the velocity distribution and the longitudinal location of
+maximum velocity (or minimum pressure) were prescribed. The airfoil parameters ¢
+and • which give the desired velocity distribution were obtained through an iterative
+process. Then the airfoil ordinates could be calculated from these parameters by use of
+the equations presented in references 1 and 7. Thus, for each prescribed velocity distri-
+bution, a set of basic airfoil parameters is obtained. However, as stated in reference 1,
+
+
+
+--- PDF_PAGE 8 ---
+it is possible to define a set of basic parameters _/ and e which could be multiplied by a
+constant factor to obtain airfoils of various thickness-chord ratios while maintaining the
+minimum pressure at the same chordwise location. Thus, for each NACA 6-series air-
+foil family (i.e., 63-, 64-, or 65-series) there is one basic set of _ and _ values.
+Calculation of Symmetrical Airfoils
+There is a unique curve of _ and e as a function of _b for each NACA 6-series
+airfoil family. This curve can be scaled by a constant factor to provide airfoils of dif-
+ferent thickness within this family. A computer program could therefore be developed to
+calculate the airfoil ordinates for given values of _ and e. Although the values of
+these basic airfoil parameters were not published, tabulated values existed in files or
+could be computed by the method of reference 7 from published airfoil ordinates. For the
+6-series airfoils, values of _ and c were available for 21 values of _b, and 26 values
+were available for the 6A-series airfoils. To provide more values of _p and e for
+storage in a computer subroutine, a fit to the original values was made with an existing
+parametric linked cubic spline-fit program and nine additional values were obtained
+between each of the original values. This process was carried out for each airfoil
+series, and the results were stored in the computer program as two subroutines for each
+airfoil family.
+To calculate the ordinates for an arbitrary airfoil, the program first determines
+which airfoil series is desired and calls for the subroutine for this series. The airfoil
+represented by the stored values of _ and e is calculated and its maximum thickness-
+chord ratio is determined. The ratio of the desired value to that obtained in this deter-
+mination is calculated. Then, _ and e are multiplied by this ratio to arrive at a
+new airfoil thickness-chord ratio. The iteration is repeated until the computed thickness-
+chord ratio is within 0.01 percent of the desired value, or until 10 iterations have been
+performed. Usually convergence;occurs within four iterations. After the iterative
+process has converged within the limit established, any residual difference between the
+,.omputed thickness-chord ratio and that desired is eliminated by linearly scaling the y
+ordinate and its first and second derivatives by the appropriate scale factor. The first
+and second derivatives of the airfoil ordinates as a function of chord are computed by a
+subroutine labeled "DIF"in the program. Although these ordinates and slopes are cal-
+culated at more than 200 internally controlled chord stations, a subroutine is used to
+interpolate between these points (by use of a vertical axis parabolic curve fit labeled
+"FTLUP") so that the output will be in specified increments of chord stations. As the
+leading edge is approached, the increments become smaller. As programed, ordinates
+are printed at increments of 0.00025c from the leading edge to x/c = 0.01250, at incre-
+ments of 0.0025c from x/c = 0.01250 to 0.1000, and at increments of 0.01c from
+x/c = 0.1000 to the trailing edge.
+4
+ !
+
+
+
+--- PDF_PAGE 9 ---
+Calculation of the Leading-Edge Radius
+The values of leading-edge radius of these airfoils, published in references 1 to 3,
+were initially determined by plotting the ordinates to a large scale and fairing in the best
+circle fit by hand. Values of the tangency point between the circle and airfoil surface
+obtained in this manner were not published. To provide smooth analytic ordinates around
+the leading edge for the computer program, a tilted ellipse has been used. This tilted
+ellipse is described by the basic ellipse function plus an additive term, linear in x,
+which vanished at the origin, and thus has three arbitrary constants. The resulting fit
+to the airfoil ordinates is exact for the ordinate itself and the first derivative, and quite
+close for the second derivative, though examination of the second derivative in the region
+of tangency generally reveals a small discrepancy. The ellipse is defined so that it has
+the same ordinate and slope as the airfoil surface at the eleventh tabulated value of _b
+in the airfoil parameter subroutine. (The eleventh stored point is actually the second
+point of the original tabulated values.) This tangency point is usually located at about the
+0.005 chord station but varies with airfoil thickness and series. By use of this method a
+smooth transition between airfoil and ellipse is produced, the tangency point is known,
+and there is a continuous variation of leading-edge shape with thickness-chord ratio. The
+nondimensional radius of curvature of the ellipse at the airfoil origin is also calculated
+in the program and its value is in close agreement with the published values of the
+leading-edge radius for known airfoils.
+Calculation of Cambered Airfoils
+To calculate ordinates for a cambered airfoil, the desired mean line is first com-
+puted and then the ordinates of the symmetrical airfoil are measured normal to the mean
+line at the same chord station. This procedure leads to a set of parametric equations,
+where (y/c)t, (y/C)cam , and 5 are all functions of the original independent variable
+x/c. The ordinates on the cambered airfoil, (x/C)ca m and (y/C)cam , are given by
+(x/C)ca m = (x/c) - (y/c) t sin 5
+(y/C)cam = (y/C)ca m + (y/c) t cos 5
+where 5 is the local inclination of the camber line and (y/c) t
+to obtain the lower surface ordinates. This procedure is also described in reference 1.
+The local slopes of the cambered airfoil can be shown to be
+tan5secS+ (_)-t (y)t(_)tan5
+/, \u 5- dl--I tan 5- y d6see
+\ax/
+is assumed to be negative
+
+
+
+--- PDF_PAGE 10 ---
+and
+ ._/ = t _c/t\dx]
+1 sec 6 + (d_) tan 6 +(Y)t d(_ )t c
+by parametric differentiation of (x/C)ca m and (y/C)ea m with respect to the original
+x/c and use of the relationship
+(==_) cam : d 'Y/C)cam'_ /: d (x/c) cam'_=k 7/l /
+The mean line for all cambered airfoils of the NACA 6-series is the single analytic
+expression presented in reference 1 and is a function of the design lift coefficient and
+type of loading desired. The calculation of these camber lines has been included in the
+program so that any desired combination of airfoil family, thickness-chord ratio, design
+lift coefficient, and type of loading may be obtained. The design lift coefficient and type
+of loading desired are input variables. The A = 0.8 modified mean line which is used
+with the NACA 6A-series airfoils (see ref. 3) has also been incorporated. As the refer-
+ence indicates, this mean line loading should always be used with the 6A-series.
+The standard mean line loadings for the 6-series airfoils consist of loading uniform
+over the entire chord (A = 1.0), or a uniform loading to a given chord station followed by
+a value decreasing linearly to zero at the trailing edge. By combining two or more types
+of loading, many different types of mean lines can be obtained. For example, refer-
+ence 8 presents data for airfoils which combine two mean lines to give zero loading to the
+60=percent chord station followed by a linearly increasing load to the trailing edge. This
+procedure produces the so=called S-type mean line, having negative camber forward and
+positive camber aft. Other references have combined up to four mean lines to produce
+desired types of loadings. The program presented herein can combine up to 10 different
+mean line combinations if desired.
+RESULTS AND DISCUSSION
+Program Capabilities
+The program which has been developed from the analysis described is presented
+in the appendix. The output of the program consists of tabulated ordinates, computer-
+generated plots of nondimensional ordinates, and punched card listings of the ordinates.
+The punched cards are in the format of the input of the program described in reference 9
+so that pressure distributions over the generated shape may be readily obtained. To
+show graphically the capabilities of the program, sample computer plots are presented
+6
+
+
+
+--- PDF_PAGE 11 ---
+in figures 2 to 9. The subscript designationsof the lift-coefficient range of minimum
+drag for these airfoils, as described in references 1to 3, havebeendeletedin the com-
+puter plots andtables. Figure 2 illustrates the possibility of changingthe thickness-
+chord ratio for a fixed series. Figures 3 and4 showthe series variations within the
+NACA 6 and 6A families of airfoils, respectively. The variations in designlift coeffi-
+cient with a constant mean line loading and the variations of mean line loading for a con-
+stant design lift coefficient are shown in figures 5 and 6, respectively. By combining
+more than one mean line for a given airfoil, the variations illustrated in figure 7 may be
+obtained. If a thickness-chord ratio of 0.0 is specified, the shape of the mean line or
+combination of mean lines is calculated. The results of this procedure are shown in
+figures 8 and 9. Note that the mean lines of figure 9 are those for the airfoils of figure 7.
+Sample Output Tabulations
+Sample computed ordinates for both a symmetric and a cambered airfoil are pre-
+sented in tables I and II, respectively. Printed at the top of the first page for each table
+is the airfoil designation and a listing of the input variables. There follows a summary
+of parameters such as the longitudinal location of maximum thickness (the point when
+the slope changes sign), the values of the location of the nose ellipse fit and its radius-
+chord ratio at the origin, and the number of iterations and scaling factor used to deter-
+mine the airfoil from its basic parameters. Both nondimensional and dimensional ordi-
+nates are listed. The dimensional quantities have the same units as the input value of
+the chord. First and second derivatives of the surface slope are also presented for the
+symmetric airfoils, but only first derivatives are tabulated for the cambered airfoils.
+Accuracy of Results
+About 25 cases, including several from each airfoil family, were computed for
+thickness-chord ratios from 0.06 to 0.15 and the results were compared with the values
+published in references 1 to 3. For the NACA 6-series airfoils the agreement was
+generally within 5 x 10 -5 chord. The NACA 6A-series airfoils show differences of as
+much as 3.5 x 10 -4 chord near the leading edge, but from about x/c = 0.10 to
+x/c = 0.95 the accuracy is about the same as for the 6-series. A plot showing a com-
+parison of the present method with published ordinates for the first 0.05 chord of an
+NACA 64A-015 airfoil is shown in figure 10. This is the case of poorest agreement found
+in the comparisons made. The equations for the airfoil geometry dictate that the trailing-
+edge thickness be zero; however, the 6A-series have a finite trailing-edge thickness.
+The best result for these airfoils can be obtained by using the ordinate and slope at
+x/c = 0.95 and extrapolating to the trailing edge.
+
+
+
+--- PDF_PAGE 12 ---
+Card Input Format
+The input to the program is in a card format as follows:
+CARD 1 - Tabulated data title card. Any designation may be used in columns 2 to 80.
+CARD 2 - Airfoil and camber line series designations are as follows:
+NACA airfoil family Card designation* Columns
+9, 1063 -series
+64 -series
+65-series
+66 -series
+67-series
+63A-series
+64A-series
+65A-series
+63
+64
+65
+66
+67
+63A
+64A
+65A
+8, 9, 10
+Camber line Card designation* Columns
+NACA 6-series
+NACA 6A-series
+63
+64
+65
+66
+63A
+64A
+65A
+19, 20
+18, 19, 20
+*These are Hollerith cards; designations must be in exact columns.
+ 8
+
+
+
+--- PDF_PAGE 13 ---
+CARD3 - Airfoil parameter card. (Notethat cards 3 to 6 are in floating point mode.
+Numbers are entered with a decimal point.)
+Description Variable Columns
+TOC 1-10Thickness-chord ratio of airfoil
+(i.e., 0.120)
+Publishedleading-edgeradius may
+be entered if desired (not usedin
+program)
+Model chord usedfor listing ordi-
+nates in dimensional units
+Designlift coefficient (i.e., 0.20);
+set to 0.0 for a symmetrical airfoil
+Meanline chordwise loading (use
+0.8 for 6A-series airfoils)
+Number of meanlines to be summed
+(if only one, leave blank or insert
+1.0)
+LER
+CHD
+CLI
+A
+CMBNMR
+11-20
+21-30
+31-40
+41-50
+51-60
+CARDS 4, 5, and 6 - Up to nine additional mean lines may be summed on these cards.
+These cards are not necessary for only one mean line.
+Des c ription Variable Columnsm
+Design lift for second mean line
+Loading for second mean line
+Design lift for third mean line
+Loading for third mean line
+Design lift for fourth mean line
+Loading for fourth mean line
+Design lift for fifth mean line
+Loading for fifth mean line
+CLI
+A
+CLI
+A
+CLI
+A
+CLI
+A
+i-I0
+II-20
+21-30
+31-40
+41-50
+51-60
+61-70
+71-80
+CARD 7 - Title card for plot of airfoil ordinate.
+columns 1 to 80.
+Any designation may be used in
+
+
+
+--- PDF_PAGE 14 ---
+CONCLUDINGREMARKS
+A computer program has been developed to calculate rapidly the ordinates for air-
+foils of any thickness, thickness distribution, or camber in the NACA 6- and 6A-series.
+The program is included as an appendix to this report. Comparisons of the computer-
+generated ordinates with previously published ordinates for the same airfoil show that
+the agreement is generally within 5 × 10 -5 chord. Exceptions were noted for the leading-
+edge region of the 6A-series airfoils, where differences of as much as 3.5 × 10 -4 chord
+occurred. The program will also produce plots of the airfoil nondimensional ordinates
+and a punch card output of ordinates in the input format of a readily available program
+for determining the pressure distributions of arbitrary airfoils in subsonic potential
+viscous flow.
+Langley Research Center,
+National Aeronautics and Space Administration,
+Hampton, Va., June 25, 1974.
+-- 10
+ 11
+
+
+
+--- PDF_PAGE 15 ---
+APPENDIX
+COMPUTER PROGRAM FOR ORDINATES OF NACA 6- AND
+6A-SERIES AIRFOILS
+The program presented herein is written in the Langley Research Center version of
+FORTRAN IV and has been used on the Control Data series 6000 computer systems. The
+computational program, the basic airfoil parameter subroutine, and the plotting routine
+are presented. In the airfoil program, two subroutines (FTLUP and DIF) are used. The
+first subroutine is used to interpolate between a series of consecutive points using a
+parabolic curve fit, and the second subroutine is used to define the slope at a given point
+in a consecutive series of points. Any standard subroutines which have these capabilities
+can be substituted for those used herein. Also, several unlisted subroutines are used in
+the plotting routine, which is presented as a guide for users. The program requires
+about 730008 storage locations and takes about 20 seconds to compile. Each case takes
+approximately 12 seconds to execute on the Control Data 6400 computer system.
+11
+
+
+
+--- PDF_PAGE 16 ---
+APPENDIX
+00000000000000000000000000_000000000000000
+000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000
+gggggggg °°°°oooogo°°°°°°°°ggggg°ooooooo ogo°°°°8°°°ooo ooogg °oo°°°oo
+0000000000000000000000000 000000000000000
+,,J ",J 'J J LJ :J L) J
+00_0
+0000
+0000
+0000
+0000
+12
+0 009000000'9000
+0 0000_0_000000
+0 0000000000000
+0 .DO00000000000
+OO 0 0_00 ODO 000
+O0 0 0000 000 000
+OO 0 0000 000 000
+
+
+
+--- PDF_PAGE 17 ---
+APPENDIX
+ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo oo ooo ooooooooooooo888 88 8 °0000000000
+0000000000000000000000000000000000000000000
+00000 000
+00000 000
+00000 000
+13
+
+
+
+--- PDF_PAGE 18 ---
+ooooooooooooooooooooooooooooooooooooooooooooooooooo
+oooo_oo_ooo_o_o0000 O0 000 0 0
+00000000000000000
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+°°°_°_°o_°o_o° oO_Oo_oO__0 0000 0
+0000000_000000000000000000
+=
+00_00000000000000000000
+00000000000000000000000
+00000000000_00000000000
+_J_ _
+00_0000
+0000000
+0000000
+14
+!
+
+
+
+--- PDF_PAGE 19 ---
+APPENDIX
+0000000000000000000000000000
+0000000000000000000000000000
+0000000000000000000000000000
+_00000 0000000000 0 0000oooo oooooooooo8  o oooo
+000000000000000
+000000000000000
+000000000000000
+o   oooo8ooooo00 0000 000000
+000000 0000000000000000000000 000000000000000
+,_,o ,o m 4- m m 4-,0 ,0 ,0 ,0 ,_
+"r_ "r _ "r _",r n-
+O0000000
+,-,4 ..4 ,-4 ,-4 ,-4 ,,=_ .-._ ,.4
+I._uJ u_ uJ uJt._wuJ
+b
+0
+&
+W
+Z
+0
+_m_
+Z
+I
+0 _- 0 c£ II
+_ _'_1 --'_ _ 0 "_
+_- Z 4- II _'D
+'.,8,....-I _- 0_'_ _- _- _- II 0
+I'-- II ('f --I Z tl _,,,_ C_ <:[
+0
+u'%
+X
+I
+_ II
+_ II X
+_X_ _Z
+_XX 000
+IIII_Z_O_+
+X _
+) 4 o
+I _
+_--_!I___X_N_II
+0 0 0
+000000000000
+000000000000
+000000000000
+0000000000000000
+0000000000000000
+0000000000000000
+0000 _0000_
+00000000000 0
+00000000000 0
+15
+
+
+
+--- PDF_PAGE 20 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOO
+0000000000000000000000000
+O0
+oo88_gSgg_8888898ggg °°°°°00000
+000000000000000000
+000000000000000000
+OOOOOOOOOOOOOOOOOO
+8_88_ooooo ooo oOOOOO_O O000000
+_ _OOOOOOOOOO_
+OOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOO
+_OOOOOOOOOO_
+"_oS22OOOOOOO
+000<900
+323S33£3SS3C)_O OO OOOO OO
+OOOOO OOOOOO
+16
+_ _ '_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+_ _._ _ ,0_ 0 _N_ ,_ _ _
+O _O OOOOO OO O OO O O O O _ OO
+
+
+
+--- PDF_PAGE 21 ---
+A PPE NDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+O
+ °°°°°°°°°°°oooooo oooo ooooooooooo
+NNN_NNN_NNNNNNNN_NN_N_NNNNNNNNN_NNNNNN_ N NN
+OOOOOOOOOOoOOOOOOOOOOOOOOOOOOOOOOOoOOOOOOoO
+NNNNNNNNNNN_NNNNNNN_NNNNNNNNNNNNNNNNNNNNNNN
+N
+II
+ee
+o
+ _X
+ I _ I
+ O_ _I w
+_ "-- _ _' _ I I '_
+-.J X" "4"<f _ _ • u0 W _['_ • ! <t'--
+I
+$
+u'%
+o4
+(D
++
+_<OO
+>( O
+II II |
+,-_o,j l.L II
+"_I"..4_-.,L.D
+C2 U.)
+I
+O I* O
++ .-* +
+I , I
+N '_ N
+I X * I I
+-- I _ * '
+O * • *O
+I 0.._ 0 I
+_" + I +"*
+e I I r'_ ,
+_D 0[.9 -._C)
+_. _[-X *:gW
+r_ w I ,OON
+I "< I , , I
+ I II II I _ ! I
+II "0 II _ NII II O II I!
+O O
+:'d c,_
+O 04"0
+,.2 O -O P.-
+,-=1 ,.-4,-.i..-i
+,'D :::) ."DO
+C:) ,'900
+
+
+
+--- PDF_PAGE 22 ---
+APPENDIX
+0000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000
+00000000000000000000_0000000000000000000000
+ogooooo o_oooo ooooo_o ooo_8 °°° °ooog gg_gooo o oooo ooo ooo_ _ _oo_°°g0 0000 O0
+00000000000000000000000000000000_ 0000000000
+0000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000
+18
+
+
+
+--- PDF_PAGE 23 ---
+000
+000
+000
+OO
+O--IN
+OOO
+mmm
+APPENDIX
+OOOOOO_OOO_OOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOO_O-- OO OOOO O OOO _ _O O O OO O OO OO O O O OO _ O O O O O_ O O O O O gO O O O O OOOO _ OOOOO
+OOOOOOOO
+OOOOOOOO
+OOOCOOOO
+00000008OOOOOOO
+_.__
+OOOOOOOOO OOO_OOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Lu
+J
+u_J
+J
+J..t"
+,O
+O
+D'-
+O
+h-
+G)
+X
+I
+@
+ N
+eol_
+001111
+III1_ _
+_Z_
+t_
+I" 10 I' I°
+cell
+elee
+Z_
+_J
+0
+ hu
+0 0
+I.--,4" "_ _.- -_ _
+N
+_.DUJ C_l_J I--L_ 4. tL I-- IJ- _--,
+• • II )- !I )- e_ Z_-.I
+UJ
+Z
+,..I
+a_
+LU
+_E
+OO OOO O O O OOOOOOOO OO OOOOOO OOOO
+OOOOOO OOOOOOOOOOOOOOOOOOOOOO
+•.-_ e,J r,_
+O..I ,-..I
+OO O
+OO O
+r_
+Z 0
+ I.-l--
+_- (DO
+J.,0
+2
+I-- u_ -I. _'1 1 '_ )_ _'_
+•1f. "n "11-_ _ I
+Z I _0 -I.tJ I-''-" X
+'_ _ ..j..j u.. ,._
+N NNNN N_
+N N,_NN NN
+O OOOO OO
+O OOOO OO
+19
+
+
+
+--- PDF_PAGE 24 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOO
+OOOOgOOOOOOOOOO_OOOOOOO0000 0000000000 0000000
+000000000000
+u.J
+o.m
+w-u.
+o
+or_
+Oua
+n,
+_u2
+....,co
+)..)< )- l.u0_ _-_ w-*-_ ,-_ ._.J
+"D .,.I-.1 -._ Z __'_ L) k.) ,_ ,..) U_
+0
+20
+OO.OO_ OOOOO
+OOOOO OO_OO
+00000000000000000000
+00000000000000000000
+OOOOOOOOOOOOOOOOOOOO
+oogoooOOOOOOOOOOgO00OO OOOOOOOOOOOOO OOO
+0000000000000000000
+444444444444444<444
+X
+J
+X
+. j
+_'_
+I_ X
+_>O 0 II _
+0
+0
+.J
+X
+U.
+(D
+uO
+II <I
+I.- -.
+e_d 0 ,.i..-_ u.l
+I-- 'D >- _ -. U..
+O C9 _" Uj #.- ,--_,--m-._
+I-.,>_' • 12._ -_ II II II ":_
+11_ _ _
+000000000
+'J 0 ",-) u,) ,D :-..1
+OOOO OO O O OOO O O
+0000 O0 0 0 000 0 0
+g
+0
+,-4
+eO
+,.ILl_"
+_" 4" 4"
+ l
+
+
+
+--- PDF_PAGE 25 ---
+APPENDIX
+D_OOOOOOOOOOOO
+OOOOOOOOOOOOOO
+OOOOOOOOOOOOOO
+o8oo°oo°888_8_O OOOOOO
+OOOOOOOOOOOOOO
+0000
+0000
+0000
+88 °°
+I
+0000
+000
+m.. I-.._.- I_.
+".4 "W ",$e_
+OOOOO
+OOOOO
+21
+
+
+
+--- PDF_PAGE 26 ---
+APPENDIX
+OOOOOOOOOO OO
+OOOOOOOOOOO_
+I I I I I I I I I I I I
+OOOOOOOOOOO
+_0___
+_0000000_0_0
+00000000000000
+O_OOOOOOOOOOO
+I I I I I I I I I I I I I I
+uU O
+U. O
+U. O
+D O
+r_
+O I
+Z Z
+D _n
+.J _--
+Z uU
+iO
+_K OO
+t9 '-_O
+.J
+.,_ I
+-2 _.O _.L_
+_O_O_
+_?_O_QO_ O
+OOOOOOOOOOOO
+OOOOOOOOOO OO
+I I I I I I I I I I I I
+OOO_ OOO O O O O
+OOOO OOO D OO O OO
+000000 O000000
+00_0_0000000_0
+O OOO OO OO O O O OOO
+IIIIIIII
+0000_000
+OODO0000
+IIIIIIII
+IIIIII
+ _Z
+00o000
+00000_
+IIIIII
+IIIIII
+_,__
+ 22
+
+
+
+--- PDF_PAGE 27 ---
+APPENDIX
+OOOOOOOOO
+llllltlll
+XXXX__
+_O000000C
+I I I I I I I I I I
+X
+0
+0000000000
+l I I l I l 1 1 1 1
+_,m__ Z
+_0_0_0_ Z
+0
+l$11111lll
+I--
+ _," Lu
+kl. t.l.
+I--{:) I--C)
+hU
+u_
+3.
+u9
+tU
+O
+U_ O
+"DU%
+23
+
+
+
+--- PDF_PAGE 28 ---
+OQO
+000
+000
+•4" m ,0
+000
+,4"4'.4"
+000
+090D_
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooo oooooooooooooooooooooooooooooooooooooo
+g°°°°°°°°g°°°gggSg88gg888898888ooooooooooo
+OOoOOOOOoOoOOoOOOOOOOOOOOOOOOOO
+OOOOOOOO
+OOOOOoOO
+OOOOOOOO
+ O0000000000000
+00000000
+!
+c
+i
+=
+hU
+_-_
+Z_
+_-r-
+_:JJ
+0 ,,1" I
+..IL)_.,_ t_ _ II .._1 ,,c_
+u"'_ "_ -', _ _" '_ ._,IF,-.,...,.,._/
+)..
+,y-
+t_
+..I
+(.9
+Z
+X O
+u0
+C_ -I-
+_ --_7_ Z-J_.i _._ ,
+"D X >- -_ _ LJ 0 "_9 , ,-_ ,
+24
+r,, o
+• "[. II II 'JJ II II
+r_,--t-- _-. -I- -t. | _ < II _ II _ II II U,-* _- %' G -t. .I- "."
+f3 >( >- >(>., ..J"_' >< >< )'_ X >- >- )- >< >- >_ _,.
+0
+C) 00 ,-_
+0 ,'D 0 .'D
+000 _'B
+0000
+0 .C:, 00
+O_
+_O
+>-
+d" 2 _ =
+g
+XXIIJDII3_3
+_4J_JIl_
+'J _.D '0 ',J ',-)
+OO OOOOOOO OOOO OO O
+OO OO OOOOO OOOOOOO
+O0 0000000 0000000
+OO OOOOOOO _OOOOOO
+O0 _ 0_0 ODOOO
+O0 O0 090 00000
+O0 O0 000 00000
+
+
+
+--- PDF_PAGE 29 ---
+APPENDIX
+OOOOOOOOOOOOOOC
+OOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOO
+OOO OO
+OOOOOOOOOOOOOO$
+X
+U. uJ
+,'3
+OO OO OOO_O
+OO OO OOOOO
+OO OO OOOOO
+t,q ",4
+tkl "xl
+O O
+O_J
+'3C)
+25
+
+
+
+--- PDF_PAGE 30 ---
+APPENDIX
+OOOO
+OoOO
+IIII
+-J
+O.
+r_4
+o
+o
+o
+I
+o
+u,)r_%
+,23
+z LU
+O Z ,..9_
+Z (.9 '-de4
+LLI P'_ ugO
+,_ Z _.. I
+m,"'fl I-- q/J
+_e,J Z
+DO m _--O
+%'%0 U. u')r_
+ X_
+_XX_
+0
+OOOO
+OOOO
+4"
+4"
+ej
+O
+O
+IIIII
+O_O
+OOOOO
+OOOOO
+: 26
+
+
+
+--- PDF_PAGE 31 ---
+0000000
+OO0_O00
+0000000
+O0ooSggg8
+APPENDIX
+ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+o_oo o ooS888988_°°°°°°°888ggSgg °°°OOOOOOO OOO
+OOOOOOO OOOOOooOoOOoooooooOooooooOoOOOooOoo
+Z
+_ cg
+0
+0
+O
+O
+OZ _'-
+On" O
+OD
+÷
+(D_ _1_ _ + _-
+O
+O
+O
+O
+0.
+Z O
+W
+Z
+• rO
+_" <.9
++..I Jo,.. "-_ "'_ <_ ,,_
+/ /_ I OX II II
+I •
+O O
+O O
+F- _--
+II _' II _' "_ U.I X--.
+O OOO_OOOOOOOOOOOOOOOOOOOO _
+O OOOOOOOOO_O_OOOOOOOOOO_O OOOO
+O OOOOOOOOOOOOOOOOOOOOOOOOOOOO
+O OOOOOOOOOOOOOOOOOOOOOOOOOOOO
+9.7
+
+
+
+--- PDF_PAGE 32 ---
+28
+APPENDIX
+OOOOOO
+OOOOOO
+OOOOOO
+OOOOOO
+OOOOOO
+OOOOOO
+OOOOO_
+w
+>-
+_-- LIJ +
+II II D _ _
+0
+OOOOO _
+OOOOOO
+
+
+
+--- PDF_PAGE 33 ---
+APPENDIX
+0000
+0000
+0000
+IIIl
+O _OO
+ OOO_
+O OOOO
+O OOOO
+O OOOO
+I Iltl
+O eq
+O OO_
+O OOOO
+O OOOO
+O OOOO
+I ! I I I
+Z
+w
+-I
+',_9
+Or_
+e£--_
+_-_4
+U. cOO
+_3 V_O
+29
+
+
+
+--- PDF_PAGE 34 ---
+3O
+00
+00
+00
+00
+00
+_0
+O,-w
+u%Lt_
+000
+000
+000
+OOC)
+000
+00000
+,.-, N en .,t u"_
+O 0 C_ c_ C_
+OOQO
+0O00
+0000
+0000
+00OO
+..t- cA ,O r',-
+bm L_ I_ tf_
+0000
+,.OD" O_ O_
+r'_ Q C) 0
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOO_OOOOOOOOOOOOOOOOOOOOOOO
+O_OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+00000000000000000_000000000000000
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOO
+_.b<-) <-_ <..)%.)
+,.-i,-.4
+0
+0."9
+O0
+O0
+•-4 ,-4
+oo
+O0
+O0
+OOOOOOO OOOOOOOOOOOOOOOO
+0
+o ;
+==1
+Z
+"-',Z
+u9 --.,LIJ
+O,<wX
+,--_--IIAJ<[ _L.
+---O _-,X I-
+I-- O -'..C)
+,--I.-4 4J _ Lil
++ -i-u9 >
+ I CU_
+_- _7- _j 'j-_-_ _ Z _
+ 0 (.._ 0 _.J 0 <.,,3 <,.,J tJ
+_0 O0 0 000 0000 00_ 000_ O0 0
+0000 0 000 0000 000 0000 O0 0 0
+OOOO O OOO OOOO OOO OOOO OO O O
+"I ii
+II
+]
+
+
+
+--- PDF_PAGE 35 ---
+APPENDIX
+000000000000000000000000
+000000000000000000000000
+000000000000000000000000
+g°°°°°°°°°°°SgSg88°°°°°°ooooooooooo oooooo
+000000000000000000000000
+0000
+0000
+_000
+0000
+0000
+0000
+ 0 _
+ _ _.
+O0 --0 I _ _t_
+_ _11 0_--_ 011__
+),.
+>-
+l
+.ll
+ II
+II ,-=, uu
+0
+000
+000
+000
+0 0
+ood,
+Z
+0
+0
+l,l.. _
+ill ,.
+_Z
+i..)
+i.- C.J
+l_i
+Z
+0
+i.l_ i.i.i
+C3
+l.IJ l..-
+...i _5
+"ru_
+O...J
+,-, I...-
+"r
+"I-
+i-- .-.i
+ii _ !.l.j
+,-4
+0
+i_.
+00000 0 0 000
+00000 0 0 000
+00000 0 0 000
+NNNNNNNNNNNNN N N
+0000000000000 0 0
+0000000000000 0 0
+31
+
+
+
+--- PDF_PAGE 36 ---
+APPENDIX
+OOOO OO
+_OOO OO
+OOOO OO
+IIII II
+OO
+OOOO OOO
+OOOO OOO
+OOOO OOO
+IIII III
+OO
+G.
+-J
+p-
+U.
+OOO_ OOO
+OOOO OOO
+OOOO OOO
+IIII III
+32
+ I
+
+
+
+--- PDF_PAGE 37 ---
+APPENDIX
+_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooooooooooooooooooooooooooooooooooo
+°°°°°8_8_° ooooooooooooo88888 _°°°ooooo ogOOOOOOOOOOOOO oooo888_88888
+Q
+O. v3
+tlJ_ O.
+..,t_ 0
+:_ -('4
+o_ _.
+uJ
+_-Z
+'.-,(DO
+D __7_
+_3_T
+ug_ _
+OOO_O_O_O_ O_O_O_O_O_ O_O_OOOOO_ O_O_O
+eeeemeeeie lleleilee_ e_eelIeeee e_eel
+tm
+•.OO OO,-_ O_40_ O
+II
+ZII;_CgII2,_
+ e • • • • • qP • • •
+'-O
+I--
+_O 4" O ,ffO_'% O _00m- O,-_ 00 O_0 C) O_ O
+ all • • • e • • • e • _ 0 ae e • • e
+II II
+0. O ,_-O _'%O _ O ,D Or-- e. O z00 O" O _
+ _1 • • O • e e # o • e _ • • e • I
+OO_O_O_O_
+eeee_le_e_
+2
+OOO_O_O_O
+eee_el_eel eeeeeloeee
+O(D_D <9 O O
+OOO O O O
+OOO O O O
+OOO O O O
+33
+
+
+
+--- PDF_PAGE 38 ---
+APPENDIX
+ooooooo_oo_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooo_oooooooooooooooooooooooooooooooooooooooooooo_oo o oo oooooooooooooooooo oggoggggg °°°
+@@@@e le @m • @ @@@ • @ •
+@@@@@ @@_@@@
+34
+L
+
+
+
+--- PDF_PAGE 39 ---
+APPENDIX
+OOOOOOOOOOOO
+OOOOOOOOOOOO
+OOOOOOOOOOOO
+OOOOOOOOO_OOOOOOOOOO O
+_OOOOO
+00 •
+N_ON
+O_OOO_
+eOeeoe
+_NO_O
+_OOOOO
+O_OOO_O
+ON_a_O# _llll
+eoeooemO_
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+35
+
+
+
+--- PDF_PAGE 40 ---
+APPENDIX
+O00000000000000000000000000000000000000000
+000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000
+_000_800000000000_000000000000000000000 000 00000000000 000000000000000000000
+000_0_0_0_ O_O_O_O_O_ 0_0_0_0_0_ 0_0_0
+Ooeeeeeeee eeegeeeoee o#eoe|_eeg eeoee
+==
+=
+Z
+O, ..J
+_WLt%
+O_a.
+_D ',.,0 _,0
+eeeeeoeeee
+eeo_eeee_e_
+_ _ '_ ,_ _ 0 _ _ _ _ _
+eaeooeeelo
+-0 .... ,'D _0 _D _0
+!1
+2
+;gg_g
+4. _.eX,01,.. O_
+eerie
+36
+ li
+
+
+
+--- PDF_PAGE 41 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+O O O _D
+O O "D ,'D
+O O (9 _')
+O O (D O
+O O O O
+37
+
+
+
+--- PDF_PAGE 42 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOO
+38
+_N_ _ 0_ _ _ _ O__ON_O
+0000_0 _0 _ONO _0 _0 _0_0 _0_ O00
+eeeeoe • ee
+00000_
+OOOO_O
+@eeee@
+_OOOO,O
+eeeeee
+ ICI21CC  
+O_ONO_O_O_
+II N N N N N !|
+_ 2
+E -
+_'DNONO _O _O_
+U% u'%
+O O
+O O
+'9 O
+O O
+O O
+O0_ON_N_
+_0__0_ _
+__0_
+0_0_0_0_00
+_O_ O _O_O_ O
+eee@eeee_e
+O_O_O _ O_,_OO
+O
+• • • @
+.,.,I
+CI
+..,..I
+O-I"
+Oc_
+m4 ..
+-_,-4
+4-um
+,O "
+c,4:_4
+-_"9
+,-4 -_
+I --
+O%
+u_ --_
+II _-
+ _ Z
+_OO90
+OOOOO
+OOOOO
+OOOOO
+
+
+
+--- PDF_PAGE 43 ---
+APPENDIX
+000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000
+OOOOOOOOOOOOO_OOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOCOOOOOOOOO_OOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OO_O_O_O_O _O_O_O_O_ O
+e_t_llet91 el_lelelll
+_O_O_OOO_O _O_O_
+. . . . . ..... . ....
+,-4
+m4
+v
+ rn
+ ..J
+a. uO
+I u9 -'_
+a. a. ,-_
+_,LUO
+.3. ,.o,J
+/.J-.-,_.j
+O.'rT
+o.o.
+u
+_-,OO
+_ u,_u9
+X .L,,,JLU
+Ooo_o_o_O_ O_O_O_O_o_ O_O_OOOOO_ O_O_O
+39
+
+
+
+--- PDF_PAGE 44 ---
+APPENDIX
+ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+oooogoooooooooooooooooooooooooooooo_ooo_o_o0000 000000000000000000000000000000 000 0 0
+eeeoe eeooo4eeee 9oeooeeeeg ogeeeeoeee eeoc
+' ' " ' ' ' ' ' _ "_ "_ ' 2
+%
+'_'_ _2"_'_'_'2'
+0" ",f
+0-,t"
+.2
+•4" ,04" 4" o'_ 0%,-_.-. ,00
+- N
+N -..J
+.......... _ • _ o _ , _ • _ • _ • _ •
+F-- F--
+ O
+40
+
+
+
+--- PDF_PAGE 45 ---
+APPENDIX
+OOO O OOO O OOOO
+OOOOOOOO(D_OO
+OOO O O O(D O O OOO
+(D_O O O OO (D O O OOO O OOOOOOOO
+_ _ 0_ 0_ _ (_
+_:0c0_0 c00O _0 _0 c0 a0 _ ¢0
+2Cl;_I
+_OOOOO
+ '_ ._ •
+O0- O O O,-_
+NNN@NN
+N_O_Q
+_OOOOO
+0_000_
+_00
+eeeeteoO_
+oOOOO
+OOOOO
+OOOOO
+OOOOO
+41
+
+
+
+--- PDF_PAGE 46 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+o  gooo ooooooooo oooooooooo ooooo oo gooo0 000 000000000 0000000000 00000 O0 000
+eeeeeeeeee eeeeeeeeee eeeeeeeeo_ ooeee
+000_0_0_0_ O_ONO_O_O_ O_O_O_O_O_ 0_0_0
+eeeoeee_ee eeeeeeeeee eeeeeeeeee oeeee
+i,. A
+e,, _,,)
+<_u.J
+w_
+,--,0
+oz
+w
+ II
+_J,--,
+ ,,,.
+_,,..-,,
+LLI ,-,,,,_
+.-,,_
+,,-,_ ..,,j
+,.X", ,J',
+m,,I I_.
+r_ ,..
+'_ ,,,,..
+.J
+._m'_
+U,J <:[
+I_.t3
+II lI II
+9IlOOllIlI_tIlItIIltl_IItIIlIIIl_IIttt
+0 _ _
+42
+
+
+
+--- PDF_PAGE 47 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_oooooooooooooooooooooooooooo
+ooog_oooo_oooooooooo_oo8oooooooo8_8ooooo_o _OOO OOOO OOOOOOOOOOOOO OOOOOOOO OOOOO O
+O_OOO OOO___ O_O O _O_O_O_O_O _O_O_O_O_O _O_O
+_O_OO O_O_O_O_O_ O_O_O_O_O_
+Oe_e eeeeeeeeoO ooo_eeooeo
+00_ 0_O
+,O ._ 0S ,._
+two e_
+o0 _ OO
+,-4
+00 o4,O m4_ ,., O00 ,00 _ _'3_%
+O.-_4. _,'_00 _- 0Om4 00OU'% _.-,-_
+O OO O._ O e40 e40 :e_O m4
+2 ..."
+_°-°7°_°2°2_
+2 2
+E -
+4"Lm U'%_0 'O
+O0 _ 0'90
+,.-4
+_OO_O_ONO_O--
+_@eee_oee_
+O_O_O_O_O_ O_O_
+eeeeee_ee@ e|ee
+eoeoe_%eoe_ooeo
+2
+u%U% u%O ,0 U% ,00 _ 0 u$
+_ 0D 40,O e,_ _0 _ O 4- r
+:,4u'% _ O o40 _- 0 r,'%0 0
+O O _00 _- O m- O 0o O _
+e • • • • I I I • t
+r-_
+O_
+_O_O
+t_% u% U.% u'%
+O O O O
+(D O O O
+O O O O
+O O O O
+O O O O
+43
+
+
+
+--- PDF_PAGE 48 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+8ooooooo8_oooooooo8_ooooooooooooo 0000000 00000000 0000000000000
+.J
+oa.
+.,i-u_
+u_e4
+cqc,_
+u,%.-,
+Z_
+m_
+"2
+q_
+U. --I
+_LLZ
+.-_ ,y
+.'_Z ,_ .xl Z
+,-.-4
+C
+"4
+44
+0 0
+O O
+O O
+"D O
+O O
+OOOOO
+OOOO<D
+OOOOO
+OOOOO
+
+
+
+--- PDF_PAGE 49 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo°ooooooooooooooo°ooooo°o=oooooooo°oooooo
+ooo8_8oooooo_o o °°°8°0°° o o oooo oooooooSo°ooo oooo_S °oooo°°°8_8_8gS °°ooOO O
+ooooooooooooo°ooooooooooo°o°oo °ooooooooao
+Omeeeeoeee eoeeeee#ee eoeeeeeeel eoe_e
+muu_
+La_ e',4
+ Q II
+_lJ ,,,,1
+_ E9 C_ _
+_ u_ u0 _
+O_Z
+x['LI _/_ "4
+II II II
+• e • _ • • • i • o _11 i o o e # q_ o i • e _[J • e • • _ • • • • e IIt • • _ • •
+E E "
+< "X 4
+"D O c_
+OOO o O O
+OOO O O O
+OOO O "D O
+OOO O O O
+OOO O O O
+45
+
+
+
+--- PDF_PAGE 50 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+00000000000000000000000000000000000000000000
+o_Ooo_ooooooooooooooooooo ooo oooooooooooooo_8_°°°_ °ooo o
+_21C; ji
+_0_00 O_
+oetet oe lel_eleeee eeeo
+eM
+48
+u'% u'% u'% Lt%
+O O O O
+O O O O
+O O O _O
+O O O O
+O O .'D (D
+
+
+
+--- PDF_PAGE 51 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo°°°°°°°°
+ooo_o_o_ooooo_oooooooooo8_oooooooOOO O O OOOOOOOOOOOOOOOO OOOOOOO
+0,,O O O OO OOO O O,.._,.,,.,.,_ ,.4,..4.,,-_ ,-d,.._o4 0,4o4 o4_'4",,I e,4 r',4N_ _ _ _"
+0000_0 mOmO_O_O_O _0_0_0_000
+• '_ '_ "_ '_'_ '_' i '_ 'J'_ 'J' _ '_
+_OOO_
+OOO_O_
+O000.-_ 0 (D
+2
+O0000.-4 a.
+¢0 .._ I'.- .00 .'_ ..I
+OO u'%'9 ,.-_O T
+,..._ Or, .O (_, ,',4 0", a.
+O"D O O .-._ O _
+0_0_0_0_0_ 0
+._ ._ ,_ ._ ,_ .
+_DB_e_l_e
+0_0_0_0_0_
+_0__0
+eeD_lee_*
+2 _
+___0
+#
+_'4'4'4'4'4o
+ O_
+__0_0_0_112
+_O_O OO_O_
+_e|oetB_ee_
+IH
+&
+0
+N
+u'%
+O
+O
+O
+O
+O
+tm
+O
+O
+O
+O
+O
+OO_N
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+4'7
+
+
+
+--- PDF_PAGE 52 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000
+000000000000000000 000O00000000000000000_ 0
+"% II 11 II II
+.-._ - -." 2 2
+ozz d ..................................
+48
+
+
+
+--- PDF_PAGE 53 ---
+APPENDIX
+0_000 00_0_0_0_0 _0_0_0_0_ 0 _0_0_0_0_0 _0_0
+_'% u0, /% u'%
+o 0 0 0
+o (D 0 0
+0 0 0 o
+0 0 _ o 0
+C) 0 0 o
+49
+
+
+
+--- PDF_PAGE 54 ---
+APPENDIX
+0000 O0 ..._ Oe, JO e'Q 0 en 0.4- 0 ur_Ou"_ 0,00 cO 000
+ _ _ _ d '_ _ '_ _ '_ '_ "_ '_'
+0_0_0_0_0_
+0_0_0_0_0_
+eeeee_eee_
+• ee •
+oeeeeeegoe
+W
+..,I
+e,
+c_
+_0_0,00_0_000 _
+_eeeeeoeeeee _
+_-_ _ _ _ _ _
+0
+0
+0
+0
+0
+0
+0 00000
+0 00000
+0 00000
+0 00000
+5O
+
+
+
+--- PDF_PAGE 55 ---
+APPENDIX
+000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000
+oooooooooooooooooooooooooooooo ooooooooooo
+ ooooooooooooooooo oo o  8 ooo ooooooo8ooo 00000000000000000 0000 000 0000000 000
+%
+ekp ,
+ C_ II..,I _.._
+C_. _ _.
+•_ './.I 0 oO
+4) ,.egO.
+O. ,'-' C_ ,_
+0.. O. C_
+_U -J
+Z_ Z.-_
+0 _0__ _ ___ __ON_ __
+000_0_0_0_ 0_0_0_0_0_ 0_0_00000_ 0 _0 0
+oeeooeeeoe eeeeooeeee eoeeoeeeee eoeee
+0000_0_0_0
+eeeeeeeeee
+000_0_0_0_
+0
+0000_0_0_0
+u'% u'% u% _ U'% I/%
+000 0 0 0
+000 0 0 0
+000 0 0 0
+000 0 0 0
+000 0 0 0
+51
+
+
+
+--- PDF_PAGE 56 ---
+APPENDIX
+O000000000000000000000000000000000000000000
+O0 O0000 O00000000000000000000000000000 O00000
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+oo°888°°°° _ ooooooooo88_88 88ooooo8_888888 °°°°°°°°°°ooooooooooOOO
+0_0_0_0_0_ 0_0_
+#ee
+2
+_O____
+#ee#o_oeee_eeeo
+52
+u'% ,2% _'% Lm
+O O O O
+O O O O
+O O O O
+O O O O
+O <9 O O
+
+
+
+--- PDF_PAGE 57 ---
+APPENDIX
+000000000000
+000000000000
+000000000000
+8_88_88_8
+_o_
+_OOOOO
+ '_ ._ .
+_00000
+0_00_0
+'_'_'_d _-
+!__O_ IIII
+0
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+53
+
+
+
+--- PDF_PAGE 58 ---
+APPENDIX
+oooooooooooo_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_oooooooooooooooooo
+OOOOO OOOOOo OOO OOOOOOOOOO OOO
+o o o _o o_o_o_o_o_ o_o_oeellIe_ell #_lelIl_II ll_II
+_U% 4- _- 0_ ,_ O0_.- ,0 aS U%_ 0_ m40 O .-_ _0 .-_ .-_O en O _ 0_ o00 _ 0_.-_ or,-
+ _ II II II II
+_1_ .,"_ "-_ LU _ e • • • I _ • e e Hn • • (l e e • * ! e eL_J (o (b e O qP e q) e • eAJJ
+fD ,_,._jZ _ , , o , , ...... . , . , , , , . , o . o , , , o . ,
+_O_O
+O_O_O
+eetee
+teeee
+54
+u_ u'%u% u'% u% Lm
+OOO O O O
+OOO O O O
+OOO O O O
+OOO O O O
+OOO O O O
+
+
+
+--- PDF_PAGE 59 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+ooooooooooooo_o_ooooooooooooo_ooooooooooooooooooooooooooooooooooooooooooo6oooooooooooo
+o oooooooooS888S_8_SSooooo ooooo8_8_S oooo°°°°° ooooo_S_88g °°°°
+O0' O oO OO _O--,or_O _ O _O-_'O 4"O _O u_O ,00 _'_ _,-00,00 O O O oo0 (7, 0
+•' '_"' " '-:'i '" '._
+eeeeo eeeeeeeele eeeee|leoe eeteeeeeee eeoe
+_oeeo_eeoeoeeoee_oeQ|oOeoee_ooeeeo0oeo_eoee
+2 _ 2 :
+oo o_ _ __ _oo - o_ o_o.o_ _ O_
+'" ' '_ '_ 'I "_ '_ "_ "_ '_ '_ 'I '_'_ "I "_ '_ "_ "C '_
+: : Z .
+E - E -
+eeee
+ ut% u'% u%
+O O O O
+O O O O
+O O O O
+O O O O
+O O O O
+55
+
+
+
+--- PDF_PAGE 60 ---
+APPENDIX
+oooooooooooooo_ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ooo oooSS_8888_88_g88
+OOOO_O _O_O_O_O_O _O_O_O_OOO
+d'_ '_' d '_ "4 '_ '_' _ '_ 'd 'd '_"
+OoOo _,-_ Oc,40_ _D_ O ,8"O,,T o _O,0Oh- O0_ O. -,
+" ' ' ' " ' ' ' '_ 'r_
+,-4
+I 2
+'_ " e_ "_ ' ' " ' '_ ' ' ' ...... '
+4",0_
+0, _J _m
+(mOo
+,-4 _4
+o_0_
+4"_-O
+,O -_ ,0
+ooo
+•-a_q -D
+_0-0 4"
+(7'O0
+t_
+_J
+.J
+,O OO.
+eg _ .,
+O tmc,4
+m4_4
+,._'3
+¢'%O ,-au9
+e/_O et_
+,'O _'%U.;
+_0 I .-"
+o_r
+.._u'% , -J
+_a
+O r
+C_
+"9
+.J
+u. Z
+of
+-JD
+_,J 0_ LU
+N
+56
+'3 O
+O O
+O O
+O O
+O O
+O DOOO
+OOOOO
+OOOOO
+OOOOO
+ri
+
+
+
+--- PDF_PAGE 61 ---
+APPENDIX
+• • . . . . . . . . . . o • . . . . . . . . . . . .-- .-- . -- .-- • .
+O("4
+w_a
+.'Z%Z
+¢K u_ ,-w.J
+¢L T[ 1" ---
+LU ..J
+'DT__Z
+_ t_tU _
+0 • • _ • • 0 0 • #
+ooeoeeeo#e
+O0 __ • _
+ • . • • , • • , . ._ , , , • , ,...._-
+It It _ ,-I It
+ • e • • | • 9 I • IJ_ • 0 0 • O _ • I I OI_
+- "3 "2
+.,, .............. __._.
+ "3
+_O_
+0ett#
+u% u'%u% ,/'% u'% u%
+OOO O O O
+OOO O O O
+O OO O 9 O
+OOO O O O
+OOO O <D O
+57
+
+
+
+--- PDF_PAGE 62 ---
+APPEND_
+oooooooooooooooooooooooooooooooooooooooooooooo_oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+oggooooogooooooo_ooooooooooSooo_oooooooooooO OOOOO OOOOOOO OOOOOOOOOO OOO OOOOOOOOOOO
+00 O,0 ,0 _
+_ O' 0, _,-4"
+oD_-_ N rW
+_ m'%_ e%l u'%
+_--_,-_0', --0
+-..,,I"..-4 4".--,
+• . _ ' . _ ' . _ ' . _ ' . _ ' " _ "_ ' _ "_ ' _
+_'_'_'_'_'_'_'Z'4"_'_
+2 2 2
+. . . . . . , . _.
+O 40 40 U%O,O Of'- O 0_O 00
+.._-00 O_ 00 o% m- _"- ,_ _4 .-,4" 00 _ W"
+ _ _ _ _ _ 4
+0 _Jo_
+• • @ • • @ • @ • • _i. • @ • •
+_ _ __ _ _ 0
+4"i '4"_'i'<_ '_ "
+,58
+ I
+
+
+
+--- PDF_PAGE 63 ---
+APPENDIX
+OOOOOOOOOOOO
+OOOOOOOOOOOO
+OOOOOOOOOOOO
+OOOOOOOOOOOO
+OOOOOOOOOOOO
+_O_O
+_O_O@O
+@OOOOO
+O_OOO_
+_'i i i
+Ci_ggC _=
+_OOOOO
+m
+g
+O_O_O_O
+oeooo-o 2
+O_
+_2gggg2g
+OO_O00_
+e_eeoe_O
+W
+D
+Z_
+OLU__
+,J :'_"LU
+O
+OO_N
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+59
+
+
+
+--- PDF_PAGE 64 ---
+APPENDIX
+000000000000000000 O000000000000000000000 O0
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OO8_8OOO O O OOOOOOOOOOOOO_OOOOOOO OOOOOOoooooooooooooooo ooooooo8oooooo888 °O
+• eoegeeeeo eeeeeeeeee eeeeeeeeee eeeee
+ w
+=_-%
+a.__J
+S._T
+tU
+"_00
+ • (_ • • • • • 0 • • L'_ • • e • 0 • 0 • • e I.E% • • • • • • • • • e,__,- • • • • •
+II II tl _!
+_- • • • e ql e • e • e_&. e • • e • • q) e • e e_ o • e • • q_ • ql e e C_I. • o o • •
+- " N E
+ • • e • • e • • • • q_ • e • e • • o • • • • • # e • i e • • • q) • •
+I,,,- ),,- F-,- I--
+6O
+OOO O "9 O
+OO'D O O 'D
+OOO C) O O
+OOO O O O
+OO(D O "9 O
+
+
+
+--- PDF_PAGE 65 ---
+APPENDIX
+lille eteeelllll OlllOllele eleeetoooo leel
+O O O O
+O '9 O O
+O O "9 O
+O O O O
+O O O O
+61
+
+
+
+--- PDF_PAGE 66 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooooo
+4 _ 4 _ _ _ _ _ ''''' .....
+,.J
+&...f
+('%1
+v,
+I,-4
+o.
+.,J
+1-.
+L.I.
+.-,I
+--J
+u_
+_Z
+_-_
+_u_Z
+_I
+O
+_f% u'%
+O O
+O O
+O O
+O O
+O O
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+ B2
+
+
+
+--- PDF_PAGE 67 ---
+APPENDIX
+000000000000000000000000000000000000000000
+O0 O0 O0 O0 O0 O00 O0 O0 O000 O000000-0 _000 O0 O000 O00
+00000000000000000000000000000_000000000000
+tit t
+@oe|eeoeeO e@@ee
+U'% U'% _ U'% _ U'%
+000 0 0 0
+000 0 0 0
+000 0 0 0
+000 0 0 0
+000 0 0 0
+63
+
+
+
+--- PDF_PAGE 68 ---
+APPENDIX
+ooooo0ooooooooooooooooooooooooooooooooooooo
+ooooooooooooooooooooooooooooooooooooooooooo
+oooooooo0oooooooooooooooooooooooooooooooooo
+ooo_oooooooooooooooooooooooooooooo_ooooooooooo ooooooooooooooooooooooQooooooo oooooooo
+64
+
+
+
+--- PDF_PAGE 69 ---
+APPENDIX
+OOOOOO OO O OOO
+OOOOOOOOOOOO
+OOOOOOO_O_OO
+OOOOOOOO
+P'-_ u'%,-_4"O
+0%O,._O0_ O
+(7'OOOO0
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+65
+
+
+
+--- PDF_PAGE 70 ---
+APPENDIX
+OOOOOOOOOOOOOOOoOOOOoOoOOOOOOooOOOOoOOOooo
+OOOOOOOOOOOOooooOOOOOOOOoOOOOoOOOOoOoOOoOO
+OOOOOOOOOOOOoOOOOOOOOOOOOOOOOooooOOOoOoOOo
+O0000000000000000000000000000C_O0000000000
+OOOOOOOOOOOOoOOOOOOOOOOOOOOOOoOOOOOOOOOOOO
+eeeoleeeee eeeOe_eoeo @@@moeeeee @elee
+oe@eeee@ee eoe_eeooe@ #eeeeeeooe eeeeo
+O_u9
+,O--
+u'),-_
+a.T
+ill
+ZZ
+" <.D
+OX
+u_D
+_ N,._ _ oO _. _ _. _ _I-_.__I- _._ 0"__._-m_,_ m'_ _" _ (__ o_% _._.- (_%_ _'_I_- N N c_I_- _J ,-_N _ _ 0_
+_ _-',@ @ I) @ q) • @ @ @ • oN • @ @ • @ • @ • @ @ _% • @ @ • • • • • • Pu_" • • • @ •
+r_ , tl " gl
+m_
+_'_'__'% 0 @ @ • @ • @ • • • _U. @ • @ @ 0 @ @ • • e0. • • • • • @ @ • • _'_ @ @ @ •
+_-' - 2 2
+ e @ • • • @ @ • o • • • • @ • @ @ @ • @ e e • • • e • • • • • • • • •
+F-,
+U'% U'% _F% !0, _ U'%
+000 0 0 0
+000 0 0 0
+000 0 0 0
+000 0 0 0
+OC) O (9 0 0
+66
+
+
+
+--- PDF_PAGE 71 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOO_OOOOOOOOOO_OOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO_OOOOOOOOOOOO
+00000000000000000000000000000_0000000000000
+0000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000
+_I.-_ _% 0,,4-,4-,'_ _o-'_O _'%,-_ O OO I_-
+0_.-_ 4"O0_ O,,_ O0,0' u50 ' O O, um _0
+• . . .. .. • . .. . . . . .
+U'% u% _ tm
+0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0
+67
+
+
+
+--- PDF_PAGE 72 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+oooooooooooooooooooooo_ooooo_oo_oo0000000000000000000000 00000 O0 O0
+0000_0 _0_0_0_0_0 _0_0_0_000
+ . _ . _ • _' . _' ......_ _ _ , _ o_ . _ ._ ._ •
+88
+0 0 DO_
+0 0 00_00
+0 0 _00_
+0 0 00000
+
+
+
+--- PDF_PAGE 73 ---
+APPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=ooooooo
+oo_sooooooooo ooooooo_ °°°ooo88_8_°°°8_8°°°°°°°ooo ooooooo_ooo°°°_°o
+#_N_@_NN_ _ M_O@_#_N_ N_N_NO_4#_ #0_
+_0__ _N__ __ __ __
+@9@@@@@@@@ _@@@@@@@@@ @@@@@@@@e@ @@@g@
+L_4
+(%J ..
+•--. (D J!
+J-_ ..j,--d
+cz%'_.
+12% ,,eq_
+,.n,-_ C_ ,,
+IU ...i
+gz,2, :u<_
+• • O • @ @ • • O ON @ e, e • • @ 5J • • eoL_
+• @ • @ • @ @ • • e _t. • @ @ @ • @ @. @ @ e_.
+g. o.
+Q _
+N -
+_- F--
+ <_
+• • • • • • @ @ @ • _ @ • • • •
+e@eoee@|@@_
+__°_...
+Ccii_
+oee@@
+69
+
+
+
+--- PDF_PAGE 74 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOCOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+0000000000000000000000000000000000000000000
+.'_N 4"h-,O
+.00" O m- N
+...: '_,
+_u'% _0 u'% 4"'-._
+• e @ • • _'%
+•-4 •
+2
+- _:'%4" _'-O'_-J
+_O_ ON_ _-'_
+_0"0
+...Or...
+_0 u'%
+ICCJ_III
+'@@00@o@0
+ '_ ._._ .- ._,
+.% um_ 0"3.., _- .0.._ 0', O "b
+,.f% .-_ ,f,, .0 u'_, _ u,% "_0 _ 4""-,
+@ o • • • @ @ • • • _'%
+2
+_0 u%,Ou,_ _ 4" ,O,,+N -_" h- o_
+• • • • @ O @ @ @ O @ @ @
+A
+.:'.:'_:': .- ._,- .-
+• e • @ • • • • • • _. • e •
+o|@|@@@ e_ee
+•. ,. .. ,_,- .- .
+@ @ • @ • @ • _ • • • @
+• .4 ,-_ .-4 _ o. _ --4
+. . . ...... ........ . . . . . ............
+7O
+ u% u'% u'%
+O O O O
+O O O O
+(3 O O O
+O O O O
+O O O O
+ II
+
+
+
+--- PDF_PAGE 75 ---
+APPENDIX
+ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_oooooooo0ooooo000o0o0ooooooooo06o_00o000
+o oooo_oooo oo_o ooooooooooo_o_8oooo 0000800 o_oooooooooooo_
+__ _ __ _0000000000000000000
+0_00_0 _0_0_0_0_0 _0_0_0_000
+_Z
+OLu_
+o4
+:3
+u'%
+o
+o
+o
+0
+0
+u'%
+0
+0
+o
+0
+0
+_0_
+OO_N_
+o0_oo
+o00oo
+00000
+00000
+71
+
+
+
+--- PDF_PAGE 76 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOO_OOOOOOOOOOOOOOOOOOOOOO
+O_ OOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOO_OOOOOOOOOOOOOOOOOO_OOOOOOOOOOOOOOOO
+ooooooo88_88_8888oo88°oooooooo°oooooo8o°o OO OOOOOOOOOOOOOOOO OOOOOOOO_O
+oooooooo_ oo o o ooooooo ooooo oo o oo o
+_ee_eeeeee eceeeeeeee eeeeeeeeee eeeee
+ _..,,-.4 • • • # • e • • e et%4 • • • • • • • • • 0 h"% • • • • • • e m • e_'- • • _i • •0 !I I II II
+i -
+.._ -'_ _ _i. • • • (, e _ e • at, e _. • e e • e • • _ e 0_. • • • e • • • • • el__ _ • • • •
+_2
+
+
+
+--- PDF_PAGE 77 ---
+APPENDIX
+ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooooooooooooooooooooooooooooooooooo
+oooooo888o0oo0oo0 ooooo oooooo_oooooo oooooooo_ooooo8_oooooo 8S88 °°°°°°°ooooooo
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO_
+_NNNNN_N_NNNN_NN_NN_N_N_NNNNN_NNN_N_N
+..... ' "' " ' " '" ' ' ' " ' ' .... ' " _ "_ '_ "i "_ ' i '_ "
+73
+
+
+
+--- PDF_PAGE 78 ---
+APPENDIX
+0000000000000000000000000000000000
+0000000000000000000000000000_00000
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+O OOOOOOOO OOOOOOO OOOO O_O OOO
+_'_'_' _ "_ '4 "_ "_' _ '_ '_'_ '_'
+_4
+u'% U_
+O O
+O O
+O O
+O O
+O O
+_j
+_Z
+_ :u _.'__
+r_
+OOOOO
+OOOOO
+OOOOO
+O_OOO
+
+
+
+--- PDF_PAGE 79 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOOOOOOOOO_OO_OOOOOOO_OO
+O0000000000000000000000000000000000000CO00
+O OOOOOOOOOOOOOOOOOOOOOO OOOOOOO OO OO
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'_ _ _ _
+•-_ u'%
+r%l ,.
+_. ug.-_..,J
+"0 ,. ".4 u'_
+u') --_ C_ ,,
+u.I _J
+_ CD CD -r
+• • e • • • • • • o L'%_ • • • • O • • • e i) L,I_
+#_ I1
+• e o • • • • o e o_. e • • • • • e e e e_.
+"2 -
+" N
+0 .4- ,0 _,',C: P,.,O 0,-_ e,4,.-,.O 4-_14-_-- ,._,._ aO _ _
+e._ o o • • g • _ $ • • o o • • • • e e o
+F..- I--
+2
+eeeeeeeooe_
+. . . . . .. .. .
+eeeee
+eemoe
+OOO O O O
+OOO O O O
+00(9 O O O
+OOO O O O
+OOC) O O O
+75
+
+
+
+--- PDF_PAGE 80 ---
+PPENDIX
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo_ooooooooo_oooooooooooooooooooooooooooooooooooooooooooooo
+oo_oooo8oooooooooooooooooooooooooo_ooooooooO0 0000 00000000000000000000000000 00000000
+0_' u'%.-_ 0
+_000 ,0 aO Lm
+" 'i ""
+te i i ! ,--I
+,.-.4 II
+2
+c,,,lCr_ 0 e_ g, ..,I
+I I • I I
+• • le •
+_0 _ 0_0 _0 _
+u ,,_ <..) _T (D u'% O ,O ¢.._ r,- u0
+• I I • e • I I I • _-
+O4 m4 r_ c_ _q
+M 
+_ _- r_ _- _- _.-- ,_D ,0 P2%-.a -_
+:"%0 _-"D um 0 .%0 00 _
+,X
+"D
+_'_.-aU'% 0
+_4 .-_.._ 0_
+0 000 _0
+o4 m4
+_0_
+lltt
+_'- "D -00
+70
+
+
+
+--- PDF_PAGE 81 ---
+APPENDIX
+OOOOOOOOOOOO
+O_OOOOOOOOOO
+OOOOOOOOOOOO
+88_8888_88 °0
+NNNNNNN_N_N_
+NNNNNNNNNNNN
+eno..d O O_O
+_OoOoO
+CII2::
+_OOOOO
+0
+q
+• • • • • • O 0 _ _
+0
+OOOOO
+OOOOO
+OOOOO
+OOOOO
+77
+
+
+
+--- PDF_PAGE 82 ---
+APPENDIX
+OOOOOOOOOOOOOOOOOOOOOOOOO_OOOOOOOOOOOOOOOO
+O_OOOOOOOOOOOOOOOOOOOOOOOOOOO_ OOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOO_OO_O_OOOO_OGC_OOOOOO
+o_goooooogog_gSoooooo_ooooogoooooooooogog _OO OOOOOO O OOOOOOOOOOOO OOOO OOOOOO O
+eeeeeoeeee eoeeeeeeeo eeOeOeeeee eeeee
+_'.--%
+"rug_
+tu
+Z_Z
+:D u_ u_
+:o_["2
+z_
+_8
+
+
+
+--- PDF_PAGE 83 ---
+APPENDIX
+0000000000000000000000000000000000000000000
+00000000000000000_000000000_0000000_0000000
+0000000000000000000000000000000000000000000
+ooOOO o o o oooo_o ooo o_oooooo8_ °. 0 0 0 0
+ I _ "_ 'i '_ " _ "_ '' ''" '' " ' ' ' . _ _ _ _ _ _' _'Z'
+e@oeeee@
+eOOeOeeOe_ eoee
+@eemoeoee@ coo@
+u'% u'% _ u'%
+0 0 0 0
+0 0 0 "_
+0 0 0 0
+0 0 0 0
+0 0 0 0
+';9
+
+
+
+--- PDF_PAGE 84 ---
+APPENDIX
+00000000000000000000000000_0000000
+0000000000000000000000000000000000
+O00000000000000000000000000000CO00
+O,--00,.-.,,._,-0 ,-._,.-,_1,-._ e,_,-_"_O,,_- 0 U'_ 0 ,00 ,00 _00 (D 0
+N '_ " _ " d e_l ' _ 'd °_ " _" ' " ' ' ' " ' ''_ _ _
+=
+t.u
+0
+e_
+8O
+0 0
+0 "D
+0 "D
+0 0
+'D 0
+
+
+
+--- PDF_PAGE 85 ---
+REFERENCES
+1. Abbott, Ira H.; Von Doenhoff, Albert E.; and Stivers, Louis S., Jr.: Summary of Air-
+foil Data. NACA Rep. 824, 1945. (Supersedes NACA WR L-560.)
+2. Abbott, Ira H.; and Von Doenhoff, Albert E.: Theory of Wing Sections. Dover Publ.,
+Inc., c.1959.
+3. Loftin. Laurence K., Jr. : Theoretical and Experimental Data for a Number of NACA
+6A-Series Airfoil Sections. NACA Rep. 903, 1948. (Supersedes NACA TN 1368.)
+4. Robinson, Frank: Increasing Tail Rotor Thrust and Comments on Other Yaw Control
+Devices. J. Amer. Helicopter Soc., vol. 15, no. 4, Oct. 1970, pp. 46-52.
+5. Patterson, Elizabeth W.; and Braslow, Albert L.: Ordinates and Theoretical
+Pressure-Distribution Data for NACA 6- and 6A-Series Airfoil Sections With
+Thicknesses From 2 to 21 and From 2 to 15 Percent Chord, Respectively. NASA
+TR R-84, 1961. (Supersedes NACA TN 4322.)
+6. Kinsey, Don W.; and Bowers, Douglas L.: A Computerized Procedure To Obtain
+the Coordinates and Section Characteristics of NACA Designated Airfoils.
+AFFDL-TR-71-87, U.S. Air Force, Nov. 1971.
+7. Theodorsen, Theodore: Theory of Wing Sections of Arbitrary Shape. NACA Rep. 411,
+1931.
+8. Von Doenhoff, Albert E.; Stivers, Louis S., Jr.; and O'Conner, James M.: Low-
+Speed Tests of Five NACA 66-Series Airfoils Having Mean Lines Designed To Give
+High Critical Mach Numbers. NACA TN 1276, 1947.
+9. Stevens, W. A.; Goradia, S. H.; and Braden, J.A.: Mathematical Model for Two-
+Dimensional Multi-Component Airfoils in Viscous Flow. NASA CR-1843, 1971.
+81
+
+
+
+--- PDF_PAGE 86 ---
+_)
+o
+o
+O0
+0
+0
+0
+0
+0
+i
+&T
+0
+0
+0
+0
+0
+tl
+uJ 01_- P'- _
+ 0 ._ _r O_
+0000_0_
+000 . • J •
+N 000.-+
+I ,-400
+_" • _' I II II |1 II
+_D 0,'__
+0_
+O_
+0"
+r_
+0
+>.
+00000000(_0000000
+0
+00000000000_0000
+0000000000000_00
+0000000000000000
+0000000000 __
+0 00_000000000000
+82
+
+
+
+--- PDF_PAGE 87 ---
+>.
+o ooooo oooooooogog __
+0000000000000000000000000000000000000000000
+_oooooooo_ooo_oooooooooo_oooo_oo_oooo_o_o 00000000 000 0000000000 0000 O0 0000 0 0
+000000000000000000000000000000000000000 _
+eeeoeeeeeooo_oe_eoeeeeeeoo_iee_eeeeoOeOeeee
+X
+0
+)-
+X
+)-
+c_
+O000000000000000000000000000000000000000000
+0_0_0_ 0_0_0_0_0_0_ 0_0_0_0_0_ 0_0_0_00000_000
+0
+83
+
+
+
+--- PDF_PAGE 88 ---
+)-
+e_oeeeeeoeeeeeoeegoeooeOoee|eeooeeoooeeeeoe
+X
+00000000000000000000000000000 00000000000000
+00000000000000 000000000 000000 00000000000000
+00000000000000000000000000000 00000000000000
+0000000000000000000000000000000000000000000
+oeeoeoeeeooeeeoeeeoeeeeeeeeoooeoe_oe_oeeee
+0 _ O000000000 O0 r2000 O00"_ 0 O0 O0 O0 O0 _0000 O00 O000
+000000000000000000000000000000000_000000000
+O_ 0_0_0_0_0_ 0_0_0_ 0_0 _0_000 00000000_00000
+84
+
+
+
+--- PDF_PAGE 89 ---
+>.
+0000000000 O'DO000000000000000 000000 000000000
+0000000 000 000000000 000000000000 000 000000000
+0000000 000 000000000000000000 000000 000000000
+0000000000 000000000 000000000 000_00000000000
+ _0_ _ _ __ 0__ _ _ _0_ _00_
+ I" I' I' I" J" I" _" I J I" I" I i" I" I' I' I" I' I" 10 I" I" I" I" I" I" I' I I" I" I I" _0 I" I" I I" f I"
+ _0_0_0_ 0_ _0 __ _ 0_ _ _0 _0 _ _ _ _0_
+ 00_0000 000 0000000000000000 O0 00_ ___
+I I I I I I I I I I I I I i I I I I I I I I I I I I I J I J I I
+,%
+:-c
+0000000000 00000000000(_ 0000 O0 000000 O00000000
+0000 _00000 000000000000 _000 O0000 000 000000000
+0000000000 0000000000000000000000000_0000000
+00 O0 _ c) o 000 0 O0000000 _ O(O 000000 O00 O00 O000000 O0
+85
+
+
+
+--- PDF_PAGE 90 ---
+)-
+X
+OoOoOo OOO ooOoOoOOO OOOOOOOOO OOoO
+OOO OOO OOO ooOoOOO OO OOOOOOOOOOOOO
+000 000 0000000000000000000000000
+000 000 000 000000000 0000000000000
+0_ _0 _ _O_N_O _ N_O_O_ _N_O
+X _ _ _O _ _ O_ _ _ _ _ __O_ _ON_
+ _O_N_N_N_O_O_N_ _
+@ • • • * @ • @ • • • I@ I I I" I I' I" #" I" l" I I" I' I I' I ! I' I I" # I" l I" I' I I' I I" I" I"
+)-
+86
+
+
+
+--- PDF_PAGE 91 ---
+_r3
+0
+0
+0
+0
+I
+<g
+Z
+o
+o
+o
+11;
+o
+o
+o
+o
+_ o _- r.- 0
+QO0 • • • •
+rD Q O .,_
+ooo
+¢ e • II II II II
+_O0_ N_
+IIII1|1111
+O0_NNNNNNNNN_
+OlJllllllllllllllll
+0
+0000 0 000000
+_o_ _ _ ooo
+0
+_0_ _
+I_I* I'" I' I' I' Ie I' I
+_oooo_ I|IIIIIII|
+_ O_N
+0000 0000
+ooooo _oo_0000000000
+00o0_0000
+000000o00 oeoe Iiee
+0
+0
+<)
+0
+r".
+I!
+o
+U f_.
+rMp..
+_,,,I V_ ../ .=1U,_
+U_
+.._ t- LU
+I_j E3 i_. II
+1.- C3 V1
+U.. Z
+E3 w" _-_ Q
+Z _- _--
+ ULU
+k-UJ
+_0_0
+ 011
+oooo ...... :ooo_ N000o_oooo oooo o_
+0
+_000_
+_ooo _Sg_ _oooo
+01!
+_°® o_ _
+_000 O000_Ou
+0
+0000000000_--_ • oo _o_ _oooo
+87
+
+
+
+--- PDF_PAGE 92 ---
+IIIillllllllllltlll;lllllll|llltllllltlltlllllllllIIIIII
+_e_o,_ .a _ o_ _ ._ ,o ,_ _ 0o _o _0 _ o _,_ _ _ _ 0 i o_'_ _ •_0 _ _ ,o _ _o_
+,_ _"_O o e_ _ _'__ _t__ O h" O_ _ ,._'_"_ O" _" O O _ ,_"_ .._00 ,_. _-_ _ ,_ e_ e_ _ _ _ _ _0 _ _0 _--O,00_ _' ,_ _ 0_,_,,t .-_,--__'
+N_0 _ _,_ _ _ ''_"_"
+ooo oooogo _ gg ., oOOO ooooo OOOOO OOOO O OOOO_ OOOO O O O O.._ ,-_ .N ,._ ,-_
+•-1 I ! I I I I I I I I I I I ! I I I ! I I t I I I I I I I I I I I i I I I I I I I I I I I I I I I I I I I I I I I
+o_
+I I I I I l I I I I I I I I I I I ! ! I t I I I I t I I I t I I I I I I I I I I I I I I I I I I I I t I I I I I
+ OO _OO
+....... _ .... o.ooo _ ..............eeoe • e_ooe • • _ee •
+OOOO OOOO
+eOeelleeeeeeeleelloee leleoe • 9tglelee6el llIe
+_ooooo.oooo _oooooooooo_ooo _ o;ooooooooo_gooooo g• Oil lilt tllll Ii I _ IlltllIllelle loll" t/
+O
+__ooo ooo oo ooo ooo_o_oooo ooo oooo oooo_ _oo_oo_ooooooo
+oooooo_OOOO
+OOOOo OO ............ O0i_eeel IIee iee i_eo_ioeo_I • • •
+88
+
+
+
+--- PDF_PAGE 93 ---
+OOOOOOOO OOO_!z_ gg ggsIIIIIIOIIglIO Ill I!tlltll
+illllllllllllllllllllllll
+ Ie i° ' Il i° t t • i' i' _" I' I' i' t' J' _" u" _" o' I o' ne _" _" _" _ o' o o" _' ; o' oe u' ue o"
+_= _.__ .___._. .=.: _. _._._._._.___
+uJ
+'Oo ••Oleo OOOOoOoOoOOOOOO OOOOOOOOO O•
+I' II II I" I" I' I I' I_ I I I_ I" I° I I I" Ie II I_ l" I° I" II I"|e I• le |l It iI le le • |t le je
+ON
+tO0
+e eel le eeltlg|lleleee
+ooooo_ O000
+eollieeleeloll
+;_:_o-_o_
+el it_ • •Ie I ! I" I Ie I Ie I Ie Ie Ie I!
+llll'l
+O0000000000000
+I I • • |lIe II I I Ie Ie I' I" I I I° Ie Ie
+ellllOel elite
+O000
+lllllllt
+OU%P- I-'%0
+OO(_
+I I" I' / I" Ie• I° I|
+el• eel
+I' Ie I• I' I' I• I• Il
+tell •0,
+OO0 _ O_moOo
+glelell le • elliot ee|l
+i I I I
+.............. _.
+_o_ _=_
+= ____O_3--_N___e... . ,., .
+oooo_ _O00
+eeeeeeeleeloee
+e',•tll 1" •
+lifo eel
+_:_o®_
+leeeoeee
+Itllllll
+NNN_el, lit0
+_o:_;o_
+C_
+_ OooOOOOOoOoOOO 0°0oooo o°_o°o°°_°o °°°°°° ooooooo ooooooooo_oo ooo oooo ooo oo_°_ °°° ,_oo oooIll leo O• lie o•oO
+_oo_ooo oo oooooo ooooooooo ooo°o°°°o°[_o°°o°o° o°_o°°o°°°° o_oooO°oOOO o°ooo°o°o oOoleO• o_'J OIl
+ •.-:-: ._ .... _._..... _............................ _._._......
+89
+
+
+
+--- PDF_PAGE 94 ---
+.... _ , .
+.,.-i ._00 _'_ ,,00 ,0 ,,t,
+o.o o. oo o oo . . .__
+)
+i_ i_ i_ ' I_
+0000 0000 0000
+I lltlltltllllllttll
+IIII1_
+oooo oOooo _ oOoO............. __
+IIIIIIIIIIII
+oo_
+o00
+000000o
+iI iI iI iIiI _ ie
+_ _°°°
+ooo oooo_oooOo
+000 000000o0000000
+I_l|lllllltlll_ltl_l
+I ! !
+e,i ,,_, i.- _ _- ,-_ _o o _ .-_ r,- _ _o_
+............... 0:.:
+IIIIIIIIIlll|ll
+2_._. _._........
+m4,
+IIIIIIIIIIIIIIIt111_
+_NO _
+_tlI Illl _tllt*ltl
+oooooooo_o_ " ooooleeeeeeeeee e4le
+oo_oo OOOO 0000 _00 O0
+90
+0
+ O00OO00000OO0000000000000000000000O
+_O00OO0000000_OOO0_O00_O00000000000_
+ooooooooo ooo oooooO_ooOO o_oooooo
+ 000
+OOO 00000
+ _e_oeeoeee_e_eil._eeee_oeeeeeee_
+
+
+
+--- PDF_PAGE 95 ---
+z- plane
+II
+z -plane
+z =ae _o+i¢
+!
+ : e(_-¢,o) + i (8-,f)Z
+, +iez =ae'/'
+a 2
+ -- Z'+
+_ Z
+X
+_=x+iy
+Figure 1.- Illustration of transformations used to derive airfoils and calculate
+pressure distribution. (From ref. 1.)
+91
+
+
+
+--- PDF_PAGE 96 ---
+z
+C:)
+I
+o
+c_J
+.F--.a
+c_
+I
+:::r
+(.o
+(I
+(..)
+It...i
+o
+>-
+o-)
+c_
+c:)
+I
+::j-,
+(.D
+(..)
+rr"7 l
+(..)
+>-
+.r-(
+o
+!
+,<
+(.o
+c::)
+c:)
+(.o
+(._)
+(3:
+o
+o,i.-4
+o
+,.c:
+I
+o.,-I
+.F-q
+c_
+_>
+I
+c_
+92
+
+
+
+--- PDF_PAGE 97 ---
+.=I
+I
+0
+X
+0
+I
+Z I I _k,L/
+I
+U
+>-
+v=.
+X
+,.,4
+,r=q
+0
+o_.-i
+!
+I
+0
+0
+0.-i
+I
+ej_
+Z
+I
+_4
+_ g0 '_"q
+tD
+II
+93
+
+
+
+--- PDF_PAGE 98 ---
+L
+!
+C_m •
+q_
+m_
+x
+c_J
+o
+I
+L_
+c.o
+a_
+cJ
+(I
+z I c_
+!
+u
+C_f
+_U
+Q
+_o
+!
+C_J
+o
+I
+(.J
+z
+g4
+
+
+
+--- PDF_PAGE 99 ---
+U
+C_
+..q
+C_J
+LS_
+CD
+Z I
+n
+m
+!
+U
+X
+q_w
+q_C_
+C_J
+(.D
+Z I o
+°_i
+0
+.v-i
+!
+C_
+!
+T-f
+O
+r_
+C_
+!
+!
+C_J _
+CO
+C_
+Z
+95
+
+
+
+--- PDF_PAGE 100 ---
+I
+0
+m •
+0
+v-i
+!
+0
+_R
+X
+p_
+I
+_D
+tT
+U
+a:
+Z
+u
+___.u x
+01-1
+o
+,M
+0
+0l,-I
+I
+0
+I-i
+I
+,ir,-I
+,i-ii
+I"4
+I
+Z
+I-i
+o
+0
+0r-I
+o
+0
+0
+g
+o
+0
+%
+I i
+_ ,_4tD
+96
+
+
+
+--- PDF_PAGE 101 ---
+!
+U
+oi •
+m_
+n_
+X
+m_
+II
+Od
+I
+Z_
+U
+ Z
+\\
+, \J !
+(.2
+rj
+Im
+uUI_
+X
+C3
+1;
+t"r
+O,I
+/' _D
+_ Z
+\
+I
+i
+m,
+0
+!
+0
+X
+_4
+0
+ 0
+._,
+I
+(..)
+Z0
+97
+
+
+
+--- PDF_PAGE 102 ---
+(:3 C_
+C:)
+I
+t,J
+>-
+_, C3
+i!
+CE
+C)
+-J
+U
+(J
+>-
+¢_.)
+_ 98
+
+
+
+--- PDF_PAGE 103 ---
+.,-, _ I
+-- ,e..V. X
+c)
+o
+II
+o
+II
+J
+t....)
+Z
+J
+n.-
+laJ
+n_
+E
+U.I
+W
+I
+!
+o
+II
+n-
+o
+II
+d
+W
+Z
+J
+n_
+Ld
+m
+E
+o-
+W
+bJ
+I I
+I
+w
+__@O
+D
+0
+E
+QO
+0
+II
+0
+I!
+J
+t,...3
+W
+Z
+J
+i"I,.."
+W
+E
+t,..J,
+bJ
+I'I,.-
+W
+I
+(I
+°1-.I
+0
+f,..,
+,,-.,I
+I
+!
+e.D
+r_
+Z
+0
+I
+99
+
+
+
+--- PDF_PAGE 104 ---
+I 0
+o
+>-
+c3
+_r3
+LO
+l
+o
+II
+CE
+_3
+I
+II
+___ _J
+L)
+(_) _-,
+-- _x ii
+XO2
+II
+_J
+bJ
+_ m Z
+11
+Z
+I_U
+--_ tr)
+Lul
+W
+t_
+I
+tD
+IJJ
+Z
+if3
+o C.I .--, o
+!
+o
+II
+II
+o
+II
+_J
+cJ
+m •
+m:
+w
+_m. Z
+_J
+z
+IM
+E
+w_. tr)
+w
+tlA
+u'J
+I
+tD
+m_ E3
+I,I
+Z
+rn
+C3
+co U
+I
+(_J
+opl
+II
+C£_ m
+0o
+c3 _0
+I I
+II
+uo j
+cJ
+o 0f4_
+--J N
+_ m Z
+Z O
+ u
+_. to M
+r_
+ g
+,
+r-i
+Z
+E
+I
+100
+
+
+
+--- PDF_PAGE 105 ---
+r
+! I
+ J
+r i • l
+/
+ )
+_PO ......
+,-I-- -
+i
+i
+i
+o o o o o
+o
+ 0
+0
+ o
+0 _
+(D
+._--I
+ 0
+0 (1)
+NASA-Langley, 1974 L-9558 101
+
+
+
+--- PDF_PAGE 106 ---

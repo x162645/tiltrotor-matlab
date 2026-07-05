@@ -7,6 +7,7 @@ addpath(rootDir);
 addpath(fullfile(rootDir,'model'));
 addpath(fullfile(rootDir,'analysis'));
 addpath(fullfile(rootDir,'tests'));
+addpath(fullfile(rootDir,'tests','wing_full_angle'));
 
 P = params_nominal();
 d2r = pi/180;
@@ -30,6 +31,21 @@ run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
+run_test('wing legacy dispatch identity', @test_wing_legacy_identity);
+run_test('wing full-angle strip model', @test_wing_full_angle_model);
+run_test('wing full-angle multidim lookup', @test_wing_full_angle_lookup_multidim);
+run_test('wing full-angle control surface', @test_wing_full_angle_control_surface);
+run_test('wing wake strip mechanics', @test_wake_strip_model);
+run_test('TM88373 graph digitization', @test_tm88373_graph_digitization);
+run_test('bridge sensitivity audit', @test_bridge_sensitivity_audit);
+run_test('control-surface aileron audit', @test_control_surface_aileron_audit);
+run_test('full-angle trim point schema', @test_full_angle_trim_point_schema);
+run_test('full-angle trim envelope resumable', @test_full_angle_trim_envelope_resumable);
+run_test('full-angle trim envelope resume', @test_full_angle_trim_envelope_resume);
+run_test('full-angle trim envelope no placeholder rows', @test_full_angle_trim_envelope_no_placeholder_rows);
+run_test('full-angle trim envelope actual execution', @test_full_angle_trim_envelope_actual_execution);
+run_test('full-angle trim envelope mode definitions', @test_full_angle_trim_envelope_mode_definitions);
+run_test('full-angle trim envelope legacy/full-angle pairing', @test_full_angle_trim_envelope_legacy_full_angle_pairing);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
 run_test('linearization finite values', @test_linearization);
@@ -179,6 +195,96 @@ fprintf('All passed: %d\n',summary.allPassed);
         wingBlendReport = check_wing_normal_flow_blend();
         assert(wingBlendReport.allPassed, ...
             'Wing near-normal blend continuity has failed items.');
+    end
+
+
+    function test_wing_legacy_identity()
+        legacyReport = check_wing_legacy_identity();
+        assert(legacyReport.allPassed, ...
+            'Wing legacy dispatch identity check failed.');
+    end
+
+    function test_wing_full_angle_model()
+        fullAngleReport = check_wing_full_angle_model();
+        assert(fullAngleReport.allPassed, ...
+            'Wing full-angle strip-model check failed.');
+    end
+
+    function test_wing_full_angle_lookup_multidim()
+        lookupReport = check_wing_full_angle_lookup_multidim();
+        assert(lookupReport.allPassed, ...
+            'Wing full-angle multidimensional lookup check failed.');
+    end
+
+    function test_wing_full_angle_control_surface()
+        controlSurfaceReport = check_wing_full_angle_control_surface();
+        assert(controlSurfaceReport.allPassed, ...
+            'Wing full-angle control-surface audit failed.');
+    end
+
+    function test_wake_strip_model()
+        wakeReport = check_wake_strip_model();
+        assert(wakeReport.allPassed, ...
+            'Wing wake strip model check failed.');
+    end
+
+    function test_tm88373_graph_digitization()
+        tmReport = check_tm88373_graph_digitization();
+        assert(tmReport.allPassed, ...
+            'TM88373 graph digitization check failed.');
+    end
+
+    function test_bridge_sensitivity_audit()
+        bridgeReport = check_bridge_sensitivity_audit();
+        assert(bridgeReport.allPassed, ...
+            'Bridge sensitivity audit check failed.');
+    end
+
+    function test_control_surface_aileron_audit()
+        aileronReport = check_control_surface_aileron_audit();
+        assert(aileronReport.allPassed, ...
+            'Control-surface aileron audit check failed.');
+    end
+    function test_full_angle_trim_point_schema()
+        trimPointReport = check_full_angle_trim_point_schema();
+        assert(trimPointReport.allPassed, ...
+            'Full-angle trim point schema check failed.');
+    end
+
+    function test_full_angle_trim_envelope_resumable()
+        resumableReport = check_full_angle_trim_envelope_resumable();
+        assert(resumableReport.allPassed, ...
+            'Full-angle trim envelope resumable check failed.');
+    end
+
+    function test_full_angle_trim_envelope_resume()
+        resumeReport = check_full_angle_trim_envelope_resume();
+        assert(resumeReport.allPassed, ...
+            'Full-angle trim envelope resume check failed.');
+    end
+
+    function test_full_angle_trim_envelope_no_placeholder_rows()
+        noPlaceholderReport = check_full_angle_trim_envelope_no_placeholder_rows();
+        assert(noPlaceholderReport.allPassed, ...
+            'Full-angle trim envelope no-placeholder check failed.');
+    end
+
+    function test_full_angle_trim_envelope_actual_execution()
+        actualReport = check_full_angle_trim_envelope_actual_execution();
+        assert(actualReport.allPassed, ...
+            'Full-angle trim envelope actual-execution check failed.');
+    end
+
+    function test_full_angle_trim_envelope_mode_definitions()
+        modeReport = check_full_angle_trim_envelope_mode_definitions();
+        assert(modeReport.allPassed, ...
+            'Full-angle trim envelope mode-definition check failed.');
+    end
+
+    function test_full_angle_trim_envelope_legacy_full_angle_pairing()
+        pairingReport = check_full_angle_trim_envelope_legacy_full_angle_pairing();
+        assert(pairingReport.allPassed, ...
+            'Full-angle trim envelope legacy/full-angle pairing check failed.');
     end
 
     function test_wing_v2()

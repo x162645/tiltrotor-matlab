@@ -1,0 +1,15 @@
+{
+  "database_id": "wing_full_angle_standard_naca64a223_multidim_v2_20260703",
+  "selected_airfoil": "standard NACA 64A223",
+  "geometry_status": "PDAS_NASA_TM_X_3069_STANDARD_6A",
+  "schema": "CL/CD/Cm=f(alpha,Re,Mach,flap_deg)",
+  "dimension_policy": "multidimensional_linear_Re_Mach_flap_pchip_alpha",
+  "source_limitations": "TM88373 Figure 6a graph digitization; positive deep stall unvalidated",
+  "surrogate_v0_used": false,
+  "grid_out_of_range_policy": "clamp",
+  "flap_interpolation_policy": "plain_flap_family_linear_only",
+  "tm88373_digitization": "TM88373_DIGITIZED_GRAPH",
+  "tm88373_pdf_page": 32,
+  "tm88373_original_page": 28,
+  "tm88373_figure": "Figure 6a"
+}

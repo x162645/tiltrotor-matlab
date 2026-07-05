@@ -1,0 +1,2 @@
+airfoil,point_count,te_gap,max_thickness_ratio,max_thickness_x,leading_edge_closed,self_intersection_check,xfoil_load_test,notes
+NACA 64A223 surrogate,321,0.004819302312447336,0.22999377716310343,0.29673989704927467,True,NOT_PERFORMED,SEE_XFOIL_MANIFEST,Surrogate geometry; AIRFOIL_GEOMETRY gate is PARTIAL.
