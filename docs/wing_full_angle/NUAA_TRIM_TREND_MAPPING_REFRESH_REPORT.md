@@ -1,60 +1,59 @@
-# 南航配平点趋势对照图变量映射翻新报告
+# 南航配平点趋势对照图变量映射翻新报告（owner 修正版）
 
 ## 一句话结论
 
-0° 和 15° 工况中的南航 Vertical pitch 对照变量已从 raw `cyclicLong_deg` 翻新为 `-cyclicLong_deg` 最佳视觉候选。75° 和 90° 工况继续使用 `elevator_deg`，已核查，无需翻新变量定义。本次只影响对照图、CSV 和报告，不影响生产模型。
+本报告原先把 0° 和 15° 的 Vertical pitch 都翻新为 `-cyclicLong_deg` 最佳视觉候选；经 owner 人工复查后，该结论必须修正：
 
-## 为什么要翻新
+- Fig.5(a) 0°：`-cyclicLong_deg` 仍只能作为临时视觉候选，但 owner-visible vertical-pitch / cyclic 曲线仍有明显弯折，不能说 0°最终配平曲线已经完全干净。
+- Fig.6(a) 15°：`-cyclicLong_deg` 与南航截图红线的符号和趋势明显不一致，已否决为 15°主对照变量；Fig.6(a) 当前状态为 `FAIL_OR_UNRESOLVED`。
+- Fig.5(b) 90° 和 Fig.6(b) 75°：继续使用 `elevator_deg`，趋势方向尚可作为截图级人工对照，但不是数字化验模。
 
-- 原对照图直接使用 raw `cyclicLong_deg`，人工审核显示它与南航 Vertical pitch 方向明显相反。
-- 0° common-cause 审计显示 `-cyclicLong_deg` 或等效变量更可能与南航截图一致。
-- 因此本次翻新对照图变量映射，而不是修改模型方程或参数。
+本次更正只修改文档结论与 owner 判读状态，不代表生产模型修复。
 
-## 映射决策表
+## 为什么要更正
 
-| 图 | 南航变量 | 原来使用的程序变量 | 重新核查后的候选 | 最终选择 | 是否翻新 |
-|---|---|---|---|---|---|
-| Fig.5(a) | Vertical pitch | cyclicLong_deg | cyclicLong_deg, cyclicLong_neg_deg, rotor_disk_pitch_deg | cyclicLong_neg_deg | 1 |
-| Fig.6(a) | Vertical pitch | cyclicLong_deg | cyclicLong_deg, cyclicLong_neg_deg, rotor_disk_pitch_deg | cyclicLong_neg_deg | 1 |
-| Fig.5(b) | Elevator | elevator_deg | elevator_deg | elevator_deg | 0 |
-| Fig.6(b) | Elevator | elevator_deg | elevator_deg | elevator_deg | 0 |
+原翻新任务的判断过度依赖 0°的符号修正经验，把 `-cyclicLong_deg` 同时用于 0°和15°。后续人工复查标准入口图后发现：
 
-## 哪些图被翻新
+1. 15°南航 Fig.6(a) 的 Vertical pitch 红线位于负值区，并总体向更负方向变化；
+2. 当前模型的 `-cyclicLong_deg` 在 15°图中为正值并上升；
+3. 因此 Fig.6(a) 的 `-cyclicLong_deg` 不是“未唯一确认的最佳候选”，而是应被否决的候选；
+4. 15°问题不能再被描述为单纯版式问题或轻微映射不确定。
 
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/model_fig5a_beta0_trim_trend_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/compare_fig5a_beta0_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/model_fig5b_beta90_trim_trend_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/compare_fig5b_beta90_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/model_fig6a_beta15_trim_trend_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/compare_fig6a_beta15_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/model_fig6b_beta75_trim_trend_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/compare_fig6b_beta75_refreshed.png`
-- `validation/nuaa_trim_trend_overlay/mapping_refresh/nuaa_trim_trend_overlay_overview_refreshed.png`
+## 修正后的映射/趋势状态表
 
-默认查看入口也已同步重导出到：
-- `validation/nuaa_trim_trend_overlay/model_plots/`
-- `validation/nuaa_trim_trend_overlay/comparison_boards/`
+| 图 | 工况 | 南航变量 | 原翻新结论 | owner 修正结论 | 当前状态 |
+|---|---:|---|---|---|---|
+| Fig.5(a) | 0° | Vertical pitch | 使用 `-cyclicLong_deg` 最佳视觉候选 | 仍可暂作候选，但曲线有明显弯折，0°最终配平曲线未完全干净 | PARTIAL_UNDER_REVIEW |
+| Fig.6(a) | 15° | Vertical pitch | 使用 `-cyclicLong_deg` 最佳视觉候选 | `-cyclicLong_deg` 与南航符号和趋势明显不一致，不能作为主候选 | FAIL_OR_UNRESOLVED |
+| Fig.5(b) | 90° | Elevator | `elevator_deg` | 继续使用 `elevator_deg` | VISUAL_TREND_ACCEPTABLE_ONLY |
+| Fig.6(b) | 75° | Elevator | `elevator_deg` | 继续使用 `elevator_deg` | VISUAL_TREND_ACCEPTABLE_ONLY |
 
-旧标准路径被新图覆盖；带 `_refreshed` 后缀的新图保留在 `mapping_refresh/` 目录中，便于追溯。
+## 当前标准图入口
 
-## 哪些图没改变量定义
+继续以以下标准入口图为人工判读对象：
 
-- Fig.5(b) 90°：已核查，仍使用 `elevator_deg`，无变量定义翻新。
-- Fig.6(b) 75°：已核查，仍使用 `elevator_deg`，无变量定义翻新。
-- 这两张图可以随总览图同步重导出，但变量定义未变。
+- `validation/nuaa_trim_trend_overlay/comparison_boards/nuaa_trim_trend_overlay_overview.png`
+- `validation/nuaa_trim_trend_overlay/comparison_boards/compare_fig5a_beta0.png`
+- `validation/nuaa_trim_trend_overlay/comparison_boards/compare_fig5b_beta90.png`
+- `validation/nuaa_trim_trend_overlay/comparison_boards/compare_fig6a_beta15.png`
+- `validation/nuaa_trim_trend_overlay/comparison_boards/compare_fig6b_beta75.png`
 
-## 这次翻新不代表什么
+但 Fig.6(a) 不得再作为趋势通过证据。
+
+## 这次更正不代表什么
 
 - 不代表模型修复。
 - 不代表生产代码修改。
 - 不代表严格 XV-15 验模。
 - 不代表 full-angle 可以切默认。
+- 不代表 XFLR5 已接入 GUI。
 
 ## 当前人工判断建议
 
-- 重新看 0°、15°图时，应看映射修正版。
-- 75°、90°未改变量定义，可继续看当前标准入口图；若看总览图，则使用刷新后的总览图。
+- 0°：继续保留为 PARTIAL；不要再声称“0°凸起完全消失”。更准确表述是：旧 branchWeight 完整结果混合触发源被移除，但 owner-visible vertical-pitch / cyclic 曲线仍有明显弯折。
+- 15°：判为 FAIL_OR_UNRESOLVED；不能继续使用 `-cyclicLong_deg` 作为主对照变量。
+- 75°/90°：可以说截图级趋势尚可，但不能说严格验模通过。
 
 ## 结论
 
-NUAA_MAPPING_REFRESH_READY
+NUAA_MAPPING_REFRESH_CORRECTED_PARTIAL_WITH_FIG6A_FAIL_OR_UNRESOLVED
