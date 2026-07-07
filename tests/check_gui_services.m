@@ -19,6 +19,7 @@ run_check('trim-point linearization service', @check_linearization);
 run_check('linear response service', @check_response);
 run_check('response waveform timing', @check_response_waveforms);
 run_check('response limit warning', @check_response_limit_warning);
+run_check('experimental nacelle response service', @check_nacelle_response_service);
 run_check('analysis session export', @check_export);
 run_check('application entry points', @check_entry_points);
 
@@ -207,6 +208,12 @@ fprintf('All passed: %d\n',report.allPassed);
         response = simulate_linear_response(linearResult,config,P);
         assert(response.limitWarning, ...
             'Large cyclic command should trigger a control-limit warning.');
+    end
+
+    function check_nacelle_response_service()
+        nacelleReport = check_nacelle_dynamics_gui_service();
+        assert(nacelleReport.allPassed, ...
+            'Experimental nacelle dynamics GUI service checks failed.');
     end
 
     function check_export()

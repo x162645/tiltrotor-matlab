@@ -7,6 +7,7 @@ P = params_nominal();
 trimResult = [];
 linearResult = [];
 responseResult = [];
+nacelleResponseResult = [];
 parameterRows = make_parameter_rows();
 stateNames = {'u','v','w','p','q','r','phi','theta','psi'};
 controlNames = {'collective','diffCollective','cyclicLong', ...
@@ -45,6 +46,7 @@ parameterTab = uitab(mainTabs,'Title','关键参数');
 trimTab = uitab(mainTabs,'Title','配平');
 linearTab = uitab(mainTabs,'Title','线性化与模态');
 responseTab = uitab(mainTabs,'Title','操纵响应');
+nacelleTab = uitab(mainTabs,'Title','短舱动态（实验）');
 
 %% Parameter tab
 parameterLayout = uigridlayout(parameterTab,[2 1]);
@@ -125,7 +127,7 @@ runLinearButton = uibutton(linearTop,'Text','运行线性化', ...
     'Enable','off','FontWeight','bold', ...
     'ButtonPushedFcn',@onRunLinearization);
 linearStatusLabel = uilabel(linearTop,'Text','需要先获得收敛配平点');
-uilabel(linearTop,'Text','A: 9×9，B: 9×7；中心差分步长来自当前参数', ...
+uilabel(linearTop,'Text','A/B 尺寸随当前状态维度变化；中心差分步长来自当前参数', ...
     'HorizontalAlignment','right');
 
 matrixTabs = uitabgroup(linearLayout);
@@ -204,6 +206,67 @@ responseOutputAxes = uiaxes(responsePlotGrid);
 title(responseOutputAxes,'状态响应');
 xlabel(responseOutputAxes,'Time (s)');
 grid(responseOutputAxes,'on');
+
+%% Experimental nacelle dynamics tab
+nacelleLayout = uigridlayout(nacelleTab,[1 2]);
+nacelleLayout.ColumnWidth = {360,'1x'};
+nacelleLayout.Padding = [8 8 8 8];
+
+nacelleInputPanel = uipanel(nacelleLayout,'Title','实验设置');
+nacelleInputGrid = uigridlayout(nacelleInputPanel,[13 2]);
+nacelleInputGrid.RowHeight = [repmat({34},1,10), {42}, {70}, {'1x'}];
+nacelleInputGrid.ColumnWidth = {170,'1x'};
+nacelleInputGrid.Padding = [10 10 10 10];
+
+uilabel(nacelleInputGrid,'Text','启用短舱动态状态');
+nacelleEnableCheck = uicheckbox(nacelleInputGrid,'Value',false,'Text','');
+uilabel(nacelleInputGrid,'Text','代表空速 V (m/s)');
+nacelleVField = uieditfield(nacelleInputGrid,'numeric','Value',70,'Limits',[0 Inf]);
+uilabel(nacelleInputGrid,'Text','初始短舱角 (deg)');
+nacelleInitialBetaField = uieditfield(nacelleInputGrid,'numeric', ...
+    'Value',15,'Limits',[0 90]);
+uilabel(nacelleInputGrid,'Text','目标短舱角 (deg)');
+nacelleCommandBetaField = uieditfield(nacelleInputGrid,'numeric','Value',75);
+uilabel(nacelleInputGrid,'Text','最大短舱角速度 (deg/s)');
+nacelleRateLimitField = uieditfield(nacelleInputGrid,'numeric', ...
+    'Value',8,'Limits',[0.1 Inf]);
+uilabel(nacelleInputGrid,'Text','短舱动态频率 (rad/s)');
+nacelleOmegaField = uieditfield(nacelleInputGrid,'numeric', ...
+    'Value',2.0,'Limits',[0.01 Inf]);
+uilabel(nacelleInputGrid,'Text','短舱阻尼比');
+nacelleZetaField = uieditfield(nacelleInputGrid,'numeric', ...
+    'Value',0.8,'Limits',[0.01 Inf]);
+uilabel(nacelleInputGrid,'Text','仿真时长 (s)');
+nacelleDurationField = uieditfield(nacelleInputGrid,'numeric', ...
+    'Value',6,'Limits',[0.1 60]);
+uilabel(nacelleInputGrid,'Text','输出时间步长 (s)');
+nacelleStepField = uieditfield(nacelleInputGrid,'numeric', ...
+    'Value',0.05,'Limits',[0.001 Inf]);
+runNacelleButton = uibutton(nacelleInputGrid,'Text','运行短舱动态响应', ...
+    'FontWeight','bold','ButtonPushedFcn',@onRunNacelleResponse);
+runNacelleButton.Layout.Column = [1 2];
+nacelleStatusLabel = uilabel(nacelleInputGrid,'Text','默认关闭，尚未运行', ...
+    'HorizontalAlignment','center');
+nacelleStatusLabel.Layout.Column = [1 2];
+nacelleInfoArea = uitextarea(nacelleInputGrid,'Editable','off','Value',{ ...
+    '该功能为实验扩展，默认关闭。启用后模型状态由 9 个增加到 11 个，用于研究短舱角滞后和速率限制。'; ...
+    '响应为开环代表工况，不代表完整转换过程。'});
+nacelleInfoArea.Layout.Column = [1 2];
+
+nacellePlotGrid = uigridlayout(nacelleLayout,[3 1]);
+nacellePlotGrid.RowHeight = {'1x','1x',120};
+nacelleBetaAxes = uiaxes(nacellePlotGrid);
+title(nacelleBetaAxes,'短舱角响应');
+xlabel(nacelleBetaAxes,'Time (s)');
+ylabel(nacelleBetaAxes,'betaM (deg)');
+grid(nacelleBetaAxes,'on');
+nacelleRateAxes = uiaxes(nacellePlotGrid);
+title(nacelleRateAxes,'短舱角速度');
+xlabel(nacelleRateAxes,'Time (s)');
+ylabel(nacelleRateAxes,'deg/s');
+grid(nacelleRateAxes,'on');
+nacelleSummaryTable = uitable(nacellePlotGrid, ...
+    'ColumnName',{'指标','数值'},'RowName',{});
 
 set_status('已载入名义概念参数，请先检查参数或运行配平。','warning');
 
@@ -347,6 +410,39 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         end
     end
 
+    function onRunNacelleResponse(~,~)
+        set_busy(true);
+        cleanup = onCleanup(@() set_busy(false));
+        try
+            config = struct( ...
+                'enableNacelleDynamics',logical(nacelleEnableCheck.Value), ...
+                'V',nacelleVField.Value, ...
+                'initialBetaDeg',nacelleInitialBetaField.Value, ...
+                'commandBetaDeg',nacelleCommandBetaField.Value, ...
+                'rateLimitDegPerSec',nacelleRateLimitField.Value, ...
+                'omega',nacelleOmegaField.Value, ...
+                'zeta',nacelleZetaField.Value, ...
+                'duration',nacelleDurationField.Value, ...
+                'timeStep',nacelleStepField.Value);
+            nacelleResponseResult = run_nacelle_dynamics_response_case(config,P);
+            update_nacelle_response_views();
+            if nacelleResponseResult.enabled
+                nacelleStatusLabel.Text = sprintf( ...
+                    '实验响应完成：状态维度 %d，实际速率限幅 %d', ...
+                    nacelleResponseResult.stateDimension, ...
+                    nacelleResponseResult.rateLimited);
+            else
+                nacelleStatusLabel.Text = sprintf( ...
+                    '已按默认关闭路径运行：状态维度 %d', ...
+                    nacelleResponseResult.stateDimension);
+            end
+            set_status('短舱动态实验响应计算完成。','success');
+        catch ME
+            set_status(ME.message,'error');
+            uialert(fig,ME.message,'短舱动态响应失败');
+        end
+    end
+
     function onResponseDisplayChanged(~,~)
         if ~isempty(responseResult)
             update_response_views();
@@ -365,6 +461,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         session.trim = trimResult;
         session.linearization = linearResult;
         session.response = responseResult;
+        session.nacelleDynamics = nacelleResponseResult;
         try
             save_analysis_case(fullfile(pathName,fileName),session);
             set_status(sprintf('已导出：%s',fullfile(pathName,fileName)),'success');
@@ -377,7 +474,8 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         uialert(fig,sprintf([ ...
             '推荐顺序：\n1. 检查或修改关键参数；\n2. 运行配平；\n' ...
             '3. 在收敛配平点运行线性化；\n4. 设置小幅操纵输入并计算响应。\n\n' ...
-            '响应结果属于配平点附近的小扰动结果。界面不会修改 params_nominal.m。']), ...
+            '响应结果属于配平点附近的小扰动结果。界面不会修改 params_nominal.m。\n' ...
+            '短舱动态页为实验入口，默认关闭。']), ...
             '使用说明');
     end
 
@@ -430,6 +528,41 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         title(eigenAxes,'特征值复平面');
     end
 
+    function update_nacelle_response_views()
+        t = nacelleResponseResult.time;
+        plot(nacelleBetaAxes,t,nacelleResponseResult.betaMDeg,'LineWidth',1.3);
+        hold(nacelleBetaAxes,'on');
+        plot(nacelleBetaAxes,t,nacelleResponseResult.betaMCommandDeg, ...
+            '--','LineWidth',1.1);
+        hold(nacelleBetaAxes,'off');
+        grid(nacelleBetaAxes,'on');
+        title(nacelleBetaAxes,'短舱角响应');
+        ylabel(nacelleBetaAxes,'betaM (deg)');
+        legend(nacelleBetaAxes,{'状态','目标'},'Location','best');
+
+        plot(nacelleRateAxes,t,nacelleResponseResult.betaMDotDegPerSec, ...
+            'LineWidth',1.3);
+        hold(nacelleRateAxes,'on');
+        plot(nacelleRateAxes,t,nacelleResponseResult.qDegPerSec, ...
+            'LineWidth',1.0);
+        hold(nacelleRateAxes,'off');
+        grid(nacelleRateAxes,'on');
+        title(nacelleRateAxes,'短舱角速度与俯仰角速度');
+        ylabel(nacelleRateAxes,'deg/s');
+        legend(nacelleRateAxes,{'d betaM/dt','q'},'Location','best');
+
+        summary = { ...
+            '启用短舱动态状态',logical(nacelleResponseResult.enabled); ...
+            '状态维度',nacelleResponseResult.stateDimension; ...
+            '末端 betaM (deg)',nacelleResponseResult.betaMDeg(end); ...
+            '最大 |d betaM/dt| (deg/s)', ...
+                max(abs(nacelleResponseResult.betaMDotDegPerSec)); ...
+            '末端 theta (deg)',nacelleResponseResult.thetaDeg(end); ...
+            '末端 u (m/s)',nacelleResponseResult.u(end); ...
+            '末端 w (m/s)',nacelleResponseResult.w(end)};
+        nacelleSummaryTable.Data = summary;
+    end
+
     function update_response_views()
         selectedState = find(strcmp(stateNames,responseStateDrop.Value),1);
         selectedControl = responseResult.config.controlChannel;
@@ -480,9 +613,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         bTable.Data = [];
         eigenTable.Data = {};
         responseSummaryTable.Data = {};
+        nacelleResponseResult = [];
+        nacelleStatusLabel.Text = '参数已变化，实验响应结果已失效';
         cla(eigenAxes);
         cla(responseInputAxes);
         cla(responseOutputAxes);
+        cla(nacelleBetaAxes);
+        cla(nacelleRateAxes);
+        nacelleSummaryTable.Data = {};
     end
 
     function set_status(message,kind)
@@ -503,6 +641,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             runTrimButton.Enable = 'off';
             runLinearButton.Enable = 'off';
             runResponseButton.Enable = 'off';
+            runNacelleButton.Enable = 'off';
             drawnow;
         else
             if isvalid(fig)
@@ -514,6 +653,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                 if ~isempty(linearResult) && linearResult.success
                     runResponseButton.Enable = 'on';
                 end
+                runNacelleButton.Enable = 'on';
                 drawnow;
             end
         end

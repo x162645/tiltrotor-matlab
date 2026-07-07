@@ -66,6 +66,28 @@ report = check_nacelle_dynamics_validation();
 
 This check runs a reduced set of cases and does not generate the full plot set.
 
+## Experimental GUI Entry
+
+The GUI exposes the extension only through a separate tab titled
+`短舱动态（实验）`. The checkbox `启用短舱动态状态` defaults to unchecked, so
+the service uses the legacy 9-state path unless the user explicitly opts in.
+
+The GUI tab calls:
+
+```matlab
+run_nacelle_dynamics_response_case(config, P)
+```
+
+With the default unchecked setting, the returned state dimension is 9 and
+`betaM` remains the prescribed static condition. When explicitly checked, the
+service enables the 11-state model and returns `betaM(t)`, actual
+`d(betaM)/dt`, the raw rate state for diagnostics, and representative
+`theta/q/u/w` response quantities.
+
+The GUI text describes the feature as an experimental extension and does not
+claim Berger 51-state reproduction, real conversion-flight validation, XV-15
+flight-test validation, or replacement of the legacy model.
+
 ## Validation Items
 
 The workflow checks:
