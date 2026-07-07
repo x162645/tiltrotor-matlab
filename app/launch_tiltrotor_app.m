@@ -334,6 +334,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                 'timeStep',responseStepField.Value, ...
                 'outputState',find(strcmp(stateNames,responseStateDrop.Value),1));
             responseResult = simulate_linear_response(linearResult,config,P);
+            stateNames = responseResult.stateNames(:).';
             update_response_views();
             if responseResult.limitWarning
                 set_status('响应完成；实际操纵历史触及或越过当前限幅。','warning');
@@ -385,6 +386,11 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     end
 
     function update_trim_tables()
+        stateNames = trimResult.stateNames(:).';
+        responseStateDrop.Items = stateNames;
+        if ~any(strcmp(stateNames, responseStateDrop.Value))
+            responseStateDrop.Value = stateNames{min(8, numel(stateNames))};
+        end
         trimStateTable.Data = make_state_display(trimResult.xTrim,stateNames);
         trimControlTable.Data = make_control_display(trimResult.uTrim,controlNames);
         residual = trimResult.report.residual(:);
@@ -400,6 +406,14 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     end
 
     function update_linearization_views()
+        stateNames = linearResult.stateNames(:).';
+        aTable.ColumnName = stateNames;
+        aTable.RowName = stateNames;
+        bTable.RowName = stateNames;
+        responseStateDrop.Items = stateNames;
+        if ~any(strcmp(stateNames, responseStateDrop.Value))
+            responseStateDrop.Value = stateNames{min(8, numel(stateNames))};
+        end
         aTable.Data = linearResult.A;
         bTable.Data = linearResult.B;
         lambda = linearResult.eigenvalues;
@@ -617,13 +631,14 @@ end
 end
 
 function data = make_state_display(x,stateNames)
-data = cell(9,3);
-for k = 1:9
+nState = numel(x);
+data = cell(nState,3);
+for k = 1:nState
     data{k,1} = stateNames{k};
     if k <= 3
         data{k,2} = x(k);
         data{k,3} = 'm/s';
-    elseif k <= 6
+    elseif k <= 6 || strcmp(stateNames{k}, 'betaM_dot')
         data{k,2} = x(k)*180/pi;
         data{k,3} = 'deg/s';
     else
@@ -647,6 +662,9 @@ if index <= 3
     displayValue = rawValue;
     unit = 'm/s';
 elseif index <= 6
+    displayValue = rawValue*180/pi;
+    unit = 'deg/s';
+elseif index == 11
     displayValue = rawValue*180/pi;
     unit = 'deg/s';
 else

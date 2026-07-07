@@ -92,6 +92,24 @@ P.rotor.wakeFactor     = 1.60;
 % 可选旋翼陀螺项。缺乏可信转动惯量时默认关闭。
 P.rotor.Jpolar         = 0.0;
 
+%% 可选短舱动态状态
+% Phase 1 opt-in quasi-static symmetric nacelle dynamics.
+% Default is disabled, so the legacy 9-state path remains the active model.
+P.nacelleDynamics.enabled = false;
+P.nacelleDynamics.model = 'symmetric_second_order';
+P.nacelleDynamics.betaMinDeg = 0.0;
+P.nacelleDynamics.betaMaxDeg = 90.0;
+% Berger 2019 gives an 8 deg/s nacelle-rate scale; this project keeps the
+% project betaM convention: 0 deg helicopter, 90 deg airplane.
+P.nacelleDynamics.rateLimitDegPerSec = 8.0;
+% ASSUMED_MODEL_PARAMETER: provisional actuator dynamics for Phase 1 only.
+P.nacelleDynamics.omega = 2.0;  % rad/s
+P.nacelleDynamics.zeta = 0.8;
+P.nacelleDynamics.tau = 0.5;    % s, metadata for first-order comparisons
+P.nacelleDynamics.commandDeg = [];
+% NUMERICAL: appended central-difference steps for [betaM; betaM_dot].
+P.nacelleDynamics.linearDx = [1.0e-4; 1.0e-4];
+
 %% 机翼
 P.wing.S               = 18.0;
 P.wing.b               = 10.0;

@@ -384,7 +384,60 @@ or paper-variable mapping.
 - The default legacy/NUAA quasi-static nacelle-angle path must remain
   unchanged.
 
+## Phase 1 Implementation Update
+
+Phase 1 adds an opt-in symmetric nacelle dynamic-state extension. The default
+parameter remains:
+
+```matlab
+P.nacelleDynamics.enabled = false;
+```
+
+Therefore the legacy nonlinear state remains the default:
+
+```matlab
+x = [u v w p q r phi theta psi]'
+```
+
+When explicitly enabled, the active nonlinear state becomes:
+
+```matlab
+x = [u v w p q r phi theta psi betaM betaM_dot]'
+```
+
+The new states use this project's `betaM` convention:
+
+```text
+betaM = 0 deg  -> helicopter mode
+betaM = 90 deg -> airplane mode
+```
+
+The implementation is a quasi-static nacelle dynamic model. `betaM` has a
+second-order lag, angle limits, and an 8 deg/s default rate limit. Existing
+force, moment, mass, CG, inertia, rotor-axis, rotor-hub, and wing slipstream
+calculations are evaluated with the instantaneous state-derived `betaM`.
+
+The first version deliberately does not include:
+
+- `rCG_dot` or `rCG_ddot`;
+- `I_dot*omega`;
+- nacelle gyroscopic or actuation reaction moments;
+- left/right nacelle desynchronization;
+- nacelle torque or PID dynamics;
+- blade modal states;
+- dynamic inflow states;
+- closed-loop flight-control dynamics.
+
+In trim with nacelle dynamics enabled, `condition.betaM` still defines the
+given trim condition. The trim state is initialized as `[legacy9; betaM; 0]`.
+With `P.nacelleDynamics.commandDeg=[]`, the external condition angle is also
+the nacelle command, so the added nacelle derivatives are zero at the trim
+point. This supports linearization about a prescribed nacelle angle, but it
+does not solve a full conversion-process optimal trim.
+
 ## Stop Point
 
-Phase 0 is complete with this audit. Phase 1 implementation should not begin
-until explicitly requested.
+Phase 1 is limited to the opt-in symmetric quasi-static nacelle state
+extension described above. Further Berger-style states, dynamic inflow, blade
+modal dynamics, torque/PID actuation, and left/right independent nacelle
+dynamics remain deferred.

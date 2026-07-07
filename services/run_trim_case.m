@@ -39,9 +39,8 @@ result.uTrim = uTrim(:);
 result.xdot = xdot(:);
 result.report = trimReport;
 result.parameterValidation = parameterReport;
-result.stateNames = {'u';'v';'w';'p';'q';'r';'phi';'theta';'psi'};
-result.stateUnits = {'m/s';'m/s';'m/s';'rad/s';'rad/s';'rad/s'; ...
-    'rad';'rad';'rad'};
+result.stateNames = get_state_names(P);
+result.stateUnits = get_state_units(P);
 result.controlNames = {'collective';'diffCollective';'cyclicLong'; ...
     'diffCyclic';'aileron';'elevator';'rudder'};
 result.controlUnits = repmat({'rad'}, 7, 1);

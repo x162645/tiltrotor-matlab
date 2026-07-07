@@ -1,5 +1,5 @@
 function [xTrim, uTrim, report] = trim_symmetric(V, betaM, P, opts)
-%TRIM_SYMMETRIC Symmetric steady trim for the current 9-state model.
+%TRIM_SYMMETRIC Symmetric steady trim for the current longitudinal closure.
 %
 % Low-speed helicopter-mode trim variables:
 %   z(1) = theta, rad
@@ -110,8 +110,7 @@ report.scaledResidual = scaledResidual;
 report.objectiveResidualCost = scaledResidual.'*scaledResidual;
 report.fullStateDerivative = xdotFull;
 report.fullResidualNorm = norm(xdotFull);
-report.fullResidualLabels = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
-    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
+report.fullResidualLabels = derivative_names(P);
 report.cost = fval;
 report.penalty = penalty;
 report.penaltyBreakdown = penaltyBreakdown;
@@ -214,6 +213,9 @@ report.compatibilityMode = true;
         end
 
         xCandidate = [u; 0; w; 0; 0; 0; 0; theta; 0];
+        if has_nacelle_dynamic_states(P)
+            xCandidate = [xCandidate; betaM; 0];
+        end
         uCandidate = [collective; 0; cyclicLong; 0; 0; 0; 0];
 
         [xd, thisEomOut] = tiltrotor_eom(xCandidate, uCandidate, betaM, P);
@@ -377,6 +379,14 @@ report.compatibilityMode = true;
         scale = params.trim.variableScale(:);
         if numel(scale) ~= 3 || ~is_real_finite(scale) || any(scale <= 0)
             error('P.trim.variableScale must be a finite positive 3-vector in rad.');
+        end
+    end
+
+    function names = derivative_names(params)
+        names = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
+            'rdot'; 'phidot'; 'thetadot'; 'psidot'};
+        if has_nacelle_dynamic_states(params)
+            names = [names; {'betaM_dot'; 'betaM_ddot'}];
         end
     end
 

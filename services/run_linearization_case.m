@@ -62,7 +62,7 @@ result.B = B;
 result.report = linearReport;
 result.trim = trimResult;
 result.parameterValidation = parameterReport;
-result.stateNames = {'u';'v';'w';'p';'q';'r';'phi';'theta';'psi'};
+result.stateNames = get_state_names(P);
 result.controlNames = {'collective';'diffCollective';'cyclicLong'; ...
     'diffCyclic';'aileron';'elevator';'rudder'};
 result.eigenvalues = lambda;

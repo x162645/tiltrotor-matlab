@@ -24,8 +24,7 @@ if definition.compatibilityMode
     return;
 end
 
-derivativeNames = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
-    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
+derivativeNames = derivative_names(P);
 
 nUnknown = numel(definition.unknownNames);
 y0 = ones(nUnknown, 1);
@@ -383,4 +382,12 @@ tf = strcmp(ME.identifier, 'rotor_model_bemt:FlapNotConverged') || ...
     strcmp(ME.identifier, 'rotor_model_bemt:CoupledSolveNotConverged') || ...
     strcmp(ME.identifier, ...
         'pitch_allocation_schedule:InvalidPitchCommand');
+end
+
+function names = derivative_names(P)
+names = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
+    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
+if has_nacelle_dynamic_states(P)
+    names = [names; {'betaM_dot'; 'betaM_ddot'}];
+end
 end

@@ -22,18 +22,29 @@ if ~parameterReport.valid
         parameterReport.summary, strjoin(parameterReport.errors, newline));
 end
 
-config = apply_defaults(config);
-config.waveform = char(config.waveform);
-validate_config(config);
-
 A = linearResult.A;
 B = linearResult.B;
 xTrim = linearResult.trim.xTrim(:);
 uTrim = linearResult.trim.uTrim(:);
-if ~isequal(size(A),[9,9]) || ~isequal(size(B),[9,7]) || ...
-        numel(xTrim) ~= 9 || numel(uTrim) ~= 7
+nState = numel(xTrim);
+if isfield(linearResult, 'stateNames')
+    stateNames = linearResult.stateNames(:);
+else
+    stateNames = get_state_names(P);
+end
+if numel(stateNames) ~= nState
+    stateNames = default_state_names(nState);
+end
+stateUnits = state_units_for_names(stateNames);
+
+config = apply_defaults(config);
+config.waveform = char(config.waveform);
+validate_config(config, nState);
+
+if ~isequal(size(A),[nState,nState]) || ~isequal(size(B),[nState,7]) || ...
+        numel(uTrim) ~= 7
     error('simulate_linear_response:DimensionMismatch', ...
-        'Expected A 9-by-9, B 9-by-7, 9 states, and 7 controls.');
+        'Expected A and B to match the trim state dimension and 7 controls.');
 end
 if ~isreal(A) || ~isreal(B) || any(~isfinite(A(:))) || any(~isfinite(B(:)))
     error('simulate_linear_response:InvalidMatrices', ...
@@ -79,7 +90,7 @@ end
 du(:,config.controlChannel) = signal;
 
 odeOptions = odeset('RelTol',1e-7,'AbsTol',1e-9);
-[timeOut, dx] = ode45(@state_derivative, t, zeros(9,1), odeOptions);
+[timeOut, dx] = ode45(@state_derivative, t, zeros(nState,1), odeOptions);
 if ~isequal(timeOut, t)
     duOut = interp1(t, du, timeOut, interpolationMethod);
 else
@@ -95,9 +106,6 @@ if ~isreal(dx) || ~isreal(xActual) || ~isreal(uActual) || ...
         'Linear response contains complex, NaN, or Inf values.');
 end
 
-stateNames = {'u';'v';'w';'p';'q';'r';'phi';'theta';'psi'};
-stateUnits = {'m/s';'m/s';'m/s';'rad/s';'rad/s';'rad/s'; ...
-    'rad';'rad';'rad'};
 controlNames = {'collective';'diffCollective';'cyclicLong'; ...
     'diffCyclic';'aileron';'elevator';'rudder'};
 selected = dx(:,config.outputState);
@@ -149,7 +157,7 @@ for k = 1:numel(names)
 end
 end
 
-function validate_config(config)
+function validate_config(config, nState)
 if ~(isnumeric(config.controlChannel) && isscalar(config.controlChannel) && ...
         isfinite(config.controlChannel) && config.controlChannel == round(config.controlChannel) && ...
         config.controlChannel >= 1 && config.controlChannel <= 7)
@@ -173,9 +181,9 @@ if config.startTime > config.totalTime
 end
 if ~(isnumeric(config.outputState) && isscalar(config.outputState) && ...
         isfinite(config.outputState) && config.outputState == round(config.outputState) && ...
-        config.outputState >= 1 && config.outputState <= 9)
+        config.outputState >= 1 && config.outputState <= nState)
     error('simulate_linear_response:InvalidOutputState', ...
-        'outputState must be an integer from 1 to 9.');
+        'outputState must be an integer within the active state dimension.');
 end
 end
 
@@ -203,4 +211,25 @@ end
 
 function tf = outside(values, limits)
 tf = any(values < limits(1) | values > limits(2));
+end
+
+function names = default_state_names(nState)
+names = {'u'; 'v'; 'w'; 'p'; 'q'; 'r'; 'phi'; 'theta'; 'psi'};
+if nState == 11
+    names = [names; {'betaM'; 'betaM_dot'}];
+end
+end
+
+function units = state_units_for_names(names)
+units = cell(size(names));
+for k = 1:numel(names)
+    switch names{k}
+        case {'u','v','w'}
+            units{k} = 'm/s';
+        case {'p','q','r','betaM_dot'}
+            units{k} = 'rad/s';
+        otherwise
+            units{k} = 'rad';
+    end
+end
 end

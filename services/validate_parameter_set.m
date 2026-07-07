@@ -49,8 +49,9 @@ check_limits({'control','cyclicLim'}, 'P.control.cyclicLim');
 check_limits({'control','aileronLim'}, 'P.control.aileronLim');
 check_limits({'control','elevatorLim'}, 'P.control.elevatorLim');
 check_limits({'control','rudderLim'}, 'P.control.rudderLim');
-check_positive_vector({'linear','dx'}, 'P.linear.dx', 9);
+check_linear_state_steps();
 check_positive_vector({'linear','du'}, 'P.linear.du', 7);
+check_nacelle_dynamics();
 
 if inertiaMatrixValid
     try
@@ -144,6 +145,95 @@ end
                 all(isfinite(value(:))) && all(value(:) > 0))
             errors{end+1,1} = sprintf('%s must contain %d finite positive values.', ...
                 label, expectedLength);
+        end
+    end
+
+    function check_linear_state_steps()
+        [ok, value] = lookup_value(P, {'linear','dx'});
+        if ~ok
+            errors{end+1,1} = 'Missing parameter linear.dx.';
+            return;
+        end
+        validBase = isnumeric(value) && isreal(value) && ...
+            (numel(value) == 9 || numel(value) == get_state_dimension(P)) && ...
+            all(isfinite(value(:))) && all(value(:) > 0);
+        if ~validBase
+            errors{end+1,1} = ...
+                'P.linear.dx must contain finite positive state steps.';
+            return;
+        end
+        if has_nacelle_dynamic_states(P) && numel(value) == 9
+            [okExtra, extra] = lookup_value(P, {'nacelleDynamics','linearDx'});
+            if ~okExtra || ~(isnumeric(extra) && isreal(extra) && ...
+                    numel(extra) == 2 && all(isfinite(extra(:))) && ...
+                    all(extra(:) > 0))
+                errors{end+1,1} = ['Enabled nacelle dynamics with 9 base ' ...
+                    'linear steps requires positive P.nacelleDynamics.linearDx.'];
+            end
+        end
+    end
+
+    function check_nacelle_dynamics()
+        if ~isfield(P, 'nacelleDynamics')
+            return;
+        end
+        nd = P.nacelleDynamics;
+        if ~isstruct(nd) || ~isscalar(nd)
+            errors{end+1,1} = 'P.nacelleDynamics must be a scalar struct.';
+            return;
+        end
+        if ~isfield(nd, 'enabled') || ~((islogical(nd.enabled) && ...
+                isscalar(nd.enabled)) || (isnumeric(nd.enabled) && ...
+                isreal(nd.enabled) && isscalar(nd.enabled) && ...
+                isfinite(nd.enabled) && (nd.enabled == 0 || nd.enabled == 1)))
+            errors{end+1,1} = ...
+                'P.nacelleDynamics.enabled must be logical or numeric 0/1.';
+        end
+        if ~isfield(nd, 'model') || ...
+                ~(ischar(nd.model) && strcmp(nd.model, 'symmetric_second_order'))
+            errors{end+1,1} = ['P.nacelleDynamics.model must be ' ...
+                '''symmetric_second_order''.'];
+        end
+        check_nd_scalar('betaMinDeg', @(v) v >= 0 && v <= 90);
+        check_nd_scalar('betaMaxDeg', @(v) v >= 0 && v <= 90);
+        if isfield(nd, 'betaMinDeg') && isfield(nd, 'betaMaxDeg') && ...
+                isnumeric(nd.betaMinDeg) && isnumeric(nd.betaMaxDeg) && ...
+                isscalar(nd.betaMinDeg) && isscalar(nd.betaMaxDeg) && ...
+                isfinite(nd.betaMinDeg) && isfinite(nd.betaMaxDeg) && ...
+                nd.betaMinDeg >= nd.betaMaxDeg
+            errors{end+1,1} = ...
+                'P.nacelleDynamics beta limits must satisfy min < max.';
+        end
+        check_nd_scalar('rateLimitDegPerSec', @(v) v > 0);
+        check_nd_scalar('omega', @(v) v > 0);
+        check_nd_scalar('zeta', @(v) v > 0);
+        check_nd_scalar('tau', @(v) v > 0);
+        if ~isfield(nd, 'commandDeg') || ...
+                ~(isempty(nd.commandDeg) || (isnumeric(nd.commandDeg) && ...
+                isreal(nd.commandDeg) && isscalar(nd.commandDeg) && ...
+                isfinite(nd.commandDeg)))
+            errors{end+1,1} = ...
+                'P.nacelleDynamics.commandDeg must be [] or a finite scalar.';
+        end
+        if isfield(nd, 'linearDx') && ~(isnumeric(nd.linearDx) && ...
+                isreal(nd.linearDx) && numel(nd.linearDx) == 2 && ...
+                all(isfinite(nd.linearDx(:))) && all(nd.linearDx(:) > 0))
+            errors{end+1,1} = ...
+                'P.nacelleDynamics.linearDx must be a positive 2-vector.';
+        end
+    end
+
+    function check_nd_scalar(fieldName, predicate)
+        if ~isfield(P.nacelleDynamics, fieldName)
+            errors{end+1,1} = sprintf( ...
+                'Missing parameter P.nacelleDynamics.%s.', fieldName);
+            return;
+        end
+        value = P.nacelleDynamics.(fieldName);
+        if ~(isnumeric(value) && isreal(value) && isscalar(value) && ...
+                isfinite(value) && predicate(value))
+            errors{end+1,1} = sprintf( ...
+                'P.nacelleDynamics.%s is outside its valid range.', fieldName);
         end
     end
 end

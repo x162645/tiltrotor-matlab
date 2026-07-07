@@ -2,15 +2,15 @@ function [x, uCtrl, residual, penalty, xdot, eomOut, allocation] = ...
         evaluate_trim_definition_point(condition, definition, z, P)
 %EVALUATE_TRIM_DEFINITION_POINT Construct and evaluate one trim point.
 % This is the shared physical point path for trim_general and trim
-% credibility diagnostics. State order is [u v w p q r phi theta psi],
+% credibility diagnostics. Base state order is [u v w p q r phi theta psi],
+% optionally followed by [betaM betaM_dot] when nacelle dynamics are enabled.
 % control order is [collective diffCollective cyclicLong diffCyclic
 % aileron elevator rudder], and angular quantities are in rad.
 
-stateNames = {'u'; 'v'; 'w'; 'p'; 'q'; 'r'; 'phi'; 'theta'; 'psi'};
+stateNames = get_state_names(P);
 controlNames = {'collective'; 'diffCollective'; 'cyclicLong'; ...
     'diffCyclic'; 'aileron'; 'elevator'; 'rudder'};
-derivativeNames = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
-    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
+derivativeNames = derivative_names(P);
 
 z = z(:);
 if numel(z) ~= numel(definition.unknownNames)
@@ -18,11 +18,15 @@ if numel(z) ~= numel(definition.unknownNames)
         'z must match definition.unknownNames.');
 end
 
-x = zeros(9,1);
+x = zeros(get_state_dimension(P),1);
 uCtrl = zeros(7,1);
 allocation = struct([]);
 x = apply_named_values(x, stateNames, definition.fixedStates);
 uCtrl = apply_named_values(uCtrl, controlNames, definition.fixedControls);
+if has_nacelle_dynamic_states(P)
+    x(strcmp(stateNames, 'betaM')) = condition.betaM;
+    x(strcmp(stateNames, 'betaM_dot')) = 0;
+end
 
 for i = 1:numel(definition.unknownNames)
     name = definition.unknownNames{i};
@@ -80,5 +84,13 @@ function vector = apply_named_values(vector, names, values)
 fields = fieldnames(values);
 for i = 1:numel(fields)
     vector(strcmp(names, fields{i})) = values.(fields{i});
+end
+end
+
+function names = derivative_names(P)
+names = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; ...
+    'rdot'; 'phidot'; 'thetadot'; 'psidot'};
+if has_nacelle_dynamic_states(P)
+    names = [names; {'betaM_dot'; 'betaM_ddot'}];
 end
 end

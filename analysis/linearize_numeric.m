@@ -7,9 +7,11 @@ ue = ue(:);
 
 nx = numel(xe);
 nu = numel(ue);
+expectedNx = get_state_dimension(P);
 
-if nx ~= 9 || nu ~= 7
-    error('当前模型要求 9 状态、7 控制。');
+if nx ~= expectedNx || nu ~= 7
+    error('linearize_numeric:DimensionMismatch', ...
+        '当前模型要求 %d 状态、7 控制。', expectedNx);
 end
 
 if ~isreal(xe) || ~isreal(ue) || ...
@@ -21,7 +23,7 @@ if ~(isscalar(betaM) && isreal(betaM) && isfinite(betaM))
     error('betaM 必须是有限实数标量。');
 end
 
-dx = P.linear.dx(:);
+dx = state_difference_steps(P, nx);
 du = P.linear.du(:);
 
 if numel(dx) ~= nx || numel(du) ~= nu
@@ -68,4 +70,18 @@ report.dx = dx;
 report.du = du;
 report.finite = isreal(A) && isreal(B) && isreal(f0) && ...
     all(isfinite(A(:))) && all(isfinite(B(:))) && all(isfinite(f0(:)));
+end
+
+function dx = state_difference_steps(P, nx)
+dxBase = P.linear.dx(:);
+if numel(dxBase) == nx
+    dx = dxBase;
+elseif nx == 11 && numel(dxBase) == 9 && ...
+        isfield(P, 'nacelleDynamics') && ...
+        isfield(P.nacelleDynamics, 'linearDx')
+    dx = [dxBase; P.nacelleDynamics.linearDx(:)];
+else
+    error('linearize_numeric:StateStepDimensionMismatch', ...
+        'P.linear.dx size does not match the active state dimension.');
+end
 end
