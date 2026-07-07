@@ -71,12 +71,12 @@ fprintf('All nacelle dynamics GUI service checks passed: %d\n', report.allPassed
         text = fileread(appPath);
         requiredText = ['该功能为实验扩展，默认关闭。启用后模型状态由 9 个增加到 11 个，' ...
             '用于研究短舱角滞后和速率限制。'];
-        assert(~isempty(strfind(text, '短舱动态（实验）')));
-        assert(~isempty(strfind(text, requiredText)));
+        assert(contains(text, '短舱动态（实验）'));
+        assert(contains(text, requiredText));
         forbidden = {'复现 Berger 51 状态', '真实转换飞行', ...
             '已验证真实 XV-15', '替代 legacy 模型'};
         for i = 1:numel(forbidden)
-            assert(isempty(strfind(text, forbidden{i})), ...
+            assert(~contains(text, forbidden{i}), ...
                 'Forbidden GUI claim found: %s', forbidden{i});
         end
     end
