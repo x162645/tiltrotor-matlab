@@ -435,6 +435,49 @@ the nacelle command, so the added nacelle derivatives are zero at the trim
 point. This supports linearization about a prescribed nacelle angle, but it
 does not solve a full conversion-process optimal trim.
 
+## Phase 1 Validation Update
+
+The reproducible validation workflow is:
+
+```matlab
+result = run_nacelle_dynamics_validation();
+```
+
+It writes reports, CSV/MAT summary data, and PNG figures under:
+
+```text
+validation/nacelle_dynamics/<timestamp>/
+```
+
+The lightweight automated gate is:
+
+```matlab
+report = check_nacelle_dynamics_validation();
+```
+
+The validation scope is intentionally limited:
+
+- default-off legacy behavior remains the primary path;
+- the legacy 9-state EOM, trim, and linearization paths remain active when
+  `P.nacelleDynamics.enabled=false`;
+- the enabled path is checked for finite real 11-state EOM and linearization
+  outputs;
+- quasi-static equivalence is checked by comparing `f11(1:9)` against the
+  legacy 9-state EOM when `x11 = [x9; betaM; 0]`;
+- actuator command clamp and the 8 deg/s rate limit are checked with bounded
+  command steps;
+- NUAA Fig.5/Fig.6 trend improvement is not used as an acceptance criterion.
+
+Endpoint linearization at `betaM=0 deg` or `betaM=90 deg` has medium risk due
+to clamp and boundary guards. Interior angles such as 15, 45, and 75 deg are
+preferred for routine 11-state linearization checks.
+
+This validation is not a Berger 51-state reproduction. Berger 2019 is used
+only as background for nacelle angle and nacelle angular rate as states. The
+Phase 1 implementation remains a symmetric 2-state quasi-static nacelle
+extension with this project's `betaM` convention: 0 deg helicopter,
+90 deg airplane.
+
 ## Stop Point
 
 Phase 1 is limited to the opt-in symmetric quasi-static nacelle state

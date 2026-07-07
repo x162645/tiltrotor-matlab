@@ -28,6 +28,7 @@ run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('nacelle dynamic state extension', @test_nacelle_dynamics);
+run_test('nacelle dynamics validation workflow', @test_nacelle_validation);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
@@ -148,6 +149,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         nacelleReport = check_nacelle_dynamics_state_extension();
         assert(nacelleReport.allPassed, ...
             'Nacelle dynamic state extension checks have failed items.');
+    end
+
+    function test_nacelle_validation()
+        validationReport = check_nacelle_dynamics_validation();
+        assert(validationReport.allPassed, ...
+            'Nacelle dynamics validation workflow checks have failed items.');
     end
 
     function test_aerodynamic_components()
