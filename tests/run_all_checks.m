@@ -29,7 +29,7 @@ run_test('control architecture closure', @test_control_architecture);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
-run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
+run_test('NUAA wing Eq16-22 zone sum', @test_wing_nuaa_zone_sum);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
 run_test('linearization finite values', @test_linearization);
@@ -175,10 +175,10 @@ fprintf('All passed: %d\n',summary.allPassed);
             'Steady first-harmonic flapping model has failed items.');
     end
 
-    function test_wing_normal_flow_blend()
-        wingBlendReport = check_wing_normal_flow_blend();
-        assert(wingBlendReport.allPassed, ...
-            'Wing near-normal blend continuity has failed items.');
+    function test_wing_nuaa_zone_sum()
+        zoneReport = check_wing_nuaa_zone_sum();
+        assert(zoneReport.allPassed, ...
+            'NUAA wing Eq16-22 zone-sum checks have failed items.');
     end
 
     function test_wing_v2()

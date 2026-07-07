@@ -1,7 +1,9 @@
 function [Fbody, Mbody, out] = wing_model(x, uCtrl, betaM, cgShift, rotorLeft, rotorRight, P)
 %WING_MODEL Wing free-stream and rotor-slipstream aerodynamic model.
-% The near-normal and lift-line conceptual branches are both evaluated at
-% the same local flow state, then blended over a finite normal-flow band.
+% The production wing load follows the NUAA Drones 2022 Eq. (16)-(22)
+% structure: slipstream and free-stream regions are evaluated separately
+% and then summed. The legacy normal-flow branch weight is retained only as
+% deprecated diagnostic metadata and does not enter Fbody or Mbody.
 
 Vbody = x(1:3);
 omegaBody = x(4:6);
@@ -30,17 +32,25 @@ SslipRawHalf = P.wing.SslipMaxHalf*angleRaw*muRaw;
 SslipUpperHalf = min(P.wing.SslipMaxHalf, S_half);
 S_slip = min(max(SslipRawHalf, 0), SslipUpperHalf);
 S_free = S_half - S_slip;
+Swss = 2*S_slip;
+Swfs = P.wing.S - Swss;
 
 Fbody = zeros(3,1);
 Mbody = zeros(3,1);
 regionOut = cell(4,1);
 idx = 0;
+sideSums.left.F = zeros(3,1);
+sideSums.left.M = zeros(3,1);
+sideSums.right.F = zeros(3,1);
+sideSums.right.M = zeros(3,1);
 
 for side = [-1, 1]
     if side < 0
         rotor = rotorLeft;
+        sideName = 'left';
     else
         rotor = rotorRight;
+        sideName = 'right';
     end
 
     rFree0 = [P.wing.xAC;
@@ -52,6 +62,8 @@ for side = [-1, 1]
     [F, M, data] = one_region(rFree, S_free, side, false, rotor);
     Fbody = Fbody + F;
     Mbody = Mbody + M;
+    sideSums.(sideName).F = sideSums.(sideName).F + F;
+    sideSums.(sideName).M = sideSums.(sideName).M + M;
     regionOut{idx} = data;
 
     rSlip0 = [P.wing.xAC;
@@ -63,12 +75,18 @@ for side = [-1, 1]
     [F, M, data] = one_region(rSlip, S_slip, side, true, rotor);
     Fbody = Fbody + F;
     Mbody = Mbody + M;
+    sideSums.(sideName).F = sideSums.(sideName).F + F;
+    sideSums.(sideName).M = sideSums.(sideName).M + M;
     regionOut{idx} = data;
 end
 
 out.SslipHalf = S_slip;
 out.SfreeHalf = S_free;
+out.Swss = Swss;
+out.Swfs = Swfs;
+out.Swing = P.wing.S;
 out.slipstreamAreaModel = 'NUAA_EQ16_WITH_PHYSICAL_AREA_GUARD';
+out.wingLoadAssemblyModel = 'NUAA_EQ16_22_ZONE_SUM';
 out.betaMCode = betaM;
 out.slipstreamAngleArgument = slipstreamAngleArgument;
 out.angleRaw = angleRaw;
@@ -83,6 +101,10 @@ out.maxEq17BasisError = max_region_field(regionOut, 'eq17BasisError');
 out.maxEq17ReconstructionError = max_region_field( ...
     regionOut, 'eq17ReconstructionError');
 out.wakeFactorUsed = false;
+out.F_wing_left = sideSums.left.F;
+out.M_wing_left = sideSums.left.M;
+out.F_wing_right = sideSums.right.F;
+out.M_wing_right = sideSums.right.M;
 out.F = Fbody;
 out.M = Mbody;
 
@@ -186,13 +208,15 @@ out.M = Mbody;
         FLiftLine = aero_force_body(DLift, YLift, LLift, alpha, beta);
         MaeroLiftLine = [0; qbar*Sreg*P.wing.c*CmLift; 0];
 
-        Freg = (1 - branchWeight)*FNear + branchWeight*FLiftLine;
-        Maero = (1 - branchWeight)*MaeroNear + ...
-            branchWeight*MaeroLiftLine;
+        % NUAA Eq. (19)/(21): production force uses the local-region
+        % lift/drag/side-force transform. The old FNear/FLiftLine branch
+        % blend is deprecated diagnostic metadata only.
+        Freg = FLiftLine;
+        Maero = MaeroLiftLine;
 
-        CL = branchWeight*CLLift;
-        CD = (1 - branchWeight)*CDn + branchWeight*CDLift;
-        Cm = branchWeight*CmLift;
+        CL = CLLift;
+        CD = CDLift;
+        Cm = CmLift;
 
         Marm = cross(rAC, Freg);
         Mreg = Marm + Maero;
@@ -211,6 +235,9 @@ out.M = Mbody;
         data.eq17BasisError = eq17BasisError;
         data.eq17ReconstructionError = eq17ReconstructionError;
         data.localVelocityModel = localVelocityModel;
+        data.zoneAssemblyModel = 'NUAA_EQ16_22_ZONE_SUM';
+        data.forceModel = 'NUAA_EQ19_21_LIFT_DRAG_TRANSFORM';
+        data.momentModel = 'NUAA_EQ20_22_CROSS_R_F_PLUS_AERO';
         data.Vlocal = Vlocal;
         data.V = V;
         data.alpha = alpha;
@@ -224,6 +251,9 @@ out.M = Mbody;
         data.normalFlowBlendHalfWidth = halfWidth;
         data.normalFlowMargin = ratio - center;
         data.normalFlowBranchWeight = branchWeight;
+        data.normalFlowBranchWeightDeprecated = true;
+        data.normalFlowBranchWeightUsage = ...
+            'diagnostic only; not used in production wing force or moment';
         data.inNormalFlowTransition = inTransition;
         data.nearNormal = nearNormal;
         data.FNear = FNear;
