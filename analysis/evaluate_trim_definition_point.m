@@ -4,12 +4,11 @@ function [x, uCtrl, residual, penalty, xdot, eomOut, allocation] = ...
 % This is the shared physical point path for trim_general and trim
 % credibility diagnostics. Base state order is [u v w p q r phi theta psi],
 % optionally followed by [betaM betaM_dot] when nacelle dynamics are enabled.
-% control order is [collective diffCollective cyclicLong diffCyclic
-% aileron elevator rudder], and angular quantities are in rad.
+% control order follows get_control_input_names(P), and angular quantities
+% are in rad.
 
 stateNames = get_state_names(P);
-controlNames = {'collective'; 'diffCollective'; 'cyclicLong'; ...
-    'diffCyclic'; 'aileron'; 'elevator'; 'rudder'};
+controlNames = get_control_input_names(P);
 derivativeNames = derivative_names(P);
 
 z = z(:);
@@ -19,7 +18,7 @@ if numel(z) ~= numel(definition.unknownNames)
 end
 
 x = zeros(get_state_dimension(P),1);
-uCtrl = zeros(7,1);
+uCtrl = zeros(numel(controlNames),1);
 allocation = struct([]);
 x = apply_named_values(x, stateNames, definition.fixedStates);
 uCtrl = apply_named_values(uCtrl, controlNames, definition.fixedControls);

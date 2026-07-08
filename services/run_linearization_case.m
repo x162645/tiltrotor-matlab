@@ -63,8 +63,7 @@ result.report = linearReport;
 result.trim = trimResult;
 result.parameterValidation = parameterReport;
 result.stateNames = get_state_names(P);
-result.controlNames = {'collective';'diffCollective';'cyclicLong'; ...
-    'diffCyclic';'aileron';'elevator';'rudder'};
+result.controlNames = get_control_input_names(P);
 result.eigenvalues = lambda;
 result.naturalFrequency = wn;
 result.dampingRatio = zeta;

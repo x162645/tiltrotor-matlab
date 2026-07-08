@@ -6,6 +6,8 @@ function [Fbody, Mbody, out] = rotor_model_bemt(x, rotorCtrl, betaM, side, cgShi
 % rotorCtrl.cyclicLong: side longitudinal cyclic command, rad. Internally it
 % is mapped to theta1s = -rotDir*rotorCtrl.cyclicLong so positive common
 % cyclic tilts both disk normals toward +eD under the current psi definition.
+% rotorCtrl.lateralCyclic: side lateral cyclic command, rad. It maps
+% directly to theta1c for the opt-in 8-input path.
 %
 % The flapping model is a minimum steady first-harmonic center-hinge model:
 %   beta = beta0 + beta1c*cos(psi) + beta1s*sin(psi).
@@ -24,6 +26,10 @@ if ~(side == -1 || side == 1)
 end
 
 rotDir = side;
+
+if ~isfield(rotorCtrl, 'lateralCyclic') || isempty(rotorCtrl.lateralCyclic)
+    rotorCtrl.lateralCyclic = 0;
+end
 
 % betaM = 0: helicopter mode, thrust upward. betaM = pi/2: airplane mode,
 % thrust forward. eD and eY span the nominal rotor disk.
@@ -122,7 +128,7 @@ out.beta0 = beta0;
 out.beta1c = beta1c;
 out.beta1s = beta1s;
 out.zFlap = zFlap;
-out.theta1c = 0;
+out.theta1c = rotorCtrl.lateralCyclic;
 out.theta1s = -rotDir*rotorCtrl.cyclicLong;
 out.eT = eT;
 out.eD = eD;
@@ -297,9 +303,10 @@ out.M = Mbody;
 
         twist = P.rotor.twistTip*(rMid-r0)/max(P.rotor.R-r0, eps);
 
-        theta1c = 0;
+        theta1c = rotorCtrl.lateralCyclic;
         theta1s = -rotDir*rotorCtrl.cyclicLong;
-        thetaBlade = rotorCtrl.collective + twist + theta1s*sin(psi);
+        thetaBlade = rotorCtrl.collective + twist + ...
+            theta1c*cos(psi) + theta1s*sin(psi);
         UT = P.rotor.Omega*rMid + VtanTrans;
 
         % Formal minimum model: uniform induced velocity. Non-uniform inflow
