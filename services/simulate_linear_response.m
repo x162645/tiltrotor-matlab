@@ -27,6 +27,7 @@ B = linearResult.B;
 xTrim = linearResult.trim.xTrim(:);
 uTrim = linearResult.trim.uTrim(:);
 nState = numel(xTrim);
+nControl = numel(get_control_input_names(P));
 if isfield(linearResult, 'stateNames')
     stateNames = linearResult.stateNames(:);
 else
@@ -39,12 +40,12 @@ stateUnits = state_units_for_names(stateNames);
 
 config = apply_defaults(config);
 config.waveform = char(config.waveform);
-validate_config(config, nState);
+validate_config(config, nState, nControl);
 
-if ~isequal(size(A),[nState,nState]) || ~isequal(size(B),[nState,7]) || ...
-        numel(uTrim) ~= 7
+if ~isequal(size(A),[nState,nState]) || ...
+        ~isequal(size(B),[nState,nControl]) || numel(uTrim) ~= nControl
     error('simulate_linear_response:DimensionMismatch', ...
-        'Expected A and B to match the trim state dimension and 7 controls.');
+        'Expected A and B to match the trim state and active control counts.');
 end
 if ~isreal(A) || ~isreal(B) || any(~isfinite(A(:))) || any(~isfinite(B(:)))
     error('simulate_linear_response:InvalidMatrices', ...
@@ -57,7 +58,7 @@ if t(end) < config.totalTime
     t(end+1,1) = config.totalTime;
 end
 
-du = zeros(numel(t), 7);
+du = zeros(numel(t), nControl);
 amplitude = config.amplitudeDeg*pi/180;
 tau = t-config.startTime;
 active = tau >= 0;
@@ -106,8 +107,7 @@ if ~isreal(dx) || ~isreal(xActual) || ~isreal(uActual) || ...
         'Linear response contains complex, NaN, or Inf values.');
 end
 
-controlNames = {'collective';'diffCollective';'cyclicLong'; ...
-    'diffCyclic';'aileron';'elevator';'rudder'};
+controlNames = get_control_input_names(P);
 selected = dx(:,config.outputState);
 [peakMagnitude, peakIndex] = max(abs(selected));
 
@@ -157,12 +157,12 @@ for k = 1:numel(names)
 end
 end
 
-function validate_config(config, nState)
+function validate_config(config, nState, nControl)
 if ~(isnumeric(config.controlChannel) && isscalar(config.controlChannel) && ...
         isfinite(config.controlChannel) && config.controlChannel == round(config.controlChannel) && ...
-        config.controlChannel >= 1 && config.controlChannel <= 7)
+        config.controlChannel >= 1 && config.controlChannel <= nControl)
     error('simulate_linear_response:InvalidControlChannel', ...
-        'controlChannel must be an integer from 1 to 7.');
+        'controlChannel must be an integer within the active control count.');
 end
 if ~(ischar(config.waveform) && isrow(config.waveform) && ...
         any(strcmpi(config.waveform,{'step','pulse','sine','doublet'})))
@@ -200,13 +200,25 @@ collectiveLeft = uActual(:,1)-uActual(:,2);
 collectiveRight = uActual(:,1)+uActual(:,2);
 cyclicLeft = uActual(:,3)-uActual(:,4);
 cyclicRight = uActual(:,3)+uActual(:,4);
+if size(uActual,2) == 8
+    lateralCyclic = uActual(:,5);
+    aileron = uActual(:,6);
+    elevator = uActual(:,7);
+    rudder = uActual(:,8);
+else
+    lateralCyclic = zeros(size(uActual,1),1);
+    aileron = uActual(:,5);
+    elevator = uActual(:,6);
+    rudder = uActual(:,7);
+end
 violated = outside(collectiveLeft,P.control.collectiveLim) || ...
     outside(collectiveRight,P.control.collectiveLim) || ...
     outside(cyclicLeft,P.control.cyclicLim) || ...
     outside(cyclicRight,P.control.cyclicLim) || ...
-    outside(uActual(:,5),P.control.aileronLim) || ...
-    outside(uActual(:,6),P.control.elevatorLim) || ...
-    outside(uActual(:,7),P.control.rudderLim);
+    outside(lateralCyclic,P.control.cyclicLim) || ...
+    outside(aileron,P.control.aileronLim) || ...
+    outside(elevator,P.control.elevatorLim) || ...
+    outside(rudder,P.control.rudderLim);
 end
 
 function tf = outside(values, limits)

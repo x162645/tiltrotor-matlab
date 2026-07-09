@@ -8,22 +8,23 @@ validate_inputs(x, uCtrl, betaM, P);
 
 mp = mass_properties(betaM, P);
 
-collective = uCtrl(1);
-diffCollective = uCtrl(2);
-cyclic = uCtrl(3);
-diffCyclic = uCtrl(4);
+ctrl = map_control_inputs(uCtrl, P);
 
-ctrlRight.collective = collective + diffCollective;
-ctrlRight.cyclicLong = cyclic + diffCyclic;
+ctrlRight.collective = ctrl.collective + ctrl.diffCollective;
+ctrlRight.cyclicLong = ctrl.cyclicLong + ctrl.diffCyclic;
+ctrlRight.lateralCyclic = ctrl.lateralCyclic;
 
-ctrlLeft.collective = collective - diffCollective;
-ctrlLeft.cyclicLong = cyclic - diffCyclic;
+ctrlLeft.collective = ctrl.collective - ctrl.diffCollective;
+ctrlLeft.cyclicLong = ctrl.cyclicLong - ctrl.diffCyclic;
+ctrlLeft.lateralCyclic = ctrl.lateralCyclic;
 
 % 对旋翼侧控制量应用当前模型输入包络。
 ctrlRight.collective = clamp(ctrlRight.collective, P.control.collectiveLim);
 ctrlLeft.collective  = clamp(ctrlLeft.collective,  P.control.collectiveLim);
 ctrlRight.cyclicLong = clamp(ctrlRight.cyclicLong, P.control.cyclicLim);
 ctrlLeft.cyclicLong  = clamp(ctrlLeft.cyclicLong,  P.control.cyclicLim);
+ctrlRight.lateralCyclic = clamp(ctrlRight.lateralCyclic, P.control.cyclicLim);
+ctrlLeft.lateralCyclic  = clamp(ctrlLeft.lateralCyclic,  P.control.cyclicLim);
 
 % 对常规舵面统一应用当前模型输入包络。保留原始命令用于诊断。
 uApplied = uCtrl;
@@ -31,9 +32,17 @@ uApplied(1) = 0.5*(ctrlRight.collective + ctrlLeft.collective);
 uApplied(2) = 0.5*(ctrlRight.collective - ctrlLeft.collective);
 uApplied(3) = 0.5*(ctrlRight.cyclicLong + ctrlLeft.cyclicLong);
 uApplied(4) = 0.5*(ctrlRight.cyclicLong - ctrlLeft.cyclicLong);
-uApplied(5) = clamp(uApplied(5), P.control.aileronLim);
-uApplied(6) = clamp(uApplied(6), P.control.elevatorLim);
-uApplied(7) = clamp(uApplied(7), P.control.rudderLim);
+if ctrl.numInputs == 8
+    uApplied(5) = 0.5*(ctrlRight.lateralCyclic + ctrlLeft.lateralCyclic);
+    uApplied(6) = clamp(ctrl.aileron, P.control.aileronLim);
+    uApplied(7) = clamp(ctrl.elevator, P.control.elevatorLim);
+    uApplied(8) = clamp(ctrl.rudder, P.control.rudderLim);
+else
+    uApplied(5) = clamp(ctrl.aileron, P.control.aileronLim);
+    uApplied(6) = clamp(ctrl.elevator, P.control.elevatorLim);
+    uApplied(7) = clamp(ctrl.rudder, P.control.rudderLim);
+end
+appliedCtrl = map_control_inputs(uApplied, P);
 
 [FrotL, MrotL, rotL] = rotor_model_bemt( ...
     x, ctrlLeft, betaM, -1, mp.cgShift, P);
@@ -47,10 +56,10 @@ uApplied(7) = clamp(uApplied(7), P.control.rudderLim);
 [Ffus, Mfus, fus] = fuselage_model(x, mp.cgShift, P);
 
 [Fht, Mht, htail] = horizontal_tail_model( ...
-    x, uApplied(6), mp.cgShift, P);
+    x, appliedCtrl.elevator, mp.cgShift, P);
 
 [Fvt, Mvt, vtail] = vertical_tail_model( ...
-    x, uApplied(7), mp.cgShift, P);
+    x, appliedCtrl.rudder, mp.cgShift, P);
 
 Ftotal = FrotL + FrotR + Fwing + Ffus + Fht + Fvt;
 Mtotal = MrotL + MrotR + Mwing + Mfus + Mht + Mvt;
@@ -68,6 +77,8 @@ info.components = {
 info.massProperties = mp;
 info.commandedControls = uCtrl;
 info.appliedControls = uApplied;
+info.mappedControls = ctrl;
+info.appliedMappedControls = appliedCtrl;
 info.appliedRotorControls.left = ctrlLeft;
 info.appliedRotorControls.right = ctrlRight;
 info.rotorLeft = rotL;

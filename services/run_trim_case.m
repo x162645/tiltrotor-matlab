@@ -41,9 +41,8 @@ result.report = trimReport;
 result.parameterValidation = parameterReport;
 result.stateNames = get_state_names(P);
 result.stateUnits = get_state_units(P);
-result.controlNames = {'collective';'diffCollective';'cyclicLong'; ...
-    'diffCyclic';'aileron';'elevator';'rudder'};
-result.controlUnits = repmat({'rad'}, 7, 1);
+result.controlNames = get_control_input_names(P);
+result.controlUnits = get_control_input_units(P);
 result.loads.FaeroProp = eomOut.FaeroProp;
 result.loads.Fgravity = eomOut.Fgravity;
 result.loads.Ftotal = eomOut.Ftotal;

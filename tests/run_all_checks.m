@@ -24,11 +24,18 @@ run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
+run_test('lateral cyclic opt-in input', @test_lateral_cyclic_input);
+run_test('lateral directional derivative report', ...
+    @test_lateral_directional_derivative_report);
+run_test('lateral cyclic mapping comparison', ...
+    @test_lateral_cyclic_mapping_comparison);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('nacelle dynamic state extension', @test_nacelle_dynamics);
 run_test('nacelle dynamics validation workflow', @test_nacelle_validation);
+run_test('berger13 interface scaffold', @test_berger13_interface);
+run_test('berger13 linearization scaffold', @test_berger13_linearization);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
@@ -127,6 +134,24 @@ fprintf('All passed: %d\n',summary.allPassed);
             'Control architecture closure has failed items.');
     end
 
+    function test_lateral_cyclic_input()
+        lateralReport = check_lateral_cyclic_input();
+        assert(lateralReport.allPassed, ...
+            'Lateral cyclic opt-in input checks have failed items.');
+    end
+
+    function test_lateral_directional_derivative_report()
+        derivativeReport = check_lateral_directional_derivative_report();
+        assert(derivativeReport.allPassed, ...
+            'Lateral/directional derivative report checks have failed items.');
+    end
+
+    function test_lateral_cyclic_mapping_comparison()
+        mappingReport = check_lateral_cyclic_mapping_comparison();
+        assert(mappingReport.allPassed, ...
+            'Lateral cyclic mapping comparison checks have failed items.');
+    end
+
     function test_trim_mode_framework()
         trimModeReport = check_trim_mode_framework();
         assert(trimModeReport.allPassed, ...
@@ -155,6 +180,18 @@ fprintf('All passed: %d\n',summary.allPassed);
         validationReport = check_nacelle_dynamics_validation();
         assert(validationReport.allPassed, ...
             'Nacelle dynamics validation workflow checks have failed items.');
+    end
+
+    function test_berger13_interface()
+        bergerReport = check_berger13_interface();
+        assert(bergerReport.allPassed, ...
+            'Berger13 interface checks have failed items.');
+    end
+
+    function test_berger13_linearization()
+        bergerLinearReport = check_berger13_linearization();
+        assert(bergerLinearReport.allPassed, ...
+            'Berger13 linearization checks have failed items.');
     end
 
     function test_aerodynamic_components()
