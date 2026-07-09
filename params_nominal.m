@@ -198,6 +198,7 @@ P.control.cyclicLim     = [-35, 35]*d2r;
 P.control.aileronLim    = [-30, 30]*d2r;
 P.control.elevatorLim   = [-40, 40]*d2r;
 P.control.rudderLim     = [-30, 30]*d2r;
+P.control.enableLateralCyclic = false;
 
 %% 配平
 P.trim.residualTolerance = 5.0e-3;

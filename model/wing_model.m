@@ -5,7 +5,8 @@ function [Fbody, Mbody, out] = wing_model(x, uCtrl, betaM, cgShift, rotorLeft, r
 
 Vbody = x(1:3);
 omegaBody = x(4:6);
-aileron = uCtrl(5);
+ctrl = map_control_inputs(uCtrl, P);
+aileron = ctrl.aileron;
 
 S_half = P.wing.S/2;
 

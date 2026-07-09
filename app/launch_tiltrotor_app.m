@@ -9,9 +9,8 @@ linearResult = [];
 responseResult = [];
 nacelleResponseResult = [];
 parameterRows = make_parameter_rows();
-stateNames = {'u','v','w','p','q','r','phi','theta','psi'};
-controlNames = {'collective','diffCollective','cyclicLong', ...
-    'diffCyclic','aileron','elevator','rudder'};
+stateNames = get_state_names(P).';
+controlNames = get_control_input_names(P).';
 
 fig = uifigure('Name','Tiltrotor Analysis Workbench', ...
     'Position',[80 60 1420 860]);
@@ -765,7 +764,7 @@ switch key
     case 'wing.c', P.wing.c = value;
     case 'trim.residualTolerance', P.trim.residualTolerance = value;
     case 'trim.maxIterations', P.trim.maxIterations = value;
-    case 'linear.du', P.linear.du = value*ones(7,1);
+    case 'linear.du', P.linear.du = value*ones(numel(get_control_input_names(P)),1);
     otherwise, error('Unknown parameter key %s.',key);
 end
 end

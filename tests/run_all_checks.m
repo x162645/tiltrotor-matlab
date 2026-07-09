@@ -24,6 +24,7 @@ run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
+run_test('lateral cyclic opt-in input', @test_lateral_cyclic_input);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -125,6 +126,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         controlReport = check_control_architecture();
         assert(controlReport.allPassed, ...
             'Control architecture closure has failed items.');
+    end
+
+    function test_lateral_cyclic_input()
+        lateralReport = check_lateral_cyclic_input();
+        assert(lateralReport.allPassed, ...
+            'Lateral cyclic opt-in input checks have failed items.');
     end
 
     function test_trim_mode_framework()
