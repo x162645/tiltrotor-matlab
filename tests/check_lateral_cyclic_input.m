@@ -18,6 +18,9 @@ messages = {};
 run_case('legacy 7-input dimensions and labels', @check_legacy_dimensions);
 run_case('enabled 8-input dimensions and labels', @check_enabled_dimensions);
 run_case('lateralCyclic produces lateral response', @check_lateral_response);
+run_case('rotDir aligns disk lateral response', @check_rotDir_disk_response);
+run_case('current mapping remains cancellation diagnostic', @check_current_cancellation);
+run_case('minusRotDir reverses lateral sign', @check_minusRotDir_sign);
 run_case('surface index alignment is protected', @check_surface_alignment);
 
 report.names = cases;
@@ -117,6 +120,39 @@ fprintf('All passed: %d\n', report.allPassed);
             'lateralCyclic B-column is still dominated by u/w/q leakage.');
     end
 
+    function check_rotDir_disk_response()
+        diag = mapping_diagnostics('rotDir');
+        assert(same_sign(diag.dBeta1sLeft, diag.dBeta1sRight), ...
+            'rotDir mapping did not align left/right beta1s response.');
+        assert(same_sign(diag.dNDiskYLeft, diag.dNDiskYRight), ...
+            'rotDir mapping did not align left/right nDisk_y response.');
+        assert(diag.dNDiskYLeft > 1e-8 && diag.dNDiskYRight > 1e-8, ...
+            'positive lateralCyclic does not produce common +eY disk-normal response.');
+    end
+
+    function check_current_cancellation()
+        rotDirDiag = mapping_diagnostics('rotDir');
+        currentDiag = mapping_diagnostics('current');
+        assert(opposite_sign(currentDiag.dBeta1sLeft, ...
+            currentDiag.dBeta1sRight), ...
+            'current mapping no longer shows opposite beta1s response.');
+        assert(opposite_sign(currentDiag.dNDiskYLeft, ...
+            currentDiag.dNDiskYRight), ...
+            'current mapping no longer shows opposite nDisk_y response.');
+        assert(rotDirDiag.targetNorm > 1e3*max(currentDiag.targetNorm, eps), ...
+            'current mapping target response is not clearly smaller than rotDir.');
+    end
+
+    function check_minusRotDir_sign()
+        rotDirDiag = mapping_diagnostics('rotDir');
+        minusDiag = mapping_diagnostics('minusRotDir');
+        assert(same_sign(minusDiag.dNDiskYLeft, minusDiag.dNDiskYRight), ...
+            'minusRotDir mapping did not align left/right nDisk_y response.');
+        assert(opposite_sign(rotDirDiag.raw_dFy, minusDiag.raw_dFy) || ...
+            opposite_sign(rotDirDiag.B_vdot, minusDiag.B_vdot), ...
+            'minusRotDir does not reverse the lateral sign versus rotDir.');
+    end
+
     function check_surface_alignment()
         P0 = P;
         P0.control.enableLateralCyclic = false;
@@ -153,5 +189,50 @@ fprintf('All passed: %d\n', report.allPassed);
         [Fp, Mp] = total_forces_moments(xCase, up, betaMCase, Pcase);
         [Fm, Mm] = total_forces_moments(xCase, um, betaMCase, Pcase);
         raw = [(Fp-Fm); (Mp-Mm)]/(2*h);
+    end
+
+    function diag = mapping_diagnostics(mappingName)
+        Pcase = P;
+        Pcase.control.enableLateralCyclic = true;
+        Pcase.control.lateralCyclicTheta1cMapping = mappingName;
+        uCase = [8*d2r;0;0;0;0;0;-2*d2r;0];
+        idx = 5;
+        h = 1.0e-4;
+        up = uCase;
+        um = uCase;
+        up(idx) = up(idx) + h;
+        um(idx) = um(idx) - h;
+        [~, ~, outP] = total_forces_moments(x, up, betaM, Pcase);
+        [~, ~, outM] = total_forces_moments(x, um, betaM, Pcase);
+        raw = raw_load_derivative(x, uCase, betaM, Pcase, idx);
+        [~, B, lin] = linearize_numeric(x, uCase, betaM, Pcase);
+        stateNames = get_state_names(Pcase);
+        vdotRow = find(strcmp(stateNames, 'v'), 1);
+        pdotRow = find(strcmp(stateNames, 'p'), 1);
+        rdotRow = find(strcmp(stateNames, 'r'), 1);
+
+        diag.dBeta1sLeft = (outP.rotorLeft.beta1s - ...
+            outM.rotorLeft.beta1s)/(2*h);
+        diag.dBeta1sRight = (outP.rotorRight.beta1s - ...
+            outM.rotorRight.beta1s)/(2*h);
+        diag.dNDiskYLeft = (outP.rotorLeft.nDisk(2) - ...
+            outM.rotorLeft.nDisk(2))/(2*h);
+        diag.dNDiskYRight = (outP.rotorRight.nDisk(2) - ...
+            outM.rotorRight.nDisk(2))/(2*h);
+        diag.B_vdot = B(vdotRow, idx);
+        diag.targetNorm = norm([B([vdotRow pdotRow rdotRow], idx); ...
+            raw([2 4 6])]);
+        diag.raw_dFy = raw(2);
+        assert(lin.finite);
+    end
+
+    function tf = same_sign(a, b)
+        tol = 1.0e-8;
+        tf = abs(a) > tol && abs(b) > tol && sign(a) == sign(b);
+    end
+
+    function tf = opposite_sign(a, b)
+        tol = 1.0e-8;
+        tf = abs(a) > tol && abs(b) > tol && sign(a) == -sign(b);
     end
 end

@@ -50,6 +50,13 @@ This sign convention is local to the current rotor azimuth and flapping model.
 It does not introduce a new lateral flapping-dynamics model and is not an
 external Berger/XV-15 validation.
 
+The sign of aircraft-level `Y/L/N` derivatives can vary with `betaM`. Changing
+nacelle angle changes how rotor-axis and disk-plane directions project into
+body axes, and also changes inflow, flapping, moment-arm, and aerodynamic
+coupling. The model-internal convention is only that positive `lateralCyclic`
+tends to produce common `+eY` disk-normal response before those operating-point
+couplings are applied.
+
 ## Compatibility
 
 - Default `P.control.enableLateralCyclic = false` keeps the legacy 7-input
@@ -69,6 +76,7 @@ external Berger/XV-15 validation.
 - No left/right independent nacelle dynamic states.
 - No change to legacy default behavior.
 - No claim of completed lateral/directional validation.
+- No claim of Berger/XV-15, flight-test, or handling-quality validation.
 
 ## Known Limitations
 

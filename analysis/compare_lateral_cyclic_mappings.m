@@ -378,6 +378,13 @@ write_mapping_summary(fid, results, 'current');
 write_mapping_summary(fid, results, 'rotDir');
 write_mapping_summary(fid, results, 'minusRotDir');
 
+fprintf(fid, '\n## betaM Sign Variation\n\n');
+fprintf(fid, 'A sign change across betaM representative points is not by itself ');
+fprintf(fid, 'a bug. Nacelle angle changes rotor-axis and disk-plane projections ');
+fprintf(fid, 'into body axes, plus inflow, flapping, moment-arm, and aerodynamic ');
+fprintf(fid, 'coupling. This comparison is limited to model-internal effectiveness ');
+fprintf(fid, 'of the mapping candidates and does not provide external sign validation.\n');
+
 fprintf(fid, '\n## Limits\n\n');
 fprintf(fid, '- This is an internal diagnostic using finite representative points.\n');
 fprintf(fid, '- No mass, inertia, geometry, `rotDir`, or `psi` definition is changed.\n');

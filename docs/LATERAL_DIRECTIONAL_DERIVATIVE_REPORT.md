@@ -95,6 +95,27 @@ This result freezes only the current model-internal convention. It does not
 complete external sign validation against Berger, XV-15, or a documented rotor
 azimuth convention.
 
+## Why lateralCyclic signs vary with betaM
+
+The default opt-in `rotDir` mapping makes `lateralCyclic` produce significant
+model-internal `Y/L/N` response, but the representative signs need not be the
+same at every nacelle angle. In the current generated reports, `B_vdot` and
+raw `dFy` are positive in betaM = 0 hover/low-speed conditions and can become
+negative in betaM = 45/90 deg conversion or airplane-mode conditions.
+
+That sign variation is not automatically a bug. The nacelle angle changes the
+rotor thrust axis `eT`, the disk-plane `eD/eY` projections into body axes,
+proprotor inflow state, flapping response, moment arms, and aerodynamic
+coupling. The B-matrix entries are EOM state-derivative sensitivities, while
+raw load derivatives are central differences of `[F; M]`; they are related
+diagnostics but not interchangeable quantities. These representative points
+are not a broad trim sweep.
+
+The conclusion is therefore limited: `theta1c = rotDir*lateralCyclic` resolves
+the current left/right cancellation and is internally effective in this model.
+It is not Berger/XV-15 validation and does not complete lateral/directional
+handling-quality validation.
+
 ## Limitations
 
 - This is not external literature validation.

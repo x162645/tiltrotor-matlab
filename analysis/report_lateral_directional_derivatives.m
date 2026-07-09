@@ -278,6 +278,19 @@ fprintf(fid, '- `rudder` produces positive raw `Fy` and negative raw `Mz` in for
 fprintf(fid, '- `diffCollective` produces a strong raw `Mx` response across the representative set.\n');
 fprintf(fid, '- `diffCyclic` produces a strong raw `Mz` response, with sign depending on nacelle angle and operating condition.\n');
 
+fprintf(fid, '\n## Why lateralCyclic signs vary with betaM\n\n');
+fprintf(fid, 'The default opt-in `rotDir` mapping makes `lateralCyclic` ');
+fprintf(fid, 'model-internally effective, but the representative `B_vdot` ');
+fprintf(fid, 'and raw `dFy` signs can change between betaM conditions. ');
+fprintf(fid, 'The betaM angle changes the rotor thrust axis `eT`, disk-plane ');
+fprintf(fid, '`eD/eY` projections into body axes, proprotor inflow state, ');
+fprintf(fid, 'flapping response, moment arms, and aerodynamic coupling. ');
+fprintf(fid, 'Also, B-matrix entries are EOM state-derivative sensitivities, ');
+fprintf(fid, 'while raw load derivatives are central differences of `[F; M]`; ');
+fprintf(fid, 'they should not be mixed as identical quantities. The representative ');
+fprintf(fid, 'points are not a broad trim sweep, so this observation confirms ');
+fprintf(fid, 'internal response effectiveness only, not external sign validation.\n');
+
 fprintf(fid, '\n## Limitations\n\n');
 fprintf(fid, '- This is an internal derivative/sign audit only, not Berger or XV-15 validation.\n');
 fprintf(fid, '- The representative states are finite operating points, not certified trims for stability conclusions.\n');
