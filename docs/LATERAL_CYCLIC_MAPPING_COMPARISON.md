@@ -81,6 +81,14 @@ The earlier `current` mapping is retained only for diagnostics because it
 drives opposite left/right `beta1s` and `nDisk_y` responses and therefore
 cancels the intended symmetric lateral cyclic effect.
 
+Across the representative betaM points, `rotDir` can change the sign of
+`B_vdot` and raw `dFy`. This does not invalidate the mapping comparison by
+itself: betaM changes the rotor thrust axis, disk-plane body-axis projections,
+inflow, flapping response, force arms, and aerodynamic coupling. B-matrix
+entries and raw load derivatives are also different diagnostics. The comparison
+therefore supports only the current model-internal convention, not external
+sign validation.
+
 ## Non-goals
 
 - No 13x10 implementation.
