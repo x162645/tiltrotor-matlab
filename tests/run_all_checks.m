@@ -25,6 +25,8 @@ run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
 run_test('lateral cyclic opt-in input', @test_lateral_cyclic_input);
+run_test('lateral directional derivative report', ...
+    @test_lateral_directional_derivative_report);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -132,6 +134,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         lateralReport = check_lateral_cyclic_input();
         assert(lateralReport.allPassed, ...
             'Lateral cyclic opt-in input checks have failed items.');
+    end
+
+    function test_lateral_directional_derivative_report()
+        derivativeReport = check_lateral_directional_derivative_report();
+        assert(derivativeReport.allPassed, ...
+            'Lateral/directional derivative report checks have failed items.');
     end
 
     function test_trim_mode_framework()
