@@ -2,7 +2,7 @@
 
 ## Why This Comparison Exists
 
-The opt-in `lateralCyclic` input currently maps directly to the rotor
+The opt-in `lateralCyclic` input previously mapped directly to the rotor
 first-harmonic cosine pitch term:
 
 ```text
@@ -24,14 +24,15 @@ rotDir      : theta1c = rotDir*lateralCyclic
 minusRotDir : theta1c = -rotDir*lateralCyclic
 ```
 
-The nominal model default remains `current` through:
+After this comparison, the opt-in model default is:
 
 ```matlab
-P.control.lateralCyclicTheta1cMapping = 'current';
+P.control.lateralCyclicTheta1cMapping = 'rotDir';
 ```
 
-This branch only adds a diagnostic switch. It does not change the default
-legacy behavior or declare a final production sign convention.
+The legacy 7-input default still remains controlled by
+`P.control.enableLateralCyclic = false`. The `current` and `minusRotDir`
+options remain available as diagnostic mappings; they are not removed.
 
 ## Metrics
 
@@ -68,6 +69,17 @@ In the current diagnostic logic, `rotDir` is preferred over `minusRotDir` when
 both remove cancellation because it maps positive `lateralCyclic` to common
 positive `nDisk_y` under the current sign convention. This is still an internal
 model convention, not external validation.
+
+The resulting internal convention is:
+
+```text
+positive lateralCyclic -> common +eY rotor disk-normal tilt
+theta1c = rotDir*lateralCyclic
+```
+
+The earlier `current` mapping is retained only for diagnostics because it
+drives opposite left/right `beta1s` and `nDisk_y` responses and therefore
+cancels the intended symmetric lateral cyclic effect.
 
 ## Non-goals
 
