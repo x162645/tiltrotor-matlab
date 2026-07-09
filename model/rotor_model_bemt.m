@@ -128,7 +128,8 @@ out.beta0 = beta0;
 out.beta1c = beta1c;
 out.beta1s = beta1s;
 out.zFlap = zFlap;
-out.theta1c = rotorCtrl.lateralCyclic;
+out.theta1c = map_lateral_cyclic_to_theta1c( ...
+    rotorCtrl.lateralCyclic, rotDir, P);
 out.theta1s = -rotDir*rotorCtrl.cyclicLong;
 out.eT = eT;
 out.eD = eD;
@@ -303,7 +304,8 @@ out.M = Mbody;
 
         twist = P.rotor.twistTip*(rMid-r0)/max(P.rotor.R-r0, eps);
 
-        theta1c = rotorCtrl.lateralCyclic;
+        theta1c = map_lateral_cyclic_to_theta1c( ...
+            rotorCtrl.lateralCyclic, rotDir, P);
         theta1s = -rotDir*rotorCtrl.cyclicLong;
         thetaBlade = rotorCtrl.collective + twist + ...
             theta1c*cos(psi) + theta1s*sin(psi);
@@ -363,5 +365,25 @@ out.M = Mbody;
 
     function psi = azimuth_grid()
         psi = (0:P.rotor.nAzimuth-1)*(2*pi/P.rotor.nAzimuth);
+    end
+
+    function theta1c = map_lateral_cyclic_to_theta1c(command, rotDirLocal, Pcase)
+        if isfield(Pcase, 'control') && ...
+                isfield(Pcase.control, 'lateralCyclicTheta1cMapping')
+            mapping = Pcase.control.lateralCyclicTheta1cMapping;
+        else
+            mapping = 'current';
+        end
+        switch mapping
+            case 'current'
+                theta1c = command;
+            case 'rotDir'
+                theta1c = rotDirLocal*command;
+            case 'minusRotDir'
+                theta1c = -rotDirLocal*command;
+            otherwise
+                error('rotor_model_bemt:InvalidLateralCyclicTheta1cMapping', ...
+                    'Unsupported lateral cyclic theta1c mapping %s.', mapping);
+        end
     end
 end

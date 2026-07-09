@@ -27,6 +27,8 @@ run_test('control architecture closure', @test_control_architecture);
 run_test('lateral cyclic opt-in input', @test_lateral_cyclic_input);
 run_test('lateral directional derivative report', ...
     @test_lateral_directional_derivative_report);
+run_test('lateral cyclic mapping comparison', ...
+    @test_lateral_cyclic_mapping_comparison);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -140,6 +142,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         derivativeReport = check_lateral_directional_derivative_report();
         assert(derivativeReport.allPassed, ...
             'Lateral/directional derivative report checks have failed items.');
+    end
+
+    function test_lateral_cyclic_mapping_comparison()
+        mappingReport = check_lateral_cyclic_mapping_comparison();
+        assert(mappingReport.allPassed, ...
+            'Lateral cyclic mapping comparison checks have failed items.');
     end
 
     function test_trim_mode_framework()
