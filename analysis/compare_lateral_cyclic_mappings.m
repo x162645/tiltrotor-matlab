@@ -1,8 +1,7 @@
 function summary = compare_lateral_cyclic_mappings(opts)
 %COMPARE_LATERAL_CYCLIC_MAPPINGS Compare theta1c mapping candidates.
-% This diagnostic branch keeps the production default mapping as 'current'
-% and compares it with rotDir-weighted alternatives at finite representative
-% operating points. It does not claim external validation.
+% This diagnostic explicitly evaluates each mapping candidate at finite
+% representative operating points. It does not claim external validation.
 
 if nargin < 1 || isempty(opts)
     opts = struct();

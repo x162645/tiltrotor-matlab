@@ -17,7 +17,7 @@ messages = {};
 
 run_case('legacy 7-input dimensions and labels', @check_legacy_dimensions);
 run_case('enabled 8-input dimensions and labels', @check_enabled_dimensions);
-run_case('lateralCyclic produces nonzero response', @check_nonzero_column);
+run_case('lateralCyclic produces lateral response', @check_lateral_response);
 run_case('surface index alignment is protected', @check_surface_alignment);
 
 report.names = cases;
@@ -93,19 +93,28 @@ fprintf('All passed: %d\n', report.allPassed);
         assert(abs(out.components.appliedControls(6) - u(6)) < eps);
         assert(abs(out.components.appliedControls(7) - u(7)) < eps);
         assert(abs(out.components.appliedControls(8) - u(8)) < eps);
-        assert(abs(out.components.rotorLeft.theta1c - u(5)) < eps);
+        assert(abs(out.components.rotorLeft.theta1c + u(5)) < eps);
         assert(abs(out.components.rotorRight.theta1c - u(5)) < eps);
     end
 
-    function check_nonzero_column()
+    function check_lateral_response()
         P8 = P;
         P8.control.enableLateralCyclic = true;
         u = [8*d2r;0;0;0;0;0;-2*d2r;0];
         [~, B, lin] = linearize_numeric(x, u, betaM, P8);
         lateralColumn = B(:,5);
+        stateNames = get_state_names(P8);
+        vdotRow = find(strcmp(stateNames, 'v'), 1);
+        longitudinalRows = find(ismember(stateNames, {'u'; 'w'; 'q'}));
+        [~, maxRow] = max(abs(lateralColumn));
+        raw = raw_load_derivative(x, u, betaM, P8, 5);
         assert(lin.finite);
         assert(norm(lateralColumn) > 1e-8, ...
             'lateralCyclic B-column is unexpectedly zero.');
+        assert(abs(lateralColumn(vdotRow)) > 1e-4 || abs(raw(2)) > 1e-2, ...
+            'lateralCyclic did not produce a significant lateral response.');
+        assert(~ismember(maxRow, longitudinalRows), ...
+            'lateralCyclic B-column is still dominated by u/w/q leakage.');
     end
 
     function check_surface_alignment()
@@ -133,5 +142,16 @@ fprintf('All passed: %d\n', report.allPassed);
         else
             value = b;
         end
+    end
+
+    function raw = raw_load_derivative(xCase, uCase, betaMCase, Pcase, idx)
+        h = 1.0e-4;
+        up = uCase;
+        um = uCase;
+        up(idx) = up(idx) + h;
+        um(idx) = um(idx) - h;
+        [Fp, Mp] = total_forces_moments(xCase, up, betaMCase, Pcase);
+        [Fm, Mm] = total_forces_moments(xCase, um, betaMCase, Pcase);
+        raw = [(Fp-Fm); (Mp-Mm)]/(2*h);
     end
 end

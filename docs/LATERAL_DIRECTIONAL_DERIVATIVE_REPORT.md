@@ -75,23 +75,31 @@ must not be interpreted interchangeably.
 
 ## Current Sign Conclusion
 
-`lateralCyclic` is connected to the rotor blade-pitch cosine harmonic:
+`lateralCyclic` is connected to the rotor blade-pitch cosine harmonic with
+the default opt-in `rotDir` mapping:
 
 ```text
 thetaBlade = collective + twist + theta1c*cos(psi) + theta1s*sin(psi)
-theta1c = lateralCyclic
+theta1c = rotDir*lateralCyclic
 ```
 
-In the current representative audit, `lateralCyclic` produces a finite,
-nonzero full B column, but its `Y/L/N` target entries are small. Therefore the
-workflow does not freeze an external lateral/directional sign convention.
-Future work should review the rotor azimuth, `rotDir`, and disk-response
-conventions before using this as a sign-validated lateral-control model.
+In the current representative audit, `lateralCyclic` produces finite,
+significant model-internal `Y/L/N` target response. Positive `lateralCyclic`
+is defined internally as a command that tilts the left and right rotor disk
+normals together toward `+eY`. The older diagnostic `current` mapping
+(`theta1c = lateralCyclic`) cancels the intended lateral response because
+left/right `beta1s` and `nDisk_y` responses are opposite for the
+counter-rotating rotors.
+
+This result freezes only the current model-internal convention. It does not
+complete external sign validation against Berger, XV-15, or a documented rotor
+azimuth convention.
 
 ## Limitations
 
 - This is not external literature validation.
 - This does not mean lateral/directional handling qualities are validated.
+- This does not complete external lateral cyclic sign validation.
 - This is not a Berger 51-state reproduction.
 - This does not implement 13x10.
 - This does not implement nacelle torque.
@@ -99,8 +107,7 @@ conventions before using this as a sign-validated lateral-control model.
 
 ## Next Step
 
-If future audits produce clear, consistent `lateralCyclic` signs across
-representative hover and low-speed conditions, the result can inform a separate
-Berger-inspired 13x10 research design. If the signs remain small or ambiguous,
-review `lateralCyclic`, `rotDir`, and `psi` conventions before extending the
-control architecture.
+The internally effective `rotDir` mapping can inform a later, separate
+Berger-inspired 13x10 research design. That later work must still review
+`lateralCyclic`, `rotDir`, and `psi` conventions against an external rotor
+azimuth reference before claiming sign validation.

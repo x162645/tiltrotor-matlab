@@ -14,10 +14,11 @@ tmpRoot = fullfile(tempdir, 'tiltrotor_lateral_directional_report_test');
 opts = struct('outputRoot', tmpRoot, 'timestamp', 'latest');
 
 run_case('report workflow runs', @check_report_runs);
-run_case('at least one condition succeeds', @check_success_count);
+run_case('all representative conditions succeed', @check_success_count);
 run_case('enabled B matrix has 8 columns', @check_b_dimension);
 run_case('lateralCyclic B column is nonzero', @check_lateral_column);
-run_case('lateralCyclic raw target derivative exists', @check_lateral_raw);
+run_case('lateralCyclic target derivative is effective', @check_lateral_raw);
+run_case('lateralCyclic is not classified as small', @check_lateral_class);
 run_case('report and CSV files exist', @check_outputs_exist);
 run_case('no silent skipped conditions', @check_skipped_reasons);
 
@@ -64,20 +65,17 @@ fprintf('All passed: %d\n', report.allPassed);
 
     function check_success_count()
         summary = get_summary();
-        assert(summary.successCount >= 1, ...
-            'No representative condition succeeded.');
+        assert(summary.successCount == numel(summary.caseResults), ...
+            'Not all representative conditions succeeded.');
     end
 
     function check_b_dimension()
         summary = get_summary();
-        ok = false;
         for i = 1:numel(summary.caseResults)
             c = summary.caseResults(i);
-            if strcmp(c.status, 'OK')
-                ok = ok || isequal(c.BSize, [9 8]);
-            end
+            assert(strcmp(c.status, 'OK') && isequal(c.BSize, [9 8]), ...
+                'A representative condition did not produce a 9-by-8 B matrix.');
         end
-        assert(ok, 'No successful condition produced a 9-by-8 B matrix.');
     end
 
     function check_lateral_column()
@@ -92,9 +90,21 @@ fprintf('All passed: %d\n', report.allPassed);
         T = summary.table;
         rows = strcmp(T.control, 'lateralCyclic') & ...
             isfinite(T.raw_dMx) & isfinite(T.raw_dFy) & isfinite(T.B_pdot);
-        target = max(abs([T.raw_dMx(rows), T.raw_dFy(rows), T.B_pdot(rows)]), [], 2);
-        assert(any(target > 1e-12), ...
-            'lateralCyclic has no detectable raw Mx/Fy or pdot effect.');
+        target = max(abs([T.raw_dMx(rows), T.raw_dFy(rows), ...
+            T.raw_dMz(rows), T.B_vdot(rows), T.B_pdot(rows), ...
+            T.B_rdot(rows)]), [], 2);
+        assert(any(target > 1e-2), ...
+            'lateralCyclic has no significant Y/L/N target response.');
+    end
+
+    function check_lateral_class()
+        summary = get_summary();
+        T = summary.table;
+        rows = strcmp(T.control, 'lateralCyclic');
+        assert(~any(strcmp(T.classification(rows), 'CAUTION_SMALL_EFFECT')), ...
+            'lateralCyclic is still classified as CAUTION_SMALL_EFFECT.');
+        assert(any(strcmp(T.classification(rows), 'PASS_NONZERO')), ...
+            'lateralCyclic was not classified as an effective nonzero response.');
     end
 
     function check_outputs_exist()

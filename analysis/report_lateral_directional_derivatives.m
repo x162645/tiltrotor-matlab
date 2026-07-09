@@ -224,7 +224,9 @@ fprintf(fid, '```\n\n');
 fprintf(fid, 'Legacy default 7-input behavior remains controlled by ');
 fprintf(fid, '`P.control.enableLateralCyclic = false`. The audited mode sets it to true.\n\n');
 fprintf(fid, '`lateralCyclic` is connected to the rotor blade-pitch term ');
-fprintf(fid, '`theta1c*cos(psi)`. `diffCyclic` remains differential longitudinal cyclic.\n\n');
+fprintf(fid, '`theta1c*cos(psi)` with the default opt-in mapping ');
+fprintf(fid, '`theta1c = rotDir*lateralCyclic`. `diffCyclic` remains ');
+fprintf(fid, 'differential longitudinal cyclic.\n\n');
 fprintf(fid, 'EOM B derivatives are state-derivative sensitivities from ');
 fprintf(fid, '`linearize_numeric`. Raw load derivatives are central differences of ');
 fprintf(fid, '`[F; M]` from `total_forces_moments`; they are not the same quantity.\n\n');
@@ -269,7 +271,8 @@ end
 
 fprintf(fid, '\n## Key Sign Findings\n\n');
 fprintf(fid, '- `lateralCyclic` has a finite nonzero full B column in all successful representative conditions.\n');
-fprintf(fid, '- `lateralCyclic` Y/L/N entries are small in these representative points, so this report freezes no external sign convention.\n');
+fprintf(fid, '- With the default opt-in `rotDir` mapping, `lateralCyclic` produces significant model-internal `Y/L/N` target response in the representative set.\n');
+fprintf(fid, '- Positive `lateralCyclic` is the current internal convention for common `+eY` rotor disk-normal tilt; this is not external sign validation.\n');
 fprintf(fid, '- `aileron` produces positive raw `Mx` in forward-speed representative points and is zero in hover-like zero-speed wing loading.\n');
 fprintf(fid, '- `rudder` produces positive raw `Fy` and negative raw `Mz` in forward-speed representative points.\n');
 fprintf(fid, '- `diffCollective` produces a strong raw `Mx` response across the representative set.\n');
@@ -279,7 +282,7 @@ fprintf(fid, '\n## Limitations\n\n');
 fprintf(fid, '- This is an internal derivative/sign audit only, not Berger or XV-15 validation.\n');
 fprintf(fid, '- The representative states are finite operating points, not certified trims for stability conclusions.\n');
 fprintf(fid, '- This does not implement 13x10, nacelle torque, independent left/right nacelle states, or Berger 51 states.\n');
-fprintf(fid, '- Small `lateralCyclic` Y/L/N response should be reviewed before any future sign convention is frozen.\n');
+fprintf(fid, '- The `rotDir` sign convention remains model-internal until checked against a documented external rotor azimuth and disk-response convention.\n');
 end
 
 function write_matrix(fid, titleText, values, rowNames, colNames)

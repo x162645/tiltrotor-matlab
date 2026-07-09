@@ -17,7 +17,8 @@ run_case('comparison workflow runs', @check_workflow_runs);
 run_case('all three mappings evaluated', @check_all_mappings);
 run_case('hover and low-speed cases succeed', @check_required_cases);
 run_case('current cancellation is identified', @check_current_cancellation);
-run_case('candidate improvement is reported', @check_candidate_improvement);
+run_case('rotDir recommendation is reported', @check_rotDir_recommendation);
+run_case('minusRotDir has opposite sign response', @check_minusRotDir_opposite);
 run_case('report and CSV files exist', @check_outputs_exist);
 run_case('finite successful rows', @check_finite_rows);
 
@@ -93,18 +94,36 @@ fprintf('All passed: %d\n', report.allPassed);
             'Current mapping did not show left/right nDiskY cancellation.');
     end
 
-    function check_candidate_improvement()
+    function check_rotDir_recommendation()
         summary = get_summary();
         T = summary.table;
         currentRows = strcmp(T.mapping, 'current');
-        candidateRows = strcmp(T.mapping, 'rotDir') | ...
-            strcmp(T.mapping, 'minusRotDir');
-        bestCandidate = max(T.lateral_target_norm(candidateRows));
+        rotDirRows = strcmp(T.mapping, 'rotDir');
+        bestCandidate = max(T.lateral_target_norm(rotDirRows));
         bestCurrent = max(T.lateral_target_norm(currentRows));
-        noBetter = strcmp(summary.recommendation.name, ...
-            'no-better-candidate');
-        assert(bestCandidate > bestCurrent || noBetter, ...
-            'No candidate improvement or explicit no-better conclusion.');
+        assert(strcmp(summary.recommendation.name, 'rotDir'), ...
+            'rotDir was not selected as the recommended mapping.');
+        assert(bestCandidate > bestCurrent, ...
+            'rotDir did not improve lateral target response over current.');
+        assert(any(strcmp(T.classification(rotDirRows), ...
+            'PROMISING_LATERAL_MAPPING')), ...
+            'rotDir was not classified as a promising lateral mapping.');
+    end
+
+    function check_minusRotDir_opposite()
+        summary = get_summary();
+        T = summary.table;
+        for i = 1:height(T)
+            if strcmp(T.mapping{i}, 'rotDir')
+                twin = strcmp(T.condition, T.condition{i}) & ...
+                    strcmp(T.mapping, 'minusRotDir');
+                assert(any(twin), 'Missing minusRotDir comparison row.');
+                assert(sign(T.raw_dFy(i)) == -sign(T.raw_dFy(twin)), ...
+                    'minusRotDir does not reverse raw dFy sign versus rotDir.');
+                assert(sign(T.raw_dMx(i)) == -sign(T.raw_dMx(twin)), ...
+                    'minusRotDir does not reverse raw dMx sign versus rotDir.');
+            end
+        end
     end
 
     function check_outputs_exist()

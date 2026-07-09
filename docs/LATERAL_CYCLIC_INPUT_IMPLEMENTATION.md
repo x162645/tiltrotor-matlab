@@ -27,19 +27,28 @@ right cyclicLong = cyclicLong + diffCyclic
 left  cyclicLong = cyclicLong - diffCyclic
 ```
 
-The new `lateralCyclic` command is symmetric. Both rotors receive the same
-side command, and `rotor_model_bemt` maps it directly to the first-harmonic
-blade-pitch cosine term:
+The new `lateralCyclic` command is symmetric at the aircraft control-vector
+level. With the default opt-in mapping, `rotor_model_bemt` weights the command
+by local rotor direction before applying it to the first-harmonic blade-pitch
+cosine term:
 
 ```text
 thetaBlade = collective + twist + theta1c*cos(psi) + theta1s*sin(psi)
-theta1c = lateralCyclic
+theta1c = rotDir*lateralCyclic
 theta1s = -rotDir*cyclicLong
 ```
 
-The sign convention is intentionally minimal and local to the current rotor
-azimuth definition. It does not introduce a new lateral flapping-dynamics
-model.
+In the current model-internal convention, positive `lateralCyclic` means the
+left and right rotor disk normals tilt together toward `+eY`. The earlier
+`theta1c = lateralCyclic` candidate remains available as the diagnostic
+`current` mapping, but it drives opposite left/right `beta1s` and `nDisk_y`
+responses for counter-rotating rotors, which cancels the intended lateral
+response. The `minusRotDir` diagnostic option is also retained for sign
+comparison.
+
+This sign convention is local to the current rotor azimuth and flapping model.
+It does not introduce a new lateral flapping-dynamics model and is not an
+external Berger/XV-15 validation.
 
 ## Compatibility
 
@@ -63,8 +72,9 @@ model.
 
 ## Known Limitations
 
-- The lateral cyclic sign convention still needs future validation against a
-  documented rotor azimuth and disk-response convention.
+- The lateral cyclic sign convention is now internally effective for the
+  current model, but still needs future validation against a documented rotor
+  azimuth and disk-response convention.
 - The new input is connected through the current conceptual BEMT/flapping
   path only; it is not a high-fidelity rotor model.
 - Lateral/directional derivatives are checked for finite, nonzero response in
