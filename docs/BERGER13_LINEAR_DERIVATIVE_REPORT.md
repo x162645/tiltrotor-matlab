@@ -37,6 +37,8 @@ For each case the report records:
 
 - A13 / B13 dimensions and norms.
 - A condition-number diagnostic.
+- Scaled condition, SVD, and rank diagnostics described in
+  `docs/BERGER13_CONDITIONING_DIAGNOSTICS.md`.
 - `betaML` and `betaMR` state-column effects on the first nine rigid-body
   derivatives.
 - Angular-acceleration row effects for `betaML` and `betaMR`.
@@ -52,6 +54,8 @@ For each case the report records:
 
 - The representative points are finite operating points, not a full trim
   sweep or envelope.
+- Conditioning diagnostics are internal numerical health checks, not
+  validation or handling-quality pass/fail criteria.
 - Non-rotor aero still uses
   `betaMAvg = 0.5*(betaML + betaMR)`.
 - Mass properties and inertia still use the betaMAvg approximation.

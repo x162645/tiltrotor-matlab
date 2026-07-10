@@ -28,6 +28,10 @@ run_case('lateral cyclic and nacelle torque columns are active', ...
     @check_control_columns);
 run_case('betaML and betaMR state columns are active', ...
     @check_beta_columns);
+run_case('conditioning diagnostics are reported', ...
+    @check_conditioning_fields);
+run_case('conditioning report text is explanatory', ...
+    @check_conditioning_text);
 run_case('report avoids external validation claims', ...
     @check_no_external_validation_claim);
 
@@ -142,6 +146,44 @@ fprintf('All passed: %d\n', report.allPassed);
             assert(item.normAFirstNineBetaML > 1e-8);
             assert(item.normAFirstNineBetaMR > 1e-8);
         end
+    end
+
+    function check_conditioning_fields()
+        data = get_report_data();
+        for conditioningIdx = 1:numel(data.cases)
+            item = data.cases(conditioningIdx);
+            assert(isfield(item, 'rawCondA'));
+            assert(isfield(item, 'scaledCondA'));
+            assert(isfield(item, 'dynamicCondA'));
+            assert(isfield(item, 'scaledDynamicCondA'));
+            assert(isfield(item, 'rawRankA'));
+            assert(isfield(item, 'scaledRankA'));
+            assert(isfield(item, 'dynamicRankA'));
+            assert(isfield(item, 'rankB'));
+            assert(isfinite(item.rawRankA));
+            assert(isfinite(item.scaledRankA));
+            assert(isfinite(item.dynamicRankA));
+            assert(isfinite(item.rankB));
+            assert(isfinite(item.rawCondA) || isinf(item.rawCondA));
+            assert(isfinite(item.scaledCondA) || isinf(item.scaledCondA));
+            assert(isfinite(item.dynamicCondA) || isinf(item.dynamicCondA));
+            assert(isfinite(item.scaledDynamicCondA) || ...
+                isinf(item.scaledDynamicCondA));
+            assert(any(strcmp(item.zeroColumnNamesA, 'psi')));
+            assert(~isempty(item.conditioningInterpretation));
+        end
+    end
+
+    function check_conditioning_text()
+        data = get_report_data();
+        text = lower(fileread(fullfile(data.outputDir, ...
+            'berger13_linear_derivatives_report.md')));
+        assert(contains(text, 'conditioning diagnostics'));
+        assert(contains(text, 'scaled'));
+        assert(contains(text, 'svd'));
+        assert(contains(text, 'rank'));
+        assert(contains(text, 'not validation'));
+        assert(contains(text, 'zero a columns: psi'));
     end
 
     function check_no_external_validation_claim()
