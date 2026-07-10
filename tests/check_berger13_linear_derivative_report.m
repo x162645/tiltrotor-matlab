@@ -30,6 +30,8 @@ run_case('betaML and betaMR state columns are active', ...
     @check_beta_columns);
 run_case('conditioning diagnostics are reported', ...
     @check_conditioning_fields);
+run_case('nullspace diagnostics are reported', ...
+    @check_nullspace_fields);
 run_case('conditioning report text is explanatory', ...
     @check_conditioning_text);
 run_case('report avoids external validation claims', ...
@@ -174,16 +176,50 @@ fprintf('All passed: %d\n', report.allPassed);
         end
     end
 
+    function check_nullspace_fields()
+        data = get_report_data();
+        for nullIdx = 1:numel(data.cases)
+            item = data.cases(nullIdx);
+            assert(isfield(item, 'A_nullity'));
+            assert(isfield(item, 'A_effectiveCond'));
+            assert(isfield(item, 'scaledA_effectiveCond'));
+            assert(isfield(item, 'reducedA_nullity'));
+            assert(isfield(item, 'reducedA_effectiveCond'));
+            assert(isfield(item, 'B_rank'));
+            assert(isfield(item, 'B_nullity'));
+            assert(isfield(item, 'B_effectiveCond'));
+            assert(isfield(item, 'B_dominantNullControls'));
+            assert(isfinite(item.A_nullity));
+            assert(isfinite(item.reducedA_nullity));
+            assert(isfinite(item.B_nullity));
+            assert(item.A_nullity >= 1);
+            assert(item.B_nullity == 10-item.B_rank);
+            assert(isfinite(item.A_effectiveCond) || ...
+                isinf(item.A_effectiveCond));
+            assert(isfinite(item.scaledA_effectiveCond) || ...
+                isinf(item.scaledA_effectiveCond));
+            assert(isfinite(item.reducedA_effectiveCond) || ...
+                isinf(item.reducedA_effectiveCond));
+            assert(isfinite(item.B_effectiveCond) || ...
+                isinf(item.B_effectiveCond));
+            assert(~isempty(item.B_dominantNullControls));
+            assert(~isempty(item.nullspaceInterpretation));
+        end
+    end
+
     function check_conditioning_text()
         data = get_report_data();
         text = lower(fileread(fullfile(data.outputDir, ...
             'berger13_linear_derivatives_report.md')));
         assert(contains(text, 'conditioning diagnostics'));
+        assert(contains(text, 'nullspace'));
+        assert(contains(text, 'effective condition'));
         assert(contains(text, 'scaled'));
         assert(contains(text, 'svd'));
         assert(contains(text, 'rank'));
         assert(contains(text, 'not validation'));
         assert(contains(text, 'zero a columns: psi'));
+        assert(contains(text, 'dominant b null controls'));
     end
 
     function check_no_external_validation_claim()

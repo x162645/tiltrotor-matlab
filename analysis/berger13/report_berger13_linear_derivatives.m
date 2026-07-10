@@ -78,6 +78,9 @@ x13 = [caseDef.V; 0; 0; 0; 0; 0; 0; 0; 0; ...
 componentInfo = out.components13;
 conditioning = diagnose_berger13_conditioning(A13, B13, ...
     get_state_names_13x10(), get_control_input_names_13x10());
+nullDiag = diagnose_berger13_nullspace(A13, B13, ...
+    get_state_names_13x10(), get_control_input_names_13x10(), ...
+    conditioning);
 
 item = empty_case_report();
 item.caseName = caseDef.caseName;
@@ -132,6 +135,19 @@ item.scaledDynamicCondA = conditioning.dynamic.condScaledADynamic;
 item.rankB = conditioning.B.rankB;
 item.nearZeroControlColumns = conditioning.B.nearZeroControlColumnNames;
 item.conditioningInterpretation = conditioning.interpretation;
+item.A_nullity = nullDiag.nullityA;
+item.A_effectiveCond = nullDiag.effectiveCondA;
+item.A_dominantNullStates = nullDiag.dominantStatesPerNullVector;
+item.scaledA_effectiveCond = nullDiag.scaledEffectiveCondA;
+item.reducedA_nullity = nullDiag.reducedNullityA;
+item.reducedA_effectiveCond = nullDiag.reducedEffectiveCondA;
+item.reducedA_dominantNullStates = ...
+    nullDiag.dominantStatesReducedNullVector;
+item.B_rank = nullDiag.rankB;
+item.B_nullity = nullDiag.nullityB;
+item.B_effectiveCond = nullDiag.effectiveCondB;
+item.B_dominantNullControls = nullDiag.dominantControlsPerNullVector;
+item.nullspaceInterpretation = nullDiag.interpretation;
 item.warnings = componentInfo.warnings;
 end
 
@@ -201,6 +217,18 @@ item = struct( ...
     'rankB', NaN, ...
     'nearZeroControlColumns', {{}} , ...
     'conditioningInterpretation', '', ...
+    'A_nullity', NaN, ...
+    'A_effectiveCond', NaN, ...
+    'A_dominantNullStates', {{}} , ...
+    'scaledA_effectiveCond', NaN, ...
+    'reducedA_nullity', NaN, ...
+    'reducedA_effectiveCond', NaN, ...
+    'reducedA_dominantNullStates', {{}} , ...
+    'B_rank', NaN, ...
+    'B_nullity', NaN, ...
+    'B_effectiveCond', NaN, ...
+    'B_dominantNullControls', {{}} , ...
+    'nullspaceInterpretation', '', ...
     'warnings', {{}} );
 end
 
@@ -229,6 +257,10 @@ fprintf(fid, 'diagnostic that removes structural heading/null columns, and ');
 fprintf(fid, 'B-column rank/norm checks. These are internal numerical ');
 fprintf(fid, 'health diagnostics, not validation or handling-quality ');
 fprintf(fid, 'pass/fail criteria.\n\n');
+fprintf(fid, 'The report also includes nullspace and effective condition ');
+fprintf(fid, 'diagnostics. These identify numerical null directions and ');
+fprintf(fid, 'linearized control dependencies only; they are not validation ');
+fprintf(fid, 'or modal classifications.\n\n');
 
 fprintf(fid, '## Cases\n\n');
 for k = 1:numel(report.cases)
@@ -295,6 +327,28 @@ for k = 1:numel(report.cases)
         join_names(item.nearZeroControlColumns));
     fprintf(fid, '- interpretation: %s\n\n', ...
         item.conditioningInterpretation);
+
+    fprintf(fid, '#### Nullspace / Effective Conditioning\n\n');
+    fprintf(fid, '- A nullity: %d\n', item.A_nullity);
+    fprintf(fid, '- A effective condition: %.12e\n', ...
+        item.A_effectiveCond);
+    fprintf(fid, '- dominant A null states: %s\n', ...
+        join_dominant_names(item.A_dominantNullStates));
+    fprintf(fid, '- scaled A effective condition: %.12e\n', ...
+        item.scaledA_effectiveCond);
+    fprintf(fid, '- reduced A nullity: %d\n', item.reducedA_nullity);
+    fprintf(fid, '- reduced A effective condition: %.12e\n', ...
+        item.reducedA_effectiveCond);
+    fprintf(fid, '- dominant reduced A null states: %s\n', ...
+        join_dominant_names(item.reducedA_dominantNullStates));
+    fprintf(fid, '- B rank: %d\n', item.B_rank);
+    fprintf(fid, '- B nullity: %d\n', item.B_nullity);
+    fprintf(fid, '- B effective condition: %.12e\n', ...
+        item.B_effectiveCond);
+    fprintf(fid, '- dominant B null controls: %s\n', ...
+        join_dominant_names(item.B_dominantNullControls));
+    fprintf(fid, '- interpretation: %s\n\n', ...
+        item.nullspaceInterpretation);
 
     fprintf(fid, '| Control | norm(B column) |\n');
     fprintf(fid, '|-|-:|\n');
@@ -389,6 +443,28 @@ for k = 1:numel(report.cases)
         join_names(item.nearZeroControlColumns));
     write_text_metric(fid, item.caseName, 'conditioningInterpretation', ...
         item.conditioningInterpretation);
+    write_metric(fid, item.caseName, 'A_nullity', item.A_nullity);
+    write_metric(fid, item.caseName, 'A_effectiveCond', ...
+        item.A_effectiveCond);
+    write_text_metric(fid, item.caseName, 'A_dominantNullStates', ...
+        join_dominant_names(item.A_dominantNullStates));
+    write_metric(fid, item.caseName, 'scaledA_effectiveCond', ...
+        item.scaledA_effectiveCond);
+    write_metric(fid, item.caseName, 'reducedA_nullity', ...
+        item.reducedA_nullity);
+    write_metric(fid, item.caseName, 'reducedA_effectiveCond', ...
+        item.reducedA_effectiveCond);
+    write_text_metric(fid, item.caseName, ...
+        'reducedA_dominantNullStates', ...
+        join_dominant_names(item.reducedA_dominantNullStates));
+    write_metric(fid, item.caseName, 'B_rank', item.B_rank);
+    write_metric(fid, item.caseName, 'B_nullity', item.B_nullity);
+    write_metric(fid, item.caseName, 'B_effectiveCond', ...
+        item.B_effectiveCond);
+    write_text_metric(fid, item.caseName, 'B_dominantNullControls', ...
+        join_dominant_names(item.B_dominantNullControls));
+    write_text_metric(fid, item.caseName, 'nullspaceInterpretation', ...
+        item.nullspaceInterpretation);
 end
 end
 
@@ -406,6 +482,23 @@ if isempty(names)
 else
     text = strjoin(names(:).', '|');
 end
+end
+
+function text = join_dominant_names(namesPerVector)
+if isempty(namesPerVector)
+    text = 'none';
+    return;
+end
+parts = cell(numel(namesPerVector), 1);
+for k = 1:numel(namesPerVector)
+    names = namesPerVector{k};
+    if isempty(names)
+        parts{k} = sprintf('v%d:none', k);
+    else
+        parts{k} = sprintf('v%d:%s', k, strjoin(names(:).', '|'));
+    end
+end
+text = strjoin(parts(:).', '; ');
 end
 
 function text = logical_text(value)

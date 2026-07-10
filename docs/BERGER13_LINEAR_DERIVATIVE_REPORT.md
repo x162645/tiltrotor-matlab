@@ -39,6 +39,8 @@ For each case the report records:
 - A condition-number diagnostic.
 - Scaled condition, SVD, and rank diagnostics described in
   `docs/BERGER13_CONDITIONING_DIAGNOSTICS.md`.
+- Nullspace and effective-condition diagnostics described in
+  `docs/BERGER13_NULLSPACE_DIAGNOSTICS.md`.
 - `betaML` and `betaMR` state-column effects on the first nine rigid-body
   derivatives.
 - Angular-acceleration row effects for `betaML` and `betaMR`.
@@ -56,6 +58,8 @@ For each case the report records:
   sweep or envelope.
 - Conditioning diagnostics are internal numerical health checks, not
   validation or handling-quality pass/fail criteria.
+- Nullspace diagnostics identify numerical linearized dependencies, not
+  modal classifications or external validation results.
 - Non-rotor aero still uses
   `betaMAvg = 0.5*(betaML + betaMR)`.
 - Mass properties and inertia still use the betaMAvg approximation.
