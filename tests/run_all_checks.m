@@ -31,6 +31,8 @@ run_test('lateral cyclic mapping comparison', ...
     @test_lateral_cyclic_mapping_comparison);
 run_test('external comparison document map', ...
     @test_external_comparison_docs);
+run_test('NUAA source-freeze scaffold', ...
+    @test_nuaa_source_freeze_scaffold);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -164,6 +166,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         externalDocsReport = check_external_comparison_docs();
         assert(externalDocsReport.allPassed, ...
             'External comparison document checks have failed items.');
+    end
+
+    function test_nuaa_source_freeze_scaffold()
+        nuaaScaffoldReport = check_nuaa_source_freeze_scaffold();
+        assert(nuaaScaffoldReport.allPassed, ...
+            'NUAA source-freeze scaffold checks have failed items.');
     end
 
     function test_trim_mode_framework()
