@@ -93,9 +93,12 @@ while non-rotor aero still uses the `betaMAvg` research approximation.
   derivative audit for representative finite operating points, covering A13 /
   B13 dimensions, beta-angle state columns, all 10 control columns, symmetric
   legacy opt-in consistency, an asymmetric independent rotor-load probe, and
-  scaled condition / SVD / rank diagnostics.
+  scaled condition / SVD / rank / nullspace / effective-condition diagnostics.
 - `check_berger13_conditioning_diagnostics` verifies the internal conditioning
   helper without changing A/B matrices or treating conditioning as validation.
+- `check_berger13_nullspace_diagnostics` verifies the internal nullspace helper
+  without changing A/B matrices or treating nullspace directions as validation
+  or modal classifications.
 
 ## Future Work
 

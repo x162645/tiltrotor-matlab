@@ -38,6 +38,8 @@ run_test('berger13 interface scaffold', @test_berger13_interface);
 run_test('berger13 linearization scaffold', @test_berger13_linearization);
 run_test('berger13 conditioning diagnostics', ...
     @test_berger13_conditioning_diagnostics);
+run_test('berger13 nullspace diagnostics', ...
+    @test_berger13_nullspace_diagnostics);
 run_test('berger13 linear derivative report', ...
     @test_berger13_linear_derivative_report);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
@@ -202,6 +204,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         bergerConditioningReport = check_berger13_conditioning_diagnostics();
         assert(bergerConditioningReport.allPassed, ...
             'Berger13 conditioning diagnostic checks have failed items.');
+    end
+
+    function test_berger13_nullspace_diagnostics()
+        bergerNullspaceReport = check_berger13_nullspace_diagnostics();
+        assert(bergerNullspaceReport.allPassed, ...
+            'Berger13 nullspace diagnostic checks have failed items.');
     end
 
     function test_berger13_linear_derivative_report()

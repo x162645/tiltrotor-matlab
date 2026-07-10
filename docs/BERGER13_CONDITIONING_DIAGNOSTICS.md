@@ -29,6 +29,11 @@ the derivative matrix is finite and the expected input/state wiring is active.
 The state scaling is a numerical diagnostic convention only. It does not change
 the model, the operating point, or the A/B matrices used by other workflows.
 
+The follow-on nullspace helper is documented in
+`docs/BERGER13_NULLSPACE_DIAGNOSTICS.md`. It uses the same representative A/B
+matrices to report effective condition numbers and dominant coordinates in
+linearized nullspace directions.
+
 ## Interpretation
 
 - A zero `psi` column is consistent with heading invariance in the current
@@ -39,6 +44,8 @@ the model, the operating point, or the A/B matrices used by other workflows.
 - Scaled and dynamic-submatrix diagnostics are internal numerical health checks.
   They are not external validation, flight-test validation, or handling-quality
   pass/fail criteria.
+- Nullspace directions identify numerical A/B dependencies at the linearization
+  point. They are not modal classifications.
 
 ## Limitations
 
