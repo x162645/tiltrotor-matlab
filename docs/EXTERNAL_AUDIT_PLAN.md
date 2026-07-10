@@ -26,6 +26,17 @@ Recommended source staging:
 validation/external_sources/<source_name>/
 ```
 
+The NUAA Fig.5/Fig.6 source-freeze scaffold now lives under:
+
+```text
+validation/external_sources/nuaa/
+validation/external_digitized_data/nuaa/
+```
+
+Those directories provide source-provenance notes, CSV templates, and a
+provenance template only. They do not contain reviewed digitized curve values
+and do not make the comparison ready.
+
 ## Phase C: Internal Script Mapping
 
 Later scripts should read current model reports and digitized CSVs. They should

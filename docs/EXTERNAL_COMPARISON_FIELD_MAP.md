@@ -114,6 +114,12 @@ angle definition, control signs, and plotted operating conditions must be
 confirmed before any trend agreement is interpreted. Trend consistency is not a
 strict numerical validation.
 
+NUAA Fig.5/Fig.6 source-freeze scaffolding is available in
+`validation/external_sources/nuaa/` and
+`validation/external_digitized_data/nuaa/`. The target figure rows remain
+`SOURCE_REQUIRED` until reviewed source images or digitized CSV files are
+provided.
+
 ## 5. Berger Dissertation Field Map
 
 Source availability:
