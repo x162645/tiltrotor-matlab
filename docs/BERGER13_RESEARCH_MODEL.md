@@ -89,6 +89,10 @@ while non-rotor aero still uses the `betaMAvg` research approximation.
 - `report_independent_nacelle_loads` writes a small Markdown/CSV validation
   artifact for the symmetric case, asymmetric rotor-load delta, and
   linearization dimensions/columns.
+- `report_berger13_linear_derivatives` writes a small Markdown/CSV internal
+  derivative audit for representative finite operating points, covering A13 /
+  B13 dimensions, beta-angle state columns, all 10 control columns, symmetric
+  legacy opt-in consistency, and an asymmetric independent rotor-load probe.
 
 ## Future Work
 
@@ -97,5 +101,6 @@ while non-rotor aero still uses the `betaMAvg` research approximation.
 - Nonlinear doublet response workflows.
 - Berger 51-state reproduction.
 - XV-15 validation.
-- Berger/XV-15 derivative comparison after source definitions are audited.
+- Berger/XV-15 derivative comparison after the internal derivative report is
+  stable and external source definitions are audited.
 - Optional GUI research-tab integration, not default-path integration.
