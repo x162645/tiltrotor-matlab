@@ -76,6 +76,8 @@ x13 = [caseDef.V; 0; 0; 0; 0; 0; 0; 0; 0; ...
 [A13, B13, lin] = linearize_13x10_numeric(x13, u10, P13);
 [xdot, out] = tiltrotor_eom_13x10(x13, u10, P13);
 componentInfo = out.components13;
+conditioning = diagnose_berger13_conditioning(A13, B13, ...
+    get_state_names_13x10(), get_control_input_names_13x10());
 
 item = empty_case_report();
 item.caseName = caseDef.caseName;
@@ -112,6 +114,24 @@ item.first9DifferenceNorm = legacy_first9_difference( ...
     x13, u10, P13, xdot, componentInfo);
 item.forceDeltaNorm = norm(componentInfo.F - componentInfo.averageOnlyF);
 item.momentDeltaNorm = norm(componentInfo.M - componentInfo.averageOnlyM);
+item.rawRankA = conditioning.raw.rankA;
+item.rawCondA = conditioning.raw.rawCondA;
+item.rawMinSingularA = conditioning.raw.minSingularA;
+item.rawNearZeroSingularCount = ...
+    conditioning.raw.nearZeroSingularCount;
+item.zeroColumnNamesA = conditioning.raw.zeroColumnNamesA;
+item.scaledRankA = conditioning.scaled.rankScaledA;
+item.scaledCondA = conditioning.scaled.scaledCondA;
+item.scaledMinSingularA = conditioning.scaled.minSingularScaledA;
+item.scaledNearZeroSingularCount = ...
+    conditioning.scaled.nearZeroSingularCountScaled;
+item.dynamicRankA = conditioning.dynamic.rankADynamic;
+item.dynamicCondA = conditioning.dynamic.condADynamic;
+item.scaledDynamicRankA = conditioning.dynamic.rankScaledADynamic;
+item.scaledDynamicCondA = conditioning.dynamic.condScaledADynamic;
+item.rankB = conditioning.B.rankB;
+item.nearZeroControlColumns = conditioning.B.nearZeroControlColumnNames;
+item.conditioningInterpretation = conditioning.interpretation;
 item.warnings = componentInfo.warnings;
 end
 
@@ -165,6 +185,22 @@ item = struct( ...
     'first9DifferenceNorm', NaN, ...
     'forceDeltaNorm', NaN, ...
     'momentDeltaNorm', NaN, ...
+    'rawRankA', NaN, ...
+    'rawCondA', NaN, ...
+    'rawMinSingularA', NaN, ...
+    'rawNearZeroSingularCount', NaN, ...
+    'zeroColumnNamesA', {{}} , ...
+    'scaledRankA', NaN, ...
+    'scaledCondA', NaN, ...
+    'scaledMinSingularA', NaN, ...
+    'scaledNearZeroSingularCount', NaN, ...
+    'dynamicRankA', NaN, ...
+    'dynamicCondA', NaN, ...
+    'scaledDynamicRankA', NaN, ...
+    'scaledDynamicCondA', NaN, ...
+    'rankB', NaN, ...
+    'nearZeroControlColumns', {{}} , ...
+    'conditioningInterpretation', '', ...
     'warnings', {{}} );
 end
 
@@ -186,6 +222,13 @@ fprintf(fid, 'nonlinear response validation. The representative points are ');
 fprintf(fid, 'finite operating points, not a full trim envelope.\n\n');
 fprintf(fid, 'Non-rotor aero and mass properties still use ');
 fprintf(fid, '`betaMAvg = 0.5*(betaML + betaMR)`.\n\n');
+fprintf(fid, '## Conditioning Diagnostics\n\n');
+fprintf(fid, 'The report includes raw A SVD/rank diagnostics, scaled A ');
+fprintf(fid, 'diagnostics using internal state scales, a dynamic submatrix ');
+fprintf(fid, 'diagnostic that removes structural heading/null columns, and ');
+fprintf(fid, 'B-column rank/norm checks. These are internal numerical ');
+fprintf(fid, 'health diagnostics, not validation or handling-quality ');
+fprintf(fid, 'pass/fail criteria.\n\n');
 
 fprintf(fid, '## Cases\n\n');
 for k = 1:numel(report.cases)
@@ -225,6 +268,33 @@ for k = 1:numel(report.cases)
         item.forceDeltaNorm);
     fprintf(fid, '- independent vs betaMAvg-only moment delta norm: %.12e\n\n', ...
         item.momentDeltaNorm);
+
+    fprintf(fid, '#### Conditioning Diagnostics\n\n');
+    fprintf(fid, '- raw A rank: %d\n', item.rawRankA);
+    fprintf(fid, '- raw A condition: %.12e\n', item.rawCondA);
+    fprintf(fid, '- raw A min singular value: %.12e\n', ...
+        item.rawMinSingularA);
+    fprintf(fid, '- raw near-zero singular count: %d\n', ...
+        item.rawNearZeroSingularCount);
+    fprintf(fid, '- zero A columns: %s\n', ...
+        join_names(item.zeroColumnNamesA));
+    fprintf(fid, '- scaled A rank: %d\n', item.scaledRankA);
+    fprintf(fid, '- scaled A condition: %.12e\n', item.scaledCondA);
+    fprintf(fid, '- scaled A min singular value: %.12e\n', ...
+        item.scaledMinSingularA);
+    fprintf(fid, '- scaled near-zero singular count: %d\n', ...
+        item.scaledNearZeroSingularCount);
+    fprintf(fid, '- dynamic A rank: %d\n', item.dynamicRankA);
+    fprintf(fid, '- dynamic A condition: %.12e\n', item.dynamicCondA);
+    fprintf(fid, '- scaled dynamic A rank: %d\n', ...
+        item.scaledDynamicRankA);
+    fprintf(fid, '- scaled dynamic A condition: %.12e\n', ...
+        item.scaledDynamicCondA);
+    fprintf(fid, '- B rank: %d\n', item.rankB);
+    fprintf(fid, '- near-zero B control columns: %s\n', ...
+        join_names(item.nearZeroControlColumns));
+    fprintf(fid, '- interpretation: %s\n\n', ...
+        item.conditioningInterpretation);
 
     fprintf(fid, '| Control | norm(B column) |\n');
     fprintf(fid, '|-|-:|\n');
@@ -294,11 +364,48 @@ for k = 1:numel(report.cases)
         item.forceDeltaNorm);
     write_metric(fid, item.caseName, 'momentDeltaNorm', ...
         item.momentDeltaNorm);
+    write_metric(fid, item.caseName, 'rawRankA', item.rawRankA);
+    write_metric(fid, item.caseName, 'rawCondA', item.rawCondA);
+    write_metric(fid, item.caseName, 'rawMinSingularA', ...
+        item.rawMinSingularA);
+    write_metric(fid, item.caseName, 'rawNearZeroSingularCount', ...
+        item.rawNearZeroSingularCount);
+    write_text_metric(fid, item.caseName, 'zeroColumnNamesA', ...
+        join_names(item.zeroColumnNamesA));
+    write_metric(fid, item.caseName, 'scaledRankA', item.scaledRankA);
+    write_metric(fid, item.caseName, 'scaledCondA', item.scaledCondA);
+    write_metric(fid, item.caseName, 'scaledMinSingularA', ...
+        item.scaledMinSingularA);
+    write_metric(fid, item.caseName, 'scaledNearZeroSingularCount', ...
+        item.scaledNearZeroSingularCount);
+    write_metric(fid, item.caseName, 'dynamicRankA', item.dynamicRankA);
+    write_metric(fid, item.caseName, 'dynamicCondA', item.dynamicCondA);
+    write_metric(fid, item.caseName, 'scaledDynamicRankA', ...
+        item.scaledDynamicRankA);
+    write_metric(fid, item.caseName, 'scaledDynamicCondA', ...
+        item.scaledDynamicCondA);
+    write_metric(fid, item.caseName, 'rankB', item.rankB);
+    write_text_metric(fid, item.caseName, 'nearZeroControlColumns', ...
+        join_names(item.nearZeroControlColumns));
+    write_text_metric(fid, item.caseName, 'conditioningInterpretation', ...
+        item.conditioningInterpretation);
 end
 end
 
 function write_metric(fid, caseName, metric, value)
 fprintf(fid, '%s,%s,%.16g\n', caseName, metric, value);
+end
+
+function write_text_metric(fid, caseName, metric, value)
+fprintf(fid, '%s,%s,%s\n', caseName, metric, value);
+end
+
+function text = join_names(names)
+if isempty(names)
+    text = 'none';
+else
+    text = strjoin(names(:).', '|');
+end
 end
 
 function text = logical_text(value)

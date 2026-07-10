@@ -92,7 +92,10 @@ while non-rotor aero still uses the `betaMAvg` research approximation.
 - `report_berger13_linear_derivatives` writes a small Markdown/CSV internal
   derivative audit for representative finite operating points, covering A13 /
   B13 dimensions, beta-angle state columns, all 10 control columns, symmetric
-  legacy opt-in consistency, and an asymmetric independent rotor-load probe.
+  legacy opt-in consistency, an asymmetric independent rotor-load probe, and
+  scaled condition / SVD / rank diagnostics.
+- `check_berger13_conditioning_diagnostics` verifies the internal conditioning
+  helper without changing A/B matrices or treating conditioning as validation.
 
 ## Future Work
 
