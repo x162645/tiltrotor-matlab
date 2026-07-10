@@ -17,6 +17,8 @@ passed = [];
 messages = {};
 
 run_case('linearization dimensions and finite values', @check_dimensions);
+run_case('independent beta angle columns affect rigid states', ...
+    @check_beta_columns);
 run_case('nacelle torque columns affect nacelle accelerations', @check_torque_columns);
 run_case('lateralCyclic column is nonzero', @check_lateral_column);
 run_case('symmetric first nine states match legacy opt-in EOM', @check_legacy_match);
@@ -70,6 +72,13 @@ fprintf('All passed: %d\n', report.allPassed);
         [~, B, ~] = get_linearization();
         assert(abs(B(12,9)) > 1e-8);
         assert(abs(B(13,10)) > 1e-8);
+    end
+
+    function check_beta_columns()
+        [A, ~, ~] = get_linearization();
+        assert(norm(A(1:9,10)) > 1e-8);
+        assert(norm(A(1:9,11)) > 1e-8);
+        assert(norm(A(4:6,10)-A(4:6,11)) > 1e-8);
     end
 
     function check_lateral_column()

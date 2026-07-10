@@ -1,6 +1,7 @@
 function [Fbody, Mbody, info] = total_forces_moments_13x10(x13, u10, P13)
 %TOTAL_FORCES_MOMENTS_13X10 Force/moment wrapper for 13x10 research model.
-% The first implementation uses the legacy component stack at betaM average.
+% Non-rotor components use the legacy stack at betaM average. Left/right
+% rotor loads are corrected with independent betaML/betaMR evaluations.
 
 validate_13x10_inputs(x13, u10);
 Pbase = P13.base;
@@ -15,7 +16,12 @@ betaML = clamp(betaMLRaw, betaLimits);
 betaMR = clamp(betaMRRaw, betaLimits);
 betaMAvg = 0.5*(betaML + betaMR);
 
-[Fbody, Mbody, baseInfo] = total_forces_moments(xRigid, u8, betaMAvg, Pbase);
+[Favg, Mavg, baseInfo] = total_forces_moments(xRigid, u8, betaMAvg, Pbase);
+rotorLoads = compute_berger13_rotor_loads( ...
+    xRigid, u8, betaMAvg, betaML, betaMR, Pbase, baseInfo);
+
+Fbody = Favg + rotorLoads.deltaF;
+Mbody = Mavg + rotorLoads.deltaM;
 
 info.betaML = betaML;
 info.betaMR = betaMR;
@@ -24,15 +30,22 @@ info.betaMLRaw = betaMLRaw;
 info.betaMRRaw = betaMRRaw;
 info.nacelleTorqueLeft = u10(9);
 info.nacelleTorqueRight = u10(10);
-info.usedIndependentRotorAngles = false;
-info.forceMomentApproximation = ['legacy component stack evaluated at ' ...
-    'average nacelle angle; independent left/right rotor-angle loads are ' ...
-    'not yet implemented'];
+info.usedIndependentRotorAngles = true;
+info.usedAverageNonRotorAero = true;
+info.forceMomentApproximation = ['left/right rotor loads use betaML/betaMR; ' ...
+    'wing, fuselage, tail, mass properties, and non-rotor aerodynamic ' ...
+    'loads still use betaMAvg research approximation'];
 info.baseComponents = baseInfo;
+info.rotorLeft = rotorLoads.rotorLeft;
+info.rotorRight = rotorLoads.rotorRight;
+info.averageOnlyF = Favg;
+info.averageOnlyM = Mavg;
+info.F = Fbody;
+info.M = Mbody;
 info.warnings = {};
 if abs(betaML-betaMR) > 1e-10
-    info.warnings{end+1,1} = ['betaML differs from betaMR; force/moment ' ...
-        'loads use betaMAvg research approximation'];
+    info.warnings{end+1,1} = ['independent left/right rotor loads are ' ...
+        'active; non-rotor aero still uses betaMAvg approximation'];
 end
 end
 

@@ -19,6 +19,12 @@ messages = {};
 run_case('state and control names', @check_names);
 run_case('params include base and nacelle placeholders', @check_params);
 run_case('EOM returns finite 13-vector', @check_eom);
+run_case('symmetric first nine states match legacy opt-in EOM', ...
+    @check_symmetric_legacy_match);
+run_case('independent rotor angle activation', ...
+    @check_independent_rotor_activation);
+run_case('asymmetric rotor loads differ from average-only loads', ...
+    @check_asymmetric_load_difference);
 run_case('nacelle torque signs', @check_torque_signs);
 run_case('nacelle angle guards finite', @check_guards);
 run_case('legacy default unchanged', @check_legacy_default);
@@ -72,6 +78,37 @@ fprintf('All passed: %d\n', report.allPassed);
         assert(isreal(xdot) && all(isfinite(xdot)));
     end
 
+    function check_symmetric_legacy_match()
+        Pbase = P13.base;
+        legacy = tiltrotor_eom(x13(1:9), u10(1:8), x13(10), Pbase);
+        research = tiltrotor_eom_13x10(x13, u10, P13);
+        assert(norm(research(1:9)-legacy) < 1e-9);
+    end
+
+    function check_independent_rotor_activation()
+        xAsym = x13;
+        xAsym(10) = 80*d2r;
+        xAsym(11) = 90*d2r;
+        [~, ~, info] = total_forces_moments_13x10(xAsym, u10, P13);
+        assert(info.usedIndependentRotorAngles == true);
+        assert(info.usedAverageNonRotorAero == true);
+        assert(abs(info.rotorLeft.betaMUsed - xAsym(10)) < 1e-12);
+        assert(abs(info.rotorRight.betaMUsed - xAsym(11)) < 1e-12);
+        assert(~isempty(info.warnings));
+        assert(any(cellfun(@warning_mentions_average_nonrotor, info.warnings)));
+    end
+
+    function check_asymmetric_load_difference()
+        xAsym = x13;
+        xAsym(10) = 80*d2r;
+        xAsym(11) = 90*d2r;
+        [Fbody, Mbody, info] = total_forces_moments_13x10(xAsym, u10, P13);
+        assert(norm(Fbody - info.averageOnlyF) > 1e-8);
+        assert(norm(Mbody - info.averageOnlyM) > 1e-8);
+        assert(norm(info.rotorLeft.deltaFromAverage.F) > 1e-8 || ...
+            norm(info.rotorRight.deltaFromAverage.F) > 1e-8);
+    end
+
     function check_torque_signs()
         up = u10;
         um = u10;
@@ -112,5 +149,10 @@ fprintf('All passed: %d\n', report.allPassed);
         else
             value = b;
         end
+    end
+
+    function tf = warning_mentions_average_nonrotor(text)
+        tf = contains(text, 'independent left/right rotor loads') && ...
+            contains(text, 'non-rotor aero still uses betaMAvg');
     end
 end
