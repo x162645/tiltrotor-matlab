@@ -51,29 +51,51 @@ stability and interface development, not aircraft data.
 
 ## Force And Moment Reuse
 
-`total_forces_moments_13x10` reuses the existing component stack with the
-first eight controls and `betaMAvg = 0.5*(betaML + betaMR)`. Therefore a
-symmetric condition with `betaML = betaMR`, zero nacelle rates, and zero
-nacelle torques matches the legacy opt-in 9-state EOM for the first nine
-derivatives.
+`total_forces_moments_13x10` first evaluates the existing component stack with
+the first eight controls and `betaMAvg = 0.5*(betaML + betaMR)`. It then
+replaces the average-angle left/right rotor loads with independent rotor loads:
 
-Asymmetric left/right nacelle aerodynamic and rotor-load effects are not yet
-implemented. When `betaML ~= betaMR`, the scaffold reports a diagnostic warning
-that the force/moment loads use the average-angle research approximation.
+```text
+left rotor  uses betaML
+right rotor uses betaMR
+```
+
+The replacement is implemented as a force/moment delta from the average-angle
+baseline, so a symmetric condition with `betaML = betaMR`, zero nacelle rates,
+and zero nacelle torques matches the legacy opt-in 9-state EOM for the first
+nine derivatives.
+
+Non-rotor aerodynamic components still use the average nacelle angle:
+
+```text
+betaMAvg = 0.5*(betaML + betaMR)
+```
+
+Independent left/right wing, fuselage, horizontal-tail, and vertical-tail
+aerodynamic effects are not yet implemented. When `betaML ~= betaMR`, the
+scaffold reports a diagnostic warning that independent rotor loads are active
+while non-rotor aero still uses the `betaMAvg` research approximation.
 
 ## Test Coverage
 
 - `check_berger13_interface` verifies labels, parameters, finite EOM output,
-  nacelle torque signs, angle guards, and legacy default isolation.
+  symmetric legacy equivalence, independent rotor-angle activation, asymmetric
+  rotor-load deltas, nacelle torque signs, angle guards, and legacy default
+  isolation.
 - `check_berger13_linearization` verifies 13x13 / 13x10 finite linearization,
-  nacelle torque columns, nonzero `lateralCyclic` column, and symmetric
-  equivalence with the legacy opt-in EOM.
+  independent beta angle columns, nacelle torque columns, nonzero
+  `lateralCyclic` column, and symmetric equivalence with the legacy opt-in EOM.
 - `run_berger13_smoke` runs a lightweight EOM and linearization smoke check.
+- `report_independent_nacelle_loads` writes a small Markdown/CSV validation
+  artifact for the symmetric case, asymmetric rotor-load delta, and
+  linearization dimensions/columns.
 
 ## Future Work
 
-- Independent left/right nacelle aerodynamics and rotor-load modeling.
-- Explicit nacelle actuator and torque-source modeling.
+- Independent left/right wing, fuselage, and tail aerodynamic effects.
+- High-fidelity nacelle actuator and torque-source modeling.
 - Nonlinear doublet response workflows.
+- Berger 51-state reproduction.
+- XV-15 validation.
 - Berger/XV-15 derivative comparison after source definitions are audited.
 - Optional GUI research-tab integration, not default-path integration.
