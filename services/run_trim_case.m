@@ -18,6 +18,11 @@ end
 config = apply_defaults(config);
 validate_config(config);
 
+if ~strcmp(config.trimMode, 'longitudinal_symmetric')
+    result = guarded_trim_mode_result(config, P, parameterReport);
+    return;
+end
+
 opts.gamma = config.gammaDeg*pi/180;
 opts.initialDeg = [config.initialThetaDeg, ...
     config.initialCollectiveDeg, config.initialCyclicLongDeg];
@@ -60,7 +65,8 @@ defaults = struct( ...
     'initialCyclicLongDeg', 0, ...
     'thetaLimitDeg', 35, ...
     'useMultiStart', true, ...
-    'alwaysMultiStart', false);
+    'alwaysMultiStart', false, ...
+    'trimMode', 'longitudinal_symmetric');
 
 names = fieldnames(defaults);
 for k = 1:numel(names)
@@ -94,6 +100,15 @@ if ~(islogical(config.alwaysMultiStart) && isscalar(config.alwaysMultiStart))
     error('run_trim_case:InvalidAlwaysMultiStart', ...
         'alwaysMultiStart must be a logical scalar.');
 end
+if isstring(config.trimMode) && isscalar(config.trimMode)
+    config.trimMode = char(config.trimMode);
+end
+validModes = {'longitudinal_symmetric', ...
+    'lateral_directional_balance', 'full_6dof'};
+if ~(ischar(config.trimMode) && any(strcmp(config.trimMode, validModes)))
+    error('run_trim_case:InvalidTrimMode', ...
+        'trimMode must be longitudinal_symmetric, lateral_directional_balance, or full_6dof.');
+end
 end
 
 function check_scalar(value, name, predicate, message)
@@ -103,4 +118,41 @@ end
 if ~predicate(value)
     error('run_trim_case:InvalidConfig', '%s', message);
 end
+end
+
+function result = guarded_trim_mode_result(config, P, parameterReport)
+definition = build_trim_mode_definition(config.trimMode, P);
+controlNames = get_control_input_names(P);
+switch config.trimMode
+    case 'lateral_directional_balance'
+        message = ['该模式当前提供受控入口和定义检查；完整横侧向求解尚未启用，' ...
+            '不会调用纵向对称配平冒充成功。'];
+        if ~any(strcmp(controlNames, 'lateralCyclic'))
+            message = [message newline ...
+                '当前为默认 7 输入；如需检查 lateralCyclic，请先启用 8 输入控制架构。'];
+        end
+    case 'full_6dof'
+        message = ['该模式需要完整未知量、残差和约束定义；当前为 guarded scaffold，' ...
+            '完整求解未启用，不输出假配平结果。'];
+    otherwise
+        error('run_trim_case:UnsupportedGuardedMode', ...
+            'Unsupported guarded trim mode %s.', config.trimMode);
+end
+
+result.kind = 'guarded-trim-mode';
+result.timestamp = datestr(now, 30);
+result.success = false;
+result.guarded = true;
+result.enabled = false;
+result.mode = config.trimMode;
+result.modeLabel = definition.label;
+result.message = message;
+result.reason = '完整配平定义尚未启用';
+result.config = config;
+result.parameterValidation = parameterReport;
+result.stateNames = get_state_names(P);
+result.controlNames = controlNames;
+result.residualTargets = definition.residualNames;
+result.recommendedControls = definition.unknownNames;
+result.definition = definition;
 end

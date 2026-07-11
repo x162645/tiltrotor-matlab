@@ -16,6 +16,15 @@ passed = [];
 messages = {};
 
 run_test('parameters and inertia', @test_parameters);
+run_test('GUI complete parameter workbench', ...
+    @test_gui_complete_parameter_workbench);
+run_test('GUI control architecture selector', ...
+    @test_gui_control_architecture_selector);
+run_test('GUI lateral cyclic response wiring', ...
+    @test_gui_lateral_response_wiring);
+run_test('GUI trim mode selector', @test_gui_trim_mode_selector);
+run_test('GUI UI wording', @test_gui_ui_text);
+run_test('GUI service smoke', @test_gui_services);
 run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
 run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
 run_test('collective thrust monotonicity', @test_collective_monotonicity);
@@ -93,6 +102,42 @@ fprintf('All passed: %d\n',summary.allPassed);
         massGeometryReport = check_mass_inertia_geometry();
         assert(massGeometryReport.allPassed, ...
             'Mass/inertia/geometry audit has failed items.');
+    end
+
+    function test_gui_complete_parameter_workbench()
+        guiParameterReport = check_gui_complete_parameter_workbench();
+        assert(guiParameterReport.allPassed, ...
+            'GUI complete parameter workbench checks have failed items.');
+    end
+
+    function test_gui_control_architecture_selector()
+        guiControlReport = check_gui_control_architecture_selector();
+        assert(guiControlReport.allPassed, ...
+            'GUI control architecture selector checks have failed items.');
+    end
+
+    function test_gui_lateral_response_wiring()
+        guiResponseReport = check_gui_lateral_response_wiring();
+        assert(guiResponseReport.allPassed, ...
+            'GUI lateral response wiring checks have failed items.');
+    end
+
+    function test_gui_trim_mode_selector()
+        guiTrimModeReport = check_gui_trim_mode_selector();
+        assert(guiTrimModeReport.allPassed, ...
+            'GUI trim mode selector checks have failed items.');
+    end
+
+    function test_gui_ui_text()
+        guiTextReport = check_gui_ui_text_interactive();
+        assert(guiTextReport.allPassed, ...
+            'GUI UI wording checks have failed items.');
+    end
+
+    function test_gui_services()
+        guiServiceReport = check_gui_services();
+        assert(guiServiceReport.allPassed, ...
+            'GUI service checks have failed items.');
     end
 
     function test_nacelle_endpoints()

@@ -1,5 +1,5 @@
 function report = check_nacelle_dynamics_gui_service()
-%CHECK_NACELLE_DYNAMICS_GUI_SERVICE Experimental GUI service checks.
+%CHECK_NACELLE_DYNAMICS_GUI_SERVICE Nacelle dynamics GUI service checks.
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 addpath(rootDir);
@@ -13,7 +13,7 @@ messages = {};
 
 run_case('default service remains legacy 9-state', @check_default_disabled);
 run_case('enabled service returns bounded 11-state response', @check_enabled);
-run_case('GUI file contains experimental opt-in text', @check_gui_text);
+run_case('GUI file contains professional opt-in text', @check_gui_text);
 
 report.names = cases;
 report.passed = passed;
@@ -69,9 +69,11 @@ fprintf('All nacelle dynamics GUI service checks passed: %d\n', report.allPassed
     function check_gui_text()
         appPath = fullfile(rootDir, 'app', 'launch_tiltrotor_app.m');
         text = fileread(appPath);
-        requiredText = ['该功能为实验扩展，默认关闭。启用后模型状态由 9 个增加到 11 个，' ...
-            '用于研究短舱角滞后和速率限制。'];
-        assert(contains(text, '短舱动态（实验）'));
+        requiredText = ['默认关闭以保持 legacy 9 状态路径；' ...
+            '该模块不等同完整转换飞行闭环控制。'];
+        assert(contains(text, 'Title'',''短舱动态'));
+        assert(~contains(text, '短舱动态（实验）'));
+        assert(~contains(text, '实验设置'));
         assert(contains(text, requiredText));
         forbidden = {'复现 Berger 51 状态', '真实转换飞行', ...
             '已验证真实 XV-15', '替代 legacy 模型'};
