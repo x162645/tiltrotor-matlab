@@ -88,16 +88,21 @@ The trim page exposes three modes:
 
 - `longitudinal_symmetric`: enabled production path, using the existing
   `trim_symmetric` service behavior.
-- `lateral_directional_balance`: guarded scaffold. It defines lateral
-  residual targets and candidate controls, but complete solving is not
-  enabled in this task.
-- `full_6dof`: guarded scaffold. It defines the intended six residual
-  targets, but complete unknown/residual/constraint solving is not enabled
-  in this task.
+- `lateral_directional_balance`: enabled solver path. It obtains a
+  longitudinal symmetric base trim, then solves `vdot`, `pdot`, and `rdot`
+  with lateral control candidates and an explicit small-control
+  regularization term.
+- `full_6dof_straight_trim`: enabled solver path. It solves straight steady
+  six-degree-of-freedom rigid-body residuals `udot`, `vdot`, `wdot`,
+  `pdot`, `qdot`, and `rdot`.
 
-Guarded modes return explicit disabled results. They do not call the
-longitudinal trim solver and do not fabricate trim states, controls, or
-success flags.
+The non-default modes return real solver reports. If a representative point
+does not converge, the GUI displays `success=false`, residuals, limit status,
+and the solver message. The service does not return the longitudinal trim as
+a fake lateral or full six-DOF success.
+
+Detailed residuals, unknowns, control candidates, regularization, and
+success criteria are recorded in `docs/TRIM_MODE_SOLVER_DEFINITIONS.md`.
 
 ## Non-Goals
 

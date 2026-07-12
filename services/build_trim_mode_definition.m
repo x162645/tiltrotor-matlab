@@ -1,7 +1,7 @@
 function definition = build_trim_mode_definition(modeKey, P)
 %BUILD_TRIM_MODE_DEFINITION Describe supported GUI trim-mode entries.
-% This service intentionally separates enabled production trim from guarded
-% scaffolds so the GUI cannot present a longitudinal trim as 6-DOF success.
+% The non-default entries call real solver services. They may return
+% success=false with diagnostics, but they are not guarded placeholders.
 
 if nargin < 2 || isempty(P)
     P = params_nominal();
@@ -27,28 +27,39 @@ switch modeKey
     case 'lateral_directional_balance'
         definition.key = modeKey;
         definition.label = '横侧向平衡/导数检查';
-        definition.enabled = false;
-        definition.guarded = true;
-        definition.solver = 'guarded_scaffold';
+        definition.enabled = true;
+        definition.guarded = false;
+        definition.solver = 'trim_lateral_directional_balance';
         definition.residualNames = {'vdot'; 'pdot'; 'rdot'};
-        definition.unknownNames = {'lateralCyclic'; 'aileron'; 'rudder'; ...
-            'diffCollective'; 'diffCyclic'};
-        definition.message = ['横侧向残差和候选控制通道已定义；完整求解尚未启用，' ...
-            '不会输出假配平结果。'];
+        if any(strcmp(controlNames, 'lateralCyclic'))
+            definition.unknownNames = {'lateralCyclic'; 'diffCollective'; ...
+                'diffCyclic'; 'aileron'; 'rudder'};
+        else
+            definition.unknownNames = {'diffCollective'; 'diffCyclic'; ...
+                'aileron'; 'rudder'};
+        end
+        definition.message = ['基于纵向对称基准点求解 vdot/pdot/rdot，' ...
+            '并用小控制量正则化处理横侧向控制欠定问题。'];
         definition.lateralCyclicAvailable = any(strcmp(controlNames, 'lateralCyclic'));
-    case 'full_6dof'
-        definition.key = modeKey;
+        definition.regularization = 'control_delta_l2';
+    case {'full_6dof', 'full_6dof_straight_trim'}
+        definition.key = 'full_6dof_straight_trim';
         definition.label = '六自由度联合配平';
-        definition.enabled = false;
-        definition.guarded = true;
-        definition.solver = 'guarded_scaffold';
+        definition.enabled = true;
+        definition.guarded = false;
+        definition.solver = 'trim_full_6dof_straight';
         definition.residualNames = {'udot'; 'vdot'; 'wdot'; 'pdot'; 'qdot'; 'rdot'};
-        definition.unknownNames = {'theta'; 'phi'; 'collective'; 'cyclicLong'; ...
-            'lateralCyclic'; 'aileron'; 'elevator'; 'rudder'; ...
-            'diffCollective'; 'diffCyclic'};
-        definition.message = ['六自由度联合配平需要完整未知量、残差和约束定义；' ...
-            '当前未启用完整求解。'];
+        if any(strcmp(controlNames, 'lateralCyclic'))
+            definition.unknownNames = {'theta'; 'phi'; 'collective'; ...
+                'cyclicLong'; 'lateralCyclic'; 'rudder'};
+        else
+            definition.unknownNames = {'theta'; 'phi'; 'collective'; ...
+                'cyclicLong'; 'aileron'; 'rudder'};
+        end
+        definition.message = ['直线定常六自由度刚体平衡求解 udot/vdot/wdot/' ...
+            'pdot/qdot/rdot；不表示外部验证或操稳品质验证。'];
         definition.lateralCyclicAvailable = any(strcmp(controlNames, 'lateralCyclic'));
+        definition.regularization = 'small_initial_deviation_l2';
     otherwise
         error('build_trim_mode_definition:UnknownMode', ...
             'Unknown trim mode %s.', modeKey);

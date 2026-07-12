@@ -13,9 +13,9 @@ passed = [];
 messages = {};
 
 run_case('default mode definition is enabled', @check_default_definition);
-run_case('lateral-directional mode is guarded', @check_lateral_guarded);
-run_case('full 6-DOF mode is guarded', @check_full_guarded);
-run_case('run_trim_case does not fake guarded success', @check_run_trim_guard);
+run_case('lateral-directional mode is enabled', @check_lateral_enabled);
+run_case('full 6-DOF mode is enabled', @check_full_enabled);
+run_case('run_trim_case returns real solver reports', @check_run_trim_solver);
 
 report.names = names;
 report.passed = passed;
@@ -51,30 +51,35 @@ fprintf('All passed: %d\n', report.allPassed);
         assert(strcmp(def.solver, 'trim_symmetric'));
     end
 
-    function check_lateral_guarded()
+    function check_lateral_enabled()
         def = build_trim_mode_definition('lateral_directional_balance', P);
-        assert(~def.enabled);
-        assert(def.guarded);
+        assert(def.enabled);
+        assert(~def.guarded);
+        assert(strcmp(def.solver, 'trim_lateral_directional_balance'));
         assert(any(strcmp(def.residualNames, 'vdot')));
-        assert(any(strcmp(def.unknownNames, 'lateralCyclic')));
+        assert(any(strcmp(def.unknownNames, 'diffCyclic')));
     end
 
-    function check_full_guarded()
-        def = build_trim_mode_definition('full_6dof', P);
-        assert(~def.enabled);
-        assert(def.guarded);
+    function check_full_enabled()
+        def = build_trim_mode_definition('full_6dof_straight_trim', P);
+        assert(def.enabled);
+        assert(~def.guarded);
+        assert(strcmp(def.solver, 'trim_full_6dof_straight'));
         assert(numel(def.residualNames) == 6);
     end
 
-    function check_run_trim_guard()
+    function check_run_trim_solver()
         config = struct('V',0,'betaMDeg',0,'gammaDeg',0, ...
-            'trimMode','full_6dof','useMultiStart',false, ...
-            'alwaysMultiStart',false);
+            'initialThetaDeg',0,'initialCollectiveDeg',18, ...
+            'initialCyclicLongDeg',0,'thetaLimitDeg',35, ...
+            'trimMode','full_6dof_straight_trim', ...
+            'useMultiStart',false,'alwaysMultiStart',false);
         result = run_trim_case(config, P);
-        assert(~result.success);
-        assert(result.guarded);
-        assert(~isfield(result, 'xTrim'), ...
-            'Guarded mode must not return a fake trim point.');
+        assert(~isfield(result, 'guarded') || ~result.guarded);
+        assert(strcmp(result.kind, 'full-6dof-straight-trim'));
+        assert(isfield(result, 'xTrim') && numel(result.xTrim) == 9);
+        assert(numel(result.report.residualLabels) == 6);
+        assert(result.report.finite);
     end
 end
 

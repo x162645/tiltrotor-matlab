@@ -23,6 +23,10 @@ run_test('GUI control architecture selector', ...
 run_test('GUI lateral cyclic response wiring', ...
     @test_gui_lateral_response_wiring);
 run_test('GUI trim mode selector', @test_gui_trim_mode_selector);
+run_test('lateral trim solver', @test_lateral_trim_solver);
+run_test('full 6-DOF trim solver', @test_full_6dof_trim_solver);
+run_test('GUI trim real solver wiring', @test_gui_trim_solver_wiring);
+run_test('legacy trim mode regression', @test_trim_mode_regression);
 run_test('GUI UI wording', @test_gui_ui_text);
 run_test('GUI service smoke', @test_gui_services);
 run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
@@ -126,6 +130,30 @@ fprintf('All passed: %d\n',summary.allPassed);
         guiTrimModeReport = check_gui_trim_mode_selector();
         assert(guiTrimModeReport.allPassed, ...
             'GUI trim mode selector checks have failed items.');
+    end
+
+    function test_lateral_trim_solver()
+        lateralTrimReport = check_lateral_directional_trim_solver();
+        assert(lateralTrimReport.allPassed, ...
+            'Lateral-directional trim solver checks have failed items.');
+    end
+
+    function test_full_6dof_trim_solver()
+        fullTrimReport = check_full_6dof_trim_solver();
+        assert(fullTrimReport.allPassed, ...
+            'Full 6-DOF trim solver checks have failed items.');
+    end
+
+    function test_gui_trim_solver_wiring()
+        guiTrimSolverReport = check_gui_trim_modes_real_solver_wiring();
+        assert(guiTrimSolverReport.allPassed, ...
+            'GUI trim solver wiring checks have failed items.');
+    end
+
+    function test_trim_mode_regression()
+        trimRegressionReport = check_trim_mode_regression_legacy();
+        assert(trimRegressionReport.allPassed, ...
+            'Legacy trim mode regression checks have failed items.');
     end
 
     function test_gui_ui_text()
