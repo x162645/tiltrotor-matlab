@@ -17,6 +17,8 @@ run_check('invalid step and limit rejection', @check_invalid_step_limit_rejectio
 run_check('hover trim service', @check_hover_trim);
 run_check('trim-point linearization service', @check_linearization);
 run_check('linear response service', @check_response);
+run_check('opt-in lateralCyclic response service', ...
+    @check_lateral_cyclic_response);
 run_check('response waveform timing', @check_response_waveforms);
 run_check('response limit warning', @check_response_limit_warning);
 run_check('experimental nacelle response service', @check_nacelle_response_service);
@@ -151,6 +153,35 @@ fprintf('All passed: %d\n',report.allPassed);
             repmat(linearResult.trim.uTrim(:).', size(responseResult.deltaControl,1), 1);
         assert(max(abs(responseResult.actualState(:)-expectedState(:))) < 1e-12);
         assert(max(abs(responseResult.actualControl(:)-expectedControl(:))) < 1e-12);
+    end
+
+    function check_lateral_cyclic_response()
+        d2r = pi/180;
+        P8 = write_parameter_value(P, 'control.enableLateralCyclic', 1);
+        betaM = pi/2;
+        x = [40;0;0;0;0;0;0;0;0];
+        u = [8*d2r;0;0;0;0;0;-2*d2r;0];
+        [A,B,linReport] = linearize_numeric(x, u, betaM, P8);
+        assert(linReport.finite);
+        trim8 = struct('xTrim',x,'uTrim',u,'betaM',betaM,'success',true);
+        lin8 = struct('A',A,'B',B,'trim',trim8,'success',true, ...
+            'stateNames',{get_state_names(P8)}, ...
+            'controlNames',{get_control_input_names(P8)});
+        config = struct( ...
+            'controlChannel',5, ...
+            'waveform','step', ...
+            'amplitudeDeg',0.1, ...
+            'startTime',0.1, ...
+            'duration',0.2, ...
+            'frequencyHz',0.5, ...
+            'totalTime',0.4, ...
+            'timeStep',0.05, ...
+            'outputState',2);
+        response8 = simulate_linear_response(lin8,config,P8);
+        assert(response8.success);
+        assert(size(response8.deltaControl,2) == 8);
+        assert(strcmp(response8.controlNames{5}, 'lateralCyclic'));
+        assert(all(isfinite(response8.deltaState(:))));
     end
 
     function check_response_waveforms()
