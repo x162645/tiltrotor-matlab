@@ -205,6 +205,10 @@ end
 
 function result = failed_dependency_result(kind, config, P, parameterReport, ...
         dependency, message)
+definition = build_trim_mode_definition(config.trimMode, P);
+stateDim = get_state_dimension(P);
+controlNames = get_control_input_names(P);
+residualLabels = definition.residualNames(:);
 result.kind = kind;
 result.timestamp = datestr(now, 30);
 result.success = false;
@@ -212,27 +216,46 @@ result.guarded = false;
 result.enabled = true;
 result.config = config;
 result.betaM = config.betaMDeg*pi/180;
-result.xTrim = [];
-result.uTrim = [];
-result.xdot = [];
+result.xTrim = NaN(stateDim,1);
+result.uTrim = NaN(numel(controlNames),1);
+result.xdot = NaN(stateDim,1);
 result.message = message;
 result.parameterValidation = parameterReport;
 result.stateNames = get_state_names(P);
 result.stateUnits = get_state_units(P);
-result.controlNames = get_control_input_names(P);
+result.controlNames = controlNames;
 result.controlUnits = get_control_input_units(P);
-result.definition = build_trim_mode_definition(config.trimMode, P);
+result.loads.FaeroProp = NaN(3,1);
+result.loads.Fgravity = NaN(3,1);
+result.loads.Ftotal = NaN(3,1);
+result.loads.Mtotal = NaN(3,1);
+result.loads.components = struct();
+result.definition = definition;
 result.dependency = dependency;
-result.report.residual = [];
+result.report.residual = NaN(numel(residualLabels),1);
 result.report.residualNorm = Inf;
-result.report.residualLabels = result.definition.residualNames(:);
-result.report.residualScale = [];
-result.report.residualScaleUnits = {};
-result.report.fullStateDerivative = [];
+result.report.residualLabels = residualLabels;
+result.report.residualScale = NaN(numel(residualLabels),1);
+result.report.residualScaleUnits = residual_units(residualLabels);
+result.report.fullStateDerivative = NaN(stateDim,1);
 result.report.fullResidualNorm = Inf;
 result.report.finite = false;
 result.report.converged = false;
 result.report.withinLimits = false;
 result.report.atLimit = false;
+result.report.limitReport = struct('anyViolation', false, ...
+    'anyAtLimit', false, 'entries', []);
 result.report.message = message;
+end
+
+function units = residual_units(labels)
+units = cell(numel(labels),1);
+for i = 1:numel(labels)
+    switch labels{i}
+        case {'udot','vdot','wdot'}
+            units{i} = 'm/s^2';
+        otherwise
+            units{i} = 'rad/s^2';
+    end
+end
 end

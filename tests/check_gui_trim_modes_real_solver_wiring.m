@@ -15,6 +15,8 @@ messages = {};
 run_case('definitions are enabled real solvers', @check_definitions);
 run_case('lateral mode dispatches real solver', @check_lateral_dispatch);
 run_case('full mode dispatches real solver', @check_full_dispatch);
+run_case('lateral dependency failure is display-safe', ...
+    @check_lateral_dependency_failure);
 run_case('static GUI text no longer says guarded scaffold', @check_gui_text);
 
 report.names = names;
@@ -67,6 +69,25 @@ fprintf('All passed: %d\n', report.allPassed);
         assert(~isfield(result, 'guarded') || ~result.guarded);
         assert(result.report.finite);
         assert(isfield(result, 'baseTrimForInitialGuess'));
+    end
+
+    function check_lateral_dependency_failure()
+        config = config_for('lateral_directional_balance');
+        config.V = 35;
+        config.betaMDeg = 45;
+        config.thetaLimitDeg = 1;
+        result = run_trim_case(config, P);
+        assert(~result.success);
+        assert(strcmp(result.kind, 'lateral-directional-trim'));
+        assert(isfield(result, 'loads'));
+        assert(all(size(result.loads.Ftotal) == [3,1]));
+        assert(all(size(result.loads.Mtotal) == [3,1]));
+        assert(numel(result.xTrim) == get_state_dimension(P));
+        assert(numel(result.uTrim) == numel(get_control_input_names(P)));
+        assert(isequal(result.report.residualLabels, {'vdot';'pdot';'rdot'}));
+        assert(numel(result.report.residual) == 3);
+        assert(isfield(result.report, 'limitReport'));
+        assert(ischar(result.message) && ~isempty(result.message));
     end
 
     function check_gui_text()

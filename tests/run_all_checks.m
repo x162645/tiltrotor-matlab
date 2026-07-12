@@ -266,14 +266,12 @@ fprintf('All passed: %d\n',summary.allPassed);
     end
 
     function test_nacelle_dynamics()
-        nacelleReport = check_nacelle_dynamics_state_extension();
-        assert(nacelleReport.allPassed, ...
+        run_isolated_matlab_check('check_nacelle_dynamics_state_extension', ...
             'Nacelle dynamic state extension checks have failed items.');
     end
 
     function test_nacelle_validation()
-        validationReport = check_nacelle_dynamics_validation();
-        assert(validationReport.allPassed, ...
+        run_isolated_matlab_check('check_nacelle_dynamics_validation', ...
             'Nacelle dynamics validation workflow checks have failed items.');
     end
 
@@ -386,5 +384,21 @@ fprintf('All passed: %d\n',summary.allPassed);
         else
             value = b;
         end
+    end
+
+    function run_isolated_matlab_check(functionName, failureMessage)
+        matlabExe = 'F:\matlab\R2021a\bin\matlab.exe';
+        if ~exist(matlabExe, 'file')
+            error('run_all_checks:MissingMatlabExecutable', ...
+                'MATLAB executable not found at %s.', matlabExe);
+        end
+        escapedRoot = strrep(rootDir, '''', '''''');
+        inner = sprintf(['cd(''%s''); run(''startup.m''); ' ...
+            'report=%s(); assert(report.allPassed);'], ...
+            escapedRoot, functionName);
+        command = ['"', matlabExe, '" -batch "', inner, '"'];
+        [status, output] = system(command);
+        fprintf('%s', output);
+        assert(status == 0, '%s', failureMessage);
     end
 end
