@@ -27,6 +27,7 @@ run_test('lateral trim solver', @test_lateral_trim_solver);
 run_test('full 6-DOF trim solver', @test_full_6dof_trim_solver);
 run_test('GUI trim real solver wiring', @test_gui_trim_solver_wiring);
 run_test('legacy trim mode regression', @test_trim_mode_regression);
+run_test('trim solver evidence report', @test_trim_solver_evidence_report);
 run_test('GUI UI wording', @test_gui_ui_text);
 run_test('GUI service smoke', @test_gui_services);
 run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
@@ -154,6 +155,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         trimRegressionReport = check_trim_mode_regression_legacy();
         assert(trimRegressionReport.allPassed, ...
             'Legacy trim mode regression checks have failed items.');
+    end
+
+    function test_trim_solver_evidence_report()
+        trimEvidenceReport = check_trim_solver_evidence_report();
+        assert(trimEvidenceReport.allPassed, ...
+            'Trim solver evidence report checks have failed items.');
     end
 
     function test_gui_ui_text()
