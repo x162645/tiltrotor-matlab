@@ -101,6 +101,7 @@ This diagnostic classifies the committed PR #44 trim solver evidence. It does no
 
 - A. Run a longitudinal trim robustness audit first.
 - B. Audit whether elevator should enter the full6dof unknown set in conversion/fixed-wing-like conditions.
+  Elevator entry into the full6dof unknown set is a diagnostic hypothesis for follow-up audit only; it is not a proven fix and is not implemented by this diagnostic.
 - C. Audit lateral objectives only on cases with converged base trim.
 - D. Run cyclicLong limit sensitivity.
 - E. Run lateralCyclic allocation / regularization sensitivity.
