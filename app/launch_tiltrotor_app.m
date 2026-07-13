@@ -372,21 +372,6 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             trimResult = run_trim_case(config,P);
             linearResult = [];
             responseResult = [];
-            if isfield(trimResult, 'guarded') && trimResult.guarded
-                trimStatusLabel.Text = trimResult.message;
-                trimStateTable.Data = {'模式', trimResult.modeLabel, '-'};
-                trimControlTable.Data = [trimResult.recommendedControls(:), ...
-                    repmat({'定义待启用'}, numel(trimResult.recommendedControls), 1), ...
-                    repmat({'-'}, numel(trimResult.recommendedControls), 1)];
-                trimResidualTable.Data = [trimResult.residualTargets(:), ...
-                    repmat({'完整求解未启用'}, numel(trimResult.residualTargets), 1), ...
-                    repmat({'-'}, numel(trimResult.residualTargets), 1)];
-                runLinearButton.Enable = 'off';
-                runResponseButton.Enable = 'off';
-                linearStatusLabel.Text = '当前配平模式未输出可线性化的配平点';
-                set_status(trimResult.message,'warning');
-                return;
-            end
             update_trim_tables();
             if trimResult.success
                 trimStatusLabel.Text = sprintf('配平收敛：残差范数 %.3e', ...
@@ -527,7 +512,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             '推荐顺序：\n1. 检查或修改参数；\n2. 运行配平；\n' ...
             '3. 在收敛配平点运行线性化；\n4. 设置小幅操纵输入并计算响应。\n\n' ...
             '控制架构默认为 7 输入；启用 lateralCyclic 后需要重新配平和线性化。\n' ...
-            '横侧向和六自由度配平入口当前为 guarded scaffold，不会冒充完整求解。\n' ...
+            '横侧向和六自由度配平入口会调用真实求解服务；未收敛时显示残差、限幅和失败原因，不冒充成功。\n' ...
             '短舱动态模块默认关闭，用于开环短舱角动态响应分析。']), ...
             '使用说明');
     end
@@ -762,7 +747,7 @@ switch modeLabel
     case '横侧向平衡/导数检查'
         modeKey = 'lateral_directional_balance';
     case '六自由度联合配平'
-        modeKey = 'full_6dof';
+        modeKey = 'full_6dof_straight_trim';
     otherwise
         error('launch_tiltrotor_app:UnknownTrimMode', ...
             'Unknown trim mode %s.', modeLabel);

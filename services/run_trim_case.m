@@ -18,8 +18,11 @@ end
 config = apply_defaults(config);
 validate_config(config);
 
-if ~strcmp(config.trimMode, 'longitudinal_symmetric')
-    result = guarded_trim_mode_result(config, P, parameterReport);
+if strcmp(config.trimMode, 'lateral_directional_balance')
+    result = run_lateral_directional_case(config, P, parameterReport);
+    return;
+elseif strcmp(config.trimMode, 'full_6dof_straight_trim')
+    result = run_full_6dof_case(config, P, parameterReport);
     return;
 end
 
@@ -103,11 +106,19 @@ end
 if isstring(config.trimMode) && isscalar(config.trimMode)
     config.trimMode = char(config.trimMode);
 end
+config.trimMode = normalize_trim_mode(config.trimMode);
 validModes = {'longitudinal_symmetric', ...
-    'lateral_directional_balance', 'full_6dof'};
+    'lateral_directional_balance', 'full_6dof_straight_trim'};
 if ~(ischar(config.trimMode) && any(strcmp(config.trimMode, validModes)))
     error('run_trim_case:InvalidTrimMode', ...
-        'trimMode must be longitudinal_symmetric, lateral_directional_balance, or full_6dof.');
+        ['trimMode must be longitudinal_symmetric, ' ...
+        'lateral_directional_balance, or full_6dof_straight_trim.']);
+end
+end
+
+function mode = normalize_trim_mode(mode)
+if strcmp(mode, 'full_6dof')
+    mode = 'full_6dof_straight_trim';
 end
 end
 
@@ -120,39 +131,131 @@ if ~predicate(value)
 end
 end
 
-function result = guarded_trim_mode_result(config, P, parameterReport)
-definition = build_trim_mode_definition(config.trimMode, P);
-controlNames = get_control_input_names(P);
-switch config.trimMode
-    case 'lateral_directional_balance'
-        message = ['该模式当前提供受控入口和定义检查；完整横侧向求解尚未启用，' ...
-            '不会调用纵向对称配平冒充成功。'];
-        if ~any(strcmp(controlNames, 'lateralCyclic'))
-            message = [message newline ...
-                '当前为默认 7 输入；如需检查 lateralCyclic，请先启用 8 输入控制架构。'];
-        end
-    case 'full_6dof'
-        message = ['该模式需要完整未知量、残差和约束定义；当前为 guarded scaffold，' ...
-            '完整求解未启用，不输出假配平结果。'];
-    otherwise
-        error('run_trim_case:UnsupportedGuardedMode', ...
-            'Unsupported guarded trim mode %s.', config.trimMode);
+function result = run_lateral_directional_case(config, P, parameterReport)
+baseConfig = config;
+baseConfig.trimMode = 'longitudinal_symmetric';
+baseTrim = run_trim_case(baseConfig, P);
+if ~baseTrim.success
+    result = failed_dependency_result('lateral-directional-trim', config, ...
+        P, parameterReport, baseTrim, ...
+        'Longitudinal base trim did not converge; lateral balance was not run.');
+    return;
 end
 
-result.kind = 'guarded-trim-mode';
+betaM = config.betaMDeg*pi/180;
+opts = struct();
+[xTrim, uTrim, trimReport] = trim_lateral_directional_balance( ...
+    baseTrim, betaM, P, opts);
+[xdot, eomOut] = tiltrotor_eom(xTrim, uTrim, betaM, P);
+result = solver_result('lateral-directional-trim', config, P, ...
+    parameterReport, betaM, xTrim, uTrim, xdot, eomOut, trimReport);
+result.baseTrim = baseTrim;
+end
+
+function result = run_full_6dof_case(config, P, parameterReport)
+condition = struct('V', config.V, 'betaM', config.betaMDeg*pi/180, ...
+    'gamma', config.gammaDeg*pi/180);
+opts = struct('thetaLimitDeg', config.thetaLimitDeg);
+baseConfig = config;
+baseConfig.trimMode = 'longitudinal_symmetric';
+try
+    baseTrim = run_trim_case(baseConfig, P);
+    if baseTrim.success
+        opts.baseTrim = baseTrim;
+    end
+catch ME
+    baseTrim = struct('success', false, 'message', ME.message, ...
+        'identifier', ME.identifier);
+end
+
+[xTrim, uTrim, trimReport] = trim_full_6dof_straight(condition, P, opts);
+[xdot, eomOut] = tiltrotor_eom(xTrim, uTrim, condition.betaM, P);
+result = solver_result('full-6dof-straight-trim', config, P, ...
+    parameterReport, condition.betaM, xTrim, uTrim, xdot, eomOut, ...
+    trimReport);
+result.baseTrimForInitialGuess = baseTrim;
+end
+
+function result = solver_result(kind, config, P, parameterReport, betaM, ...
+        xTrim, uTrim, xdot, eomOut, trimReport)
+result.kind = kind;
 result.timestamp = datestr(now, 30);
-result.success = false;
-result.guarded = true;
-result.enabled = false;
-result.mode = config.trimMode;
-result.modeLabel = definition.label;
-result.message = message;
-result.reason = '完整配平定义尚未启用';
+result.success = trimReport.converged;
+result.guarded = false;
+result.enabled = true;
 result.config = config;
+result.betaM = betaM;
+result.xTrim = xTrim(:);
+result.uTrim = uTrim(:);
+result.xdot = xdot(:);
+result.report = trimReport;
+result.message = trimReport.message;
 result.parameterValidation = parameterReport;
 result.stateNames = get_state_names(P);
+result.stateUnits = get_state_units(P);
+result.controlNames = get_control_input_names(P);
+result.controlUnits = get_control_input_units(P);
+result.loads.FaeroProp = eomOut.FaeroProp;
+result.loads.Fgravity = eomOut.Fgravity;
+result.loads.Ftotal = eomOut.Ftotal;
+result.loads.Mtotal = eomOut.Mtotal;
+result.loads.components = eomOut.components;
+result.definition = build_trim_mode_definition(config.trimMode, P);
+end
+
+function result = failed_dependency_result(kind, config, P, parameterReport, ...
+        dependency, message)
+definition = build_trim_mode_definition(config.trimMode, P);
+stateDim = get_state_dimension(P);
+controlNames = get_control_input_names(P);
+residualLabels = definition.residualNames(:);
+result.kind = kind;
+result.timestamp = datestr(now, 30);
+result.success = false;
+result.guarded = false;
+result.enabled = true;
+result.config = config;
+result.betaM = config.betaMDeg*pi/180;
+result.xTrim = NaN(stateDim,1);
+result.uTrim = NaN(numel(controlNames),1);
+result.xdot = NaN(stateDim,1);
+result.message = message;
+result.parameterValidation = parameterReport;
+result.stateNames = get_state_names(P);
+result.stateUnits = get_state_units(P);
 result.controlNames = controlNames;
-result.residualTargets = definition.residualNames;
-result.recommendedControls = definition.unknownNames;
+result.controlUnits = get_control_input_units(P);
+result.loads.FaeroProp = NaN(3,1);
+result.loads.Fgravity = NaN(3,1);
+result.loads.Ftotal = NaN(3,1);
+result.loads.Mtotal = NaN(3,1);
+result.loads.components = struct();
 result.definition = definition;
+result.dependency = dependency;
+result.report.residual = NaN(numel(residualLabels),1);
+result.report.residualNorm = Inf;
+result.report.residualLabels = residualLabels;
+result.report.residualScale = NaN(numel(residualLabels),1);
+result.report.residualScaleUnits = residual_units(residualLabels);
+result.report.fullStateDerivative = NaN(stateDim,1);
+result.report.fullResidualNorm = Inf;
+result.report.finite = false;
+result.report.converged = false;
+result.report.withinLimits = false;
+result.report.atLimit = false;
+result.report.limitReport = struct('anyViolation', false, ...
+    'anyAtLimit', false, 'entries', []);
+result.report.message = message;
+end
+
+function units = residual_units(labels)
+units = cell(numel(labels),1);
+for i = 1:numel(labels)
+    switch labels{i}
+        case {'udot','vdot','wdot'}
+            units{i} = 'm/s^2';
+        otherwise
+            units{i} = 'rad/s^2';
+    end
+end
 end
