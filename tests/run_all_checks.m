@@ -30,6 +30,8 @@ run_test('legacy trim mode regression', @test_trim_mode_regression);
 run_test('trim solver evidence report', @test_trim_solver_evidence_report);
 run_test('trim solver failure diagnostic', ...
     @test_trim_solver_failure_diagnostic);
+run_test('longitudinal trim robustness audit', ...
+    @test_longitudinal_trim_robustness_audit);
 run_test('GUI UI wording', @test_gui_ui_text);
 run_test('GUI service smoke', @test_gui_services);
 run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
@@ -169,6 +171,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         failureDiagnosticReport = check_trim_solver_failure_diagnostic();
         assert(failureDiagnosticReport.allPassed, ...
             'Trim solver failure diagnostic checks have failed items.');
+    end
+
+    function test_longitudinal_trim_robustness_audit()
+        robustnessReport = check_longitudinal_trim_robustness_audit();
+        assert(robustnessReport.allPassed, ...
+            'Longitudinal trim robustness audit checks have failed items.');
     end
 
     function test_gui_ui_text()
