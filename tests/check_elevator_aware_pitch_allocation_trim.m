@@ -1,0 +1,136 @@
+function report = check_elevator_aware_pitch_allocation_trim()
+%CHECK_ELEVATOR_AWARE_PITCH_ALLOCATION_TRIM Verify opt-in trim candidate.
+
+rootDir = fileparts(fileparts(mfilename('fullpath')));
+addpath(rootDir);
+addpath(fullfile(rootDir, 'analysis'));
+addpath(fullfile(rootDir, 'model'));
+addpath(fullfile(rootDir, 'services'));
+
+P0 = params_nominal();
+config = struct('V', 20, 'betaMDeg', 0, 'gammaDeg', 0, ...
+    'trimMode', 'longitudinal_symmetric');
+before = run_trim_case(config, P0);
+
+caseDef = struct('name', 'helicopter_low_speed', 'V', 20, ...
+    'betaMDeg', 0, 'gammaDeg', 0);
+candidate = trim_longitudinal_elevator_aware(P0, caseDef, struct( ...
+    'candidateName', 'theta_collective_scheduled_pitch', ...
+    'controlSet', 'theta_collective_scheduled_pitch', ...
+    'runHeavy', false, 'maxIterations', 80));
+
+outputDir = fullfile(tempdir, ['elevator_aware_pitch_trim_test_' ...
+    datestr(now, 'yyyymmddTHHMMSSFFF')]);
+summary = report_elevator_aware_pitch_allocation_trim(struct( ...
+    'outputDir', outputDir, 'runHeavy', false, 'maxIterations', 80));
+
+P1 = params_nominal();
+after = run_trim_case(config, P1);
+
+cases = {};
+passed = [];
+messages = {};
+
+add_case('candidate function completes', isstruct(candidate), '');
+add_case('candidate reports residual diagnostics', ...
+    isfield(candidate, 'residualNorm') && ...
+    isfield(candidate, 'dominantResidual') && ...
+    isfield(candidate, 'limitReport') && ...
+    isfield(candidate, 'message'), '');
+add_case('report function completes', isstruct(summary), '');
+add_case('contains four representative cases', ...
+    summary.caseCount >= 4 && has_values({summary.records.case_name}, ...
+    {'helicopter_low_speed','conversion_mid','airplane_like', ...
+    'conversion_high'}), '');
+add_case('contains at least four formulations', ...
+    summary.candidateCount >= 4 && ...
+    has_values({summary.records.candidate_name}, ...
+    {'baseline_existing_summary','theta_collective_cyclicLong', ...
+    'theta_collective_elevator','theta_collective_scheduled_pitch'}), '');
+add_case('required output fields are populated', ...
+    all(isfield(summary.records, {'residual_norm','dominant_residual', ...
+    'active_limit_names','diagnosis_label'})), '');
+add_case('params_nominal cyclic limit unchanged', ...
+    isequal(P0.control.cyclicLim, P1.control.cyclicLim), '');
+add_case('params_nominal lateralCyclic default unchanged', ...
+    ~P0.control.enableLateralCyclic && ...
+    isequal(P0.control.enableLateralCyclic, ...
+    P1.control.enableLateralCyclic), '');
+add_case('run_trim_case behavior unchanged', ...
+    before.success == after.success && ...
+    norm(before.xTrim-after.xTrim) < 1.0e-10 && ...
+    norm(before.uTrim-after.uTrim) < 1.0e-10, '');
+add_case('baseline longitudinal result unchanged', ...
+    strcmp(before.kind, 'symmetric-trim') && ...
+    strcmp(after.kind, 'symmetric-trim'), '');
+add_case('report avoids forbidden validation claims', ...
+    avoids_forbidden_claims(summary.reportFile) && ...
+    avoids_forbidden_claims(fullfile(rootDir, 'docs', ...
+    'ELEVATOR_AWARE_PITCH_ALLOCATION_TRIM.md')), '');
+add_case('output files are text artifacts', ...
+    output_files_are_text(summary), '');
+add_case('not-run records do not crash report', ...
+    all(has_values({summary.records.diagnosis_label}, ...
+    {'BASELINE_REPRODUCED'})) && summary.runErrorCount >= 0, '');
+
+report.names = cases;
+report.passed = passed;
+report.messages = messages;
+report.summary = summary;
+report.allPassed = all(passed);
+
+fprintf('\nElevator-aware pitch allocation trim checks\n');
+fprintf('===========================================\n');
+for k = 1:numel(cases)
+    fprintf('%-52s : %s\n', cases{k}, ternary(passed(k), 'PASS', 'FAIL'));
+    if ~passed(k)
+        fprintf('  %s\n', messages{k});
+    end
+end
+fprintf('All passed: %d\n', report.allPassed);
+
+    function add_case(name, condition, message)
+        cases{end+1,1} = name;
+        passed(end+1,1) = logical(condition);
+        messages{end+1,1} = message;
+    end
+end
+
+function ok = has_values(items, expected)
+ok = true;
+for i = 1:numel(expected)
+    ok = ok && any(strcmp(items, expected{i}));
+end
+end
+
+function ok = output_files_are_text(summary)
+files = {summary.reportFile, summary.casesCsvFile, ...
+    summary.summaryCsvFile, summary.summaryJsonFile};
+ok = true;
+for i = 1:numel(files)
+    [~, ~, ext] = fileparts(files{i});
+    ok = ok && exist(files{i}, 'file') == 2 && ...
+        any(strcmpi(ext, {'.md','.csv','.json'}));
+end
+end
+
+function ok = avoids_forbidden_claims(reportFile)
+text = fileread(reportFile);
+forbidden = {'validation completed','validated against XV-15', ...
+    'NUAA validated','Berger validated','XV-15 validated', ...
+    'trend comparison passed','handling qualities validated', ...
+    'elevator fix is proven','scheduled allocation is validated', ...
+    'cyclicLong sign is wrong'};
+ok = true;
+for i = 1:numel(forbidden)
+    ok = ok && ~contains(text, forbidden{i});
+end
+end
+
+function value = ternary(condition, a, b)
+if condition
+    value = a;
+else
+    value = b;
+end
+end
