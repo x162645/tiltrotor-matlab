@@ -32,6 +32,8 @@ run_test('trim solver failure diagnostic', ...
     @test_trim_solver_failure_diagnostic);
 run_test('longitudinal trim robustness audit', ...
     @test_longitudinal_trim_robustness_audit);
+run_test('pitch control authority/source audit', ...
+    @test_pitch_control_authority_source_audit);
 run_test('GUI UI wording', @test_gui_ui_text);
 run_test('GUI service smoke', @test_gui_services);
 run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
@@ -177,6 +179,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         robustnessReport = check_longitudinal_trim_robustness_audit();
         assert(robustnessReport.allPassed, ...
             'Longitudinal trim robustness audit checks have failed items.');
+    end
+
+    function test_pitch_control_authority_source_audit()
+        pitchAuthorityReport = check_pitch_control_authority_source_audit();
+        assert(pitchAuthorityReport.allPassed, ...
+            'Pitch control authority/source audit checks have failed items.');
     end
 
     function test_gui_ui_text()
