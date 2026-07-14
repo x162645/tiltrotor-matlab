@@ -1,0 +1,13 @@
+case_name,candidate,baseline_residual_norm,residual_after_linear_allocation,improvement_fraction,diagnosis,notes
+helicopter_low_speed,current_cyclicLong,1.78315711669508e-09,3.72818338409819e-10,0.79092232820134,SIGN_OK_LIKELY,current local cyclicLong column
+helicopter_low_speed,inverted_cyclicLong_sign,1.78315711669508e-09,3.72818338409819e-10,0.79092232820134,SIGN_OK_LIKELY,audit-only negated cyclicLong column
+helicopter_low_speed,zero_cyclic_plus_elevator,1.78315711669508e-09,1.77419104600151e-09,0.00502820004452928,SIGN_OK_LIKELY,cyclicLong held fixed; elevator only
+conversion_mid,current_cyclicLong,2.12606974546791,1.63762641314075,0.229740032455832,AUTHORITY_LIMIT_LIKELY,current local cyclicLong column
+conversion_mid,inverted_cyclicLong_sign,2.12606974546791,1.63762641314075,0.229740032455832,AUTHORITY_LIMIT_LIKELY,audit-only negated cyclicLong column
+conversion_mid,zero_cyclic_plus_elevator,2.12606974546791,1.99071332094121,0.0636650913335457,AUTHORITY_LIMIT_LIKELY,cyclicLong held fixed; elevator only
+airplane_like,current_cyclicLong,3.14973154111308,2.30807651580159,0.267214844924231,AUTHORITY_LIMIT_LIKELY,current local cyclicLong column
+airplane_like,inverted_cyclicLong_sign,3.14973154111308,2.30807651580159,0.267214844924231,AUTHORITY_LIMIT_LIKELY,audit-only negated cyclicLong column
+airplane_like,zero_cyclic_plus_elevator,3.14973154111308,2.53326884824722,0.195719122350348,AUTHORITY_LIMIT_LIKELY,cyclicLong held fixed; elevator only
+conversion_high,current_cyclicLong,6.19866883030344,6.197535347157,0.000182859123058393,FORMULATION_LIMITATION_LIKELY,current local cyclicLong column
+conversion_high,inverted_cyclicLong_sign,6.19866883030344,6.197535347157,0.000182859123058393,FORMULATION_LIMITATION_LIKELY,audit-only negated cyclicLong column
+conversion_high,zero_cyclic_plus_elevator,6.19866883030344,5.03945132905848,0.187010716813568,FORMULATION_LIMITATION_LIKELY,cyclicLong held fixed; elevator only

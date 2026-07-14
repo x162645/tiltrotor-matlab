@@ -1,0 +1,13 @@
+item,current_implementation,source_status,evidence,action_needed
+cyclicLong definition,"symmetric longitudinal cyclic; input 3 in active control vector",DOC_CONFIRMED,"AGENTS.md and docs/CONTROL_CONVENTIONS.md define common longitudinal disk tilt",Keep current definition; audit source literature before changing limits
+diffCyclic definition,"differential longitudinal cyclic; input 4 in active control vector",DOC_CONFIRMED,"docs/CONTROL_CONVENTIONS.md documents historical name and physical meaning",Keep documentation name differentialLongitudinalCyclic
+lateralCyclic definition,"opt-in symmetric lateral cyclic inserted as input 5 in 8-input mode",DOC_CONFIRMED,"get_control_input_names inserts lateralCyclic only when enabled",Keep opt-in behavior
+cyclicLong limit +/-35 deg,"P.control.cyclicLim = [-35, 35] deg",SOURCE_REQUIRED,"params_nominal.m defines the value; no literature source is traced here",Audit references before widening any default limit
+elevator limit,"P.control.elevatorLim = [-40, 40] deg",SOURCE_REQUIRED,"params_nominal.m defines the value; no literature source is traced here",Audit references before using it as validated surface authority
+rotor longitudinal cyclic mapping,"cyclicSide maps to theta1sSide = -rotDir*cyclicSide",DOC_CONFIRMED,"AGENTS.md and docs/CONTROL_CONVENTIONS.md record the mapping",Do not call sign wrong unless strict multi-case evidence is met
+pitch attitude trim unknown,"theta is solved in longitudinal and full6DOF trim modes",CODE_CONFIRMED,"trim_symmetric and trim_full_6dof_straight include theta",Keep as state unknown
+elevator excluded from baseline longitudinal trim,"baseline symmetric trim fixes elevator at zero",CODE_CONFIRMED,"trim_symmetric fixedControls sets elevator = 0",Consider only a future opt-in elevator-aware trim mode
+elevator excluded from current full6DOF selected controls,"current full6DOF unknown set uses aileron/rudder or lateralCyclic/rudder, not elevator",CODE_CONFIRMED,"trim_full_6dof_straight full_unknown_set omits elevator",Future implementation can add opt-in candidate after source/sign audit
+fixed-wing pitch control role,"airplane-like pitch control role is not externally sourced in this codebase",SOURCE_REQUIRED,"No repository document validates the fixed-wing allocation against flight data",Treat elevator-vs-cyclic role as implementation hypothesis
+betaM convention,"0 deg helicopter mode, 90 deg airplane mode",CODE_CONFIRMED,"trim/evidence representative cases and validation docs use betaMDeg in [0,90]",Keep existing convention
+control unit rad/deg,"internal controls are radians; GUI/reports may show degrees",CODE_CONFIRMED,"get_control_input_units returns rad; services accept config angles in deg",Preserve rad internal units
