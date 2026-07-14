@@ -8,10 +8,9 @@ trimResult = [];
 linearResult = [];
 responseResult = [];
 nacelleResponseResult = [];
-parameterRows = make_parameter_rows();
-stateNames = {'u','v','w','p','q','r','phi','theta','psi'};
-controlNames = {'collective','diffCollective','cyclicLong', ...
-    'diffCyclic','aileron','elevator','rudder'};
+parameterRows = build_parameter_catalog(P);
+stateNames = get_state_names(P).';
+controlNames = get_control_input_names(P).';
 
 fig = uifigure('Name','Tiltrotor Analysis Workbench', ...
     'Position',[80 60 1420 860]);
@@ -20,9 +19,9 @@ root.RowHeight = {54,'1x'};
 root.Padding = [10 8 10 10];
 root.RowSpacing = 8;
 
-header = uigridlayout(root,[1 8]);
+header = uigridlayout(root,[1 9]);
 header.Layout.Row = 1;
-header.ColumnWidth = {270,22,'1x',120,120,120,120,150};
+header.ColumnWidth = {270,22,'1x',115,115,115,115,120,230};
 header.ColumnSpacing = 8;
 
 uilabel(header,'Text','倾转旋翼机分析工作台', ...
@@ -33,35 +32,37 @@ uibutton(header,'Text','检查参数', ...
     'ButtonPushedFcn',@onValidateParameters);
 uibutton(header,'Text','恢复默认', ...
     'ButtonPushedFcn',@onResetParameters);
-uibutton(header,'Text','导出工况', ...
+uibutton(header,'Text','保存项目', ...
     'ButtonPushedFcn',@onExportSession);
 uibutton(header,'Text','使用说明', ...
     'ButtonPushedFcn',@onShowHelp);
-uilabel(header,'Text','内部角度：rad｜界面角度：deg', ...
-    'HorizontalAlignment','right');
+controlArchitectureDrop = uidropdown(header, ...
+    'Items',{'默认 7 输入','启用 lateralCyclic 8 输入'}, ...
+    'Value','默认 7 输入', ...
+    'ValueChangedFcn',@onControlArchitectureChanged);
 
 mainTabs = uitabgroup(root);
 mainTabs.Layout.Row = 2;
-parameterTab = uitab(mainTabs,'Title','关键参数');
+parameterTab = uitab(mainTabs,'Title','参数设置');
 trimTab = uitab(mainTabs,'Title','配平');
 linearTab = uitab(mainTabs,'Title','线性化与模态');
 responseTab = uitab(mainTabs,'Title','操纵响应');
-nacelleTab = uitab(mainTabs,'Title','短舱动态（实验）');
+nacelleTab = uitab(mainTabs,'Title','短舱动态');
 
 %% Parameter tab
 parameterLayout = uigridlayout(parameterTab,[2 1]);
 parameterLayout.RowHeight = {'1x',95};
 parameterLayout.Padding = [8 8 8 8];
 parameterTable = uitable(parameterLayout, ...
-    'ColumnName',{'分组','参数','字段','数值','单位','来源分类'}, ...
-    'ColumnEditable',[false false false true false false], ...
-    'ColumnWidth',{100,190,180,110,100,150}, ...
+    'ColumnName',{'分组','参数','当前值','单位','来源','可编辑','内部字段'}, ...
+    'ColumnEditable',[false false true false false false false], ...
+    'ColumnWidth',{115,230,110,90,120,70,185}, ...
     'CellEditCallback',@onParameterEdited);
 uitextarea(parameterLayout,'Editable','off', ...
     'Value',{ ...
-    '这里仅暴露会直接影响当前概念模型和数值计算的关键参数。'; ...
-    '修改参数后，已有配平、线性化和响应结果会自动失效。'; ...
-    '“检查通过”仅表示结构、单位和基本数值条件合理，不代表完成 XV-15 型号验证。'});
+    '参数按物理部件和计算模块分类；来源分类显示为中文工程说明。'; ...
+    '派生计算和兼容保留字段只读；修改参数后，已有配平、线性化和响应结果会自动失效。'; ...
+    '来源说明：参考常数、概念假设、模型假设、数值设置、派生计算、兼容保留、外部来源待确认、符号待确认。'});
 refresh_parameter_table();
 
 %% Trim tab
@@ -69,12 +70,16 @@ trimLayout = uigridlayout(trimTab,[1 2]);
 trimLayout.ColumnWidth = {330,'1x'};
 trimLayout.Padding = [8 8 8 8];
 
-trimInputPanel = uipanel(trimLayout,'Title','工况与初值');
-trimInputGrid = uigridlayout(trimInputPanel,[11 2]);
-trimInputGrid.RowHeight = repmat({34},1,11);
+trimInputPanel = uipanel(trimLayout,'Title','工况、配平类型与初值');
+trimInputGrid = uigridlayout(trimInputPanel,[12 2]);
+trimInputGrid.RowHeight = repmat({34},1,12);
 trimInputGrid.ColumnWidth = {165,'1x'};
 trimInputGrid.Padding = [10 10 10 10];
 
+uilabel(trimInputGrid,'Text','配平类型');
+trimModeDrop = uidropdown(trimInputGrid, ...
+    'Items',{'纵向对称配平','横侧向平衡/导数检查','六自由度联合配平'}, ...
+    'Value','纵向对称配平');
 uilabel(trimInputGrid,'Text','目标空速 V (m/s)');
 trimVField = uieditfield(trimInputGrid,'numeric','Value',0,'Limits',[0 Inf]);
 uilabel(trimInputGrid,'Text','短舱倾转角 betaM (deg)');
@@ -91,7 +96,7 @@ uilabel(trimInputGrid,'Text','俯仰搜索限幅 (deg)');
 trimThetaLimitField = uieditfield(trimInputGrid,'numeric','Value',35,'Limits',[1 89]);
 uilabel(trimInputGrid,'Text','启用多初值');
 trimMultiStartCheck = uicheckbox(trimInputGrid,'Value',true,'Text','');
-uilabel(trimInputGrid,'Text','总是完成全部初值');
+uilabel(trimInputGrid,'Text','找到可用解后继续计算其余初值');
 trimAlwaysMultiCheck = uicheckbox(trimInputGrid,'Value',false,'Text','');
 runTrimButton = uibutton(trimInputGrid,'Text','运行配平', ...
     'FontWeight','bold','ButtonPushedFcn',@onRunTrim);
@@ -184,7 +189,7 @@ responseStepField = uieditfield(responseInputGrid,'numeric','Value',0.02,'Limits
 uilabel(responseInputGrid,'Text','显示状态');
 responseStateDrop = uidropdown(responseInputGrid,'Items',stateNames, ...
     'Value','theta','ValueChangedFcn',@onResponseDisplayChanged);
-uilabel(responseInputGrid,'Text','显示实际总量');
+uilabel(responseInputGrid,'Text','叠加配平值显示');
 responseActualCheck = uicheckbox(responseInputGrid,'Value',false,'Text','', ...
     'ValueChangedFcn',@onResponseDisplayChanged);
 runResponseButton = uibutton(responseInputGrid,'Text','运行线性响应', ...
@@ -207,12 +212,12 @@ title(responseOutputAxes,'状态响应');
 xlabel(responseOutputAxes,'Time (s)');
 grid(responseOutputAxes,'on');
 
-%% Experimental nacelle dynamics tab
+%% Nacelle dynamics tab
 nacelleLayout = uigridlayout(nacelleTab,[1 2]);
 nacelleLayout.ColumnWidth = {360,'1x'};
 nacelleLayout.Padding = [8 8 8 8];
 
-nacelleInputPanel = uipanel(nacelleLayout,'Title','实验设置');
+nacelleInputPanel = uipanel(nacelleLayout,'Title','短舱角命令与动态参数');
 nacelleInputGrid = uigridlayout(nacelleInputPanel,[13 2]);
 nacelleInputGrid.RowHeight = [repmat({34},1,10), {42}, {70}, {'1x'}];
 nacelleInputGrid.ColumnWidth = {170,'1x'};
@@ -249,8 +254,8 @@ nacelleStatusLabel = uilabel(nacelleInputGrid,'Text','默认关闭，尚未运�
     'HorizontalAlignment','center');
 nacelleStatusLabel.Layout.Column = [1 2];
 nacelleInfoArea = uitextarea(nacelleInputGrid,'Editable','off','Value',{ ...
-    '该功能为实验扩展，默认关闭。启用后模型状态由 9 个增加到 11 个，用于研究短舱角滞后和速率限制。'; ...
-    '响应为开环代表工况，不代表完整转换过程。'});
+    '当前模块用于开环短舱角动态响应分析，可评估短舱角滞后和速率限制。'; ...
+    '默认关闭以保持 legacy 9 状态路径；该模块不等同完整转换飞行闭环控制。'});
 nacelleInfoArea.Layout.Column = [1 2];
 
 nacellePlotGrid = uigridlayout(nacelleLayout,[3 1]);
@@ -271,19 +276,29 @@ nacelleSummaryTable = uitable(nacellePlotGrid, ...
 set_status('已载入名义概念参数，请先检查参数或运行配平。','warning');
 
     function onParameterEdited(~, event)
+        if event.Indices(2) ~= 3
+            refresh_parameter_table();
+            return;
+        end
         row = event.Indices(1);
         newValue = event.NewData;
         if ischar(newValue) || isstring(newValue)
             newValue = str2double(newValue);
         end
         try
-            candidate = set_parameter_value(P, parameterRows(row).key, newValue);
+            if ~parameterRows(row).editable
+                error('launch_tiltrotor_app:ReadOnlyParameter', ...
+                    '该参数为派生计算或兼容保留字段，不能直接编辑。');
+            end
+            candidate = write_parameter_value(P, parameterRows(row).key, newValue);
             validation = validate_parameter_set(candidate);
             if ~validation.valid
                 error('launch_tiltrotor_app:InvalidParameterEdit', '%s', ...
                     strjoin(validation.errors,newline));
             end
             P = candidate;
+            parameterRows = build_parameter_catalog(P);
+            sync_control_dependent_views();
             invalidate_analysis('参数已修改，旧计算结果已失效。');
             refresh_parameter_table();
         catch ME
@@ -313,8 +328,24 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function onResetParameters(~,~)
         P = params_nominal();
+        parameterRows = build_parameter_catalog(P);
+        controlArchitectureDrop.Value = '默认 7 输入';
+        sync_control_dependent_views();
         refresh_parameter_table();
         invalidate_analysis('已恢复名义参数，旧计算结果已失效。');
+    end
+
+    function onControlArchitectureChanged(~,~)
+        enable8 = strcmp(controlArchitectureDrop.Value, '启用 lateralCyclic 8 输入');
+        P = write_parameter_value(P, 'control.enableLateralCyclic', double(enable8));
+        parameterRows = build_parameter_catalog(P);
+        sync_control_dependent_views();
+        refresh_parameter_table();
+        if enable8
+            invalidate_analysis('已启用 lateralCyclic 8 输入；旧配平、线性化和响应结果已失效。');
+        else
+            invalidate_analysis('已切回默认 7 输入；旧配平、线性化和响应结果已失效。');
+        end
     end
 
     function onRunTrim(~,~)
@@ -336,7 +367,8 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                 'initialCyclicLongDeg',trimCyclic0Field.Value, ...
                 'thetaLimitDeg',trimThetaLimitField.Value, ...
                 'useMultiStart',logical(trimMultiStartCheck.Value), ...
-                'alwaysMultiStart',logical(trimAlwaysMultiCheck.Value));
+                'alwaysMultiStart',logical(trimAlwaysMultiCheck.Value), ...
+                'trimMode',trim_mode_key(trimModeDrop.Value));
             trimResult = run_trim_case(config,P);
             linearResult = [];
             responseResult = [];
@@ -396,8 +428,13 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                 'totalTime',responseTotalTimeField.Value, ...
                 'timeStep',responseStepField.Value, ...
                 'outputState',find(strcmp(stateNames,responseStateDrop.Value),1));
+            if isempty(config.controlChannel)
+                error('launch_tiltrotor_app:InvalidResponseControl', ...
+                    '当前线性化结果不包含所选操纵通道，请重新线性化。');
+            end
             responseResult = simulate_linear_response(linearResult,config,P);
             stateNames = responseResult.stateNames(:).';
+            controlNames = responseResult.controlNames(:).';
             update_response_views();
             if responseResult.limitWarning
                 set_status('响应完成；实际操纵历史触及或越过当前限幅。','warning');
@@ -428,7 +465,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
             update_nacelle_response_views();
             if nacelleResponseResult.enabled
                 nacelleStatusLabel.Text = sprintf( ...
-                    '实验响应完成：状态维度 %d，实际速率限幅 %d', ...
+                    '短舱动态响应完成：状态维度 %d，实际速率限幅 %d', ...
                     nacelleResponseResult.stateDimension, ...
                     nacelleResponseResult.rateLimited);
             else
@@ -436,7 +473,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
                     '已按默认关闭路径运行：状态维度 %d', ...
                     nacelleResponseResult.stateDimension);
             end
-            set_status('短舱动态实验响应计算完成。','success');
+            set_status('短舱动态响应计算完成。','success');
         catch ME
             set_status(ME.message,'error');
             uialert(fig,ME.message,'短舱动态响应失败');
@@ -450,7 +487,7 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
     end
 
     function onExportSession(~,~)
-        [fileName,pathName] = uiputfile('*.mat','导出分析工况', ...
+        [fileName,pathName] = uiputfile('*.mat','保存项目', ...
             'tiltrotor_analysis_case.mat');
         if isequal(fileName,0)
             return;
@@ -464,18 +501,19 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         session.nacelleDynamics = nacelleResponseResult;
         try
             save_analysis_case(fullfile(pathName,fileName),session);
-            set_status(sprintf('已导出：%s',fullfile(pathName,fileName)),'success');
+            set_status(sprintf('已保存项目：%s',fullfile(pathName,fileName)),'success');
         catch ME
-            uialert(fig,ME.message,'导出失败');
+            uialert(fig,ME.message,'保存失败');
         end
     end
 
     function onShowHelp(~,~)
         uialert(fig,sprintf([ ...
-            '推荐顺序：\n1. 检查或修改关键参数；\n2. 运行配平；\n' ...
+            '推荐顺序：\n1. 检查或修改参数；\n2. 运行配平；\n' ...
             '3. 在收敛配平点运行线性化；\n4. 设置小幅操纵输入并计算响应。\n\n' ...
-            '响应结果属于配平点附近的小扰动结果。界面不会修改 params_nominal.m。\n' ...
-            '短舱动态页为实验入口，默认关闭。']), ...
+            '控制架构默认为 7 输入；启用 lateralCyclic 后需要重新配平和线性化。\n' ...
+            '横侧向和六自由度配平入口会调用真实求解服务；未收敛时显示残差、限幅和失败原因，不冒充成功。\n' ...
+            '短舱动态模块默认关闭，用于开环短舱角动态响应分析。']), ...
             '使用说明');
     end
 
@@ -505,9 +543,15 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
 
     function update_linearization_views()
         stateNames = linearResult.stateNames(:).';
+        controlNames = linearResult.controlNames(:).';
         aTable.ColumnName = stateNames;
         aTable.RowName = stateNames;
         bTable.RowName = stateNames;
+        bTable.ColumnName = controlNames;
+        responseControlDrop.Items = controlNames;
+        if ~any(strcmp(controlNames, responseControlDrop.Value))
+            responseControlDrop.Value = controlNames{min(3, numel(controlNames))};
+        end
         responseStateDrop.Items = stateNames;
         if ~any(strcmp(stateNames, responseStateDrop.Value))
             responseStateDrop.Value = stateNames{min(8, numel(stateNames))};
@@ -578,7 +622,8 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         [displayOutput,displayUnit] = convert_state_for_display(rawOutput,selectedState);
         plot(responseInputAxes,t,inputDeg,'LineWidth',1.3);
         grid(responseInputAxes,'on');
-        title(responseInputAxes,sprintf('%s 输入扰动',controlNames{selectedControl}));
+        responseControlNames = responseResult.controlNames(:).';
+        title(responseInputAxes,sprintf('%s 输入扰动',responseControlNames{selectedControl}));
         ylabel(responseInputAxes,'deg');
         plot(responseOutputAxes,t,displayOutput,'LineWidth',1.3);
         grid(responseOutputAxes,'on');
@@ -614,13 +659,22 @@ set_status('已载入名义概念参数，请先检查参数或运行配平。',
         eigenTable.Data = {};
         responseSummaryTable.Data = {};
         nacelleResponseResult = [];
-        nacelleStatusLabel.Text = '参数已变化，实验响应结果已失效';
+        nacelleStatusLabel.Text = '参数已变化，短舱动态响应结果已失效';
         cla(eigenAxes);
         cla(responseInputAxes);
         cla(responseOutputAxes);
         cla(nacelleBetaAxes);
         cla(nacelleRateAxes);
         nacelleSummaryTable.Data = {};
+    end
+
+    function sync_control_dependent_views()
+        controlNames = get_control_input_names(P).';
+        bTable.ColumnName = controlNames;
+        responseControlDrop.Items = controlNames;
+        if ~any(strcmp(controlNames, responseControlDrop.Value))
+            responseControlDrop.Value = controlNames{min(3, numel(controlNames))};
+        end
     end
 
     function set_status(message,kind)
@@ -669,104 +723,34 @@ grid.RowSpacing = 0;
 grid.ColumnSpacing = 0;
 end
 
-function rows = make_parameter_rows()
-raw = { ...
-    '环境','空气密度','env.rho','kg/m^3','ASSUMED_CONCEPT'; ...
-    '环境','重力加速度','env.g','m/s^2','REFERENCE_CONSTANT'; ...
-    '质量惯量','总质量','mass.m','kg','ASSUMED_CONCEPT'; ...
-    '质量惯量','倾转组件总质量','mass.mNac','kg','ASSUMED_CONCEPT'; ...
-    '质量惯量','Ixx','mass.Ixx','kg m^2','ASSUMED_CONCEPT'; ...
-    '质量惯量','Iyy','mass.Iyy','kg m^2','ASSUMED_CONCEPT'; ...
-    '质量惯量','Izz','mass.Izz','kg m^2','ASSUMED_CONCEPT'; ...
-    '质量惯量','Ixz','mass.Ixz','kg m^2','ASSUMED_CONCEPT'; ...
-    '旋翼','旋翼半径','rotor.R','m','ASSUMED_CONCEPT'; ...
-    '旋翼','旋翼角速度','rotor.Omega','rad/s','ASSUMED_CONCEPT'; ...
-    '旋翼','桨叶弦长','rotor.chord','m','ASSUMED_CONCEPT'; ...
-    '旋翼','径向离散数','rotor.nRadial','-','NUMERICAL'; ...
-    '旋翼','方位离散数','rotor.nAzimuth','-','NUMERICAL'; ...
-    '机翼','机翼面积','wing.S','m^2','ASSUMED_CONCEPT'; ...
-    '机翼','翼展','wing.b','m','ASSUMED_CONCEPT'; ...
-    '机翼','平均弦长','wing.c','m','ASSUMED_CONCEPT'; ...
-    '配平','残差容限','trim.residualTolerance','mixed','NUMERICAL'; ...
-    '配平','最大迭代数','trim.maxIterations','-','NUMERICAL'; ...
-    '线性化','控制差分步长','linear.du','rad','NUMERICAL'};
-rows = repmat(struct('group','','name','','key','','unit','','source',''),size(raw,1),1);
-for k = 1:size(raw,1)
-    rows(k).group = raw{k,1};
-    rows(k).name = raw{k,2};
-    rows(k).key = raw{k,3};
-    rows(k).unit = raw{k,4};
-    rows(k).source = raw{k,5};
-end
-end
-
 function data = parameter_table_data(P,rows)
-data = cell(numel(rows),6);
+data = cell(numel(rows),7);
 for k = 1:numel(rows)
     data{k,1} = rows(k).group;
     data{k,2} = rows(k).name;
-    data{k,3} = rows(k).key;
-    data{k,4} = get_parameter_value(P,rows(k).key);
-    data{k,5} = rows(k).unit;
-    data{k,6} = rows(k).source;
+    data{k,3} = read_parameter_value(P,rows(k).key);
+    data{k,4} = rows(k).unit;
+    data{k,5} = rows(k).sourceLabel;
+    if rows(k).editable
+        data{k,6} = '是';
+    else
+        data{k,6} = '只读';
+    end
+    data{k,7} = rows(k).key;
 end
 end
 
-function value = get_parameter_value(P,key)
-switch key
-    case 'env.rho', value = P.env.rho;
-    case 'env.g', value = P.env.g;
-    case 'mass.m', value = P.mass.m;
-    case 'mass.mNac', value = P.mass.mNac;
-    case 'mass.Ixx', value = P.mass.I0(1,1);
-    case 'mass.Iyy', value = P.mass.I0(2,2);
-    case 'mass.Izz', value = P.mass.I0(3,3);
-    case 'mass.Ixz', value = P.mass.I0(1,3);
-    case 'rotor.R', value = P.rotor.R;
-    case 'rotor.Omega', value = P.rotor.Omega;
-    case 'rotor.chord', value = P.rotor.chord;
-    case 'rotor.nRadial', value = P.rotor.nRadial;
-    case 'rotor.nAzimuth', value = P.rotor.nAzimuth;
-    case 'wing.S', value = P.wing.S;
-    case 'wing.b', value = P.wing.b;
-    case 'wing.c', value = P.wing.c;
-    case 'trim.residualTolerance', value = P.trim.residualTolerance;
-    case 'trim.maxIterations', value = P.trim.maxIterations;
-    case 'linear.du', value = P.linear.du(1);
-    otherwise, error('Unknown parameter key %s.',key);
-end
-end
-
-function P = set_parameter_value(P,key,value)
-if ~(isnumeric(value) && isreal(value) && isscalar(value) && isfinite(value))
-    error('Parameter value must be a finite real scalar.');
-end
-switch key
-    case 'env.rho', P.env.rho = value;
-    case 'env.g', P.env.g = value;
-    case 'mass.m', P.mass.m = value;
-    case 'mass.mNac', P.mass.mNac = value;
-    case 'mass.Ixx', P.mass.I0(1,1) = value;
-    case 'mass.Iyy', P.mass.I0(2,2) = value;
-    case 'mass.Izz', P.mass.I0(3,3) = value;
-    case 'mass.Ixz'
-        P.mass.I0(1,3) = value;
-        P.mass.I0(3,1) = value;
-    case 'rotor.R'
-        P.rotor.R = value;
-        P.rotor.Ib = P.rotor.bladeMass*P.rotor.R^2/3;
-        P.rotor.Sblade = P.rotor.bladeMass*P.rotor.R/2;
-    case 'rotor.Omega', P.rotor.Omega = value;
-    case 'rotor.chord', P.rotor.chord = value;
-    case 'rotor.nRadial', P.rotor.nRadial = value;
-    case 'rotor.nAzimuth', P.rotor.nAzimuth = value;
-    case 'wing.S', P.wing.S = value;
-    case 'wing.b', P.wing.b = value;
-    case 'wing.c', P.wing.c = value;
-    case 'trim.residualTolerance', P.trim.residualTolerance = value;
-    case 'trim.maxIterations', P.trim.maxIterations = value;
-    case 'linear.du', P.linear.du = value*ones(7,1);
-    otherwise, error('Unknown parameter key %s.',key);
+function modeKey = trim_mode_key(modeLabel)
+switch modeLabel
+    case '纵向对称配平'
+        modeKey = 'longitudinal_symmetric';
+    case '横侧向平衡/导数检查'
+        modeKey = 'lateral_directional_balance';
+    case '六自由度联合配平'
+        modeKey = 'full_6dof_straight_trim';
+    otherwise
+        error('launch_tiltrotor_app:UnknownTrimMode', ...
+            'Unknown trim mode %s.', modeLabel);
 end
 end
 
@@ -789,8 +773,9 @@ end
 end
 
 function data = make_control_display(u,controlNames)
-data = cell(7,3);
-for k = 1:7
+nControl = numel(u);
+data = cell(nControl,3);
+for k = 1:nControl
     data{k,1} = controlNames{k};
     data{k,2} = u(k)*180/pi;
     data{k,3} = 'deg';

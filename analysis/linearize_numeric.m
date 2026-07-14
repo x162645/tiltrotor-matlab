@@ -1,6 +1,5 @@
 function [A, B, report] = linearize_numeric(xe, ue, betaM, P)
-%LINEARIZE_NUMERIC 在给定配平点进行中心差分线性化。
-% 对应论文式(38)~(42)。
+%LINEARIZE_NUMERIC Center-difference linearization at one operating point.
 
 xe = xe(:);
 ue = ue(:);
@@ -8,32 +7,37 @@ ue = ue(:);
 nx = numel(xe);
 nu = numel(ue);
 expectedNx = get_state_dimension(P);
+expectedNu = numel(get_control_input_names(P));
 
-if nx ~= expectedNx || nu ~= 7
+if nx ~= expectedNx || nu ~= expectedNu
     error('linearize_numeric:DimensionMismatch', ...
-        '当前模型要求 %d 状态、7 控制。', expectedNx);
+        'Expected %d states and %d controls.', expectedNx, expectedNu);
 end
 
 if ~isreal(xe) || ~isreal(ue) || ...
         any(~isfinite(xe)) || any(~isfinite(ue))
-    error('线性化基点必须是有限实数。');
+    error('linearize_numeric:InvalidOperatingPoint', ...
+        'Linearization point must contain finite real values.');
 end
 
 if ~(isscalar(betaM) && isreal(betaM) && isfinite(betaM))
-    error('betaM 必须是有限实数标量。');
+    error('linearize_numeric:InvalidNacelleAngle', ...
+        'betaM must be a finite real scalar.');
 end
 
 dx = state_difference_steps(P, nx);
-du = P.linear.du(:);
+du = control_difference_steps(P, nu);
 
 if numel(dx) ~= nx || numel(du) ~= nu
-    error('差分步长尺寸与状态/控制维数不一致。');
+    error('linearize_numeric:StepDimensionMismatch', ...
+        'Difference-step dimensions do not match state/control dimensions.');
 end
 
 if ~isreal(dx) || ~isreal(du) || ...
         any(~isfinite(dx)) || any(~isfinite(du)) || ...
         any(dx <= 0) || any(du <= 0)
-    error('线性化差分步长必须为有限正实数。');
+    error('linearize_numeric:InvalidDifferenceSteps', ...
+        'Difference steps must be finite positive real values.');
 end
 
 A = zeros(nx,nx);
@@ -70,6 +74,18 @@ report.dx = dx;
 report.du = du;
 report.finite = isreal(A) && isreal(B) && isreal(f0) && ...
     all(isfinite(A(:))) && all(isfinite(B(:))) && all(isfinite(f0(:)));
+end
+
+function du = control_difference_steps(P, nu)
+duBase = P.linear.du(:);
+if numel(duBase) == nu
+    du = duBase;
+elseif nu == 8 && numel(duBase) == 7
+    du = [duBase(1:4); duBase(4); duBase(5:7)];
+else
+    error('linearize_numeric:ControlStepDimensionMismatch', ...
+        'P.linear.du size does not match the active control dimension.');
+end
 end
 
 function dx = state_difference_steps(P, nx)

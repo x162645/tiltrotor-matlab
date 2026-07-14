@@ -164,6 +164,9 @@ report.fixedStates = struct('v', 0, 'p', 0, 'q', 0, 'r', 0, ...
     'phi', 0, 'psi', 0);
 report.fixedControls = struct('diffCollective', 0, 'diffCyclic', 0, ...
     'aileron', 0, 'elevator', 0, 'rudder', 0);
+if any(strcmp(get_control_input_names(P), 'lateralCyclic'))
+    report.fixedControls.lateralCyclic = 0;
+end
 report.compatibilityMode = true;
 
     function z = trim_from_y(y, seedZ)
@@ -216,7 +219,8 @@ report.compatibilityMode = true;
         if has_nacelle_dynamic_states(P)
             xCandidate = [xCandidate; betaM; 0];
         end
-        uCandidate = [collective; 0; cyclicLong; 0; 0; 0; 0];
+        uCandidate = zeros(numel(get_control_input_names(P)),1);
+        uCandidate(1:4) = [collective; 0; cyclicLong; 0];
 
         [xd, thisEomOut] = tiltrotor_eom(xCandidate, uCandidate, betaM, P);
         xdot = xd(:);

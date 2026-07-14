@@ -49,8 +49,9 @@ check_limits({'control','cyclicLim'}, 'P.control.cyclicLim');
 check_limits({'control','aileronLim'}, 'P.control.aileronLim');
 check_limits({'control','elevatorLim'}, 'P.control.elevatorLim');
 check_limits({'control','rudderLim'}, 'P.control.rudderLim');
+check_lateral_cyclic_flag();
 check_linear_state_steps();
-check_positive_vector({'linear','du'}, 'P.linear.du', 7);
+check_linear_control_steps();
 check_nacelle_dynamics();
 
 if inertiaMatrixValid
@@ -135,16 +136,37 @@ end
         end
     end
 
-    function check_positive_vector(pathParts, label, expectedLength)
-        [ok, value] = lookup_value(P, pathParts);
+    function check_lateral_cyclic_flag()
+        [ok, value] = lookup_value(P, {'control','enableLateralCyclic'});
         if ~ok
-            errors{end+1,1} = sprintf('Missing parameter %s.', strjoin(pathParts,'.'));
+            errors{end+1,1} = 'Missing parameter P.control.enableLateralCyclic.';
             return;
         end
-        if ~(isnumeric(value) && isreal(value) && numel(value) == expectedLength && ...
+        valid = (islogical(value) && isscalar(value)) || ...
+            (isnumeric(value) && isreal(value) && isscalar(value) && ...
+            isfinite(value) && (value == 0 || value == 1));
+        if ~valid
+            errors{end+1,1} = ...
+                'P.control.enableLateralCyclic must be logical or numeric 0/1.';
+        end
+    end
+
+    function check_linear_control_steps()
+        [ok, value] = lookup_value(P, {'linear','du'});
+        expectedLength = numel(get_control_input_names(P));
+        validLength = expectedLength;
+        if expectedLength == 8
+            validLength = [7, 8];
+        end
+        if ~ok
+            errors{end+1,1} = 'Missing parameter linear.du.';
+            return;
+        end
+        if ~(isnumeric(value) && isreal(value) && ...
+                any(numel(value) == validLength) && ...
                 all(isfinite(value(:))) && all(value(:) > 0))
-            errors{end+1,1} = sprintf('%s must contain %d finite positive values.', ...
-                label, expectedLength);
+            errors{end+1,1} = ...
+                'P.linear.du must contain finite positive control steps.';
         end
     end
 

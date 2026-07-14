@@ -9,7 +9,7 @@ if nargin < 4
     opts = struct();
 end
 validate_condition(condition);
-definition = validate_definition(definition);
+definition = validate_definition(definition, P);
 
 if definition.compatibilityMode
     validate_legacy_compatibility(definition, P);
@@ -166,7 +166,7 @@ if condition.V < 0 || condition.betaM < 0 || condition.betaM > pi/2
 end
 end
 
-function definition = validate_definition(definition)
+function definition = validate_definition(definition, P)
 required = {'name','mode','unknownNames','residualNames','fixedStates', ...
     'fixedControls','initialValues','variableScale','bounds'};
 if ~isstruct(definition) || ~all(isfield(definition, required))
@@ -188,8 +188,7 @@ if numel(unique(definition.unknownNames)) ~= numel(definition.unknownNames)
 end
 
 stateUnknowns = {'theta'};
-controlNames = {'collective','diffCollective','cyclicLong','diffCyclic', ...
-    'aileron','elevator','rudder'};
+controlNames = get_control_input_names(P).';
 residualNames = {'udot','vdot','wdot','pdot','qdot','rdot', ...
     'phidot','thetadot','psidot'};
 hasAllocation = isfield(definition, 'allocation');
@@ -312,6 +311,9 @@ expectedStates = struct('v', 0, 'p', 0, 'q', 0, 'r', 0, ...
     'phi', 0, 'psi', 0);
 expectedControls = struct('diffCollective', 0, 'diffCyclic', 0, ...
     'aileron', 0, 'rudder', 0, 'elevator', 0);
+if any(strcmp(get_control_input_names(P), 'lateralCyclic'))
+    expectedControls.lateralCyclic = 0;
+end
 expectedBounds = [-35*d2r, 35*d2r; ...
     P.control.collectiveLim(:).'; P.control.cyclicLim(:).'];
 valid = strcmp(definition.name, 'legacy_symmetric') && ...

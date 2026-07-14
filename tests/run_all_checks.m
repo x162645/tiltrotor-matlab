@@ -16,6 +16,26 @@ passed = [];
 messages = {};
 
 run_test('parameters and inertia', @test_parameters);
+run_test('GUI complete parameter workbench', ...
+    @test_gui_complete_parameter_workbench);
+run_test('GUI control architecture selector', ...
+    @test_gui_control_architecture_selector);
+run_test('GUI lateral cyclic response wiring', ...
+    @test_gui_lateral_response_wiring);
+run_test('GUI trim mode selector', @test_gui_trim_mode_selector);
+run_test('lateral trim solver', @test_lateral_trim_solver);
+run_test('full 6-DOF trim solver', @test_full_6dof_trim_solver);
+run_test('GUI trim real solver wiring', @test_gui_trim_solver_wiring);
+run_test('legacy trim mode regression', @test_trim_mode_regression);
+run_test('trim solver evidence report', @test_trim_solver_evidence_report);
+run_test('trim solver failure diagnostic', ...
+    @test_trim_solver_failure_diagnostic);
+run_test('longitudinal trim robustness audit', ...
+    @test_longitudinal_trim_robustness_audit);
+run_test('pitch control authority/source audit', ...
+    @test_pitch_control_authority_source_audit);
+run_test('GUI UI wording', @test_gui_ui_text);
+run_test('GUI service smoke', @test_gui_services);
 run_test('mass/inertia/geometry audit', @test_mass_inertia_geometry);
 run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
 run_test('collective thrust monotonicity', @test_collective_monotonicity);
@@ -24,11 +44,28 @@ run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
+run_test('lateral cyclic opt-in input', @test_lateral_cyclic_input);
+run_test('lateral directional derivative report', ...
+    @test_lateral_directional_derivative_report);
+run_test('lateral cyclic mapping comparison', ...
+    @test_lateral_cyclic_mapping_comparison);
+run_test('external comparison document map', ...
+    @test_external_comparison_docs);
+run_test('NUAA source-freeze scaffold', ...
+    @test_nuaa_source_freeze_scaffold);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('nacelle dynamic state extension', @test_nacelle_dynamics);
 run_test('nacelle dynamics validation workflow', @test_nacelle_validation);
+run_test('berger13 interface scaffold', @test_berger13_interface);
+run_test('berger13 linearization scaffold', @test_berger13_linearization);
+run_test('berger13 conditioning diagnostics', ...
+    @test_berger13_conditioning_diagnostics);
+run_test('berger13 nullspace diagnostics', ...
+    @test_berger13_nullspace_diagnostics);
+run_test('berger13 linear derivative report', ...
+    @test_berger13_linear_derivative_report);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
@@ -76,6 +113,90 @@ fprintf('All passed: %d\n',summary.allPassed);
         massGeometryReport = check_mass_inertia_geometry();
         assert(massGeometryReport.allPassed, ...
             'Mass/inertia/geometry audit has failed items.');
+    end
+
+    function test_gui_complete_parameter_workbench()
+        guiParameterReport = check_gui_complete_parameter_workbench();
+        assert(guiParameterReport.allPassed, ...
+            'GUI complete parameter workbench checks have failed items.');
+    end
+
+    function test_gui_control_architecture_selector()
+        guiControlReport = check_gui_control_architecture_selector();
+        assert(guiControlReport.allPassed, ...
+            'GUI control architecture selector checks have failed items.');
+    end
+
+    function test_gui_lateral_response_wiring()
+        guiResponseReport = check_gui_lateral_response_wiring();
+        assert(guiResponseReport.allPassed, ...
+            'GUI lateral response wiring checks have failed items.');
+    end
+
+    function test_gui_trim_mode_selector()
+        guiTrimModeReport = check_gui_trim_mode_selector();
+        assert(guiTrimModeReport.allPassed, ...
+            'GUI trim mode selector checks have failed items.');
+    end
+
+    function test_lateral_trim_solver()
+        lateralTrimReport = check_lateral_directional_trim_solver();
+        assert(lateralTrimReport.allPassed, ...
+            'Lateral-directional trim solver checks have failed items.');
+    end
+
+    function test_full_6dof_trim_solver()
+        fullTrimReport = check_full_6dof_trim_solver();
+        assert(fullTrimReport.allPassed, ...
+            'Full 6-DOF trim solver checks have failed items.');
+    end
+
+    function test_gui_trim_solver_wiring()
+        guiTrimSolverReport = check_gui_trim_modes_real_solver_wiring();
+        assert(guiTrimSolverReport.allPassed, ...
+            'GUI trim solver wiring checks have failed items.');
+    end
+
+    function test_trim_mode_regression()
+        trimRegressionReport = check_trim_mode_regression_legacy();
+        assert(trimRegressionReport.allPassed, ...
+            'Legacy trim mode regression checks have failed items.');
+    end
+
+    function test_trim_solver_evidence_report()
+        trimEvidenceReport = check_trim_solver_evidence_report();
+        assert(trimEvidenceReport.allPassed, ...
+            'Trim solver evidence report checks have failed items.');
+    end
+
+    function test_trim_solver_failure_diagnostic()
+        failureDiagnosticReport = check_trim_solver_failure_diagnostic();
+        assert(failureDiagnosticReport.allPassed, ...
+            'Trim solver failure diagnostic checks have failed items.');
+    end
+
+    function test_longitudinal_trim_robustness_audit()
+        robustnessReport = check_longitudinal_trim_robustness_audit();
+        assert(robustnessReport.allPassed, ...
+            'Longitudinal trim robustness audit checks have failed items.');
+    end
+
+    function test_pitch_control_authority_source_audit()
+        pitchAuthorityReport = check_pitch_control_authority_source_audit();
+        assert(pitchAuthorityReport.allPassed, ...
+            'Pitch control authority/source audit checks have failed items.');
+    end
+
+    function test_gui_ui_text()
+        guiTextReport = check_gui_ui_text_interactive();
+        assert(guiTextReport.allPassed, ...
+            'GUI UI wording checks have failed items.');
+    end
+
+    function test_gui_services()
+        guiServiceReport = check_gui_services();
+        assert(guiServiceReport.allPassed, ...
+            'GUI service checks have failed items.');
     end
 
     function test_nacelle_endpoints()
@@ -127,6 +248,36 @@ fprintf('All passed: %d\n',summary.allPassed);
             'Control architecture closure has failed items.');
     end
 
+    function test_lateral_cyclic_input()
+        lateralReport = check_lateral_cyclic_input();
+        assert(lateralReport.allPassed, ...
+            'Lateral cyclic opt-in input checks have failed items.');
+    end
+
+    function test_lateral_directional_derivative_report()
+        derivativeReport = check_lateral_directional_derivative_report();
+        assert(derivativeReport.allPassed, ...
+            'Lateral/directional derivative report checks have failed items.');
+    end
+
+    function test_lateral_cyclic_mapping_comparison()
+        mappingReport = check_lateral_cyclic_mapping_comparison();
+        assert(mappingReport.allPassed, ...
+            'Lateral cyclic mapping comparison checks have failed items.');
+    end
+
+    function test_external_comparison_docs()
+        externalDocsReport = check_external_comparison_docs();
+        assert(externalDocsReport.allPassed, ...
+            'External comparison document checks have failed items.');
+    end
+
+    function test_nuaa_source_freeze_scaffold()
+        nuaaScaffoldReport = check_nuaa_source_freeze_scaffold();
+        assert(nuaaScaffoldReport.allPassed, ...
+            'NUAA source-freeze scaffold checks have failed items.');
+    end
+
     function test_trim_mode_framework()
         trimModeReport = check_trim_mode_framework();
         assert(trimModeReport.allPassed, ...
@@ -146,15 +297,43 @@ fprintf('All passed: %d\n',summary.allPassed);
     end
 
     function test_nacelle_dynamics()
-        nacelleReport = check_nacelle_dynamics_state_extension();
-        assert(nacelleReport.allPassed, ...
+        run_isolated_matlab_check('check_nacelle_dynamics_state_extension', ...
             'Nacelle dynamic state extension checks have failed items.');
     end
 
     function test_nacelle_validation()
-        validationReport = check_nacelle_dynamics_validation();
-        assert(validationReport.allPassed, ...
+        run_isolated_matlab_check('check_nacelle_dynamics_validation', ...
             'Nacelle dynamics validation workflow checks have failed items.');
+    end
+
+    function test_berger13_interface()
+        bergerReport = check_berger13_interface();
+        assert(bergerReport.allPassed, ...
+            'Berger13 interface checks have failed items.');
+    end
+
+    function test_berger13_linearization()
+        bergerLinearReport = check_berger13_linearization();
+        assert(bergerLinearReport.allPassed, ...
+            'Berger13 linearization checks have failed items.');
+    end
+
+    function test_berger13_conditioning_diagnostics()
+        bergerConditioningReport = check_berger13_conditioning_diagnostics();
+        assert(bergerConditioningReport.allPassed, ...
+            'Berger13 conditioning diagnostic checks have failed items.');
+    end
+
+    function test_berger13_nullspace_diagnostics()
+        bergerNullspaceReport = check_berger13_nullspace_diagnostics();
+        assert(bergerNullspaceReport.allPassed, ...
+            'Berger13 nullspace diagnostic checks have failed items.');
+    end
+
+    function test_berger13_linear_derivative_report()
+        bergerDerivativeReport = check_berger13_linear_derivative_report();
+        assert(bergerDerivativeReport.allPassed, ...
+            'Berger13 linear derivative report checks have failed items.');
     end
 
     function test_aerodynamic_components()
@@ -236,5 +415,21 @@ fprintf('All passed: %d\n',summary.allPassed);
         else
             value = b;
         end
+    end
+
+    function run_isolated_matlab_check(functionName, failureMessage)
+        matlabExe = 'F:\matlab\R2021a\bin\matlab.exe';
+        if ~exist(matlabExe, 'file')
+            error('run_all_checks:MissingMatlabExecutable', ...
+                'MATLAB executable not found at %s.', matlabExe);
+        end
+        escapedRoot = strrep(rootDir, '''', '''''');
+        inner = sprintf(['cd(''%s''); run(''startup.m''); ' ...
+            'report=%s(); assert(report.allPassed);'], ...
+            escapedRoot, functionName);
+        command = ['"', matlabExe, '" -batch "', inner, '"'];
+        [status, output] = system(command);
+        fprintf('%s', output);
+        assert(status == 0, '%s', failureMessage);
     end
 end
