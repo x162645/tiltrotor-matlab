@@ -5,7 +5,9 @@ function summary = run_all_checks()
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 addpath(rootDir);
 addpath(fullfile(rootDir,'model'));
+addpath(fullfile(rootDir,'model','berger13'));
 addpath(fullfile(rootDir,'analysis'));
+addpath(fullfile(rootDir,'analysis','berger13'));
 addpath(fullfile(rootDir,'tests'));
 
 P = params_nominal();
@@ -26,6 +28,8 @@ run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
+run_test('berger13 PR1 interface and parity', @test_berger13_interface);
+run_test('berger13 PR1 linearization', @test_berger13_linearization);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -125,6 +129,18 @@ fprintf('All passed: %d\n',summary.allPassed);
         controlReport = check_control_architecture();
         assert(controlReport.allPassed, ...
             'Control architecture closure has failed items.');
+    end
+
+    function test_berger13_interface()
+        berger13Report = check_berger13_interface();
+        assert(berger13Report.allPassed, ...
+            'Berger13 PR1 interface or baseline-parity checks failed.');
+    end
+
+    function test_berger13_linearization()
+        berger13LinearReport = check_berger13_linearization();
+        assert(berger13LinearReport.allPassed, ...
+            'Berger13 PR1 numerical-linearization checks failed.');
     end
 
     function test_nuaa_eq12_13_16()
