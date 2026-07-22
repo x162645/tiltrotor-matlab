@@ -5,7 +5,23 @@ function mp = mass_properties(betaM, P)
 dx = P.mass.mNac * P.mass.RH_mass * sin(betaM) / P.mass.m;
 dz = P.mass.mNac * P.mass.RH_mass * (1 - cos(betaM)) / P.mass.m;
 
-mp.cgShift = [dx; 0; dz];
+% Optional opt-in longitudinal-layout interface.  The legacy/default
+% parameter structure does not contain baselineCG, which is exactly
+% equivalent to a zero vector.  Positive components are expressed in the
+% body frame (x forward, y right, z down) from the unchanged model origin.
+% This field is for explicitly named design variants; it is never inferred.
+baselineCG = zeros(3,1);
+if isfield(P.mass, 'baselineCG')
+    baselineCG = P.mass.baselineCG(:);
+    if numel(baselineCG) ~= 3 || ~isreal(baselineCG) || ...
+            any(~isfinite(baselineCG))
+        error('mass_properties:InvalidBaselineCG', ...
+            'P.mass.baselineCG must be a finite real 3-element vector.');
+    end
+end
+
+mp.cgShift = baselineCG + [dx; 0; dz];
+mp.baselineCG = baselineCG;
 
 I = P.mass.I0 - betaM * P.mass.KI;
 I = 0.5*(I + I.');

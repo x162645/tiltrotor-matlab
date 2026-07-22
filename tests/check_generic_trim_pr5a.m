@@ -1,0 +1,116 @@
+function report = check_generic_trim_pr5a()
+%CHECK_GENERIC_TRIM_PR5A Focused provenance and diagnostic regression.
+
+P0=params_nominal(); P13=params_berger13();
+report.cases=struct('name',{},'passed',{},'message',{});
+add_case('default parameters unchanged',isequaln(P0,params_nominal()), ...
+    'Repeated params_nominal calls differ.');
+
+[Poverlay,manifest]=apply_xv15_public_overlay(P0);
+Preverted=Poverlay;
+for k=1:numel(manifest.modifiedPaths)
+    parts=strsplit(manifest.modifiedPaths{k},'.');
+    Preverted.(parts{1}).(parts{2})=P0.(parts{1}).(parts{2});
+end
+add_case('overlay changes manifest paths only',isequaln(Preverted,P0), ...
+    'The opt-in overlay changed a field absent from its manifest.');
+add_case('every overlay change has provenance', ...
+    numel(manifest.records)>=numel(manifest.modifiedPaths) && ...
+    all(~cellfun(@isempty,{manifest.records.sourceFile})) && ...
+    all(~cellfun(@isempty,{manifest.records.conversion})), ...
+    'One or more overlay values lack a source or conversion record.');
+
+ref=params_xv15_public_reference();
+radius=record_value(ref.records,'rotor.R');
+omega=record_value(ref.records,'rotor.Omega');
+add_case('public unit conversions', ...
+    abs(radius-12.5*0.3048)<1e-12 && ...
+    abs(omega-565*2*pi/60)<1e-12, ...
+    'XV-15 ft/rpm to SI conversion is inconsistent.');
+add_case('nacelle angle endpoint mapping', ...
+    abs((90-90)-0)<eps && abs((90-0)-90)<eps, ...
+    'betaM=90-deltaNac endpoint mapping failed.');
+
+mpDefault=mass_properties(pi/4,P0);
+Pcg=P0; Pcg.mass.baselineCG=[0.2;0;-0.1];
+mpShift=mass_properties(pi/4,Pcg);
+add_case('optional baseline CG interface', ...
+    norm(mpShift.cgShift-mpDefault.cgShift-Pcg.mass.baselineCG)<1e-12, ...
+    'Opt-in baseline CG was not added exactly once.');
+
+x13=[55;0;2;zeros(6,1);75*pi/180;75*pi/180;0;0];
+u10=[20;0;0;0;0;0;-8;0;0;0]*pi/180;
+[F,M,info]=total_forces_moments_13x10(x13,u10,P13);
+sumF=zeros(3,1); sumM=zeros(3,1);
+for k=1:numel(info.components)
+    sumF=sumF+info.components{k}.F; sumM=sumM+info.components{k}.M;
+end
+scale=max([norm(F),norm(M),1]);
+add_case('component force and moment sums', ...
+    norm(sumF-F)<1e-11*scale && norm(sumM-M)<1e-11*scale, ...
+    'Component loads do not sum to the formal 13x10 total.');
+
+Psign=P0; x9=[50;0;2;zeros(6,1)]; cg=zeros(3,1);
+[~,Mzero]=horizontal_tail_model(x9,0,cg,Psign);
+[~,Mplus]=horizontal_tail_model(x9,1*pi/180,cg,Psign);
+add_case('positive elevator pitch sign',Mplus(2)<Mzero(2), ...
+    'Positive elevator should make the current body-axis My more negative.');
+
+condition=struct('V',80,'betaM',75*pi/180,'gamma',0);
+[~,~,trim]=trim_berger13_symmetric(condition,P13, ...
+    struct('mode','airplane_longitudinal','runMultipleSeeds',true));
+mini.variantName='PR5A_TEST'; mini.grid=generic_trim_design_grid();
+mini.grid=mini.grid(strcmp(mini.grid.pointId,'B75_V080'),:);
+mini.points=struct('id','B75_V080','condition',condition, ...
+    'mode','airplane_longitudinal','status',trim.status, ...
+    'failureIdentifier','','failureMessage','','trim',trim,'elapsedSeconds',0);
+limitBefore=P13.base.control.elevatorLim;
+[diagTable,~]=unconstrained_elevator_diagnostic(mini,P13);
+add_case('diagnostic preserves production limits', ...
+    isequaln(P13.base.control.elevatorLim,limitBefore) && height(diagTable)==1, ...
+    'Unconstrained diagnostic polluted the production parameter structure.');
+
+S1=parameter_sensitivity_analysis(mini,P13);
+S2=parameter_sensitivity_analysis(mini,P13);
+add_case('sensitivity is finite and reproducible', ...
+    all(S1.longTable.finiteReal) && ...
+    isequaln(S1.longTable.normalizedSensitivity, ...
+        S2.longTable.normalizedSensitivity), ...
+    'Central implicit sensitivity was non-finite or non-reproducible.');
+
+T=build_parameter_provenance_master();
+sourceAllowed={'REFERENCE','DIGITIZED','DERIVED', ...
+    'ASSUMED_MODEL_PARAMETER','RESEARCH_PLACEHOLDER','UNKNOWN'};
+claimAllowed={'XV15_DIRECT','XV15_DIGITIZED','XV15_DERIVED', ...
+    'XV15_LIKE_UNVERIFIED','GENERIC_REFERENCE','GENERIC_ASSUMED', ...
+    'CALIBRATED_EFFECTIVE','OPTIMIZED_GENERIC','NUMERICAL_ONLY','UNKNOWN'};
+roleAllowed={'GEOMETRY','MASS','INERTIA','ROTOR_AERO','WING_AERO', ...
+    'TAIL_AERO','FUSELAGE_AERO','CONTROL_EFFECTIVENESS','CONTROL_LIMIT', ...
+    'ACTUATOR','INTERFERENCE','NUMERICAL','ANALYSIS_GUARD'};
+complete=height(T)>150 && all(~cellfun(@isempty,T.parameterName)) && ...
+    all(ismember(T.sourceClass,sourceAllowed)) && ...
+    all(ismember(T.claimClass,claimAllowed)) && ...
+    all(ismember(T.roleClass,roleAllowed));
+add_case('provenance classification complete',complete, ...
+    'Provenance table is sparse or contains an unapproved class.');
+
+report.allPassed=all([report.cases.passed]);
+fprintf('\nPR5A generic trim checks\n========================\n');
+for k=1:numel(report.cases)
+    if report.cases(k).passed, status='PASS'; else, status='FAIL'; end
+    fprintf('%-42s : %s\n',report.cases(k).name,status);
+end
+fprintf('All PR5A checks passed: %d\n',report.allPassed);
+
+    function add_case(name,passed,message)
+        report.cases(end+1,1)=struct('name',name,'passed',logical(passed), ...
+            'message',ternary(passed,'',message));
+    end
+end
+
+function value=record_value(records,path)
+k=find(strcmp({records.path},path),1); assert(~isempty(k)); value=records(k).valueSI;
+end
+function value=ternary(condition,a,b)
+if condition, value=a; else, value=b; end
+end
