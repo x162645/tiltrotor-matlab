@@ -33,6 +33,7 @@ run_test('berger13 PR1 linearization', @test_berger13_linearization);
 run_test('berger13 PR2 formal trim', @test_berger13_formal_trim);
 run_test('berger13 PR3 actuator and independent wing', ...
     @test_berger13_pr3_actuator_wing);
+run_test('berger13 PR4 research workflow', @test_berger13_pr4_research);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -156,6 +157,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         pr3Report = check_berger13_pr3_actuator_wing();
         assert(pr3Report.allPassed, ...
             'Berger13 PR3 actuator/independent-wing checks failed.');
+    end
+
+    function test_berger13_pr4_research()
+        pr4Report = check_berger13_pr4_research();
+        assert(pr4Report.allPassed, ...
+            'Berger13 PR4 research workflow checks failed.');
     end
 
     function test_nuaa_eq12_13_16()

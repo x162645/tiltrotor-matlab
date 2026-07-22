@@ -14,6 +14,7 @@ P13.meta.portSourceSHA = ...
 P13.meta.scope = 'PR1_ISOLATED_RESEARCH_SCAFFOLD';
 
 P13.interface.lateralCyclicTheta1cMapping = 'rotDir';
+P13.interface.lateralCyclicScale = 1.0;
 P13.interface.lateralCyclicLimitSource = 'P13.base.control.cyclicLim';
 P13.interface.parameterSource = 'ASSUMED_MODEL_PARAMETER';
 

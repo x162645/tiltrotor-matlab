@@ -41,7 +41,7 @@ linearModel.stepScaleModels = models;
 linearModel.relativeStepVariation = variation;
 linearModel.maximumRelativeStepVariation = max(variation);
 linearModel.finiteReal = all(finiteFlags);
-linearModel.symdiff = berger13_symdiff_transform(A,B);
+linearModel.symdiff = berger13_symdiff_transform(A,B,'ANGLE_COMMAND');
 linearModel.inputContract = 'ANGLE_COMMAND';
 linearModel.claimBoundary = ['finite command A/B at an internally credible ' ...
     'trim does not establish external validation'];

@@ -1,6 +1,14 @@
-function transform = berger13_symdiff_transform(A, B)
+function transform = berger13_symdiff_transform(A, B, inputContract)
 %BERGER13_SYMDIFF_TRANSFORM Left/right to symmetric/differential axes.
-% betaDiff and torqueDiff are defined as (right-left)/2.
+% betaDiff and the differential input are defined as (right-left)/2.
+
+if nargin < 3 || isempty(inputContract)
+    inputContract = 'TORQUE';
+end
+if ~ismember(inputContract,{'TORQUE','ANGLE_COMMAND'})
+    error('berger13_symdiff_transform:InvalidInputContract', ...
+        'inputContract must be TORQUE or ANGLE_COMMAND.');
+end
 
 Tstate = eye(13);
 Tstate(10:11,10:11) = [0.5, 0.5; -0.5, 0.5];
@@ -15,9 +23,19 @@ transform.TinputInverse = inv(Tinput);
 transform.stateNames = get_state_names_13x10();
 transform.stateNames(10:13) = {'betaSym'; 'betaDiff'; ...
     'betaSymDot'; 'betaDiffDot'};
-transform.inputNames = get_control_input_names_13x10();
-transform.inputNames(9:10) = {'nacelleTorqueSym'; ...
-    'nacelleTorqueDiff'};
+if strcmp(inputContract,'ANGLE_COMMAND')
+    transform.inputNames = get_command_input_names_13x10();
+    transform.inputNames(9:10) = {'betaSymCommand'; ...
+        'betaDiffCommand'};
+    transform.inputUnits = get_command_input_units_13x10();
+else
+    transform.inputNames = get_control_input_names_13x10();
+    transform.inputNames(9:10) = {'nacelleTorqueSym'; ...
+        'nacelleTorqueDiff'};
+    transform.inputUnits = get_control_input_units_13x10();
+end
+transform.stateUnits = get_state_units_13x10();
+transform.inputContract = inputContract;
 transform.invertibilityError = max( ...
     norm(Tstate*transform.TstateInverse-eye(13),'fro'), ...
     norm(Tinput*transform.TinputInverse-eye(10),'fro'));
