@@ -1,0 +1,6 @@
+function names = get_command_input_names_13x10()
+%GET_COMMAND_INPUT_NAMES_13X10 Frozen distinct angle-command contract.
+names = {'collective'; 'diffCollective'; 'cyclicLong'; 'diffCyclic'; ...
+    'lateralCyclic'; 'aileron'; 'elevator'; 'rudder'; ...
+    'betaMLCommand'; 'betaMRCommand'};
+end
