@@ -1,50 +1,42 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / BERGER13 PR4 PHYSICS-BASED RESULT CORRECTION / 2026-07-22
+STATUS: ACTIVE / GENERIC TILTROTOR PARAMETER PROVENANCE AND TRIM DIAGNOSTICS / 2026-07-22
 
 ## Version contract
 
-- Stage: PR4 correction of derivative, modal, tracking, time-domain, sensitivity, figure, and academic-report evidence.
-- Base branch: `codex/berger13-pr3-commanded-actuator-independent-wing`.
-- Corrected base SHA: `587a0d3755bdcdc808324827ac131ebc939ad042`.
-- Original PR4 head: `b3abfb78db1f183560e757917482024edbcb9f1f`.
-- Head branch: `codex/berger13-pr4-modes-time-domain-study`.
-- The existing Draft PR #52 is updated; no replacement PR is created and no PR is merged.
+- Stage: PR5A parameter provenance audit, opt-in XV-15 public overlay, pitch-moment diagnosis, sensitivity, and identifiability.
+- Base branch: `codex/berger13-pr4-modes-time-domain-study`.
+- Base SHA: `388de28723743984849b9768532b1f81178896fb`.
+- Head branch: `codex/generic-trim-parameter-provenance`.
+- Worktree: `E:\tiltrotor-generic-provenance`.
+- Open a stacked Draft PR against the stated base; do not merge or rewrite PR #49-#52.
 
 ## Allowed scope
 
-- `CODEX_TASK.md`, `analysis/berger13/`, Berger13-focused tests and registration, PR4/final evidence documentation, reproducible output/report scripts, and regenerated `results/berger13_final/`.
-- Small namespace-local analysis metadata changes are allowed only to expose missing diagnostics, not to tune outcomes.
-- Extra audit deliverables are generated under `E:\tiltrotor-work-output\13x10-correction-20260722`.
+- Parameter provenance code/data/docs/tests for parameters used by trim and longitudinal loads.
+- Opt-in `GENERIC_MODEL_WITH_XV15_PUBLIC_OVERLAY` parameter-set implementation and manifest.
+- Nacelle/control sign mapping, pitch-moment decomposition, unconstrained-elevator diagnostic, failure classification, sensitivity, and identifiability analysis.
+- Reproducible PR5A figures, raw data, metadata, evidence, and focused regression tests.
 
-## Prohibited scope
+## Protected behavior
 
-- No model tuning for expected roots, no hidden failures, no legacy/default-path changes, and no external-validation claim.
-- No invented external hinge generalized load, mechanical-jam reaction, or bidirectional nacelle coupling claim.
-- No mode name based only on eigenvalue location and no matching across a failed or discontinuous operating-condition gap.
-- No unsupported Berger 51-state, XV-15 validation, aircraft-type limit, blade-elastic, dynamic-inflow, or drivetrain claim.
+- `params_nominal.m` values and default behavior remain unchanged.
+- New parameter sets remain opt-in and do not become GUI/model defaults.
+- Production control limits, trim tolerances, numerical steps, model equations, and legacy paths are not tuned to manufacture success.
+- XV-15 claims require explicit primary-source evidence; inherited generic fields remain labelled non-XV-15.
 
-## Required corrections
+## Required validation
 
-- Classify the zero `psi` root as `heading kinematic integrator`; exclude it from damping/stability qualification and preserve its identity during tracking.
-- Derive every derivative unit from explicit state-derivative and state/input unit contracts. Command inputs 9/10 are `betaSymCommand` and `betaDiffCommand`.
-- Establish fixed-step convergence with 0.1, 0.05, and 0.025 s, adding 0.0125 s where the 2% adjacent-step gate requires it. Archive a converged step or withhold quantitative claims.
-- Apply an explicit `ASSUMED_ANALYSIS_GUARD`; retain the full numerical trajectory but form quantitative claims from the valid prefix only.
-- Keep force and moment sensitivities dimensionally separate. Use flight-response and tracked-mode metrics for actuator bandwidth/damping, and return `CANNOT_RELIABLY_DETERMINE` when a limit is inactive.
-- Track fixed-nacelle-angle speed paths independently. Preserve failures/path interruptions and do not force cross-gap assignment.
-- Use the prescribed one-way actuator boundary inherited from corrected PR3. Command freeze and kinematic lock remain distinct; mechanical jam is not implemented.
+- Pre-change and post-change complete `run_all_checks` under MATLAB R2021a.
+- Focused provenance, overlay-manifest, unit/sign mapping, moment-sum, diagnostic-isolation, reproducibility, and classification tests.
+- `checkcode` on modified MATLAB files; finite-real checks; runtime and evidence capture.
+- Inspect full Git diff and keep this worktree clean after commit/push.
 
-## Evidence, figures, and report
+## Deliverables
 
-- Regenerate all CSV/MAT databases and all figures with traceable raw data/metadata under `results/berger13_final/`.
-- Generate the full Chinese academic report titled `规定执行器模型下倾转旋翼机左右短舱运动对刚体动态的影响研究` and visually verify its PDF rendering.
-- Create the requested correction audit documents, pre/post comparison, GitHub evidence index, SHA-256 manifest, and final ZIP.
-- Run focused tests, `checkcode`, post-change full MATLAB R2021a regression, finite-real checks, ZIP extraction verification, worktree/diff review, push, and Draft PR update.
+- All PR5A deliverables named in the user task, including provenance tables, sign conventions, XV-15 source/overlay records, moment decomposition, unconstrained elevator results, failure root cause, sensitivity/identifiability, figures/raw data, and `PR5A_EVIDENCE.md`.
+- Commit, push, and create a Draft PR with explicit scope, results, failures, tests, limitations, and claim boundary.
 
 ## Claim boundary
 
-The model supports internally consistent low-order study of prescribed nacelle motion effects on rigid-body dynamics. It does not establish bidirectional hinge-load closure, mechanical-jam loads, external validation, XV-15 validation, Berger 51-state reproduction, handling-quality compliance, or a flight-safety envelope.
-
-## Stop conditions
-
-Only the user-defined baseline/worktree, MATLAB, critical repository/reference, unrepairable legacy-regression, invented-data, permission, finite-real, or time-step-convergence failures are blockers. Individual trim failures, path interruptions, and post-guard trajectories are retained and reported.
+This branch audits and diagnoses a generic low-order component model and adds a partial public-data overlay. It does not create a full XV-15 model, establish flight-test validation, or identify unknown/effective parameters as measured aircraft properties.

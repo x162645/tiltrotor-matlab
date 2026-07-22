@@ -6,8 +6,10 @@ rootDir = fileparts(fileparts(mfilename('fullpath')));
 addpath(rootDir);
 addpath(fullfile(rootDir,'model'));
 addpath(fullfile(rootDir,'model','berger13'));
+addpath(fullfile(rootDir,'model','parameter_sets'));
 addpath(fullfile(rootDir,'analysis'));
 addpath(fullfile(rootDir,'analysis','berger13'));
+addpath(fullfile(rootDir,'analysis','generic_trim'));
 addpath(fullfile(rootDir,'tests'));
 
 P = params_nominal();
@@ -34,6 +36,7 @@ run_test('berger13 PR2 formal trim', @test_berger13_formal_trim);
 run_test('berger13 PR3 actuator and independent wing', ...
     @test_berger13_pr3_actuator_wing);
 run_test('berger13 PR4 research workflow', @test_berger13_pr4_research);
+run_test('generic trim PR5A provenance', @test_generic_trim_pr5a);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -139,6 +142,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         berger13Report = check_berger13_interface();
         assert(berger13Report.allPassed, ...
             'Berger13 PR1 interface or baseline-parity checks failed.');
+    end
+
+    function test_generic_trim_pr5a()
+        pr5aReport = check_generic_trim_pr5a();
+        assert(pr5aReport.allPassed, ...
+            'Generic trim PR5A provenance or diagnostic checks failed.');
     end
 
     function test_berger13_linearization()
