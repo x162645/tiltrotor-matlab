@@ -1,0 +1,5 @@
+﻿recordId,split,sourceFile,feature,sourceStatement,comparisonClass,manualReviewRequired,usedInObjective,digitizedNumericPoint,splitFrozenBeforeFinalParameterSelection
+EXT07,validation,Berger_Dissertation_2013.pdf,mode participation structure,nacelle states may couple with rigid-body modes,QUALITATIVE_HOLDOUT,True,False,False,True
+EXT08,validation,NUAA_main_paper.pdf,speed trend,control allocation changes across conversion speed,QUALITATIVE_HOLDOUT,True,False,False,True
+EXT09,validation,NASA_TM_X_62407.pdf,configuration dependence,inertia/rotor speed differ with configuration,QUALITATIVE_HOLDOUT,False,False,False,True
+EXT10,validation,NASA_TM_81244.pdf,claim boundary,public geometry does not supply full aerodynamic calibration,QUALITATIVE_HOLDOUT,False,False,False,True

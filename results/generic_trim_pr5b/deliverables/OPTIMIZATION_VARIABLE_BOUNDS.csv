@@ -1,0 +1,6 @@
+﻿path,lowerBound,upperBound,frozenValue,unit,class,formalC1,formalC2
+wing.xAC,-0.4,0.4,0.1,m,GEOMETRY,True,True
+rotor.pivotZ,-0.6,0.6,0.1,m,GEOMETRY,True,True
+htail.incidence,-5.0,2.0,-5.0,deg,GEOMETRY,True,True
+htail.CLelevator,1.6,2.4,2.35,1/rad,CALIBRATED_EFFECTIVE,False,True
+htail.downwashAlpha,0.3,0.5,0.4,1,REJECTED_CORRELATED,False,False

@@ -1,0 +1,15 @@
+﻿runId,candidate,stage,wingXACm,rotorPivotZm,tailIncidenceDeg,tailCLelevatorPerRad,coverage,disposition,randomSeed,externalObjectiveContribution,allFailuresRetained,formalObjective
+1,A_BASELINE,BASELINE,0.0,0.0,-2,2.0,7/9,"B75/40, B75/60 failed",20260723,0.0,True,20020.673159409645
+2,B_PUBLIC_OVERLAY,PUBLIC_OVERLAY,0.0,0.0,-2,2.0,5/9,two ill-conditioned and two failed,20260723,0.0,True,40022.65120452539
+3,TAIL_MAX,C1_EXPLORE,0.0,0.0,-5,2.0,not accepted,B75/40 residual 4.31; B75/60 residual 0.115,20260723,0.0,True,
+4,CG_X_NEG_025,C1_EXPLORE,0.0,0.0,-2,2.0,rejected,repairs B75/60 but degrades lower points,20260723,0.0,True,
+5,WRONG_SIGN_COMBINED,C1_EXPLORE,-0.25,-0.35,0,2.0,rejected,worsened all key conditions,20260723,0.0,True,
+6,WING030_ROTORZ030,C1_EXPLORE,0.3,0.3,-2,2.0,rejected,repairs B75/60 but breaks B45/25,20260723,0.0,True,
+7,WING025_ROTORZ025,C1_EXPLORE,0.25,0.25,-2,2.0,rejected,B45/25 residual 0.351; B75/60 margin below 10%,20260723,0.0,True,
+8,C1_FROZEN,C1_FORMAL,0.1,0.1,-5,2.0,8/9,only B75/40 failed; geometry-only,20260723,0.0,True,10013.692209712908
+9,C2_TWO_EFFECTIVE,C2_EXPLORE,0.1,0.1,-2,2.4,rejected,CLelevator/downwash joint use rejected for identifiability,20260723,0.0,True,
+10,C2_GEOM018,C2_EXPLORE,0.18,0.18,-2,2.4,rejected,B45/25 boundary-limited,20260723,0.0,True,
+11,C2_GEOM010_DW050,C2_EXPLORE,0.1,0.1,-2,2.4,rejected,8/9 but used two correlated effective terms,20260723,0.0,True,
+12,C2_CALLER_CELL_EXPANSION,RUN_FAILURE,0.1,0.1,-5,2.2,error,MATLAB cell expanded struct; model result discarded,20260723,0.0,True,
+13,C2_PREFREEZE_220,C2_EXPLORE,0.1,0.1,-5,2.2,8/9,rejected: full-span elevator margin only 7.75%,20260723,0.0,True,
+14,C2_FROZEN,C2_FORMAL,0.1,0.1,-5,2.35,8/9,one effective derivative; B75/V60 full-span elevator margin 10.42%,20260723,0.0,True,10012.407442254244

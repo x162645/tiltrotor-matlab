@@ -37,6 +37,7 @@ run_test('berger13 PR3 actuator and independent wing', ...
     @test_berger13_pr3_actuator_wing);
 run_test('berger13 PR4 research workflow', @test_berger13_pr4_research);
 run_test('generic trim PR5A provenance', @test_generic_trim_pr5a);
+run_test('generic trim PR5B frozen design', @test_generic_trim_pr5b);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -148,6 +149,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         pr5aReport = check_generic_trim_pr5a();
         assert(pr5aReport.allPassed, ...
             'Generic trim PR5A provenance or diagnostic checks failed.');
+    end
+
+    function test_generic_trim_pr5b()
+        pr5bReport = check_generic_trim_pr5b();
+        assert(pr5bReport.allPassed, ...
+            'Generic trim PR5B frozen-design checks failed.');
     end
 
     function test_berger13_linearization()

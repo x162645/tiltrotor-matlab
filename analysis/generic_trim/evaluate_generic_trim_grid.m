@@ -3,7 +3,13 @@ function database = evaluate_generic_trim_grid(P13,opts)
 
 if nargin < 1 || isempty(P13), P13 = params_berger13(); end
 if nargin < 2, opts = struct(); end
-grid = generic_trim_design_grid();
+grid = get_option(opts,'grid',generic_trim_design_grid());
+requiredGridFields = {'pointId','betaDeg','speedMps','mode','condition'};
+if ~istable(grid) || ~all(ismember(requiredGridFields, ...
+        grid.Properties.VariableNames))
+    error('evaluate_generic_trim_grid:InvalidGrid', ...
+        'opts.grid must provide pointId, betaDeg, speedMps, mode, and condition.');
+end
 variantName = get_option(opts,'variantName','UNNAMED_VARIANT');
 initialVectors = get_option(opts,'initialVectors',cell(height(grid),1));
 runMultipleSeeds = get_option(opts,'runMultipleSeeds',true);
@@ -20,13 +26,12 @@ previousBeta = NaN;
 previousZ = [];
 for k = 1:height(grid)
     condition = grid.condition{k};
-    trimOpts = struct('mode',grid.mode{k});
+    trimOpts = struct('mode',grid.mode{k}, ...
+        'runMultipleSeeds',runMultipleSeeds);
     if ~isempty(initialVectors{k})
         trimOpts.initialValues = initialVectors{k};
     elseif grid.betaDeg(k) == previousBeta && ~isempty(previousZ)
         trimOpts.initialValues = previousZ;
-    else
-        trimOpts.runMultipleSeeds = runMultipleSeeds;
     end
     points(k).id = grid.pointId{k};
     points(k).condition = condition;
