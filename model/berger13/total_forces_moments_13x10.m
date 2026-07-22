@@ -1,8 +1,8 @@
 function [Fbody, Mbody, info] = total_forces_moments_13x10(x13, u10, P13)
 %TOTAL_FORCES_MOMENTS_13X10 Isolated force/moment wrapper for PR1.
-% The unchanged NUAA component stack receives the legacy seven controls at
-% betaMAvg.  A namespace-local rotor replacement adds lateral cyclic and
-% independent betaML/betaMR only to rotor loads.
+% The unchanged NUAA component stack supplies the symmetric control mapping.
+% Every Berger13 component is reevaluated about the same actual total CG;
+% no average-CG force/moment subtotal enters the rigid-body equations.
 
 validate_13x10_inputs(x13, u10);
 x13 = x13(:);
@@ -22,11 +22,41 @@ lateralApplied = clamp(lateralRaw, Pbase.control.cyclicLim);
 
 [Favg, Mavg, baseInfo] = total_forces_moments( ...
     xRigid, uLegacy, betaMAvg, Pbase);
+massProperties13 = mass_properties_berger13(betaML,betaMR,P13);
 rotorLoads = compute_berger13_rotor_loads( ...
-    xRigid, betaMAvg, betaML, betaMR, lateralApplied, P13, baseInfo);
+    xRigid, betaMAvg, betaML, betaMR, lateralApplied, P13,baseInfo, ...
+    massProperties13);
+[FwingIndependent,MwingIndependent,wingIndependent] = ...
+    wing_model_berger13_independent(xRigid,uLegacy,betaML,betaMR, ...
+    massProperties13.cgShift,rotorLoads.rotorLeft.independent.data, ...
+    rotorLoads.rotorRight.independent.data,Pbase);
+cgActual = massProperties13.cgShift;
+[Ffuselage,Mfuselage,fuselage] = ...
+    fuselage_model(xRigid,cgActual,Pbase);
+[FhorizontalTail,MhorizontalTail,horizontalTail] = ...
+    horizontal_tail_model(xRigid,baseInfo.appliedControls(6), ...
+    cgActual,Pbase);
+[FverticalTail,MverticalTail,verticalTail] = ...
+    vertical_tail_model(xRigid,baseInfo.appliedControls(7), ...
+    cgActual,Pbase);
 
-Fbody = Favg + rotorLoads.deltaF;
-Mbody = Mavg + rotorLoads.deltaM;
+actualComponents = {
+    pack_component('rotorLeft',rotorLoads.rotorLeft.independent, ...
+        rotorLoads.rotorLeft.independent.data);
+    pack_component('rotorRight',rotorLoads.rotorRight.independent, ...
+        rotorLoads.rotorRight.independent.data);
+    pack_component_values('wing',FwingIndependent,MwingIndependent, ...
+        wingIndependent);
+    pack_component_values('fuselage',Ffuselage,Mfuselage,fuselage);
+    pack_component_values('horizontalTail',FhorizontalTail, ...
+        MhorizontalTail,horizontalTail);
+    pack_component_values('verticalTail',FverticalTail, ...
+        MverticalTail,verticalTail)
+    };
+[Fbody,Mbody] = sum_components(actualComponents);
+wingAverage = component_by_name(baseInfo,'wing');
+wingDeltaF = FwingIndependent-wingAverage.F;
+wingDeltaM = MwingIndependent-wingAverage.M;
 
 info.betaML = betaML;
 info.betaMR = betaMR;
@@ -38,15 +68,26 @@ info.lateralCyclicApplied = lateralApplied;
 info.nacelleTorqueLeft = u10(9);
 info.nacelleTorqueRight = u10(10);
 info.usedIndependentRotorAngles = true;
-info.usedAverageNonRotorAero = true;
+info.usedAverageNonRotorAero = false;
+info.usedAverageWingLoads = false;
+info.usedIndependentWingLoads = true;
 info.usedNamespaceLocalLateralCyclic = true;
-info.forceMomentApproximation = ['left/right rotor loads use betaML/betaMR ' ...
-    'and research lateralCyclic; wing, fuselage, tail, mass properties, ' ...
-    'and wing slipstream diagnostics use the unchanged baseline stack at ' ...
-    'betaMAvg without lateralCyclic'];
+info.forceMomentReference = 'ACTUAL_TOTAL_CG';
+info.momentReferenceCG = cgActual;
+info.forceMomentApproximation = ['all rotor, wing, fuselage, horizontal-' ...
+    'tail, and vertical-tail loads are directly evaluated about actual CG'];
 info.baseComponents = baseInfo;
+info.components = actualComponents;
+info.massProperties = massProperties13;
 info.rotorLeft = rotorLoads.rotorLeft;
 info.rotorRight = rotorLoads.rotorRight;
+info.wingIndependent = wingIndependent;
+info.wingIndependent.average = wingAverage;
+info.wingIndependent.deltaF = wingDeltaF;
+info.wingIndependent.deltaM = wingDeltaM;
+info.fuselage = fuselage;
+info.horizontalTail = horizontalTail;
+info.verticalTail = verticalTail;
 info.averageOnlyF = Favg;
 info.averageOnlyM = Mavg;
 info.F = Fbody;
@@ -59,12 +100,41 @@ info.limitFlags.baseControls = ...
     10*eps*max(1,norm(uLegacy,inf));
 info.warnings = {};
 if abs(betaML-betaMR) > 1e-10
-    info.warnings{end+1,1} = ['independent rotor nacelle angles are active; ' ...
-        'non-rotor loads remain at betaMAvg'];
+    info.warnings{end+1,1} = ['independent rotor and wing angles are active; ' ...
+        'every component moment uses the reconstructed actual total CG'];
 end
 if abs(lateralApplied) > 1e-12
     info.warnings{end+1,1} = ['lateral cyclic changes namespace-local rotor ' ...
         'loads; baseline wing slipstream inputs remain lateral-free'];
+end
+
+function comp = pack_component(name,loads,data)
+comp = pack_component_values(name,loads.F,loads.M,data);
+end
+
+function comp = pack_component_values(name,F,M,data)
+comp = struct('name',name,'F',F,'M',M,'data',data);
+end
+
+function [F,M] = sum_components(components)
+F = zeros(3,1);
+M = zeros(3,1);
+for k = 1:numel(components)
+    F = F+components{k}.F;
+    M = M+components{k}.M;
+end
+end
+
+function comp = component_by_name(baseInfo,targetName)
+for k = 1:numel(baseInfo.components)
+    candidate = baseInfo.components{k};
+    if strcmp(candidate.name,targetName)
+        comp = candidate;
+        return;
+    end
+end
+error('total_forces_moments_13x10:MissingComponent', ...
+    'Could not find component %s.',targetName);
 end
 end
 

@@ -1,5 +1,6 @@
 function rotorLoads = compute_berger13_rotor_loads( ...
-        xRigid, betaMAvg, betaML, betaMR, lateralCyclic, P13, baseInfo)
+        xRigid, betaMAvg, betaML, betaMR, lateralCyclic, P13, ...
+        baseInfo, massProperties13)
 %COMPUTE_BERGER13_ROTOR_LOADS Replace baseline rotors with PR1 rotors.
 % The baseline component stack and mass reference are evaluated at the
 % average nacelle angle.  Only left/right rotor loads are reevaluated at
@@ -12,7 +13,10 @@ if ~isfield(baseInfo, 'appliedRotorControls') || ...
 end
 
 Pbase = P13.base;
-cgShiftAvg = baseInfo.massProperties.cgShift;
+if nargin < 9 || isempty(massProperties13)
+    massProperties13 = baseInfo.massProperties;
+end
+cgShift = massProperties13.cgShift;
 leftAvg = component_by_name(baseInfo, 'rotorLeft');
 rightAvg = component_by_name(baseInfo, 'rotorRight');
 
@@ -23,9 +27,9 @@ rightControl.lateralCyclic = lateralCyclic;
 mapping = P13.interface.lateralCyclicTheta1cMapping;
 
 [Fleft, Mleft, leftData] = rotor_model_bemt_berger13( ...
-    xRigid, leftControl, betaML, -1, cgShiftAvg, Pbase, mapping);
+    xRigid, leftControl, betaML, -1, cgShift, Pbase, mapping);
 [Fright, Mright, rightData] = rotor_model_bemt_berger13( ...
-    xRigid, rightControl, betaMR, +1, cgShiftAvg, Pbase, mapping);
+    xRigid, rightControl, betaMR, +1, cgShift, Pbase, mapping);
 
 rotorLoads.rotorLeft = pack_side(betaMAvg, betaML, leftAvg, ...
     Fleft, Mleft, leftData);

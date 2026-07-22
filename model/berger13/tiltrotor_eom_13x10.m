@@ -23,7 +23,7 @@ end
 
 [Fap, Map, componentInfo] = total_forces_moments_13x10(x13, u10, P13);
 Pbase = P13.base;
-mp = componentInfo.baseComponents.massProperties;
+mp = componentInfo.massProperties;
 mass = mp.mass;
 
 xRigid = x13(1:9);
