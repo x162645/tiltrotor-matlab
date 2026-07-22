@@ -1,13 +1,3 @@
-# Berger13 final research result snapshot
+# Berger13 corrected result snapshot
 
-This directory is the GitHub review snapshot of the external deliverable at
-`E:\tiltrotor-work-output\13x10-complete-20260722`.
-
-It contains the seven-credible/two-failed trim database, command-interface
-linear models, derivative/eigenvalue/mode-tracking databases, 14 time-domain
-cases, sensitivity results, 21 PNG/SVG figure pairs with raw CSV/MAT data,
-and the complete Chinese Markdown/PDF report. Generated results are committed
-with `git add -f` because the repository normally ignores local `results/*`.
-
-These artifacts demonstrate internal numerical consistency only. They are not
-Berger 51-state reproduction, XV-15 validation, or handling-quality approval.
+Main report: `规定执行器模型下倾转旋翼机左右短舱运动对刚体动态的影响研究.md`. Databases, 21 figures, raw CSV/MAT, convergence and guard evidence are generated from the corrected PR51 one-way prescribed-actuator model.

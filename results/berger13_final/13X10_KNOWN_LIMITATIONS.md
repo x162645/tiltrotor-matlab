@@ -1,14 +1,3 @@
-# 已知局限
+# Known limitations
 
-- 低阶 13 状态模型没有 32 个桨叶模态状态、6 个动态入流状态、弹性机翼/传动轴状态。
-- 稳态 BEMT 与一阶谐波挥舞不等于自由尾迹、CFD 或试验校准旋翼。
-- 机身和平尾/垂尾仍使用平均短舱角参考；未建模跨旋翼尾流、机翼—旋翼高保真干扰。
-- 短舱执行器带宽、阻尼、惯量、限幅、延迟和 moving-mass 参数缺少型号级辨识。
-- 纯时间延迟依赖外部命令历史，不是冻结 13 状态内部的 Markov 动力学。
-- 已实现执行器反力矩与参数化倾转速率陀螺项；未实现 `I_dot omega`、移动重心速度/加速度力、局部未知惯量张量旋转、高阶传动耦合。
-- 75°/40 和 60 m/s 点在当前控制边界下失败，不能用于稳定性结论。
-- 代表工况存在一个 `+0.03993 s^-1` 的纵向非振荡特征根；这只表明该局部开环概念模型不稳定，不能外推为型号结论。
-- 模态名称使用左右特征向量、参与因子、对称/差动结构与相邻点匹配，但“roll-like”等仍是低阶解释。
-- 非线性仿真为固定步长显式梯形法；故障工况的 5 s 结果不是硬件鉴定或安全性分析。
-- 参数敏感性仅覆盖表中给定比例，不证明全参数域单调性。
-- 未完成构型一致的外部试验验证、XV-15 型号复现或操纵品质评估。
+No Qexternal feedback, mechanical jam, local nacelle inertia tensor, full-order inflow/blade/drivetrain states, external validation, XV-15 validation, Berger 51-state reproduction, handling-quality qualification, or safety envelope.

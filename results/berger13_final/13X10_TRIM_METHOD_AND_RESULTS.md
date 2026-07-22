@@ -1,13 +1,3 @@
-# 正式配平方法与结果
+# Trim method and results
 
-对称直线稳态约束为 `v=p=r=phi=0`、`betaML=betaMR`、两侧短舱角速度/加速度为零，并要求六个刚体加速度为零。求解报告保留未知量、尺度、上下界、退出状态、完整 13 状态导数、力/力矩平衡、控制余量、三档 Jacobian、SVD/秩/条件数、多初值与 continuation 路径。只有 `CREDIBLE` 点允许线性化。
-
-|短舱角|速度点|可信|失败|结论|
-|-:|-|-:|-:|-|
-|15°|10/20/30 m/s|3|0|残差约 `4.5e-10`–`1.0e-9`|
-|45°|25/35/45 m/s|3|0|残差约 `2.6e-10`–`1.2e-9`|
-|75°|40/60/80 m/s|1|2|40/60 m/s 在升降舵 -20° 下界仍有 4.603/1.315 残差；80 m/s 可信|
-
-总计 7 个可信点、2 个失败点。失败点没有通过调质量、惯量、气动参数、边界或容差修复，也没有删除。完整逐点数值见 `13X10_TRIM_POINT_DATABASE.csv`。
-
-该网格是基于当前概念模型能力选择的 `ASSUMED_RESEARCH_GRID`，不是经验证的转换走廊。配平方法与 Dreier 第 17 章结构相似，但数值来自本项目模型。
+7 credible and 2 failed candidates. Failed points remain archived and do not enter linear/modal results.

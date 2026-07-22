@@ -1,7 +1,3 @@
-# 外部文献对照与声明边界
+# External comparison boundary
 
-1. Berger 博士论文 PDF 90–91 页（原文 55–56，第 2.1.3.1/2.1.3.2 节，图 2.15、表 2.2）用于确认通用构型及短舱转动自由度；PDF 93–95 页（原文 58–60，第 2.1.3.3 节，图 2.16/2.17）用于确认 51 状态/10 输入结构和角指令—PID—力矩链。当前模型省略桨叶模态与动态入流，不复现其特征根。
-2. Sheng、Zhang、Xiang，*Mathematical Modeling and Stability Analysis of Tiltrotor Aircraft*，*Drones* 2022：PDF 2–10 页、式 (1)–(36) 用于结构/坐标/部件方法核查；PDF 12 页、第 5 节、式 (37)–(42) 用于“配平后线性化”方法核查；PDF 16 页、第 6 节明确原作者也受 XV-15 公开数据不完整限制。其 9×7 数值不能作为本 13×10 真值。
-3. Dreier 中文版 PDF 348–371 页（书页 323–346），第 17 章表 17-1/17-2、式 (17-1)–(17-43) 用于配平变量、约束、Jacobian、迭代及周期/稳态配平边界。该书不提供本项目短舱参数。
-
-本交付只完成结构对照、方法对照和内部趋势分析；没有构型一致的外部试验点、独立型号参数集或飞行试验残差，因此“XV-15 验证”“Berger 51 状态复现”“操纵品质合格”均不成立。
+NUAA comparison is methodological. NASA reports provide background only. No external numerical validation is claimed; Berger source is absent and requires manual verification.

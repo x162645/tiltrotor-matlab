@@ -17,6 +17,15 @@ x = NaN(n,13);
 u = NaN(n,10);
 loads = NaN(n,3);
 limits = false(n,1);
+leftRateClamped = false(n,1);
+leftAccelerationClamped = false(n,1);
+leftTorqueClamped = false(n,1);
+rightRateClamped = false(n,1);
+rightAccelerationClamped = false(n,1);
+rightTorqueClamped = false(n,1);
+guardValid = false(n,1);
+guardReasons = cell(n,1);
+guardDiagnostics = cell(n,1);
 x(1,:) = trimReport.x13(:).';
 diverged = false;
 divergenceIndex = NaN;
@@ -28,6 +37,18 @@ for k = 1:n
     loads(k,:) = [out1.Ftotal(2),out1.Mtotal(1),out1.Mtotal(3)];
     limits(k) = out1.nacelle.left.flags.anyLimit || ...
         out1.nacelle.right.flags.anyLimit;
+    leftRateClamped(k) = out1.nacelle.left.flags.rateClamped;
+    leftAccelerationClamped(k) = ...
+        out1.nacelle.left.flags.accelerationClamped;
+    leftTorqueClamped(k) = out1.nacelle.left.flags.torqueClamped;
+    rightRateClamped(k) = out1.nacelle.right.flags.rateClamped;
+    rightAccelerationClamped(k) = ...
+        out1.nacelle.right.flags.accelerationClamped;
+    rightTorqueClamped(k) = out1.nacelle.right.flags.torqueClamped;
+    guardDiagnostics{k} = berger13_analysis_guard( ...
+        x(k,:).',u(k,:).',out1,guard_config(caseDef));
+    guardValid(k) = guardDiagnostics{k}.valid;
+    guardReasons{k} = guardDiagnostics{k}.reasons;
     if k == n
         break;
     end
@@ -56,26 +77,74 @@ simulation.x = x;
 simulation.u = u;
 simulation.lateralForceRollYawMoment = loads;
 simulation.limitActive = limits;
+simulation.limitDetails.leftRateClamped = leftRateClamped;
+simulation.limitDetails.leftAccelerationClamped = leftAccelerationClamped;
+simulation.limitDetails.leftTorqueClamped = leftTorqueClamped;
+simulation.limitDetails.rightRateClamped = rightRateClamped;
+simulation.limitDetails.rightAccelerationClamped = ...
+    rightAccelerationClamped;
+simulation.limitDetails.rightTorqueClamped = rightTorqueClamped;
 simulation.betaSym = betaSym;
 simulation.betaDiff = betaDiff;
 simulation.diverged = diverged;
 simulation.divergenceIndex = divergenceIndex;
-simulation.metrics.maxAttitudeDeviationRad = ...
-    max(abs(deviation(:,7:9)),[],'all','omitnan');
-simulation.metrics.maxAngularRateRadPerSecond = ...
-    max(abs(deviation(:,4:6)),[],'all','omitnan');
-simulation.metrics.maxBetaDiffRad = ...
-    max(abs(betaDiff),[],'all','omitnan');
-simulation.metrics.maxAbsLateralForceN = ...
-    max(abs(loads(:,1)),[],'all','omitnan');
-simulation.metrics.maxAbsRollMomentNm = ...
-    max(abs(loads(:,2)),[],'all','omitnan');
-simulation.metrics.maxAbsYawMomentNm = ...
-    max(abs(loads(:,3)),[],'all','omitnan');
-simulation.metrics.anyLimit = any(limits);
-simulation.metrics.recoveryTimeSeconds = recovery_time( ...
-    t,deviation,caseDef.startTime);
+firstViolationIndex = find(~guardValid,1);
+if isempty(firstViolationIndex)
+    firstViolationIndex = NaN;
+    firstViolationTime = NaN;
+    validPrefixEndIndex = find(all(isfinite(x),2),1,'last');
+    violationReason = 'NONE';
+else
+    firstViolationTime = t(firstViolationIndex);
+    validPrefixEndIndex = max(firstViolationIndex-1,1);
+    violationReason = strjoin(guardReasons{firstViolationIndex},';');
+end
+if isempty(validPrefixEndIndex), validPrefixEndIndex = 1; end
+simulation.guardValid = guardValid;
+simulation.guardReasons = guardReasons;
+simulation.guardDiagnostics = guardDiagnostics;
+simulation.firstEnvelopeViolationIndex = firstViolationIndex;
+simulation.firstEnvelopeViolationTime = firstViolationTime;
+simulation.violationReason = violationReason;
+simulation.validPrefixEndIndex = validPrefixEndIndex;
+simulation.fullNumericalTrajectoryAvailable = true;
+simulation.fullTrajectoryMetrics = trajectory_metrics( ...
+    t,deviation,betaDiff,loads,limits,caseDef.startTime,1:n);
+simulation.validPrefixMetrics = trajectory_metrics( ...
+    t,deviation,betaDiff,loads,limits,caseDef.startTime, ...
+    1:validPrefixEndIndex);
+simulation.metrics = simulation.validPrefixMetrics;
+simulation.quantitativeClaimAllowed = validPrefixEndIndex >= 2 && ...
+    simulation.validPrefixMetrics.finiteReal;
 simulation.finiteReal = all(isfinite(x(~isnan(x)))) && isreal(x);
+end
+
+function metrics = trajectory_metrics( ...
+        t,deviation,betaDiff,loads,limits,startTime,indices)
+metrics.maxAttitudeDeviationRad = ...
+    max(abs(deviation(indices,7:9)),[],'all','omitnan');
+metrics.maxAngularRateRadPerSecond = ...
+    max(abs(deviation(indices,4:6)),[],'all','omitnan');
+metrics.maxBetaDiffRad = max(abs(betaDiff(indices)),[],'all','omitnan');
+metrics.maxAbsLateralForceN = ...
+    max(abs(loads(indices,1)),[],'all','omitnan');
+metrics.maxAbsRollMomentNm = ...
+    max(abs(loads(indices,2)),[],'all','omitnan');
+metrics.maxAbsYawMomentNm = ...
+    max(abs(loads(indices,3)),[],'all','omitnan');
+metrics.anyLimit = any(limits(indices));
+metrics.recoveryTimeSeconds = recovery_time( ...
+    t(indices),deviation(indices,:),startTime);
+metrics.finiteReal = all(isfinite(deviation(indices,:)),'all') && ...
+    all(isfinite(loads(indices,:)),'all');
+end
+
+function guard = guard_config(caseDef)
+if isfield(caseDef,'analysisGuard')
+    guard = caseDef.analysisGuard;
+else
+    guard = [];
+end
 end
 
 function P = apply_parameter_overrides(P,caseDef)

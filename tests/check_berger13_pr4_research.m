@@ -22,9 +22,17 @@ passed = [];
 messages = {};
 run_case('biorthogonal eigenvectors and finite modal metrics',@case_modal);
 run_case('participation normalization and nacelle modes',@case_participation);
+run_case('heading zero root has separate classification',@case_heading);
+run_case('heading root is excluded from spiral qualification',@case_heading_not_spiral);
+run_case('explicit derivative units and command labels',@case_units);
 run_case('Hungarian global assignment optimum',@case_hungarian);
-run_case('adjacent identical model tracking',@case_tracking);
+run_case('continuous-path tracking reserves heading mode',@case_tracking);
+run_case('cross-gap assignment is prohibited',@case_tracking_gap);
 run_case('short nonlinear command simulation finite',@case_simulation);
+run_case('analysis guard reports first violation',@case_guard);
+run_case('valid-prefix and full metrics are separate',@case_prefix);
+run_case('three-step time integration peak convergence',@case_time_step);
+run_case('force and moment derivative norms stay separate',@case_dimensions);
 run_case('linear/nonlinear comparison has ten states',@case_comparison);
 
 report.names = names;
@@ -53,6 +61,35 @@ fprintf('All passed: %d\n',report.allPassed);
         assert(any(modal.table.betaDiffParticipation > 0.4));
     end
 
+    function case_heading()
+        mask = modal.table.headingIntegrator;
+        assert(sum(mask) == 1);
+        assert(strcmp(modal.table.modeName{mask}, ...
+            'heading kinematic integrator'));
+        assert(isnan(modal.table.dampingRatio(mask)));
+        assert(~modal.table.stabilityQualified(mask));
+        assert(strcmp(modal.table.dominantState{mask},'psi'));
+    end
+
+    function case_heading_not_spiral()
+        mask = modal.table.headingIntegrator;
+        assert(~contains(modal.table.modeName{mask},'spiral'));
+        spiral = strcmp(modal.table.modeName,'spiral-like');
+        assert(~any(mask & spiral));
+    end
+
+    function case_units()
+        contract = berger13_derivative_contract();
+        assert(strcmp(berger13_derivative_unit( ...
+            'p','betaDiffDot'),'(rad/s^2)/(rad/s)'));
+        assert(strcmp(berger13_derivative_unit( ...
+            'v','betaDiff'),'(m/s^2)/(rad)'));
+        assert(strcmp(contract.commandInputNames{9},'betaSymCommand'));
+        assert(strcmp(contract.commandInputNames{10},'betaDiffCommand'));
+        assert(strcmp(linearModel.symdiff.inputNames{9},'betaSymCommand'));
+        assert(strcmp(linearModel.symdiff.inputNames{10},'betaDiffCommand'));
+    end
+
     function case_hungarian()
         cost = [4,1,3;2,0,5;3,2,2];
         assignment = hungarian_assignment(cost);
@@ -62,10 +99,24 @@ fprintf('All passed: %d\n',report.allPassed);
     end
 
     function case_tracking()
-        tracking = track_berger13_modes({modal,modal},{'P1','P2'});
+        tracking = track_berger13_modes( ...
+            {modal,modal},{'P1','P2'},{'PATH_A','PATH_A'});
         second = tracking.table(strcmp(tracking.table.pointId,'P2'),:);
         assert(all(second.matchingConfidence > 0.99));
         assert(numel(unique(second.modeId)) == 13);
+        heading = second.headingIntegrator;
+        assert(strcmp(second.matchingStatus{heading}, ...
+            'RESERVED_HEADING_INTEGRATOR'));
+    end
+
+    function case_tracking_gap()
+        tracking = track_berger13_modes({modal,modal,modal}, ...
+            {'P1','P2','P3'},{'PATH_A','PATH_A','PATH_B'});
+        first = tracking.table(strcmp(tracking.table.pointId,'P1'),:);
+        third = tracking.table(strcmp(tracking.table.pointId,'P3'),:);
+        assert(isempty(intersect(first.modeId,third.modeId)));
+        assert(all(strcmp(third.matchingStatus,'PATH_START_UNMATCHED')));
+        assert(~tracking.crossGapAssignment);
     end
 
     function case_simulation()
@@ -76,12 +127,73 @@ fprintf('All passed: %d\n',report.allPassed);
         sim = simulate_berger13_case(commandTrim,P13,caseDef);
         assert(sim.finiteReal && ~sim.diverged);
         assert(size(sim.x,2) == 13);
+        assert(isfield(sim,'validPrefixMetrics'));
+        assert(isfield(sim,'fullTrajectoryMetrics'));
         metricNames = fieldnames(sim.metrics);
         for metricIndex = 1:numel(metricNames)
             metric = sim.metrics.(metricNames{metricIndex});
             assert(isscalar(metric) && isreal(metric), ...
                 'Every archived simulation metric must be a real scalar.');
         end
+    end
+
+    function case_guard()
+        [~,out] = tiltrotor_eom_13x10_command( ...
+            commandTrim.x13,commandTrim.u10Command,P13);
+        xGuard = commandTrim.x13;
+        xGuard(7) = 60*d2r;
+        assessment = berger13_analysis_guard( ...
+            xGuard,commandTrim.u10Command,out,[]);
+        assert(~assessment.valid);
+        assert(any(strcmp(assessment.reasons,'ROLL_ATTITUDE_GUARD')));
+        assert(strcmp(assessment.guard.parameterSource, ...
+            'ASSUMED_ANALYSIS_GUARD'));
+    end
+
+    function case_prefix()
+        caseDef = base_case('forced-guard','betaSym',0.005*d2r);
+        caseDef.duration = 0.10;
+        caseDef.dt = 0.05;
+        [~,out] = tiltrotor_eom_13x10_command( ...
+            commandTrim.x13,commandTrim.u10Command,P13);
+        guard = berger13_analysis_guard( ...
+            commandTrim.x13,commandTrim.u10Command,out,[]);
+        caseDef.analysisGuard = guard.guard;
+        caseDef.analysisGuard.maxAbsAlphaRad = 0;
+        sim = simulate_berger13_case(commandTrim,P13,caseDef);
+        assert(sim.firstEnvelopeViolationTime == 0);
+        assert(sim.validPrefixEndIndex == 1);
+        assert(sim.fullNumericalTrajectoryAvailable);
+        assert(~sim.quantitativeClaimAllowed);
+    end
+
+    function case_time_step()
+        dt = [0.1,0.05,0.025,0.0125];
+        peak = zeros(4,1);
+        for stepIndex = 1:4
+            caseDef = base_case('convergence','betaDiff',0.0001*d2r);
+            caseDef.duration = 0.50;
+            caseDef.startTime = 0.10;
+            caseDef.dt = dt(stepIndex);
+            sim = simulate_berger13_case(commandTrim,P13,caseDef);
+            peak(stepIndex) = sim.validPrefixMetrics.maxAbsRollMomentNm;
+        end
+        change = abs(peak(4)-peak(3))/max(abs(peak(4)),1e-9);
+        assert(change < 0.02);
+    end
+
+    function case_dimensions()
+        h = 1e-4;
+        xp = commandTrim.x13; xm = commandTrim.x13;
+        xp(10:11) = xp(10:11)+[-h;+h];
+        xm(10:11) = xm(10:11)+[+h;-h];
+        uTorque = [commandTrim.u10Command(1:8);0;0];
+        [Fp,Mp] = total_forces_moments_13x10(xp,uTorque,P13);
+        [Fm,Mm] = total_forces_moments_13x10(xm,uTorque,P13);
+        forceNorm = norm((Fp-Fm)/(2*h));
+        momentNorm = norm((Mp-Mm)/(2*h));
+        assert(isfinite(forceNorm) && isfinite(momentNorm));
+        assert(forceNorm > 0 && momentNorm > 0);
     end
 
     function case_comparison()

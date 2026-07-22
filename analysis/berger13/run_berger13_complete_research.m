@@ -31,7 +31,8 @@ linearCache = fullfile(outputDir,'13X10_LINEAR_MODEL_DATABASE.mat');
 derivativeCache = fullfile(outputDir,'13X10_DERIVATIVE_DATABASE.csv');
 eigenCache = fullfile(outputDir,'13X10_EIGENVALUE_DATABASE.csv');
 trackingCache = fullfile(outputDir,'13X10_MODE_TRACKING_DATABASE.csv');
-reuseExisting = exist(trimCache,'file') && exist(linearCache,'file') && ...
+reuseExisting = ~forceRecompute && exist(trimCache,'file') && ...
+    exist(linearCache,'file') && ...
     exist(derivativeCache,'file') && exist(eigenCache,'file') && ...
     exist(trackingCache,'file');
 if reuseExisting
@@ -45,9 +46,9 @@ if reuseExisting
     derivativeTable = readtable(derivativeCache);
     eigenTable = readtable(eigenCache);
     tracking.table = readtable(trackingCache);
-    tracking.method = ['Hungarian global adjacent assignment; cost=0.35 ' ...
-        'normalized eigenvalue distance + 0.45*(1-MAC) + 0.20 ' ...
-        'participation L1 distance'];
+    tracking.method = ['independent continuous paths with reserved heading ' ...
+        'integrator and Hungarian dynamic-mode assignment'];
+    tracking.crossGapAssignment = false;
 else
     trimDatabase = build_berger13_pr2_database(rawDir);
     writetable(trimDatabase.summary, ...
@@ -57,6 +58,7 @@ else
     commandTrims = cell(nCredible,1);
     modalModels = cell(nCredible,1);
     crediblePointIds = cell(nCredible,1);
+    trackingPathIds = cell(nCredible,1);
     derivativeRows = {};
     eigenTables = cell(nCredible,1);
     credibleIndex = 0;
@@ -73,6 +75,8 @@ else
             linearModel.symdiff.B,linearModel.symdiff.stateNames,inputNames);
         credibleIndex = credibleIndex+1;
         crediblePointIds{credibleIndex} = point.id;
+        trackingPathIds{credibleIndex} = sprintf('B%02d_SPEED_PATH', ...
+            round(point.condition.betaM*180/pi));
         commandTrims{credibleIndex} = commandTrim;
         linearModels{credibleIndex} = linearModel;
         modalModels{credibleIndex} = modal;
@@ -90,7 +94,8 @@ else
         'outputName','inputName','units','differenceStep','limitActive', ...
         'maximumMatrixStepVariation','parameterSource'});
     eigenTable = vertcat(eigenTables{:});
-    tracking = track_berger13_modes(modalModels,crediblePointIds);
+    tracking = track_berger13_modes( ...
+        modalModels,crediblePointIds,trackingPathIds);
     writetable(derivativeTable,derivativeCache);
     writetable(eigenTable,eigenCache);
     writetable(tracking.table,trackingCache);
@@ -98,6 +103,7 @@ else
     linearDatabase.commandTrims = commandTrims;
     linearDatabase.linearModels = linearModels;
     linearDatabase.modalModels = modalModels;
+    linearDatabase.trackingPathIds = trackingPathIds;
     linearDatabase.stateContract = get_state_names_13x10();
     linearDatabase.commandInputContract = get_command_input_names_13x10();
     linearDatabase.claimBoundary = ['CREDIBLE internal trim points only; ' ...
@@ -113,7 +119,7 @@ end
 representativeTrim = commandTrims{representativeIndex};
 representativeLinear = linearModels{representativeIndex};
 
-[timeSimulations,timeSummary] = run_time_cases( ...
+[timeSimulations,timeSummary,timeStepConvergence] = run_time_cases( ...
     representativeTrim,P13,rawDir);
 writetable(timeSummary, ...
     fullfile(outputDir,'13X10_TIME_DOMAIN_CASES.csv'));
@@ -123,7 +129,12 @@ writetable(timeSummary, ...
 writetable(comparisonTable, ...
     fullfile(rawDir,'13X10_LINEAR_NONLINEAR_METRICS.csv'));
 
-sensitivityTable = run_sensitivity(representativeTrim,P13);
+if ~forceRecompute && exist(sensitivityCache,'file')
+    sensitivityTable = readtable(sensitivityCache);
+else
+    sensitivityTable = run_berger13_sensitivity_corrected( ...
+        representativeTrim,P13);
+end
 writetable(sensitivityTable, ...
     fullfile(outputDir,'13X10_SENSITIVITY_RESULTS.csv'));
 
@@ -134,6 +145,7 @@ results.eigenTable = eigenTable;
 results.tracking = tracking;
 results.timeSimulations = timeSimulations;
 results.timeSummary = timeSummary;
+results.timeStepConvergence = timeStepConvergence;
 results.comparisons = comparisons;
 results.comparisonTable = comparisonTable;
 results.sensitivityTable = sensitivityTable;
@@ -141,7 +153,8 @@ results.representativePointId = 'B45_V035';
 results.outputDir = outputDir;
 results.finiteReal = check_finite(results);
 results.claimBoundary = ['low-order internally consistent research output; ' ...
-    'not Berger 51-state reproduction or XV-15 validation'];
+    'prescribed nacelle motion affects rigid-body dynamics one-way; not ' ...
+    'Berger 51-state reproduction, XV-15 validation, or a safety envelope'];
 save(fullfile(outputDir,'13X10_RESEARCH_RESULTS.mat'),'results','-v7');
 plot_berger13_research_outputs(results,figureDir,rawDir);
 end
@@ -160,13 +173,14 @@ stateItems = { ...
     'Xu',1,1;'Xw',1,3;'Zu',3,1;'Zw',3,3;'Mu',5,1;'Mw',5,3; ...
     'Mq',5,5;'Yv',2,2;'Yp',2,4;'Yr',2,6;'Lv',4,2; ...
     'Lp',4,4;'Lr',4,6;'Nv',6,2;'Np',6,4;'Nr',6,6};
-stateNames = get_state_names_13x10();
+contract = berger13_derivative_contract();
+stateNames = contract.stateNames;
 for k = 1:size(stateItems,1)
     row = stateItems{k,2};
     column = stateItems{k,3};
     rows(end+1,:) = make_row(point.id,betaDeg,speed,stateItems{k,1}, ...
         A(row,column),stateNames{row},stateNames{column}, ...
-        derivative_unit(row,column,false), ...
+        berger13_derivative_unit(stateNames{row},stateNames{column}), ...
         linearModel.stepScaleModels(2).report.dx(column),limitActive, ...
         variation,source); %#ok<AGROW>
 end
@@ -177,7 +191,8 @@ for row = 1:6
         name = sprintf('d%s_d%s',stateNames{row},axisNames{localColumn});
         rows(end+1,:) = make_row(point.id,betaDeg,speed,name, ...
             Asd(row,column),stateNames{row},axisNames{localColumn}, ...
-            derivative_unit(row,column,false), ...
+            berger13_derivative_unit(stateNames{row}, ...
+            axisNames{localColumn}), ...
             linearModel.stepScaleModels(2).report.dx(column),limitActive, ...
             variation,source); %#ok<AGROW>
     end
@@ -191,7 +206,8 @@ for row = 1:6
         name = sprintf('d%s_d%s',stateNames{row},inputNames{localColumn});
         rows(end+1,:) = make_row(point.id,betaDeg,speed,name, ...
             Bsd(row,column),stateNames{row},inputNames{localColumn}, ...
-            derivative_unit(row,column,true), ...
+            berger13_derivative_unit(stateNames{row}, ...
+            inputNames{localColumn}), ...
             linearModel.stepScaleModels(2).report.du(column),limitActive, ...
             variation,source); %#ok<AGROW>
     end
@@ -203,23 +219,8 @@ function row = make_row(id,beta,speed,name,value,output,input,units, ...
 row = {id,beta,speed,name,value,output,input,units,step,limit,variation,source};
 end
 
-function unit = derivative_unit(outputIndex,inputIndex,isControl)
-if outputIndex <= 3
-    outputUnit = 'm/s^2';
-else
-    outputUnit = 'rad/s^2';
-end
-if isControl || inputIndex >= 7
-    inputUnit = 'rad';
-elseif inputIndex <= 3
-    inputUnit = 'm/s';
-else
-    inputUnit = 'rad/s';
-end
-unit = sprintf('(%s)/(%s)',outputUnit,inputUnit);
-end
-
-function [simulations,summary] = run_time_cases(trimReport,P13,rawDir)
+function [simulations,summary,convergenceTable] = run_time_cases( ...
+        trimReport,P13,rawDir)
 d2r = pi/180;
 base = struct('duration',5,'dt',0.1,'startTime',1, ...
     'amplitude',2*d2r,'inputType','betaSym');
@@ -249,10 +250,10 @@ delayCase = named(base,'left_command_delay');
 delayCase.amplitude = 5*d2r;
 delayCase.leftActuator = struct('commandDelay',0.30);
 cases{end+1} = delayCase;
-stuckCase = named(base,'left_nacelle_stuck');
-stuckCase.amplitude = 5*d2r;
-stuckCase.leftActuator = struct('stuck',true);
-cases{end+1} = stuckCase;
+lockCase = named(base,'left_kinematic_lock');
+lockCase.amplitude = 5*d2r;
+lockCase.leftActuator = struct('kinematicLock',true);
+cases{end+1} = lockCase;
 degradeCase = named(base,'left_rate_degradation');
 degradeCase.amplitude = 5*d2r;
 degradeCase.leftActuator = struct('rateScale',0.20);
@@ -260,7 +261,7 @@ cases{end+1} = degradeCase;
 freezeCase = named(base,'left_command_freeze');
 freezeCase.amplitude = 5*d2r;
 freezeCase.leftActuator = struct('commandFreeze',true, ...
-    'frozenCommand',trimReport.x13(10));
+    'frozenCommand',trimReport.x13(10)+1*d2r);
 cases{end+1} = freezeCase;
 lat = named(base,'conversion_lateral_cyclic_pulse');
 lat.inputType = 'lateralCyclic'; lat.amplitude = 0.5*d2r;
@@ -277,27 +278,172 @@ rud.inputType = 'rudder'; rud.amplitude = 0.5*d2r;
 cases{end+1} = rud;
 
 simulations = cell(numel(cases),1);
-summaryRows = cell(numel(cases),11);
+summaryRows = cell(numel(cases),19);
+convergenceRows = {};
+convergencePath = fullfile(fileparts(rawDir), ...
+    '13X10_TIME_STEP_CONVERGENCE.csv');
+if exist(convergencePath,'file')
+    archivedConvergence = readtable(convergencePath);
+else
+    archivedConvergence = table();
+end
 for k = 1:numel(cases)
-    simulations{k} = simulate_berger13_case(trimReport,P13,cases{k});
+    archivedMask = ~strcmp(cases{k}.name,'left_command_freeze') && ...
+        ~isempty(archivedConvergence) && ...
+        any(strcmp(archivedConvergence.caseName,cases{k}.name));
+    if archivedMask
+        caseRowsTable = archivedConvergence( ...
+            strcmp(archivedConvergence.caseName,cases{k}.name),:);
+        if ~caseRowsTable.peakGatePassed(end)
+            error('run_berger13_complete_research:InvalidCheckpoint', ...
+                'Archived convergence for %s did not pass.',cases{k}.name);
+        end
+        finalCase = cases{k};
+        finalCase.dt = caseRowsTable.fineDt(end);
+        simulations{k} = simulate_berger13_case( ...
+            trimReport,P13,finalCase);
+        simulations{k}.timeStepConverged = true;
+        simulations{k}.timeStepTolerance = 0.02;
+        simulations{k}.quantitativeClaimAllowed = ...
+            simulations{k}.quantitativeClaimAllowed && ...
+            simulations{k}.timeStepConverged;
+        caseRows = table2cell(caseRowsTable);
+    else
+        [simulations{k},caseRows] = converged_simulation( ...
+            trimReport,P13,cases{k});
+    end
+    convergenceRows = [convergenceRows;caseRows]; %#ok<AGROW>
     sim = simulations{k};
     summaryRows(k,:) = {cases{k}.name,cases{k}.inputType, ...
-        cases{k}.amplitude,cases{k}.duration,sim.metrics.maxAttitudeDeviationRad, ...
-        sim.metrics.maxAngularRateRadPerSecond,sim.metrics.maxBetaDiffRad, ...
-        sim.metrics.maxAbsRollMomentNm,sim.metrics.maxAbsYawMomentNm, ...
-        sim.metrics.recoveryTimeSeconds,sim.diverged || ~sim.finiteReal};
+        cases{k}.amplitude,cases{k}.duration,sim.caseDef.dt, ...
+        sim.validPrefixMetrics.maxAttitudeDeviationRad, ...
+        sim.validPrefixMetrics.maxAngularRateRadPerSecond, ...
+        sim.validPrefixMetrics.maxBetaDiffRad, ...
+        sim.validPrefixMetrics.maxAbsRollMomentNm, ...
+        sim.validPrefixMetrics.maxAbsYawMomentNm, ...
+        sim.validPrefixMetrics.recoveryTimeSeconds, ...
+        sim.fullTrajectoryMetrics.maxAttitudeDeviationRad, ...
+        sim.fullTrajectoryMetrics.maxAbsRollMomentNm, ...
+        sim.fullTrajectoryMetrics.maxAbsYawMomentNm, ...
+        sim.firstEnvelopeViolationTime,sim.violationReason, ...
+        sim.validPrefixEndIndex,sim.quantitativeClaimAllowed, ...
+        sim.diverged || ~sim.finiteReal};
+    [speed,alpha,sideslip] = guard_columns(sim);
     timeTable = array2table([sim.time,sim.x,sim.betaSym,sim.betaDiff, ...
-        sim.lateralForceRollYawMoment,double(sim.limitActive)], ...
+        sim.lateralForceRollYawMoment,double(sim.limitActive), ...
+        double(sim.guardValid),speed,alpha,sideslip], ...
         'VariableNames',[{'time'},get_state_names_13x10().', ...
         {'betaSym','betaDiff','lateralForceN','rollMomentNm', ...
-        'yawMomentNm','limitActive'}]);
+        'yawMomentNm','limitActive','analysisGuardValid','bodySpeedMps', ...
+        'alphaRad','sideslipRad'}]);
     writetable(timeTable,fullfile(rawDir,[cases{k}.name '.csv']));
 end
 summary = cell2table(summaryRows,'VariableNames', ...
-    {'caseName','inputType','amplitudeRad','durationSeconds', ...
-    'maxAttitudeDeviationRad','maxAngularRateRadPerSecond', ...
-    'maxBetaDiffRad','maxAbsRollMomentNm','maxAbsYawMomentNm', ...
-    'recoveryTimeSeconds','diverged'});
+    {'caseName','inputType','amplitudeRad','durationSeconds','archiveDt', ...
+    'validMaxAttitudeDeviationRad','validMaxAngularRateRadPerSecond', ...
+    'validMaxBetaDiffRad','validMaxAbsRollMomentNm', ...
+    'validMaxAbsYawMomentNm','validRecoveryTimeSeconds', ...
+    'fullMaxAttitudeDeviationRad','fullMaxAbsRollMomentNm', ...
+    'fullMaxAbsYawMomentNm','firstEnvelopeViolationTime', ...
+    'violationReason','validPrefixEndIndex','quantitativeClaimAllowed', ...
+    'diverged'});
+convergenceTable = cell2table(convergenceRows,'VariableNames', ...
+    {'caseName','coarseDt','fineDt','maxBetaDiffRelativeChange', ...
+    'rollMomentRelativeChange','yawMomentRelativeChange', ...
+    'attitudeRelativeChange','angularRateRelativeChange', ...
+    'recoveryTimeRelativeChange','violationTimeRelativeChange', ...
+    'peakGatePassed'});
+writetable(convergenceTable,convergencePath);
+end
+
+function [simulation,rows] = converged_simulation(trimReport,P13,caseDef)
+dtValues = [0.1,0.05,0.025];
+sims = cell(3,1);
+for k = 1:3
+    candidate = caseDef;
+    candidate.dt = dtValues(k);
+    sims{k} = simulate_berger13_case(trimReport,P13,candidate);
+end
+rows = {};
+[rows,~] = append_convergence(rows,caseDef.name,sims{1},sims{2});
+[rows,passed] = append_convergence(rows,caseDef.name, ...
+    sims{2},sims{3});
+if passed
+    simulation = sims{3};
+else
+    extraDt = [0.0125,0.00625,0.003125];
+    previous = sims{3};
+    simulation = [];
+    for extraIndex = 1:numel(extraDt)
+        candidate = caseDef;
+        candidate.dt = extraDt(extraIndex);
+        current = simulate_berger13_case(trimReport,P13,candidate);
+        [rows,passed] = append_convergence( ...
+            rows,caseDef.name,previous,current);
+        if passed
+            simulation = current;
+            break;
+        end
+        previous = current;
+    end
+    if isempty(simulation)
+        error('run_berger13_complete_research:TimeStepNotConverged', ...
+            ['Case %s did not pass the 2%% adjacent-step peak gate ' ...
+            'through dt=0.003125 s.'],caseDef.name);
+    end
+end
+simulation.timeStepConverged = true;
+simulation.timeStepTolerance = 0.02;
+simulation.quantitativeClaimAllowed = ...
+    simulation.quantitativeClaimAllowed && simulation.timeStepConverged;
+end
+
+function [rows,passed] = append_convergence(rows,name,coarse,fine)
+coarseValues = convergence_metrics(coarse);
+fineValues = convergence_metrics(fine);
+changes = relative_changes(coarseValues,fineValues);
+peakIndices = 1:5;
+passed = all(changes(peakIndices) <= 0.02);
+rows(end+1,:) = {name,coarse.caseDef.dt,fine.caseDef.dt, ...
+    changes(1),changes(2),changes(3),changes(4),changes(5), ...
+    changes(6),changes(7),passed};
+end
+
+function values = convergence_metrics(sim)
+m = sim.validPrefixMetrics;
+values = [m.maxBetaDiffRad,m.maxAbsRollMomentNm, ...
+    m.maxAbsYawMomentNm,m.maxAttitudeDeviationRad, ...
+    m.maxAngularRateRadPerSecond,m.recoveryTimeSeconds, ...
+    sim.firstEnvelopeViolationTime];
+end
+
+function changes = relative_changes(a,b)
+changes = zeros(size(a));
+% A pure relative error is undefined for symmetry-enforced zero responses.
+% Floors are dimensioned numerical comparison scales, not model tuning:
+% [rad, N*m, N*m, rad, rad/s, s, s].
+comparisonFloor = [1e-6,1,1,1e-6,1e-6,0.025,0.025];
+for k = 1:numel(a)
+    if isnan(a(k)) && isnan(b(k))
+        changes(k) = 0;
+    elseif ~isfinite(a(k)) || ~isfinite(b(k))
+        changes(k) = Inf;
+    else
+        changes(k) = abs(b(k)-a(k))/ ...
+            max([abs(a(k)),abs(b(k)),comparisonFloor(k)]);
+    end
+end
+end
+
+function [speed,alpha,sideslip] = guard_columns(sim)
+n = numel(sim.guardDiagnostics);
+speed = NaN(n,1); alpha = NaN(n,1); sideslip = NaN(n,1);
+for k = 1:n
+    if isempty(sim.guardDiagnostics{k}), continue; end
+    speed(k) = sim.guardDiagnostics{k}.bodySpeedMps;
+    alpha(k) = sim.guardDiagnostics{k}.alphaRad;
+    sideslip(k) = sim.guardDiagnostics{k}.sideslipRad;
+end
 end
 
 function value = named(base,name)
@@ -327,186 +473,6 @@ for k = 1:numel(types)
     writetable(raw,fullfile(rawDir,[def.name '.csv']));
 end
 tableOut = vertcat(tables{:});
-end
-
-function tableOut = run_sensitivity(trimReport,P13)
-d2r = pi/180;
-rows = {};
-rows = [rows; linear_sweep('omegaN',[0.5,1,1.5],trimReport,P13)];
-rows = [rows; linear_sweep('zeta',[0.625,1,1.375],trimReport,P13)];
-rows = [rows; linear_sweep('lateralCyclicScale',[0.5,1,1.5], ...
-    trimReport,P13)];
-timeParameters = {'leftOmegaN','leftZeta','rateScale','accelLim', ...
-    'torqueLim','movingMassLeft','nacelleInertia','leftDelay','wakeArea'};
-factors = [0.5,1,1.5];
-for p = 1:numel(timeParameters)
-    for k = 1:numel(factors)
-        [Ptest,def] = sensitivity_case(P13,timeParameters{p}, ...
-            factors(k),trimReport,d2r);
-        if strcmp(timeParameters{p},'wakeArea')
-            metric = beta_diff_load_derivative(trimReport,Ptest);
-            rows(end+1,:) = {timeParameters{p},factors(k),NaN,NaN,NaN, ...
-                NaN,metric,'norm(d[F;M]/d betaDiff)', ...
-                'PENDING_CLASSIFICATION'}; %#ok<AGROW>
-        else
-            sim = simulate_berger13_case(trimReport,Ptest,def);
-            rows(end+1,:) = {timeParameters{p},factors(k),NaN, ...
-                sim.metrics.maxAttitudeDeviationRad, ...
-                sim.metrics.maxAngularRateRadPerSecond, ...
-                sim.metrics.maxBetaDiffRad, ...
-                hypot(sim.metrics.maxAbsRollMomentNm, ...
-                sim.metrics.maxAbsYawMomentNm), ...
-                'hypot(peak roll moment,peak yaw moment) [N m]', ...
-                'PENDING_CLASSIFICATION'}; %#ok<AGROW>
-        end
-    end
-end
-tableOut = cell2table(rows,'VariableNames', ...
-    {'parameter','factor','spectralAbscissaPerSecond', ...
-    'maxAttitudeDeviationRad','maxAngularRateRadPerSecond', ...
-    'maxBetaDiffRad','primaryLoadMetric','primaryMetricDefinition', ...
-    'conclusionClass'});
-numericNames = {'factor','spectralAbscissaPerSecond', ...
-    'maxAttitudeDeviationRad','maxAngularRateRadPerSecond', ...
-    'maxBetaDiffRad','primaryLoadMetric'};
-for columnIndex = 1:numel(numericNames)
-    name = numericNames{columnIndex};
-    if iscell(tableOut.(name))
-        tableOut.(name) = numeric_cell_column(tableOut.(name),name);
-    end
-end
-parameters = unique(tableOut.parameter,'stable');
-for k = 1:numel(parameters)
-    mask = strcmp(tableOut.parameter,parameters{k});
-    primaryValues = tableOut.primaryLoadMetric(mask);
-    primaryValues = primaryValues(isfinite(primaryValues));
-    primaryInactive = ~isempty(primaryValues) && ...
-        max(abs(primaryValues)) < 1e-8;
-    values = primaryValues;
-    if primaryInactive
-        values = tableOut.maxAttitudeDeviationRad(mask);
-        values = values(isfinite(values));
-    end
-    if isempty(values)
-        classification = 'CANNOT_RELIABLY_DETERMINE';
-    else
-        relativeRange = (max(values)-min(values))/max(max(abs(values)),eps);
-        if primaryInactive && relativeRange < 1e-8
-            classification = 'CANNOT_RELIABLY_DETERMINE';
-        elseif relativeRange < 0.05
-            classification = 'TREND_ROBUST';
-        elseif relativeRange < 0.5
-            classification = 'MAGNITUDE_SENSITIVE';
-        else
-            classification = 'HIGHLY_ASSUMPTION_DEPENDENT';
-        end
-    end
-    tableOut.conclusionClass(mask) = repmat({classification},sum(mask),1);
-end
-end
-
-function values = numeric_cell_column(column,name)
-values = NaN(numel(column),1);
-for rowIndex = 1:numel(column)
-    item = column{rowIndex};
-    while iscell(item) && isscalar(item)
-        item = item{1};
-    end
-    if ~isnumeric(item) || ~isscalar(item) || ~isreal(item)
-        error('run_berger13_complete_research:InvalidSensitivityValue', ...
-            'Sensitivity column %s row %d is not a real scalar.', ...
-            name,rowIndex);
-    end
-    values(rowIndex) = double(item);
-end
-end
-
-function rows = linear_sweep(parameter,factors,trimReport,P13)
-rows = cell(numel(factors),9);
-for k = 1:numel(factors)
-    Ptest = P13;
-    switch parameter
-        case 'omegaN'
-            Ptest.commandActuator.left.omegaN = ...
-                factors(k)*P13.commandActuator.left.omegaN;
-            Ptest.commandActuator.right.omegaN = ...
-                factors(k)*P13.commandActuator.right.omegaN;
-        case 'zeta'
-            Ptest.commandActuator.left.zeta = ...
-                factors(k)*P13.commandActuator.left.zeta;
-            Ptest.commandActuator.right.zeta = ...
-                factors(k)*P13.commandActuator.right.zeta;
-        case 'lateralCyclicScale'
-            Ptest.interface.lateralCyclicScale = factors(k);
-    end
-    [A,B] = linearize_13x10_command_numeric( ...
-        trimReport.x13,trimReport.u10Command,Ptest,1);
-    lambda = eig(A);
-    switch parameter
-        case 'omegaN'
-            primaryMetric = norm(B(:,9:10),'fro');
-            metricDefinition = 'Frobenius norm of command B columns 9:10';
-        case 'zeta'
-            primaryMetric = norm(A(12:13,12:13),'fro');
-            metricDefinition = 'Frobenius norm of nacelle-rate A subblock';
-        otherwise
-            primaryMetric = norm(B(:,5));
-            metricDefinition = '2-norm of lateralCyclic B column';
-    end
-    rows(k,:) = {parameter,factors(k),max(real(lambda)),NaN,NaN,NaN, ...
-        primaryMetric,metricDefinition,'PENDING_CLASSIFICATION'};
-end
-end
-
-function [Ptest,def] = sensitivity_case(P13,parameter,factor,trimReport,d2r)
-Ptest = P13;
-def = struct('name',['sensitivity_' parameter], ...
-    'duration',3,'dt',0.1,'inputType','betaSym', ...
-    'amplitude',5*d2r,'startTime',0.5);
-switch parameter
-    case 'leftOmegaN'
-        Ptest.commandActuator.left.omegaN = ...
-            factor*P13.commandActuator.left.omegaN;
-    case 'leftZeta'
-        Ptest.commandActuator.left.zeta = ...
-            factor*P13.commandActuator.left.zeta;
-    case 'rateScale'
-        Ptest.commandActuator.left.rateScale = factor;
-    case 'accelLim'
-        Ptest.commandActuator.left.accelLim = ...
-            factor*P13.commandActuator.left.accelLim;
-    case 'torqueLim'
-        Ptest.nacelle.torqueLim = factor*P13.nacelle.torqueLim;
-    case 'movingMassLeft'
-        Ptest.movingComponents.left.mass = ...
-            factor*P13.movingComponents.left.mass;
-        def.inputType = 'betaDiff'; def.amplitude = d2r;
-    case 'nacelleInertia'
-        Ptest.nacelle.I = factor*P13.nacelle.I;
-    case 'leftDelay'
-        Ptest.commandActuator.left.commandDelay = 0.2*factor;
-    case 'wakeArea'
-        Ptest.base.wing.SslipMaxHalf = ...
-            factor*P13.base.wing.SslipMaxHalf;
-end
-if strcmp(parameter,'leftDelay') && factor == 0
-    Ptest.commandActuator.left.commandDelay = 0;
-end
-if strcmp(parameter,'wakeArea')
-    def.amplitude = trimReport.x13(10)*0;
-end
-end
-
-function metric = beta_diff_load_derivative(trimReport,P13)
-h = 1e-4;
-xp = trimReport.x13;
-xm = trimReport.x13;
-xp(10:11) = xp(10:11)+[-h;+h];
-xm(10:11) = xm(10:11)+[+h;-h];
-uTorque = [trimReport.u10Command(1:8);0;0];
-[Fp,Mp] = total_forces_moments_13x10(xp,uTorque,P13);
-[Fm,Mm] = total_forces_moments_13x10(xm,uTorque,P13);
-metric = norm(([Fp;Mp]-[Fm;Mm])/(2*h));
 end
 
 function finite = check_finite(results)

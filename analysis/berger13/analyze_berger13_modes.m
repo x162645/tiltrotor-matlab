@@ -52,25 +52,41 @@ dominantStateParticipation = zeros(13,1);
 betaSymParticipation = participation(10,:).'+participation(12,:).';
 betaDiffParticipation = participation(11,:).'+participation(13,:).';
 rigidBodyParticipation = sum(participation(1:9,:),1).';
+zeroTolerance = max(1e-9,1e-8*max(1,norm(A,2)));
+headingIntegrator = false(13,1);
 for k = 1:13
     [dominantStateParticipation(k),idx] = max(participation(:,k));
     dominantState{k} = stateNames{idx};
-    modeName{k} = classify_mode(lambda(k),participation(:,k), ...
-        betaSymParticipation(k),betaDiffParticipation(k));
+    headingIntegrator(k) = abs(lambda(k)) <= zeroTolerance && ...
+        participation(9,k) >= 0.5;
+    if headingIntegrator(k)
+        modeName{k} = 'heading kinematic integrator';
+        dampingRatio(k) = NaN;
+        timeConstant(k) = NaN;
+        doublingTime(k) = NaN;
+        halvingTime(k) = NaN;
+    else
+        modeName{k} = classify_mode(lambda(k),participation(:,k), ...
+            betaSymParticipation(k),betaDiffParticipation(k));
+    end
 end
 
 modeIndex = (1:13).';
 stable = realPart < 0;
+stabilityQualified = ~headingIntegrator;
+stable(headingIntegrator) = false;
 tableOut = table(modeIndex,modeName,realPart,imagPart,dampingRatio, ...
     naturalFrequency,frequencyHz,timeConstant,doublingTime,halvingTime, ...
     dominantState,dominantStateParticipation,betaSymParticipation, ...
-    betaDiffParticipation,rigidBodyParticipation,stable, ...
+    betaDiffParticipation,rigidBodyParticipation,headingIntegrator, ...
+    stabilityQualified,stable, ...
     'VariableNames',{'localModeIndex','modeName','realPartPerSecond', ...
     'imagPartRadPerSecond','dampingRatio','naturalFrequencyRadPerSecond', ...
     'frequencyHz','timeConstantSeconds','doublingTimeSeconds', ...
     'halvingTimeSeconds','dominantState','dominantStateParticipation', ...
     'betaSymParticipation','betaDiffParticipation', ...
-    'rigidBodyParticipation','stable'});
+    'rigidBodyParticipation','headingIntegrator','stabilityQualified', ...
+    'stable'});
 
 modal.A = A;
 modal.B = B;
@@ -83,6 +99,7 @@ modal.controlParticipation = controlParticipation;
 modal.stateNames = stateNames(:);
 modal.inputNames = inputNames(:);
 modal.table = tableOut;
+modal.headingZeroTolerance = zeroTolerance;
 modal.claimBoundary = ['mode names use participation and symmetric/' ...
     'differential structure but remain low-order model interpretations'];
 end
@@ -113,8 +130,10 @@ if lateral >= longitudinal
         name = 'lateral oscillatory';
     elseif p(4) == max(p)
         name = 'roll-like';
-    else
+    elseif sum(p([2,4,6,7])) >= 0.45
         name = 'spiral-like';
+    else
+        name = 'lateral aperiodic';
     end
 else
     if oscillatory && p(3)+p(5) > p(1)+p(8)
