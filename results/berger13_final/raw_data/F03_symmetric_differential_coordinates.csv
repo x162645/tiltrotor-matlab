@@ -1,0 +1,4 @@
+caseName,inputType,amplitudeRad,durationSeconds,maxAttitudeDeviationRad,maxAngularRateRadPerSecond,maxBetaDiffRad,maxAbsRollMomentNm,maxAbsYawMomentNm,recoveryTimeSeconds,diverged
+symmetric_nacelle_step,betaSym,0.0349065850398866,5,0.0503049860096734,0.0181557404655393,0,5.81859238870632e-11,3.11521195284416e-11,NaN,0
+symmetric_nacelle_ramp,ramp,0.139626340159546,5,0.1288379331906,0.0662723544265833,0,5.82048861533463e-11,3.63855560741987e-11,NaN,0
+differential_nacelle_step,betaDiff,0.0174532925199433,5,0.441173177872777,0.163771161320055,0.0176553573443035,2696.50376618566,3849.27621982893,NaN,0

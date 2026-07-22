@@ -1,0 +1,5 @@
+caseName,peakRollMomentNm,peakYawMomentNm
+symmetric_nacelle_step,5.81859238870632e-11,3.11521195284416e-11
+differential_nacelle_step,2696.50376618566,3849.27621982893
+left_command_delay,4311.14222990597,1982.71339313859
+left_nacelle_stuck,6551.72541822864,7033.17578226052

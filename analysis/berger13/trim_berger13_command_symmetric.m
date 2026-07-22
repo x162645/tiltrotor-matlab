@@ -9,8 +9,20 @@ end
 if nargin < 3
     opts = struct();
 end
-[xTrim,uTorque,torqueReport] = ...
-    trim_berger13_symmetric(condition,P13,opts);
+if isfield(opts,'torqueTrimReport')
+    torqueReport = opts.torqueTrimReport;
+    if ~isstruct(torqueReport) || ~isfield(torqueReport,'x13') || ...
+            ~isfield(torqueReport,'u10Torque') || ...
+            ~isequal(torqueReport.condition,condition)
+        error('trim_berger13_command_symmetric:InvalidTorqueTrim', ...
+            'opts.torqueTrimReport must match the requested condition.');
+    end
+    xTrim = torqueReport.x13;
+    uTorque = torqueReport.u10Torque;
+else
+    [xTrim,uTorque,torqueReport] = ...
+        trim_berger13_symmetric(condition,P13,opts);
+end
 uCommand = [uTorque(1:8);xTrim(10);xTrim(11)];
 [xdot,out] = tiltrotor_eom_13x10_command(xTrim,uCommand,P13);
 dynamicIndices = [1:6,10:13];

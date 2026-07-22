@@ -1,0 +1,7 @@
+parameter,factor,spectralAbscissaPerSecond,maxAttitudeDeviationRad,maxAngularRateRadPerSecond,maxBetaDiffRad,primaryLoadMetric,primaryMetricDefinition,conclusionClass
+omegaN,0.5,0.0399324342593561,NaN,NaN,NaN,5.65705590943212,Frobenius norm of command B columns 9:10,HIGHLY_ASSUMPTION_DEPENDENT
+omegaN,1,0.0399324342593561,NaN,NaN,NaN,22.6282236377285,Frobenius norm of command B columns 9:10,HIGHLY_ASSUMPTION_DEPENDENT
+omegaN,1.5,0.0399324342593561,NaN,NaN,NaN,50.913503184889,Frobenius norm of command B columns 9:10,HIGHLY_ASSUMPTION_DEPENDENT
+zeta,0.625,0.0399324342593561,NaN,NaN,NaN,5.65685424949238,Frobenius norm of nacelle-rate A subblock,HIGHLY_ASSUMPTION_DEPENDENT
+zeta,1,0.0399324342593561,NaN,NaN,NaN,9.05096679918781,Frobenius norm of nacelle-rate A subblock,HIGHLY_ASSUMPTION_DEPENDENT
+zeta,1.375,0.0399324342593561,NaN,NaN,NaN,12.4450793488832,Frobenius norm of nacelle-rate A subblock,HIGHLY_ASSUMPTION_DEPENDENT

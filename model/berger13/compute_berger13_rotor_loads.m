@@ -22,8 +22,8 @@ rightAvg = component_by_name(baseInfo, 'rotorRight');
 
 leftControl = baseInfo.appliedRotorControls.left;
 rightControl = baseInfo.appliedRotorControls.right;
-leftControl.lateralCyclic = lateralCyclic;
-rightControl.lateralCyclic = lateralCyclic;
+leftControl.lateralCyclic = P13.interface.lateralCyclicScale*lateralCyclic;
+rightControl.lateralCyclic = P13.interface.lateralCyclicScale*lateralCyclic;
 mapping = P13.interface.lateralCyclicTheta1cMapping;
 
 [Fleft, Mleft, leftData] = rotor_model_bemt_berger13( ...
