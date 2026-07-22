@@ -1,0 +1,7 @@
+﻿recordId,split,sourceFile,feature,sourceStatement,comparisonClass,manualReviewRequired,usedInObjective,digitizedNumericPoint,splitFrozenBeforeFinalParameterSelection
+EXT01,calibration,NASA_TM_X_62407.pdf,nacelle endpoint convention,helicopter and airplane endpoints are distinct,QUALITATIVE_ONLY,False,False,False,True
+EXT02,calibration,NASA_TM_X_62407.pdf,control surface limit,elevator physical limit is ±20 deg,QUANTITATIVE_LIMIT_ONLY,False,False,False,True
+EXT03,calibration,Berger_Dissertation_2013.pdf,conversion modeling structure,nacelle angle is a scheduled conversion variable,QUALITATIVE_ONLY,True,False,False,True
+EXT04,calibration,NUAA_main_paper.pdf,component load decomposition,rotor/wing/tail contributions are combined in body axes,QUALITATIVE_ONLY,True,False,False,True
+EXT05,calibration,NUAA_main_paper.pdf,trim curve smoothness,credible branches should vary continuously away from limits,QUALITATIVE_ONLY,True,False,False,True
+EXT06,calibration,NASA_TM_81244.pdf,rotor architecture,three-bladed highly twisted rotor,QUANTITATIVE_GEOMETRY_ONLY,False,False,False,True

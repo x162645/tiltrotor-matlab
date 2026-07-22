@@ -1,0 +1,26 @@
+﻿figureNumber,fileStem,chineseTitle,sourceFiles,claimBoundary,generationScript
+1,PR5A_FIGURE_01,参数来源分类统计,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+2,PR5A_FIGURE_02,当前参数与XV-15公开参数对比,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+3,PR5A_FIGURE_03,75°俯仰力矩分解,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+4,PR5A_FIGURE_04,无约束升降舵需求,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+5,PR5A_FIGURE_05,归一化参数敏感性,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+6,PR5A_FIGURE_06,参数相关矩阵,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+7,PR5A_FIGURE_07,参数奇异值分解,results/generic_trim_pr5a,PR5A provenance/diagnostic evidence,PR5A committed MATLAB generator
+8,08_C1几何优化历史,C1几何优化历史,OPTIMIZATION_RUN_DATABASE.csv,探索历史，不代表全局最优,analysis/generic_trim/build_pr5b_deliverables.py
+9,09_C2联合优化历史,C2联合优化历史,OPTIMIZATION_RUN_DATABASE.csv,只冻结一个等效参数,analysis/generic_trim/build_pr5b_deliverables.py
+10,10_四模型九点配平状态,每个模型的9点配平成功图,MODEL_*_RESULTS.csv,可信门禁未放宽,analysis/generic_trim/build_pr5b_deliverables.py
+11,11_配平残差对比,配平残差对比,MODEL_*_RESULTS.csv,失败点残差不截断,analysis/generic_trim/build_pr5b_deliverables.py
+12,12_升降舵角对比,升降舵角对比,MODEL_*_RESULTS.csv,物理限制±20°,analysis/generic_trim/build_pr5b_deliverables.py
+13,13_升降舵余度对比,升降舵余度对比,CONTROL_MARGIN_RESULTS.csv,5/10/15%为假设设计要求,analysis/generic_trim/build_pr5b_deliverables.py
+14,14_总距与纵向周期变距,总距和纵向周期变距对比,MODEL_*_RESULTS.csv,控制映射沿用正式13×10路径,analysis/generic_trim/build_pr5b_deliverables.py
+15,15_俯仰姿态对比,俯仰姿态对比,MODEL_*_RESULTS.csv,±35°为现有配平未知量边界,analysis/generic_trim/build_pr5b_deliverables.py
+16,16_加密转换走廊,加密转换走廊,DENSE_TRIM_CORRIDOR.csv,失败点不插值为可行,analysis/generic_trim/build_pr5b_deliverables.py
+17,17_控制曲线连续性,控制曲线连续性,DENSE_TRIM_CORRIDOR.csv,仅连接同β采样点，失败保留,analysis/generic_trim/build_pr5b_deliverables.py
+18,18_优化前后俯仰力矩分解,参数优化前后俯仰力矩分解,PITCH_MOMENT_DECOMPOSITION*.csv,失败点载荷为受限最优而非平衡解,analysis/generic_trim/build_pr5b_deliverables.py
+19,19_校准集对比,校准集对比,EXTERNAL_CALIBRATION_SET.csv,定性留出，不作严格外部验证,analysis/generic_trim/build_pr5b_deliverables.py
+20,20_独立验证集对比,独立验证集对比,EXTERNAL_VALIDATION_SET.csv,定性留出，不作严格外部验证,analysis/generic_trim/build_pr5b_deliverables.py
+21,21_未参与优化的稳定导数,未参与优化的稳定导数对比,STABILITY_DERIVATIVE_COMPARISON.csv,横侧向导数未进入目标函数,analysis/generic_trim/build_pr5b_deliverables.py
+22,22_代表特征根,代表特征根对比,REPRESENTATIVE_EIGENVALUES.csv,特征向量病态，模态参与度未分类,analysis/generic_trim/build_pr5b_deliverables.py
+23,23_参数扰动鲁棒性,参数扰动鲁棒性,PARAMETER_ROBUSTNESS_RESULTS.csv,所有场景保持2/3，B75/40持续失败,analysis/generic_trim/build_pr5b_deliverables.py
+24,24_四模型总览,Model A/B/C1/C2总览,MODEL_*_RESULTS.csv,Model B为部分公开参数覆盖层,analysis/generic_trim/build_pr5b_deliverables.py
+25,25_声明边界,当前结论与XV-15声明边界图,CLAIM_BOUNDARY.md,不得升级为型号验证声明,analysis/generic_trim/build_pr5b_deliverables.py

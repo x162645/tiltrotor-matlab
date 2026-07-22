@@ -1,0 +1,10 @@
+﻿pointId,betaMDeg,speedMps,mode,setClass
+B15_V010,15,10,helicopter_longitudinal,DESIGN_FEASIBILITY_SET
+B15_V020,15,20,helicopter_longitudinal,DESIGN_FEASIBILITY_SET
+B15_V030,15,30,helicopter_longitudinal,DESIGN_FEASIBILITY_SET
+B45_V025,45,25,conversion_longitudinal,DESIGN_FEASIBILITY_SET
+B45_V035,45,35,conversion_longitudinal,DESIGN_FEASIBILITY_SET
+B45_V045,45,45,conversion_longitudinal,DESIGN_FEASIBILITY_SET
+B75_V040,75,40,airplane_longitudinal,DESIGN_FEASIBILITY_SET
+B75_V060,75,60,airplane_longitudinal,DESIGN_FEASIBILITY_SET
+B75_V080,75,80,airplane_longitudinal,DESIGN_FEASIBILITY_SET
