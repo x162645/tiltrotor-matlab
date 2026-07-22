@@ -30,6 +30,7 @@ run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
 run_test('berger13 PR1 interface and parity', @test_berger13_interface);
 run_test('berger13 PR1 linearization', @test_berger13_linearization);
+run_test('berger13 PR2 formal trim', @test_berger13_formal_trim);
 run_test('general trim mode framework', @test_trim_mode_framework);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
@@ -141,6 +142,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         berger13LinearReport = check_berger13_linearization();
         assert(berger13LinearReport.allPassed, ...
             'Berger13 PR1 numerical-linearization checks failed.');
+    end
+
+    function test_berger13_formal_trim()
+        berger13TrimReport = check_berger13_formal_trim();
+        assert(berger13TrimReport.allPassed, ...
+            'Berger13 PR2 formal trim checks failed.');
     end
 
     function test_nuaa_eq12_13_16()
