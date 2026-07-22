@@ -64,3 +64,4 @@ This branch performs bounded design and effective-parameter calibration on a gen
 - PR5B focused: 16/16 PASS, 2.110712 s; checkcode messages: 0.
 - PR5B post-change: 25/25 PASS, 387.654684 s.
 - Exact log scan: no warning, NaN, Inf, or unexpected complex output.
+- Draft PR: https://github.com/x162645/tiltrotor-matlab/pull/54 (stacked on PR #53; unmerged).

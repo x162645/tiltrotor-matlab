@@ -413,7 +413,16 @@ C1将内部覆盖从A的7/9提高到8/9，且不使用等效气动变量；C2保
 - 精确日志扫描未发现warning、NaN、Inf或非预期complex；显式FAILED为保留的物理/数值失败。
 """
     write(dest/"PR5B_EVIDENCE.md",pr5b)
-    write(dest/"FINAL_GITHUB_EVIDENCE_INDEX.md","# GitHub证据索引\n\nPR5A: https://github.com/x162645/tiltrotor-matlab/pull/53\n\nPR5B: PENDING_DRAFT_PR\n")
+    write(dest/"FINAL_GITHUB_EVIDENCE_INDEX.md",'''# GitHub证据索引
+
+- PR5A Draft: https://github.com/x162645/tiltrotor-matlab/pull/53
+- PR5A head: `40eb097a952036ef99b1399bcf6d71efcf5f390f`
+- PR5B Draft: https://github.com/x162645/tiltrotor-matlab/pull/54
+- PR5B implementation commit: `844ae8e1fd93b8d59d21c2e7568448740e1b17ba`
+- PR5B base branch: `codex/generic-trim-parameter-provenance`
+- PR5B head branch: `codex/generic-trim-envelope-optimization`
+- Both pull requests are Draft and unmerged at final evidence generation.
+''')
 
     report=f"""# 通用倾转旋翼机纵向布局参数设计、转换走廊配平能力优化及独立验证研究
 
