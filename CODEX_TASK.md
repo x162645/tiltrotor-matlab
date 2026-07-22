@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: ACTIVE / BERGER13 PR3 COMMANDED ACTUATORS AND INDEPENDENT WING / 2026-07-22
+STATUS: ACTIVE / BERGER13 PR3 PHYSICS CORRECTION / 2026-07-22
 
 ## Version contract
 
@@ -10,18 +10,22 @@ STATUS: ACTIVE / BERGER13 PR3 COMMANDED ACTUATORS AND INDEPENDENT WING / 2026-07
 - Head branch: `codex/berger13-pr3-commanded-actuator-independent-wing`.
 - PR base after push: `codex/berger13-pr2-formal-trim`.
 - PR must remain Draft and must not be merged automatically.
+- Correction starts from reviewed PR3 head `247e3a4b46d39b375152fd5fa8bea9e7a4ba9e74` and appends commits without rewriting PR1/PR2 history.
 
 ## Allowed scope
 
 - `CODEX_TASK.md`, `model/berger13/`, `analysis/berger13/`, Berger13-focused tests, `tests/run_all_checks.m`, and PR3 evidence documentation.
 - Add a distinct angle-command EOM and input-name/unit helpers; retain the torque EOM unchanged.
 - Add namespace-local independent wing-region loads, symmetric/differential mass-property parameterization, actuator faults, and command-interface trim/linearization.
+- Reconstruct every Berger13 component moment about the same actual CG and rebuild fixed/moving inertia contributions about that CG.
+- Preserve a prescribed one-way command actuator boundary when a nonduplicated external hinge generalized load cannot be established.
 
 ## Prohibited scope
 
 - No reinterpretation of PR1 input 9/10, no changes to the torque-interface names/order, and no changes to legacy defaults or production `model/wing_model.m`.
 - No parameter tuning, no invented reference values, no full-angle wing default, no Berger 51-state or XV-15 validation claim.
 - No high-order transmission terms without a derivable equation and declared parameters.
+- No invented external hinge torque and no mechanical-jam claim without a constraint reaction solution.
 
 ## Equations and physical boundary
 
@@ -30,6 +34,7 @@ STATUS: ACTIVE / BERGER13 PR3 COMMANDED ACTUATORS AND INDEPENDENT WING / 2026-07
 - Independent left/right wing loads use each side's nacelle angle, rotor induced velocity, local rigid-body velocity, area partition, aerodynamic center, and `cross(r,F)` moment.
 - Parameterized moving components use `rCG=sum(m_i*r_i)/sum(m_i)` and the parallel-axis theorem. Placeholder mass/inertia values remain research assumptions.
 - Reliable gyroscopic additions are limited to terms derivable from configured angular momentum and nacelle tilt rate. Unparameterized transmission and moving-mass acceleration terms remain explicit limitations.
+- Command freeze holds the command while the actuator continues. Kinematic lock freezes angle/rate without claiming a resolved constraint torque. Mechanical jam is not implemented.
 
 ## Parameter sources
 
@@ -47,4 +52,3 @@ STATUS: ACTIVE / BERGER13 PR3 COMMANDED ACTUATORS AND INDEPENDENT WING / 2026-07
 ## Stop conditions
 
 Stop only under the user-defined environment, MATLAB, reference/repository, unrepairable legacy-regression, invented-data, or permission blockers. Missing high-order parameters are documented and explored parametrically; they are not blockers.
-

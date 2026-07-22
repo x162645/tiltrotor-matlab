@@ -36,7 +36,8 @@ theta = x13(8);
 
 Fg = mp.mass*P13.base.env.g*[-sin(theta); ...
     sin(phi)*cos(theta);cos(phi)*cos(theta)];
-Mreaction = [0;left.internalTorque+right.internalTorque;0];
+eBeta = [0;-1;0];
+Mreaction = -left.internalTorque*eBeta-right.internalTorque*eBeta;
 MtiltRateGyro = tilt_rate_gyro(x13,P13);
 Mtotal = Map+Mreaction+MtiltRateGyro;
 Vdot = (Fap+Fg)/mp.mass-cross(omega,Vbody);
@@ -51,6 +52,7 @@ out.Ftotal = Fap+Fg;
 out.MaeroProp = Map;
 out.MactuatorReaction = Mreaction;
 out.MnacelleRateGyro = MtiltRateGyro;
+out.MexternalHinge = zeros(3,1);
 out.Mtotal = Mtotal;
 out.massProperties = mp;
 out.components13 = components;
@@ -59,6 +61,7 @@ out.nacelle.right = right;
 out.inputContract = 'ANGLE_COMMAND';
 out.inputNames = get_command_input_names_13x10();
 out.mechanics = P13.mechanics;
+out.couplingBoundary = P13.mechanics.couplingBoundary;
 out.xdot = xdot;
 end
 

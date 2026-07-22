@@ -44,7 +44,7 @@ actuator.zeta = 0.8;
 actuator.accelLim = 30*d2r;
 actuator.rateScale = 1.0;
 actuator.commandDelay = 0;
-actuator.stuck = false;
+actuator.kinematicLock = false;
 actuator.commandFreeze = false;
 actuator.frozenCommand = 45*d2r;
 actuator.parameterSource = 'RESEARCH_PLACEHOLDER';
@@ -75,6 +75,10 @@ P13.mechanics.nacelleRateGyroImplemented = true;
 P13.mechanics.iDotOmegaImplemented = false;
 P13.mechanics.movingMassAccelerationImplemented = false;
 P13.mechanics.transmissionHigherOrderImplemented = false;
+P13.mechanics.externalHingeTorqueImplemented = false;
+P13.mechanics.mechanicalJamImplemented = false;
+P13.mechanics.couplingBoundary = ...
+    'PRESCRIBED_NACELLE_MOTION_TO_RIGID_BODY_ONE_WAY';
 
 P13.linear.dx = [Pbase.linear.dx(:); 1e-4; 1e-4; 1e-4; 1e-4];
 P13.linear.du = [Pbase.linear.du(1:4); 1e-4; ...

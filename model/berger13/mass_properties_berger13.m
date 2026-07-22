@@ -1,6 +1,7 @@
 function mp = mass_properties_berger13(betaML, betaMR, P13)
-%MASS_PROPERTIES_BERGER13 Parameterized left/right moving-mass correction.
-% The symmetric limit is exactly the reviewed legacy mass-properties model.
+%MASS_PROPERTIES_BERGER13 Reconstruct fixed/moving inertia at actual CG.
+% The fixed body is recovered from the average-angle baseline mass moments
+% and inertia. Every contribution is then translated to the actual total CG.
 
 betaAvg = 0.5*(betaML+betaMR);
 baseAvg = mass_properties(betaAvg,P13.base);
@@ -15,17 +16,32 @@ rR = component_position(betaMR,+1,radius,P);
 rLAvg = component_position(betaAvg,-1,radius,P);
 rRAvg = component_position(betaAvg,+1,radius,P);
 
-nominalCombinedCG = (mL*rLAvg+mR*rRAvg)/(mL+mR);
-actualCombinedCG = (mL*rL+mR*rR)/(mL+mR);
-cgCorrection = (mL+mR)/P.mass.m * ...
-    (actualCombinedCG-nominalCombinedCG);
-cgShift = baseAvg.cgShift + cgCorrection;
+mTotal = P.mass.m;
+mFixed = mTotal-mL-mR;
+if mFixed <= 0
+    error('mass_properties_berger13:InvalidMassDecomposition', ...
+        'Fixed mass must remain positive after moving-mass extraction.');
+end
 
-Icorrection = point_inertia(mL,rL-cgShift) + ...
-    point_inertia(mR,rR-cgShift) - ...
-    point_inertia(mL,rLAvg-baseAvg.cgShift) - ...
-    point_inertia(mR,rRAvg-baseAvg.cgShift);
-I = 0.5*(baseAvg.I+Icorrection + (baseAvg.I+Icorrection).');
+% Recover the fixed-body CG from the reviewed average-angle mass moment.
+rFixed = (mTotal*baseAvg.cgShift-mL*rLAvg-mR*rRAvg)/mFixed;
+cgShift = (mFixed*rFixed+mL*rL+mR*rR)/mTotal;
+massMomentResidual = mTotal*cgShift- ...
+    (mFixed*rFixed+mL*rL+mR*rR);
+
+% Remove average moving point masses and translate the remaining fixed-body
+% inertia back to its own CG. Local moving-component tensors are UNKNOWN.
+IleftBase = point_inertia(mL,rLAvg-baseAvg.cgShift);
+IrightBase = point_inertia(mR,rRAvg-baseAvg.cgShift);
+IfixedAboutBaseCG = baseAvg.I-IleftBase-IrightBase;
+IfixedOwn = IfixedAboutBaseCG- ...
+    point_inertia(mFixed,rFixed-baseAvg.cgShift);
+
+IfixedActual = IfixedOwn+point_inertia(mFixed,rFixed-cgShift);
+IleftActual = point_inertia(mL,rL-cgShift);
+IrightActual = point_inertia(mR,rR-cgShift);
+I = IfixedActual+IleftActual+IrightActual;
+I = 0.5*(I+I.');
 principalMoments = eig(I);
 if any(principalMoments <= 0)
     error('mass_properties_berger13:NonPositiveDefinite', ...
@@ -43,11 +59,27 @@ mp.betaML = betaML;
 mp.betaMR = betaMR;
 mp.betaMAvg = betaAvg;
 mp.baseAverage = baseAvg;
+mp.massDecomposition.total = mTotal;
+mp.massDecomposition.fixed = mFixed;
+mp.massDecomposition.left = mL;
+mp.massDecomposition.right = mR;
+mp.fixedComponent.cg = rFixed;
+mp.fixedComponent.inertiaAboutOwnCG = IfixedOwn;
+mp.fixedComponent.inertiaAboutActualCG = IfixedActual;
+mp.fixedComponent.referenceBeta = betaAvg;
+mp.fixedComponent.localInertiaSource = ...
+    'DERIVED_RESIDUAL_FROM_AVERAGE_BASELINE';
 mp.componentPositions.left = rL;
 mp.componentPositions.right = rR;
-mp.componentContributions.left = point_inertia(mL,rL-cgShift);
-mp.componentContributions.right = point_inertia(mR,rR-cgShift);
-mp.asymmetricCorrection = Icorrection;
+mp.componentPositions.leftBase = rLAvg;
+mp.componentPositions.rightBase = rRAvg;
+mp.componentContributions.left = IleftActual;
+mp.componentContributions.right = IrightActual;
+mp.baselineContributions.left = IleftBase;
+mp.baselineContributions.right = IrightBase;
+mp.massMomentResidual = massMomentResidual;
+mp.inertiaReconstructionResidual = I-(IfixedActual+IleftActual+IrightActual);
+mp.asymmetricCorrection = I-baseAvg.I;
 mp.localInertiaCorrectionImplemented = ...
     cfg.localInertiaCorrectionImplemented;
 mp.parameterSources = cfg.parameterSources;

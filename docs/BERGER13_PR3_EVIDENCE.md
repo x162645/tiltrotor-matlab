@@ -112,3 +112,35 @@ drivetrain torsion, and unidentified local nacelle inertia tensors remain
 unimplemented. Their absence is preferable to inserting unsupported constants.
 This PR supplies an internally testable low-order research path, not Berger
 51-state reproduction, XV-15 validation, or actuator qualification.
+
+## 2026-07-22 physics-correction addendum
+
+The correction commit removes the mixed moment-reference construction. Both
+rotors, both independent half-wing region sums, fuselage, horizontal tail,
+and vertical tail are now directly reevaluated about the reconstructed actual
+total CG. The rigid-body EOM receives only their direct component sum; the
+average-angle stack remains a symmetric control/reference diagnostic and is
+not added to the corrected subtotal.
+
+Moving-mass reconstruction now uses `mTotal=mFixed+mLeft+mRight`. At each
+average-angle baseline, the fixed-component CG is recovered from mass moments,
+average moving point-mass contributions are removed from the baseline total
+inertia, the fixed residual is translated back to its own CG, and fixed/left/
+right contributions are all translated to the actual CG. Unknown local
+nacelle inertia tensors remain `UNKNOWN`; no tensor was invented. The fixed
+residual is invariant for asymmetric cases with the same mean angle.
+
+The command actuator remains a prescribed one-way model because the existing
+aircraft external-load chain does not identify a nonduplicated hinge-load
+object suitable for `Qexternal`. The boundary is therefore explicitly
+`PRESCRIBED_NACELLE_MOTION_TO_RIGID_BODY_ONE_WAY`. Command freeze holds the
+command while the actuator continues. The former `stuck` switch is renamed
+`kinematicLock`: it freezes angle/rate without a resolved constraint torque.
+Mechanical jam is not implemented or claimed.
+
+Focused correction checks: 17/17 passed, including actual-CG component sums,
+fixed-component reevaluation, mass-moment conservation, complete inertia
+reconstruction, fixed residual invariance, action-reaction sign, no double
+count, freeze/lock distinction, symmetric degradation, mirror exchange, and
+PR1/PR2/torque-interface preservation. All changed MATLAB files produced zero
+`checkcode` findings.

@@ -16,10 +16,15 @@ run_case('nominal command step and reaction torque', @case_step);
 run_case('angle rate acceleration and torque limits observable', @case_limits);
 run_case('left/right bandwidth and damping may differ', @case_asymmetry);
 run_case('external delay context is explicit', @case_delay);
-run_case('stuck freeze and rate degradation faults', @case_faults);
+run_case('command freeze and kinematic lock are distinct', @case_faults);
 run_case('independent wing symmetric degradation', @case_wing_symmetric);
 run_case('positive/negative betaDiff mirror loads', @case_wing_mirror);
-run_case('CG and inertia symmetry/exchange', @case_mass);
+run_case('all component moments use actual total CG', @case_moment_reference);
+run_case('actual CG changes fixed-component load evaluation', @case_fixed_component);
+run_case('mass moment and complete inertia reconstruction', @case_mass);
+run_case('fixed inertia residual is invariant at fixed mean angle', @case_fixed_inertia);
+run_case('actuator action-reaction sign and coupling boundary', @case_reaction);
+run_case('component sum has no force or moment double count', @case_component_sum);
 run_case('parameterized nacelle-rate gyroscopic moment', @case_gyro);
 run_case('command trim and three-step A/B', @case_trim_linear);
 run_case('torque interface remains callable and finite', @case_torque);
@@ -94,9 +99,9 @@ fprintf('All passed: %d\n',report.allPassed);
 
     function case_faults()
         Pf = P13;
-        Pf.commandActuator.left.stuck = true;
+        Pf.commandActuator.left.kinematicLock = true;
         Pf.commandActuator.right.commandFreeze = true;
-        Pf.commandActuator.right.frozenCommand = x(11);
+        Pf.commandActuator.right.frozenCommand = x(11)+0.5*d2r;
         Pf.commandActuator.left.rateScale = 0.25;
         xf = x;
         xf(12) = P13.nacelle.betaDotLim;
@@ -104,9 +109,11 @@ fprintf('All passed: %d\n',report.allPassed);
         uf(9:10) = uf(9:10)+d2r;
         [xdot,out] = tiltrotor_eom_13x10_command(xf,uf,Pf);
         assert(xdot(10) == 0 && xdot(12) == 0);
-        assert(abs(xdot(13)) < 1e-14);
-        assert(out.nacelle.left.flags.stuck);
+        assert(xdot(13) > 0);
+        assert(out.nacelle.left.flags.kinematicLock);
         assert(out.nacelle.right.flags.commandFrozen);
+        assert(out.nacelle.left.unresolvedKinematicLockTorque ~= 0);
+        assert(~out.nacelle.left.constraintTorqueAvailable);
         assert(out.nacelle.left.rateLimitApplied == ...
             0.25*P13.nacelle.betaDotLim);
     end
@@ -141,6 +148,77 @@ fprintf('All passed: %d\n',report.allPassed);
         assert(norm(mpa.cgShift-mirror*mpb.cgShift) < 1e-12);
         assert(norm(mpa.I-mirror*mpb.I*mirror,'fro') < 1e-8);
         assert(all(eig(mpa.I)>0));
+        assert(abs(sum(struct2array(mpa.massDecomposition))- ...
+            2*mpa.massDecomposition.total) < 1e-10);
+        assert(norm(mpa.massMomentResidual) < 1e-10);
+        assert(norm(mpa.inertiaReconstructionResidual,'fro') < 1e-10);
+    end
+
+    function case_moment_reference()
+        xa = x;
+        xa(10:11) = [42;48]*d2r;
+        [~,~,info] = total_forces_moments_13x10( ...
+            xa,zeros(10,1),P13);
+        assert(strcmp(info.forceMomentReference,'ACTUAL_TOTAL_CG'));
+        assert(norm(info.momentReferenceCG- ...
+            info.massProperties.cgShift) < 1e-14);
+        namesActual = cellfun(@(c)c.name,info.components, ...
+            'UniformOutput',false);
+        assert(isequal(namesActual(:),{'rotorLeft';'rotorRight';'wing'; ...
+            'fuselage';'horizontalTail';'verticalTail'}));
+    end
+
+    function case_fixed_component()
+        xa = x;
+        xa(1:6) = [35;2;8;0.03;-0.02;0.04];
+        xa(10:11) = [42;48]*d2r;
+        [~,~,info] = total_forces_moments_13x10( ...
+            xa,zeros(10,1),P13);
+        [Fdirect,Mdirect] = fuselage_model(xa(1:9), ...
+            info.massProperties.cgShift,P13.base);
+        assert(norm(Fdirect-info.fuselage.F) < 1e-12);
+        assert(norm(Mdirect-info.fuselage.M) < 1e-12);
+        baseCG = info.massProperties.baseAverage.cgShift;
+        [~,Mbase] = fuselage_model(xa(1:9),baseCG,P13.base);
+        assert(norm(Mdirect-Mbase) > 1e-8);
+    end
+
+    function case_fixed_inertia()
+        mpa = mass_properties_berger13(43*d2r,47*d2r,P13);
+        mpb = mass_properties_berger13(44*d2r,46*d2r,P13);
+        assert(norm(mpa.fixedComponent.inertiaAboutOwnCG- ...
+            mpb.fixedComponent.inertiaAboutOwnCG,'fro') < 1e-10);
+        assert(norm(mpa.fixedComponent.cg-mpb.fixedComponent.cg) < 1e-12);
+    end
+
+    function case_reaction()
+        us = u;
+        us(9:10) = us(9:10)+d2r;
+        [~,out] = tiltrotor_eom_13x10_command(x,us,P13);
+        eBeta = [0;-1;0];
+        expected = -(out.nacelle.left.internalTorque+ ...
+            out.nacelle.right.internalTorque)*eBeta;
+        assert(norm(out.MactuatorReaction-expected) < 1e-12);
+        assert(~out.mechanics.externalHingeTorqueImplemented);
+        assert(~out.mechanics.mechanicalJamImplemented);
+        assert(strcmp(out.couplingBoundary, ...
+            'PRESCRIBED_NACELLE_MOTION_TO_RIGID_BODY_ONE_WAY'));
+        assert(norm(out.MexternalHinge) == 0);
+    end
+
+    function case_component_sum()
+        xa = x;
+        xa(10:11) = [44;46]*d2r;
+        [F,M,info] = total_forces_moments_13x10( ...
+            xa,zeros(10,1),P13);
+        Fsum = zeros(3,1);
+        Msum = zeros(3,1);
+        for componentIndex = 1:numel(info.components)
+            Fsum = Fsum+info.components{componentIndex}.F;
+            Msum = Msum+info.components{componentIndex}.M;
+        end
+        assert(norm(F-Fsum) < 1e-12);
+        assert(norm(M-Msum) < 1e-12);
     end
 
     function case_gyro()

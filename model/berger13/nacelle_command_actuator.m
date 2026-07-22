@@ -10,7 +10,8 @@ end
 validate_cfg(cfg,nacelleCfg);
 commandRequested = betaCommand;
 flags.delayActive = cfg.commandDelay > 0;
-flags.stuck = logical(cfg.stuck);
+flags.kinematicLock = logical(cfg.kinematicLock);
+flags.mechanicalJam = false;
 flags.commandFrozen = logical(cfg.commandFreeze);
 
 if flags.delayActive
@@ -43,8 +44,9 @@ torqueApplied = min(max(rawTorque,-nacelleCfg.torqueLim), ...
 betaDDot = torqueApplied/nacelleCfg.I;
 betaDDot = min(max(betaDDot,-cfg.accelLim),cfg.accelLim);
 torqueApplied = nacelleCfg.I*betaDDot;
+actuatorTorque = torqueApplied;
 
-if flags.stuck
+if flags.kinematicLock
     betaDot = 0;
     betaDDot = 0;
     torqueApplied = 0;
@@ -78,14 +80,22 @@ flags.atLowerAngle = beta <= nacelleCfg.betaMin;
 flags.atUpperAngle = beta >= nacelleCfg.betaMax;
 flags.anyLimit = flags.commandClamped || flags.rateClamped || ...
     flags.accelerationClamped || flags.torqueClamped || ...
-    flags.atLowerAngle || flags.atUpperAngle;
+    flags.atLowerAngle || flags.atUpperAngle || flags.kinematicLock;
 
 result.betaDot = betaDot;
 result.betaDDot = betaDDot;
 result.commandRequested = commandRequested;
 result.commandApplied = commandApplied;
 result.rawAcceleration = rawAcceleration;
+result.actuatorTorque = actuatorTorque;
 result.internalTorque = torqueApplied;
+result.externalHingeTorque = 0;
+result.constraintTorque = 0;
+result.constraintTorqueAvailable = false;
+result.unresolvedKinematicLockTorque = ...
+    flags.kinematicLock*actuatorTorque;
+result.couplingBoundary = ...
+    'PRESCRIBED_ACTUATOR_NO_EXTERNAL_HINGE_LOAD_FEEDBACK';
 result.rateLimitApplied = rateLimit;
 result.flags = flags;
 end
