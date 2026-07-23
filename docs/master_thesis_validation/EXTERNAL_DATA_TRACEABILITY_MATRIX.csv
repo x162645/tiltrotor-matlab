@@ -1,0 +1,13 @@
+﻿trace_id,source,class,local_file,pages_figures,use,uncertainty,angle_mapping,human_review
+EXT-01,NASA TM-86854,A,source_evidence/NASA_TM_86854_XV15_ATB_Hover.pdf,PDF 54/原文52，图25,是,总距约±1°；图像数字化纵坐标±0.003,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-02,NASA金属桨叶悬停报告,A,source_evidence/NASA_XV15_Metal_Rotor_Hover.pdf,详见原文目录；需继续人工核对,候选,扫描图数字化误差待评估,若文献η=90°为直升机模式，则β=90°−η,是
+EXT-03,NASA TM-81177,A,source_evidence/NASA_TM_81177_XV15_WindTunnel.pdf,详见原文目录；需继续人工核对,候选,扫描图及构型误差,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-04,NASA CR-166537,A,source_evidence/NASA_CR_166537.pdf,详见原文目录；需继续人工核对,部分基准,扫描质量限制,若文献η=90°为直升机模式，则β=90°−η,是
+EXT-05,NASA TM-86009,B,source_evidence/NASA_TM_86009_XV15_Frequency.pdf,详见原文目录；需继续人工核对,候选,辨识置信区间按原文,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-06,NASA CR-2017-219456,D/A转引,source_evidence/NASA_CR_2017_219456_NDARC_XV15.pdf,PDF 13—14，图6—8、表2,趋势基准,曲线数字化和构型差,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-07,NASA TM-100025,E,source_evidence/NASA_TM_100025_XV15_Pilot.pdf,PDF 7附近，短舱速率文字说明,外部约束,近似文字范围,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-08,NASA TM-X-62407,A/设计资料,source_evidence/NASA_TM_X_62407.pdf,详见原文目录；需继续人工核对,参数候选,多构型冲突需保留,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-09,NASA TM-81244,A/设计资料,source_evidence/NASA_TM_81244.pdf,详见原文目录；需继续人工核对,参数候选,版本与构型差,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-10,Sheng等Drones 2022,D/E,source_evidence/NUAA_Drones_2022.pdf,PDF 4—5，式(4)—(15),趋势对照,公开公式闭合不完整,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-11,Berger学位论文,C/D,source_evidence/Berger_Dissertation.pdf,详见原文目录；需继续人工核对,结构对照,模型层级差异,若文献η=90°为直升机模式，则β=90°−η,否
+EXT-12,Dreier教材,D,source_evidence/Dreier_Chinese.pdf,PDF 176—199/原文151—174,理论闭合,教材示例非试验真值,若文献η=90°为直升机模式，则β=90°−η,否
