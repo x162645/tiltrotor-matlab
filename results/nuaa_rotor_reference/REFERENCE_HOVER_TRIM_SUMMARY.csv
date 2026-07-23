@@ -1,0 +1,2 @@
+status,credible,exitflag,evaluationCount,failedEvaluationCount,dynamicResidualNorm,minimumUnknownMarginFraction,conditionNumber,theta_deg,collective_deg,cyclicLong_deg
+CREDIBLE,1,1,463,0,0.000126267034700797,0.239566012822322,74.0497226667825,-3.9260582517193e-09,16.7696208975625,-0.00110299937737968

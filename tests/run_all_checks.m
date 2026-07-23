@@ -6,10 +6,12 @@ rootDir = fileparts(fileparts(mfilename('fullpath')));
 addpath(rootDir);
 addpath(fullfile(rootDir,'model'));
 addpath(fullfile(rootDir,'model','berger13'));
+addpath(fullfile(rootDir,'model','rotor_reference'));
 addpath(fullfile(rootDir,'model','parameter_sets'));
 addpath(fullfile(rootDir,'analysis'));
 addpath(fullfile(rootDir,'analysis','berger13'));
 addpath(fullfile(rootDir,'analysis','generic_trim'));
+addpath(fullfile(rootDir,'analysis','rotor_reference'));
 addpath(fullfile(rootDir,'tests'));
 
 P = params_nominal();
@@ -28,6 +30,7 @@ run_test('NUAA Eq12 Eq13 Eq16 closure', @test_nuaa_eq12_13_16);
 run_test('NUAA Eq17 wing velocity chain', @test_nuaa_eq17_wing_velocity);
 run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
+run_test('NUAA public-formula reference', @test_nuaa_reference);
 run_test('aerodynamic component audit', @test_aerodynamic_components);
 run_test('control architecture closure', @test_control_architecture);
 run_test('berger13 PR1 interface and parity', @test_berger13_interface);
@@ -227,6 +230,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         flapReport = check_flapping_model();
         assert(flapReport.allPassed, ...
             'Steady first-harmonic flapping model has failed items.');
+    end
+
+    function test_nuaa_reference()
+        referenceReport = check_nuaa_public_formula_reference();
+        assert(referenceReport.allPassed, ...
+            'NUAA public-formula reference checks failed.');
     end
 
     function test_wing_normal_flow_blend()
