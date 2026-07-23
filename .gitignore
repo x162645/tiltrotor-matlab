@@ -34,6 +34,13 @@ cache/
 Thumbs.db
 .DS_Store
 
+# Python bytecode and aborted local verification launch logs
+__pycache__/
+logs/thesis_full_regression.log
+logs/thesis_full_regression.err.log
+logs/thesis_full_regression_v2.log
+logs/thesis_full_regression_v2.err.log
+
 # ===== Local cleanup rules =====
 
 # MATLAB temporary files

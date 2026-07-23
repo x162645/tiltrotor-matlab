@@ -1,67 +1,81 @@
 # CODEX_TASK.md
 
-STATUS: COMPLETE / GENERIC TILTROTOR TRIM-ENVELOPE OPTIMIZATION AND VALIDATION / 2026-07-23
+STATUS: COMPLETE / THESIS NACELLE-STATE CONSOLIDATION / 2026-07-23
 
 ## Version contract
 
-- Stage: PR5B constrained multi-condition design, frozen-parameter validation, stability/mode impact, figures, academic report, and final delivery bundle.
-- Base branch: `codex/generic-trim-parameter-provenance`.
-- Base SHA: `40eb097a952036ef99b1399bcf6d71efcf5f390f`.
-- Head branch: `codex/generic-trim-envelope-optimization`.
-- Worktree: `E:\tiltrotor-generic-trim-opt`.
-- Open a stacked Draft PR against PR5A; do not merge or rewrite PR #49-#53.
+- Base branch: `codex/generic-trim-envelope-optimization`.
+- Exact base SHA: `e3e604d81d038a34866e4104ab993255d26bcc79`.
+- Head branch: `codex/thesis-nacelle-state-consolidation`.
+- Isolated worktree: `E:\tiltrotor-thesis-nacelle-consolidation`.
+- The protected original workspace `E:\tiltrotor` must not be used or modified.
+- Open a stacked Draft PR against the PR54 head branch; do not merge or
+  rewrite PR #49-#54.
 
-## Required model variants
+## Scientific objective
 
-- Model A: unchanged generic conceptual baseline.
-- Model B: opt-in partial public XV-15 overlay, with inherited fields explicitly non-XV-15.
-- Model C1: bounded geometry/layout optimization only.
-- Model C2: bounded joint optimization, adding only selected `CALIBRATED_EFFECTIVE` aerodynamic parameters when C1 is insufficient.
+Consolidate the accepted PR49-PR54 evidence into the Chinese thesis
+《倾转旋翼机部件级飞行动力学建模与短舱动态状态影响研究》.  The primary
+scientific line is the necessity and effect of independent left/right nacelle
+states.  Parameter provenance and trim-feasibility optimization remain
+supporting evidence rather than the principal innovation.
 
-## Protected behavior
+## Frozen model and parameter boundary
 
-- `params_nominal.m`, default GUI/model behavior, production control limits, trim credibility gates, numerical tolerances, finite-difference steps, iteration limits, and inertias are not optimization variables.
-- The frozen 9-point design-feasibility grid retains all failures.
-- Optimization history, failed trials, objective terms, bounds, runtimes, seeds, and final frozen values are archived.
-- Validation/holdout data are not used to select variables, bounds, weights, or the final solution.
-- No optimized generic variant is called a full or validated XV-15 model.
+- Do not modify physical model functions, `params_nominal.m`, state/input
+  ordering, control limits, credibility gates, numerical tolerances, or C2
+  frozen parameters.
+- Do not add optimization variables, rerun parameter optimization, or make C2
+  the default.
+- New work is limited to analysis/report/plot scripts, terminology mapping,
+  result databases, and read-only tests.
+- Retain all failed and ill-conditioned trim records.
 
-## Required validation
+## Required supplemental calculation
 
-- Pre-change and post-change complete `run_all_checks` under MATLAB R2021a.
-- Focused bound, invariant-field, objective reproducibility, design-grid, margin, dense-corridor continuity, data-split isolation, frozen-parameter, provenance, legacy, and 13x10 regression checks.
-- Independent initial values and bounded parameter perturbations after parameter freeze.
-- Stability derivatives, representative modes, and retained lateral/directional conclusions.
-- `checkcode`, finite-real checks, full diff inspection, clean worktree after commit/push.
+At the three archived credible C2 points B15/V20, B45/V35, and B75/V80,
+compare:
 
-## Deliverables
+1. the legacy 9-state fixed-nacelle model;
+2. the 13-state command model on the symmetric invariant manifold;
+3. the 13-state model with independent left/right nacelle motion.
 
-- All PR5B CSV/Markdown/MAT/figure deliverables in the user contract.
-- Complete Chinese academic report in Markdown and visually verified PDF.
-- Final output tree and SHA-256 ZIP at the prescribed external output path.
-- Commit, push, and create a stacked Draft PR with explicit failures, limitations, claim boundary, tests, and SHAs.
+The comparison must quantify common rigid-body degradation, four added state
+roots, symmetric/differential response channels, angle-rate effects,
+asynchronous lateral/directional response, dynamic trim departure, and
+finite-difference/time-step sensitivity.  It must not create an artificial
+11-state model.
+
+## Deliverables and validation
+
+- Produce the prescribed Markdown/CSV/LaTeX/XeLaTeX-project/PDF/figure/raw-data
+  package under
+  `E:\tiltrotor-work-output\thesis-nacelle-consolidation-20260723`.
+- Apply the frozen Chinese terminology and academic-language rules.
+- Run focused MATLAB checks, `checkcode`, complete `run_all_checks`, finite-real
+  scans, language/figure audits, PDF render inspection, full Git diff review,
+  SHA-256 manifest, and final ZIP verification.
+- Push the branch and create a Draft PR.  Do not merge it.
 
 ## Claim boundary
 
-This branch performs bounded design and effective-parameter calibration on a generic low-order component model. Internal trim coverage, qualitative public-data trend comparison, and held-out numerical checks do not establish a complete XV-15 reproduction or flight-test validation.
+This is a generic low-order component-level flight-dynamics study.  It is not
+a high-fidelity aircraft model, a Berger 51-state reproduction, a complete
+XV-15 model, flight-test validation, handling-quality qualification, or a
+bidirectionally closed nacelle/rigid-body multibody model.  The prescribed
+nacelle actuator supplies one-way dynamic influence only; external hinge-load
+feedback and mechanical-jam constraint loads are not implemented.
 
-## Frozen outcome
+## Completed evidence
 
-- Model A: 7/9 CREDIBLE.
-- Model B: 5/9 CREDIBLE, 2/9 ILL_CONDITIONED, 2/9 FAILED.
-- Model C1: 8/9 CREDIBLE with three geometry variables only.
-- Model C2: 8/9 CREDIBLE; C1 plus `htail.CLelevator=2.35 /rad`.
-- B75/V60 C2 elevator: -15.8305319 deg; full-span margin: 10.4236704%.
-- B75/V40 remains FAILED at the -20 deg elevator limit.
-- Post-freeze dense extra grid: 10/13 CREDIBLE; failures retained.
-- Post-freeze perturbations: 14/21 credible combinations; every scenario retains the same 2/3 key-point pattern.
-- External holdout is qualitative only and contributes zero to the objective.
-- Representative derivatives are finite, but ill-conditioned eigenvectors prevent reliable participation-based mode classification.
-
-## Test evidence
-
-- Exact PR5A base pre-change: 24/24 PASS, 387.555047 s.
-- PR5B focused: 16/16 PASS, 2.110712 s; checkcode messages: 0.
-- PR5B post-change: 25/25 PASS, 387.654684 s.
-- Exact log scan: no warning, NaN, Inf, or unexpected complex output.
-- Draft PR: https://github.com/x162645/tiltrotor-matlab/pull/54 (stacked on PR #53; unmerged).
+- Three representative credible points and three model layers were evaluated.
+- All new matrices, roots, response histories, force/moment outputs, and
+  summaries are finite and real-valued.
+- Maximum adjacent time-step peak change: 0.015247522 (below the 0.02 gate).
+- Focused consolidation check: PASS; `checkcode` messages: 0.
+- Complete MATLAB R2021a regression: 25/25 PASS.
+- The complete 31-page Chinese report, 18 Chinese figures, Markdown, LaTeX,
+  XeLaTeX project, raw data, QA reports, manifest, and verified ZIP are archived
+  under the prescribed external output directory.
+- No physical-model function, default parameter, frozen C2 value, state/input
+  ordering, credibility gate, or historical result was modified.

@@ -1,0 +1,4 @@
+pointId,betaMDeg,speedMps,reactionSymXNmPerRadPerSec,reactionSymYNmPerRadPerSec,reactionSymZNmPerRadPerSec,reactionDiffXNmPerRadPerSec,reactionDiffYNmPerRadPerSec,reactionDiffZNmPerRadPerSec,gyroSymNormNmPerRadPerSec,gyroDiffNormNmPerRadPerSec
+B15_V020,15,20,0,-3200,0,0,0,0,0,0
+B45_V035,45,35,0,-3200,0,0,0,0,0,0
+B75_V080,75,80,0,-3200,0,0,0,0,0,0
