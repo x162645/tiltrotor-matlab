@@ -862,7 +862,7 @@ $$\\mathbf{{M}}_g=-\\boldsymbol{{\\Omega}}_{{tilt}}\\times\\mathbf{{H}}_r.$$
 
 ## 6.13 动态配平偏离
 
-定义动态配平偏离为瞬时刚体加速度相对于初始配平残差的尺度化范数。对称阶跃的最大值约0.731；差动阶跃在三个点分别为
+定义动态配平偏离为瞬时刚体加速度相对于初始配平残差的尺度化范数。对称阶跃的最大值约{rs.maximumDynamicTrimDeparture.max():.3f}；差动阶跃在三个点分别为
 {", ".join(f"{v:.3f}" for v in rd.maximumDynamicTrimDeparture)}。差动事件明显离开纵向配平流形，说明“初始时刻已配平”不能替代全过程的刚体动态计算。
 
 {fig_md(8, "短舱运动引起的动态配平偏离")}
