@@ -1,0 +1,16 @@
+claim_id,original_claim,data_source,condition,model_level,evidence_type,supported,recommended_revision,prohibited_extrapolation
+C01,对称短舱运动主要进入纵向,MODEL_HIERARCHY_RESPONSE_METRICS.csv,三个冻结代表点,13状态规定运动模型,内部时域与镜像,YES_WITH_DOMAIN,在三个可信对称工况中对称阶跃以纵向响应为主,不得外推全部转换包线
+C02,差动短舱运动激励横航向,MODEL_HIERARCHY_RESPONSE_METRICS.csv,三个冻结代表点,13状态左右独立模型,内部时域与导数,YES_WITH_DOMAIN,差动阶跃在三点产生非零侧向滚转和偏航响应,不得等同操纵效果优良
+C03,滚转作用强于偏航,MODEL_HIERARCHY_RESPONSE_METRICS.csv,三个差动阶跃,13状态左右独立模型,内部峰值,PARTIAL,分别报告滚转矩与偏航矩且不以不同单位幅值直接排序,不得形成无量纲强弱结论
+C04,75度40米每秒只因升降舵不足而失败,TRIM_POINT_EVIDENCE.csv,B75_V040,联合优化参数方案,配平回代,NO,失败由升降舵边界俯仰矩平衡多约束及适用性共同造成,不得把约负52.91度称真实平衡需求
+C05,75度60米每秒是控制权限问题,TRIM_POINT_EVIDENCE.csv,B75_V060,联合优化参数方案,配平回代与余度,PARTIAL,该点在等效升降舵效能提高后可信且余度约10.4%,不得称真实飞机控制权限已验证
+C06,75度80米每秒南航参考旋翼失败,NUAA reference evidence,B75_V080,公开公式参考旋翼,独立实现对照,YES,参考式未闭合负推力或风车分支因而显式失败,不得推断南航原程序必然失败
+C07,参数优化达到8比9可信,TRIM_POINT_EVIDENCE.csv,九点冻结网格,联合优化参数方案,内部设计评估,YES,九点中8点满足本文可信度门禁且75度40米每秒保留失败,不得称外部验证成功率
+C08,形成连续配平走廊,DENSE_TRIM_CORRIDOR.csv,加密点,联合优化参数方案,内部扫描,NO,加密点仍有60度30和45米每秒及90度50米每秒空缺,不得称连续走廊
+C09,稳定导数符号正确,MODEL_HIERARCHY_POINT_SUMMARY.csv,三个代表点,9与13状态,内部差分,PARTIAL,导数有限且多步长稳定但物理符号只在明示通道解释,不得替代外部辨识
+C10,模型开环稳定,MODEL_HIERARCHY_EIGENVALUES.csv,三个代表点,9与13状态,局部特征根,NO,逐工况报告正负实部并区分航向积分根和执行机构根,不得整体宣称稳定
+C11,旋翼完成外部验证,EXTERNAL_ROTOR_CORRELATION_METRICS_FINAL.csv,NASA图25,部件级旋翼,公开图线关联,NO,斜率方向一致但幅值偏差显著的初步部件级外部数据关联,不得传播到整机
+C12,短舱速率限制得到验证,NASA TM-100025,文字范围,规定运动执行机构,外部范围约束,PARTIAL,约7.5度每秒及端点减速只约束数量级,不得验证左右动态和铰链载荷
+C13,已分析机械卡滞载荷,mechanics flags,无,13状态执行机构,实现边界,NO,只区分指令冻结和运动学锁定未实现真实约束载荷,不得称卡滞载荷研究
+C14,已量化转子陀螺效应,params_nominal.m,冻结工况,13状态模型,接口检查,NO,默认极惯量为零故陀螺接口存在但数值通道未激活,不得给出真实幅值
+C15,九状态严格退化于十三状态,NINE_VS_THIRTEEN_A_BLOCK_ELEMENTWISE.csv,三个代表点,9与13状态,双实现对照,NO,B子块近一致但A子块因逐侧机翼尾流定义存在非零差异,不得称矩阵等价

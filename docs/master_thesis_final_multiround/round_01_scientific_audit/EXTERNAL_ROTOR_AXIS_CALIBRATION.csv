@@ -1,0 +1,5 @@
+axis,calibration_id,data_value,pixel_coordinate,role
+x,X1,-6,422,left_major_tick
+x,X2,24,1463,right_major_tick
+y,Y1,-0.02,976,bottom_major_tick
+y,Y2,0.22,236,top_major_tick
