@@ -383,7 +383,6 @@ def build() -> dict[str, object]:
 
     # Copy required final evidence without modifying the earlier round outputs.
     copies = {
-        ROUNDS / "round_01_scientific_audit" / "FINAL_HEAD_TEST_REPORT.md": FINAL / "FINAL_HEAD_TEST_REPORT.md",
         ROUNDS / "round_01_scientific_audit" / "NINE_VS_THIRTEEN_A_BLOCK_AUDIT.md": FINAL / "NINE_VS_THIRTEEN_A_BLOCK_AUDIT.md",
         ROUNDS / "round_01_scientific_audit" / "NINE_VS_THIRTEEN_A_BLOCK_ELEMENTWISE.csv": FINAL / "NINE_VS_THIRTEEN_A_BLOCK_ELEMENTWISE.csv",
         ROUNDS / "round_01_scientific_audit" / "EXTERNAL_ROTOR_DIGITIZATION_REVIEW.md": FINAL / "EXTERNAL_ROTOR_DIGITIZATION_REVIEW.md",
