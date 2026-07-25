@@ -1,0 +1,11 @@
+Low-collective quick audit
+==========================
+Started: 2026-07-26 03:25:55
+Root: E:\tiltrotor-worktrees\low-collective-quick-audit-pr58-20260726
+Output: E:\tiltrotor-worktrees\low-collective-quick-audit-pr58-20260726\docs\low_collective_quick_audit
+Point  4 deg: diagnostic=CONVERGED iter=18 vi= 6.2063958e-05 T=-930.152042 N; production=CONVERGED
+Point  8 deg: diagnostic=COUPLED_MAX_ITER iter=20 vi= 5.99666419 T= 8065.59969 N; production=rotor_model_bemt:CoupledSolveNotConverged
+Point 10 deg: diagnostic=COUPLED_MAX_ITER iter=20 vi= 9.94100533 T= 10949.0505 N; production=rotor_model_bemt:CoupledSolveNotConverged
+Point 12 deg: diagnostic=CONVERGED iter=17 vi= 12.1956489 T= 16532.1799 N; production=CONVERGED
+Residual classification: CLEAR_SINGLE_ROOT
+Finished: 2026-07-26 03:26:05
