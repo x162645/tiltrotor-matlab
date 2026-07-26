@@ -53,5 +53,8 @@ out.Ftotal = Ftotal;
 out.Mtotal = Mtotal;
 out.massProperties = mp;
 out.components = componentInfo;
+out.physicalConverged = componentInfo.physicalConverged;
+out.physicalBranchSupported = componentInfo.physicalBranchSupported;
+out.physicalStatus = componentInfo.physicalStatus;
 out.xdot = xdot;
 end

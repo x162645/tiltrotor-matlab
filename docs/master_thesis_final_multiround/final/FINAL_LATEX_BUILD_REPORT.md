@@ -1,5 +1,20 @@
 # 最终 XeLaTeX 构建与版式检查报告
 
+## 2026-07-26 独立复核后的构建状态
+
+本次已同步修改 `MASTER_THESIS_FINAL_CANDIDATE.md`、
+`MASTER_THESIS_FINAL_CANDIDATE.tex` 和 `xelatex_project/main.tex`。实际检查
+系统 PATH、常见 TeX Live/MiKTeX 安装位置及 Codex 捆绑依赖后，当前环境只有
+Poppler，没有 XeLaTeX 和 Biber。因此本次不能重新生成 PDF；现存
+`MASTER_THESIS_FINAL_CANDIDATE.pdf` 及下述哈希、页数和视觉检查结果均属于
+上一版构建，不能作为本次源文件修订已进入 PDF 的证据。
+
+该环境缺口不影响 MATLAB 代码、测试、Markdown/LaTeX 同步和 Git 提交，但在
+具有 XeLaTeX/Biber 的环境中应按 README 的四遍命令重建并重新执行逐页视觉核验。
+为排除既有二进制损坏，本次仍用 Poppler 重新渲染了旧 PDF 全部 82 页并检查 7 张
+接触表；未见新增的空白页、裁切或渲染损坏。该检查只说明旧 PDF 完整，不证明本次
+源文件修订已进入 PDF。
+
 ## 构建环境
 
 - 引擎：XeTeX 3.141592653-2.6-0.999998（TeX Live 2026）

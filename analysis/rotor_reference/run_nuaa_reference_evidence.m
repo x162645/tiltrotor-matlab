@@ -22,6 +22,9 @@ n = numel(anglesDeg);
 
 template = struct('betaM_deg',NaN,'implementation','', ...
     'success',false,'errorIdentifier','', ...
+    'numericalConverged',false,'physicalConverged',false, ...
+    'physicalStatus','NOT_APPLICABLE', ...
+    'inducedClosureResidual_N',NaN, ...
     'Fx_N',NaN,'Fy_N',NaN,'Fz_N',NaN, ...
     'Mx_Nm',NaN,'My_Nm',NaN,'Mz_Nm',NaN, ...
     'thrust_N',NaN,'torque_Nm',NaN,'inducedVelocity_mps',NaN, ...
@@ -182,7 +185,22 @@ fprintf(fid,['零平面来流时，公开式(12)的方位一阶诱导分布需�
             if isfield(out,'inducedIterations')
                 row.inducedIterations = out.inducedIterations;
             end
-            row.success = true;
+            if strcmp(implementation,'CURRENT_PRODUCTION')
+                row.numericalConverged = out.numericalConverged;
+                row.physicalConverged = out.physicalConverged;
+                row.physicalStatus = out.physicalStatus;
+                row.inducedClosureResidual_N = ...
+                    out.inducedClosureResidual;
+                row.success = out.physicalConverged;
+                if ~out.physicalConverged
+                    row.errorIdentifier = out.physicalStatus;
+                end
+            else
+                row.numericalConverged = true;
+                row.physicalConverged = true;
+                row.physicalStatus = 'REFERENCE_MODEL_RETURNED';
+                row.success = true;
+            end
             row.Fx_N = F(1); row.Fy_N = F(2); row.Fz_N = F(3);
             row.Mx_Nm = M(1); row.My_Nm = M(2); row.Mz_Nm = M(3);
             row.thrust_N = out.thrust;
@@ -194,6 +212,9 @@ fprintf(fid,['零平面来流时，公开式(12)的方位一阶诱导分布需�
             row.flapResidualNorm = out.flap.residualNorm;
         catch ME
             row.errorIdentifier = ME.identifier;
+            if strcmp(implementation,'CURRENT_PRODUCTION')
+                row.physicalStatus = ME.identifier;
+            end
         end
     end
 end

@@ -11,7 +11,12 @@ if nargin < 3
     opts = struct();
 end
 validate_condition(condition);
-mode = option_value(opts,'mode',select_mode(condition.betaM));
+if ~isfield(opts,'mode') || isempty(opts.mode)
+    error('trim_reference_rotor_symmetric:ExplicitModeRequired', ...
+        ['opts.mode is required. No betaM-based trim-definition handoff ' ...
+         'is accepted without explicit continuity evidence.']);
+end
+mode = opts.mode;
 definition = make_trim_definition(mode,condition,P13.base);
 z0 = option_value(opts,'initialValues',definition.initialValues);
 z0 = z0(:);
@@ -229,16 +234,6 @@ span = bounds(:,2)-bounds(:,1);
 margin = min(z-bounds(:,1),bounds(:,2)-z)./span;
 minimumMargin = min(margin);
 active = margin <= 0.02;
-end
-
-function mode = select_mode(betaM)
-if betaM < pi/6
-    mode = 'helicopter_longitudinal';
-elseif betaM < pi/3
-    mode = 'conversion_longitudinal';
-else
-    mode = 'airplane_longitudinal';
-end
 end
 
 function validate_condition(condition)

@@ -72,6 +72,13 @@ info.appliedRotorControls.left = ctrlLeft;
 info.appliedRotorControls.right = ctrlRight;
 info.rotorLeft = rotL;
 info.rotorRight = rotR;
+info.physicalConverged = rotL.physicalConverged && ...
+    rotR.physicalConverged;
+info.physicalBranchSupported = rotL.physicalBranchSupported && ...
+    rotR.physicalBranchSupported;
+info.physicalStatus = combined_rotor_status(rotL, rotR);
+info.physicalValidity.rotorLeft = rotor_validity(rotL);
+info.physicalValidity.rotorRight = rotor_validity(rotR);
 info.wing = wing;
 info.fuselage = fus;
 info.horizontalTail = htail;
@@ -81,5 +88,29 @@ info.M = Mtotal;
 
     function y = clamp(value, limits)
         y = min(max(value, limits(1)), limits(2));
+    end
+
+    function validity = rotor_validity(rotor)
+        validity.numericalConverged = rotor.coupledConverged;
+        validity.flapConverged = rotor.flapConverged;
+        validity.closureResidualSatisfied = ...
+            rotor.closureResidualSatisfied;
+        validity.physicalBranchSupported = ...
+            rotor.physicalBranchSupported;
+        validity.physicalConverged = rotor.physicalConverged;
+        validity.status = rotor.physicalStatus;
+        validity.inducedClosureResidual = ...
+            rotor.inducedClosureResidual;
+    end
+
+    function status = combined_rotor_status(left, right)
+        if left.physicalConverged && right.physicalConverged
+            status = 'PHYSICAL_CONVERGED';
+        elseif strcmp(left.physicalStatus, right.physicalStatus)
+            status = left.physicalStatus;
+        else
+            status = sprintf('LEFT_%s__RIGHT_%s', ...
+                left.physicalStatus, right.physicalStatus);
+        end
     end
 end

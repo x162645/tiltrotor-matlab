@@ -62,12 +62,16 @@ report.fullStateDerivative = xdotFull;
 report.fullResidualNorm = norm(xdotFull);
 report.fullResidualLabels = derivativeNames;
 report.finiteFullStateDerivative = is_real_finite(xdotFull);
+report.physicalConverged = eomOut.physicalConverged;
+report.physicalBranchSupported = eomOut.physicalBranchSupported;
+report.physicalStatus = eomOut.physicalStatus;
 report.limitReport = limitReport;
 report.atLimit = limitReport.anyAtLimit;
 report.withinLimits = ~limitReport.anyViolation;
 report.converged = report.solverConverged && ...
     report.residualNorm < P.trim.residualTolerance && ...
-    report.finiteFullStateDerivative && ~report.atLimit && report.withinLimits;
+    report.finiteFullStateDerivative && report.physicalConverged && ...
+    ~report.atLimit && report.withinLimits;
 report.V = condition.V;
 report.betaM = condition.betaM;
 report.gamma = condition.gamma;
@@ -94,7 +98,8 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
 
     function J = objective(y)
         try
-            [~, ~, R, thisPenalty] = evaluate_trim_definition_point( ...
+            [~, ~, R, thisPenalty, ~, thisEomOut] = ...
+                evaluate_trim_definition_point( ...
                 condition, definition, from_scaled(y), P);
         catch ME
             if is_objective_domain_error(ME)
@@ -110,6 +115,11 @@ report.trimVariables = named_struct(definition.unknownNames, zOpt);
             invalidEvalIdentifiers{end+1} = 'trim_general:NonFiniteObjective';
             J = 1.0e30;
             return;
+        end
+        if ~thisEomOut.physicalConverged
+            invalidEvalCount = invalidEvalCount + 1;
+            invalidEvalIdentifiers{end+1} = ...
+                ['trim_general:' thisEomOut.physicalStatus];
         end
         rs = R./residual_scales(definition.residualNames, P);
         J = rs.'*rs + thisPenalty;

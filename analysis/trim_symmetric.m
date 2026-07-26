@@ -122,12 +122,15 @@ report.candidates = candidates;
 report.candidateAcceptance = [candidates.acceptable].';
 report.solverConverged = exitflag > 0;
 report.finiteFullStateDerivative = is_real_finite(xdotFull);
+report.physicalConverged = eomOut.physicalConverged;
+report.physicalBranchSupported = eomOut.physicalBranchSupported;
+report.physicalStatus = eomOut.physicalStatus;
 report.limitReport = limitReport;
 report.atLimit = limitReport.anyAtLimit;
 report.withinLimits = ~limitReport.anyViolation;
 report.converged = report.solverConverged && ...
     report.residualNorm < P.trim.residualTolerance && ...
-    report.finiteFullStateDerivative && ...
+    report.finiteFullStateDerivative && report.physicalConverged && ...
     ~report.atLimit && report.withinLimits;
 report.betaM = betaM;
 report.V = V;
@@ -177,7 +180,7 @@ report.compatibilityMode = true;
 
     function J = trim_cost(z)
         try
-            [~, ~, R, thisPenalty] = build_point(z);
+            [~, ~, R, thisPenalty, ~, thisEomOut] = build_point(z);
         catch ME
             if is_objective_domain_error(ME)
                 note_invalid_eval(ME);
@@ -191,6 +194,11 @@ report.compatibilityMode = true;
             invalidEvalIdentifiers{end+1} = 'trim_symmetric:NonFiniteObjective';
             J = 1.0e30;
             return;
+        end
+        if ~thisEomOut.physicalConverged
+            invalidEvalCount = invalidEvalCount + 1;
+            invalidEvalIdentifiers{end+1} = ...
+                ['trim_symmetric:' thisEomOut.physicalStatus];
         end
         scale = [P.env.g; P.env.g; 1.0];
         Rs = R./scale;
@@ -246,6 +254,8 @@ report.compatibilityMode = true;
             'residualNorm', NaN, ...
             'exitflag', NaN, ...
             'acceptable', false, ...
+            'physicalConverged', false, ...
+            'physicalStatus', '', ...
             'atLimit', false, ...
             'withinLimits', false), nStart, 1);
 
@@ -273,7 +283,7 @@ report.compatibilityMode = true;
                     fminsearch(@(z) trim_cost(z), zi, options);
                 yCandidate = NaN(size(ySeed));
             end
-            [~, uc, rc, ~, xd] = build_point(zCandidate);
+            [~, uc, rc, ~, xd, candidateEomOut] = build_point(zCandidate);
             rn = norm(rc);
             candidateLimits = make_limit_report(zCandidate, uc);
 
@@ -284,6 +294,9 @@ report.compatibilityMode = true;
             records(iStart).cost = costCandidate;
             records(iStart).residualNorm = rn;
             records(iStart).exitflag = exitCandidate;
+            records(iStart).physicalConverged = ...
+                candidateEomOut.physicalConverged;
+            records(iStart).physicalStatus = candidateEomOut.physicalStatus;
 
             better = costCandidate < bestCost || ...
                 (abs(costCandidate-bestCost) < 1e-14 && rn < bestResidualNorm);
@@ -298,6 +311,7 @@ report.compatibilityMode = true;
             acceptable = exitCandidate > 0 && ...
                 rn < P.trim.residualTolerance && ...
                 is_real_finite(xd) && ...
+                candidateEomOut.physicalConverged && ...
                 ~candidateLimits.anyAtLimit && ...
                 ~candidateLimits.anyViolation;
             records(iStart).acceptable = acceptable;

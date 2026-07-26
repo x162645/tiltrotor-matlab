@@ -1,18 +1,18 @@
-timestamp=2026-07-26 03:26:05
+timestamp=2026-07-26 16:46:32
 matlab_version=9.10.0.1602886 (R2021a)
 computer=PCWIN64
 operating_system=Windows_NT
-root=E:\tiltrotor-worktrees\low-collective-quick-audit-pr58-20260726
-output=E:\tiltrotor-worktrees\low-collective-quick-audit-pr58-20260726\docs\low_collective_quick_audit
+root=E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726
+output=E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726\docs\low_collective_quick_audit
 head_status=0
-head_sha=dad5be2f1257599301d5337e921805b61fd8c486
+head_sha=65e459504dd473f6dcf18326028f3a8a7991c55a
 branch_status=0
-branch=codex/low-collective-quick-audit-pr58-20260726
+branch=codex/independent-logic-consistency-pr59-20260726
 default_initial_vi_mps=16.26969419437201
 residual_classification=CLEAR_SINGLE_ROOT
 scope=4,8,10,12 deg points; 11 residual samples at 8 deg; two seeds at 8 and 10 deg
 audit_command=MATLAB R2021a -batch "cd(worktree); run('startup.m'); result=low_collective_quick_audit;"
 validation_command=MATLAB R2021a -batch "cd(worktree); run('startup.m'); check_low_collective_quick_audit; check_rotor_force_moment_chain; check_flapping_model; check_nuaa_public_formula_reference;"
 complete_regression=NOT_RUN; PR58 recorded runtime is about 500 s and exceeds the several-minute confirmation threshold
-production_model_modified=false
+production_model_modified=true; equations and default parameters unchanged; physical-convergence status and propagation added
 default_parameters_modified=false

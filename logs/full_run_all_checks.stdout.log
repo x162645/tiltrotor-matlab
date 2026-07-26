@@ -1,0 +1,368 @@
+Tiltrotor forward model v2 paths added.
+Project root: E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726
+Tiltrotor forward model v2 paths added.
+Project root: E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726
+
+Mass/inertia/geometry checks
+============================
+case                                                   : status
+mass positive and invariant with tilt                  : PASS
+CG shift endpoint identities                           : PASS
+CG shift continuity and central derivative             : PASS
+legacy shared-radius behavior preserved                : PASS
+moving-mass radius independent of hub radius           : PASS
+hub radius independent of moving-mass radius           : PASS
+deprecated RH alias has no production effect           : PASS
+inertia symmetry and positive definiteness             : PASS
+principal moments and radii plausible                  : PASS
+KI interpreted per radian                              : PASS
+left/right rotor hub mirror geometry                   : PASS
+rotor disk non-overlap clearance                       : PASS
+rotor/wing/nacelle broad geometry relation             : PASS
+tail locations aft of current CG                       : PASS
+component CG-relative position identities              : PASS
+repeated calls deterministic and finite                : PASS
+Model calls: total_forces_moments=10, rotor_model_bemt=20
+RH split tolerances: geometry=1.0e-12 m, decoupling=1.0e-12 m; worst legacy CG=0.000e+00 m, hub=4.291e-18 m
+All mass/inertia/geometry checks passed: 1
+
+NUAA Eq. (12)/(13)/(16) focused checks
+======================================
+case                                                     : status
+Eq12 literal radial/azimuth values and azimuth mean      : PASS
+Eq12 left/right spatial field consistency                : PASS
+Eq13 algebra and 0.5 induced update                      : PASS
+Eq13 representative rotor calls finite and converged     : PASS
+Eq16 raw/applied area and clamp flags                    : PASS
+old wing slipstream schedules absent from production     : PASS
+All NUAA equation focused checks passed: 1
+
+Rotor physical-convergence checks
+=================================
+4 deg numerical sequence is not physical closure         : PASS
+12 deg positive-thrust regression remains physical       : PASS
+unsupported branch propagates through nine-state loads   : PASS
+trim point exposes unsupported physical branch           : PASS
+GUI service cannot accept unsupported branch             : PASS
+unsupported branch propagates through thirteen-state loads : PASS
+4 deg: T=-930.152042 N closure=-930.152042 N numerical=1 physical=0 status=UNSUPPORTED_NEGATIVE_THRUST_BRANCH
+12 deg: T=16532.1799 N closure=1.414102 N numerical=1 physical=1 status=PHYSICAL_CONVERGED
+
+NUAA Eq. (17)-(22) wing velocity checks
+=======================================
+case                                                       : status
+Eq17 beta endpoint and conversion-angle components         : PASS
+Eq17 rigid-body velocity and reconstruction identity       : PASS
+Eq17 left/right rotor basis equivalence                    : PASS
+free-stream regions do not add induced velocity            : PASS
+wakeFactor no longer affects wing production output        : PASS
+invalid Eq17 induced velocity errors explicitly            : PASS
+Eq18 wing aerodynamic-center shift identity                : PASS
+Eq19 Eq21 zero-sideslip force transform identity           : PASS
+Eq20 Eq22 wing moment identities and symmetry              : PASS
+All NUAA Eq17 wing checks passed: 1
+
+Rotor force/moment chain checks
+===============================
+case                                                       : status
+rotor basis unit length and orthogonality                  : PASS
+left/right hub mirror geometry                             : PASS
+hub local-velocity identity                                : PASS
+exact rotor moment decomposition                           : PASS
+exact total component force/moment summation               : PASS
+symmetric-hover force and reaction-torque cancellation     : PASS
+differential-collective mirror/sign relations              : PASS
+common collective monotonic thrust and finite torque       : PASS
+Jpolar=0 gives zero gyroscopic moment                      : PASS
+synthetic nonzero Jpolar gyroscopic moment                 : PASS
+finite real outputs and convergence flags                  : PASS
+minimum UT applicability record                            : PASS
+Model calls: total_forces_moments=8, rotor_model_bemt=16
+Representative hover      betaM= 0.000000 minUT= 5.045767e+01 maxUT= 2.275503e+02
+Representative transition betaM= 0.785398 minUT= 3.518750e+01 maxUT= 2.428205e+02
+Representative airplane   betaM= 1.570796 minUT= 4.930710e+01 maxUT= 2.287009e+02
+All rotor force/moment chain checks passed: 1
+
+NUAA Eq12 hover flapping components [mean cos sin], N*m
+left  MT:  3.282231449787e+04 -4.054356841152e-04  2.375279180985e+00
+left   R:  1.482513593487e-05  4.769736272614e-10 -1.895684111075e-08
+right MT:  3.282231449787e+04 -4.054356786583e-04 -2.375279180990e+00
+right  R:  1.482513843598e-05  4.713423124025e-10  1.896143294461e-08
+
+Flapping model checks
+=====================
+case                                         : status
+UP degenerates when beta and betaDot are zero : PASS
+hover zero-cyclic left/right mirror          : PASS
+NUAA Eq12 hover inflow field diagnostics     : PASS
+positive cyclicLong disk-tilt direction      : PASS
++/- cyclicLong antisymmetric response        : PASS
+diffCyclic left/right differential mapping   : PASS
+rotDir changes betaDot phase                 : PASS
+flapping residual convergence                : PASS
+induced/flapping coupled convergence         : PASS
+rotor grid sensitivity                       : PASS
+forward-speed scan continuity                : PASS
+finite real outputs                          : PASS
+trim and linearization still run             : PASS
+repeat calls are deterministic               : PASS
+All flapping model checks passed: 1
+
+NUAA public-formula reference checks
+====================================
+model identity and finite real output      : PASS
+left/right mirror symmetry                 : PASS
+nacelle endpoint thrust direction          : PASS
+radial/azimuth grid convergence            : PASS
+induced and flap convergence evidence      : PASS
+default stack unchanged by reference calls : PASS
+13x10 symmetric whole-aircraft interface   : PASS
+
+Aerodynamic component checks
+============================
+case                                               : status
+aero force basis and canonical directions          : PASS
+positive drag opposes local velocity               : PASS
+wing area partition and left/right symmetry        : PASS
+aileron sign-reversal mirror and roll sign         : PASS
+near-normal blend continuity and diagnostics       : PASS
+slipstream scope and hover force direction         : PASS
+fuselage decomposition, drag, and p/q/r damping    : PASS
+horizontal-tail downwash and elevator response     : PASS
+twin vertical-tail sideslip and rudder response    : PASS
+finite real deterministic representative conditions : PASS
+Top-level component/model calls: 29
+Calls: aero=6 wing=9 fuselage=5 htail=4 vtail=5 totalModel=0
+All aerodynamic component checks passed: 1
+
+Control architecture checks
+===========================
+Control derivative columns use h = 1.0e-04 rad.
+case                                   : status
+symmetric collective                   : PASS
+differential collective                : PASS
+symmetric longitudinal cyclic          : PASS
+differential longitudinal cyclic       : PASS
++diff/-diff mirror relation            : PASS
+finite-difference stability h=1e-3,1e-4,1e-5 : PASS
+
+Derivative d[F;M]/d(control), rows [Fx Fy Fz Mx My Mz]
+collective (collective):
+-9.529527726688e+00  0.000000000000e+00 -2.999762297856e+05  0.000000000000e+00  7.147145795016e+00  0.000000000000e+00
+diffCollective (differentialCollective):
+ 7.033262861000e-10 -3.407225606444e+04  0.000000000000e+00 -1.532930601386e+06 -5.273559366969e-10  1.458236213615e+05
+cyclicLong (longitudinalCyclic):
+ 3.373800364254e+04  1.136868377216e-08  4.520297443378e-01  2.910383045673e-07 -2.530350273191e+04  1.818989403546e-08
+diffCyclic (differentialLongitudinalCyclic):
+-7.294165271787e-10 -1.017320880919e+01  7.275957614183e-08 -5.358474600143e+00  5.473399511402e-10 -1.686829985914e+05
+All control architecture checks passed: 1
+
+Berger13 PR1 interface checks
+=============================
+frozen 13-state names and units                  : PASS
+frozen 10-input names and units                  : PASS
+placeholder provenance is explicit               : PASS
+symmetric degradation to NUAA baseline           : PASS
+independent loads use actual total CG            : PASS
+left/right angle exchange mirror relation        : PASS
+independent torque-channel signs                 : PASS
+legacy 9x7 and wing defaults unchanged           : PASS
+Max |baseline F difference|: 0.000e+00 N
+Max |baseline M difference|: 0.000e+00 N*m
+Max |first-nine derivative difference|: 0.000e+00
+All passed: 1
+
+Berger13 PR1 linearization checks
+==================================
+dimensions, finite values, and interior central stencil : PASS
+h/10, h, 10h key-column stability                : PASS
+boundary-aware nacelle-angle stencils            : PASS
+local nonlinear/linear error decreases           : PASS
+Key-column relative variation [h/10,10h]: 6.559e-09 6.557e-07
+Local approximation errors [1,1/2,1/4]: 3.856e-06 9.642e-07 2.411e-07
+All passed: 1
+
+Berger13 PR2 formal trim checks
+================================
+formal 13-state dimensions and finite values         : PASS
+full dynamic-equilibrium substitution                : PASS
+multiple-seed convergence and sensitivity            : PASS
+static torque and symmetric nacelle constraints      : PASS
+continuation to neighboring speed                    : PASS
+symmetric/differential transform invertibility       : PASS
+credible-point three-step linearization              : PASS
+noncredible point rejected                           : PASS
+legacy nine-state point remains identical            : PASS
+Status=CREDIBLE residual=4.326e-10 cond=6.916e+01 margin=0.087
+All passed: 1
+
+Berger13 PR3 actuator/wing checks
+=================================
+distinct torque and angle-command contracts              : PASS
+nominal command step and reaction torque                 : PASS
+angle rate acceleration and torque limits observable     : PASS
+left/right bandwidth and damping may differ              : PASS
+external delay context is explicit                       : PASS
+command freeze and kinematic lock are distinct           : PASS
+independent wing symmetric degradation                   : PASS
+positive/negative betaDiff mirror loads                  : PASS
+all component moments use actual total CG                : PASS
+actual CG changes fixed-component load evaluation        : PASS
+mass moment and complete inertia reconstruction          : PASS
+fixed inertia residual is invariant at fixed mean angle  : PASS
+actuator action-reaction sign and coupling boundary      : PASS
+component sum has no force or moment double count        : PASS
+parameterized nacelle-rate gyroscopic moment             : PASS
+command trim and three-step A/B                          : PASS
+torque interface remains callable and finite             : PASS
+All passed: 1
+
+Berger13 PR4 research workflow checks
+=====================================
+biorthogonal eigenvectors and finite modal metrics      : PASS
+participation normalization and nacelle modes           : PASS
+heading zero root has separate classification           : PASS
+heading root is excluded from spiral qualification      : PASS
+explicit derivative units and command labels            : PASS
+Hungarian global assignment optimum                     : PASS
+continuous-path tracking reserves heading mode          : PASS
+cross-gap assignment is prohibited                      : PASS
+short nonlinear command simulation finite               : PASS
+analysis guard reports first violation                  : PASS
+valid-prefix and full metrics are separate              : PASS
+three-step time integration peak convergence            : PASS
+force and moment derivative norms stay separate         : PASS
+linear/nonlinear comparison has ten states              : PASS
+All passed: 1
+
+PR5A generic trim checks
+========================
+default parameters unchanged               : PASS
+overlay changes manifest paths only        : PASS
+every overlay change has provenance        : PASS
+public unit conversions                    : PASS
+nacelle angle endpoint mapping             : PASS
+optional baseline CG interface             : PASS
+component force and moment sums            : PASS
+positive elevator pitch sign               : PASS
+diagnostic preserves production limits     : PASS
+sensitivity is finite and reproducible     : PASS
+provenance classification complete         : PASS
+All PR5A checks passed: 1
+
+PR5B generic trim checks
+========================
+C1 changes manifest fields only            : PASS
+C2 changes manifest fields only            : PASS
+default parameter function unchanged       : PASS
+inertia controls and numerics invariant    : PASS
+frozen values remain inside declared bounds : PASS
+one effective parameter only               : PASS
+dense grid includes frozen required stations : PASS
+robustness perturbations stay inside bounds : PASS
+objective is finite and reproducible       : PASS
+required frozen evidence is present        : PASS
+formal design anchors retain failures      : PASS
+key C2 control margin passes 10 percent    : PASS
+dense corridor is finite with explicit gaps : PASS
+calibration and validation sets remain isolated : PASS
+post-freeze perturbation pattern is retained : PASS
+13x10 optimized-branch regression is finite : PASS
+All PR5B checks passed: 1
+
+General trim mode framework checks
+==================================
+definition factory schemas                  : PASS
+overdetermined definition rejected          : PASS
+underdetermined definition rejected         : PASS
+duplicate unknown rejected                  : PASS
+unsupported names rejected                  : PASS
+unknown/fixed overlap rejected              : PASS
+malformed values and sizes rejected         : PASS
+conversion allocation constraint required   : PASS
+conversion initial pitch command domain     : PASS
+old high-tilt cyclic seed overflows         : PASS
+modified legacy compatibility rejected      : PASS
+legacy hover identity                       : PASS
+legacy 20 m/s identity                      : PASS
+helicopter endpoint                         : PASS
+airplane endpoint                           : PASS
+Legacy worst differences: state=0.000e+00 control=0.000e+00 residual-norm=0.000e+00
+Endpoint residual norms: helicopter=8.232e-10 airplane=1.525e-08
+All general trim mode framework checks passed: 1
+
+Trim-mode boundary audit
+========================
+30 deg: CONTINUITY_NOT_DEMONSTRATED; max direct jump=4.49569 deg; virtual jump=0.103379; margin jump=0.0516896
+60 deg: CONTINUITY_NOT_DEMONSTRATED; max direct jump=11.6676 deg; virtual jump=2.95046e-10; margin jump=1.47523e-10
+
+Open-loop pitch allocation checks
+=================================
+static allocation schedule              : PASS
+helicopter endpoint equivalence         : PASS
+airplane endpoint equivalence           : PASS
+single 45 deg conversion trim           : PASS
+Endpoint differences [state control residual-norm]:
+  helicopter 1.145e-09 2.064e-10 1.393e-10
+  airplane   1.236e-08 4.862e-10 1.297e-08
+45 deg conversion: residual=1.450525e-09 pitchCommand=1.653135e+00 cyclicLong=-5.049214e-01 elevator=-2.885265e-01 atLimit=0 withinLimits=1
+45 deg authority: limit=2.000000e+00 normalizedCommand=8.265676e-01 cyclicUsage=0.826568 elevatorUsage=0.826568 cyclicMargin=0.173432 elevatorMargin=0.173432
+45 deg state x= 3.250810276780e+01 0.000000000000e+00 1.297009076445e+01 0.000000000000e+00 0.000000000000e+00 0.000000000000e+00 0.000000000000e+00 3.796269678429e-01 0.000000000000e+00
+45 deg control u= 2.528525840512e-01 0.000000000000e+00 -5.049214038697e-01 0.000000000000e+00 0.000000000000e+00 -2.885265164970e-01 0.000000000000e+00
+45 deg residual= -8.602607219170e-10 -1.161442924058e-09 -1.225774374738e-10
+Runtimes [static helicopter airplane conversion] s: 0.042 33.809 87.381 36.156
+All open-loop pitch allocation checks passed: 1
+
+Trim credibility Stage 2/3 checks
+==================================
+shared point evaluation identity         : PASS
+three representative diagnostics         : PASS
+one-sided finite differences             : PASS
+deterministic seed sensitivity           : PASS
+seed nonconvergence classification       : PASS
+four-point condition sensitivity         : PASS
+invalid options rejected                 : PASS
+Representative statuses: helicopter=PASS conversion=PASS airplane=PASS
+45 deg minimum margin=0.17343242 condition=69.160311 max-step-variation=3.013e-05
+All trim credibility Stage 2/3 checks passed: 1
+
+Wing normal-flow blend continuity
+=================================
+halfWidth=0.030 maxStep=3.385519e+02 maxDerivJump=1.769719e+04 leftC1=7.272938e-04 rightC1=6.248051e-04 weightRange=[0.000000 1.000000] passed=1
+halfWidth=0.050 maxStep=2.007409e+02 maxDerivJump=3.227179e+04 leftC1=2.092492e-04 rightC1=2.288201e-04 weightRange=[0.000000 1.000000] passed=1
+halfWidth=0.080 maxStep=1.231544e+02 maxDerivJump=5.190618e+05 leftC1=1.242118e-04 rightC1=1.519065e-04 weightRange=[0.000000 1.000000] passed=1
+halfWidth=0.150 maxStep=6.279668e+01 maxDerivJump=3.182648e+05 leftC1=1.063144e-04 rightC1=1.434335e-04 weightRange=[0.000000 1.000000] passed=1
+
+Internal checks
+===============
+parameters and inertia               : PASS
+mass/inertia/geometry audit          : PASS
+nacelle endpoint thrust direction    : PASS
+collective thrust monotonicity       : PASS
+left/right symmetry                  : PASS
+NUAA Eq12 Eq13 Eq16 closure          : PASS
+rotor numerical versus physical convergence : PASS
+NUAA Eq17 wing velocity chain        : PASS
+rotor force/moment chain audit       : PASS
+steady first-harmonic flapping       : PASS
+NUAA public-formula reference        : PASS
+aerodynamic component audit          : PASS
+control architecture closure         : PASS
+berger13 PR1 interface and parity    : PASS
+berger13 PR1 linearization           : PASS
+berger13 PR2 formal trim             : PASS
+berger13 PR3 actuator and independent wing : PASS
+berger13 PR4 research workflow       : PASS
+generic trim PR5A provenance         : PASS
+generic trim PR5B frozen design      : PASS
+general trim mode framework          : PASS
+trim mode boundary audit             : PASS
+open-loop pitch allocation           : PASS
+trim credibility diagnostics         : PASS
+wing near-normal blend continuity    : PASS
+wing V^2 scaling                     : PASS
+rotor grid convergence               : PASS
+linearization finite values          : PASS
+All passed: 1
+FULL_ELAPSED_SEC=1777.308212
+FULL_ALL_PASSED=1

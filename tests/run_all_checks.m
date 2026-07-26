@@ -27,6 +27,8 @@ run_test('nacelle endpoint thrust direction', @test_nacelle_endpoints);
 run_test('collective thrust monotonicity', @test_collective_monotonicity);
 run_test('left/right symmetry', @test_symmetry);
 run_test('NUAA Eq12 Eq13 Eq16 closure', @test_nuaa_eq12_13_16);
+run_test('rotor numerical versus physical convergence', ...
+    @test_rotor_physical_convergence);
 run_test('NUAA Eq17 wing velocity chain', @test_nuaa_eq17_wing_velocity);
 run_test('rotor force/moment chain audit', @test_rotor_force_moment_chain);
 run_test('steady first-harmonic flapping', @test_flapping_model);
@@ -42,6 +44,7 @@ run_test('berger13 PR4 research workflow', @test_berger13_pr4_research);
 run_test('generic trim PR5A provenance', @test_generic_trim_pr5a);
 run_test('generic trim PR5B frozen design', @test_generic_trim_pr5b);
 run_test('general trim mode framework', @test_trim_mode_framework);
+run_test('trim mode boundary audit', @test_trim_mode_boundaries);
 run_test('open-loop pitch allocation', @test_pitch_allocation);
 run_test('trim credibility diagnostics', @test_trim_credibility);
 run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
@@ -196,6 +199,12 @@ fprintf('All passed: %d\n',summary.allPassed);
             'NUAA Eq17 focused wing velocity checks have failed items.');
     end
 
+    function test_rotor_physical_convergence()
+        convergenceReport = check_rotor_physical_convergence();
+        assert(convergenceReport.allPassed, ...
+            'Rotor physical-convergence checks have failed items.');
+    end
+
     function test_trim_mode_framework()
         trimModeReport = check_trim_mode_framework();
         assert(trimModeReport.allPassed, ...
@@ -206,6 +215,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         pitchAllocationReport = check_pitch_allocation();
         assert(pitchAllocationReport.allPassed, ...
             'Open-loop pitch allocation has failed items.');
+    end
+
+    function test_trim_mode_boundaries()
+        boundaryReport = check_trim_mode_boundaries();
+        assert(boundaryReport.allPassed, ...
+            'Trim-mode boundary audit has failed items.');
     end
 
     function test_trim_credibility()

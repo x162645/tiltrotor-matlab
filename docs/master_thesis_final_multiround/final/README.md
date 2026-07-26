@@ -1,8 +1,16 @@
 # 最终提交候选包
 
+> 2026-07-26 独立逻辑一致性复核说明：Markdown、归档 LaTeX 与
+> `xelatex_project/main.tex` 已同步旋翼物理闭合和配平模式边界结论。
+> 当前 worktree 可用环境未提供 XeLaTeX/Biber，因而仓库中的 PDF 仍是
+> 上一版 82 页构建产物，不能视为包含本次正文修订；详见
+> `FINAL_LATEX_BUILD_REPORT.md`。可编辑 DOCX 已由同步后的 LaTeX 重建并
+> 完成结构/内容/无障碍审计，但因缺少 LibreOffice/`soffice` 未完成新版逐页
+> 渲染，详见 `WORD_EDITABLE_QA.md`。
+
 ## 核心文件
 
-- `MASTER_THESIS_FINAL_CANDIDATE.pdf`：82 页提交候选 PDF。
+- `MASTER_THESIS_FINAL_CANDIDATE.pdf`：上一版 82 页 PDF；本次源文件修订尚未重建进该二进制产物。
 - `MASTER_THESIS_FINAL_CANDIDATE.tex`：单文件 LaTeX 归档版本。
 - `MASTER_THESIS_FINAL_CANDIDATE.md`：可检索的 Markdown 正文。
 - `xelatex_project/`：可复现 XeLaTeX 工程，含 `main.tex`、`references.bib` 和 24 幅正文图。

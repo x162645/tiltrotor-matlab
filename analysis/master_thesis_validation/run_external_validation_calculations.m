@@ -28,7 +28,9 @@ cg = zeros(3,1);
 implementation = {'CURRENT_PRODUCTION'; ...
     'NUAA_PUBLIC_FORMULA_REFERENCE'};
 rows = repmat(struct('collective_deg',NaN,'implementation','', ...
-    'success',false,'errorIdentifier','','CT_over_sigma',NaN, ...
+    'success',false,'errorIdentifier','','numericalConverged',false, ...
+    'physicalConverged',false,'physicalStatus','NOT_APPLICABLE', ...
+    'inducedClosureResidual_N',NaN,'CT_over_sigma',NaN, ...
     'thrust_N',NaN,'torque_Nm',NaN,'inducedVelocity_mps',NaN), ...
     numel(collectiveDeg)*numel(implementation),1);
 index = 0;
@@ -45,7 +47,22 @@ for i = 1:numel(collectiveDeg)
                 [~,~,out] = nuaa_public_formula_rotor( ...
                     x,ctrl,0,-1,cg,P);
             end
-            rows(index).success = true;
+            if j == 1
+                rows(index).numericalConverged = out.numericalConverged;
+                rows(index).physicalConverged = out.physicalConverged;
+                rows(index).physicalStatus = out.physicalStatus;
+                rows(index).inducedClosureResidual_N = ...
+                    out.inducedClosureResidual;
+                rows(index).success = out.physicalConverged;
+                if ~out.physicalConverged
+                    rows(index).errorIdentifier = out.physicalStatus;
+                end
+            else
+                rows(index).numericalConverged = true;
+                rows(index).physicalConverged = true;
+                rows(index).physicalStatus = 'REFERENCE_MODEL_RETURNED';
+                rows(index).success = true;
+            end
             rows(index).CT_over_sigma = ...
                 (out.thrust/denominator)/sigma;
             rows(index).thrust_N = out.thrust;
@@ -53,6 +70,9 @@ for i = 1:numel(collectiveDeg)
             rows(index).inducedVelocity_mps = out.inducedVelocity;
         catch ME
             rows(index).errorIdentifier = ME.identifier;
+            if j == 1
+                rows(index).physicalStatus = ME.identifier;
+            end
         end
     end
 end
