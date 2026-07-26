@@ -10,6 +10,7 @@ addpath(fullfile(rootDir,'model','rotor_reference'));
 addpath(fullfile(rootDir,'model','parameter_sets'));
 addpath(fullfile(rootDir,'analysis'));
 addpath(fullfile(rootDir,'analysis','berger13'));
+addpath(fullfile(rootDir,'analysis','control_stability'));
 addpath(fullfile(rootDir,'analysis','generic_trim'));
 addpath(fullfile(rootDir,'analysis','rotor_reference'));
 addpath(fullfile(rootDir,'tests'));
@@ -51,6 +52,8 @@ run_test('wing near-normal blend continuity', @test_wing_normal_flow_blend);
 run_test('wing V^2 scaling', @test_wing_v2);
 run_test('rotor grid convergence', @test_grid_convergence);
 run_test('linearization finite values', @test_linearization);
+run_test('control-stability generated evidence', ...
+    @test_control_stability_assessment);
 
 summary.names = tests;
 summary.passed = passed;
@@ -306,6 +309,12 @@ fprintf('All passed: %d\n',summary.allPassed);
         assert(rep.finite);
         assert(all(size(A) == [9,9]));
         assert(all(size(B) == [9,7]));
+    end
+
+    function test_control_stability_assessment()
+        controlStabilityReport = check_control_stability_assessment();
+        assert(controlStabilityReport.allPassed, ...
+            'Control-stability assessment checks have failed items.');
     end
 
     function value = ternary(condition,a,b)

@@ -1,0 +1,28 @@
+Control-stability assessment started: 2026-07-26 23:04:36
+MATLAB: 9.10.0.1602886 (R2021a)
+Output: E:\tiltrotor-control-stability-technical-report-20260726\docs\tiltrotor_control_stability_technical_report
+Full trim grid: 0
+Completed derivatives/modal analysis: B15_V020
+Completed derivatives/modal analysis: B45_V035
+Completed derivatives/modal analysis: B75_V080
+Completed step response: B15_V020 elevator
+Completed step response: B15_V020 aileron
+Completed step response: B15_V020 rudder
+Completed step response: B15_V020 diffCollective
+Completed step response: B15_V020 diffCyclic
+Completed step response: B15_V020 cyclicLong
+Completed step response: B45_V035 elevator
+Completed step response: B45_V035 aileron
+Completed step response: B45_V035 rudder
+Completed step response: B45_V035 diffCollective
+Completed step response: B45_V035 diffCyclic
+Completed step response: B45_V035 cyclicLong
+Completed step response: B75_V080 elevator
+Completed step response: B75_V080 aileron
+Completed step response: B75_V080 rudder
+Completed step response: B75_V080 diffCollective
+Completed step response: B75_V080 diffCyclic
+Completed step response: B75_V080 cyclicLong
+FINITE_REAL=1
+REPRESENTATIVE_CREDIBLE=1
+Control-stability assessment finished: 2026-07-26 23:09:15

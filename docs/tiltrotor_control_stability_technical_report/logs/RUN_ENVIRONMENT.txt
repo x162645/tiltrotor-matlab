@@ -1,0 +1,13 @@
+Repository: x162645/tiltrotor-matlab
+Task worktree: E:\tiltrotor-control-stability-technical-report-20260726
+Task branch: codex/control-stability-technical-report-20260726
+Analysis base HEAD: 99acba44740087fdf3d7cdc82efd191c87cfb2d1
+Operating system: Microsoft Windows 11 Home Chinese, version 10.0.26100, build 26100, 64-bit
+MATLAB: 9.10.0.1602886 (R2021a)
+MATLAB computer: PCWIN64
+MATLAB executable: F:\matlab\R2021a\bin\matlab.exe
+Python: bundled Codex primary runtime
+Pandoc: C:\Program Files\Pandoc\pandoc.exe
+Microsoft Word: C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE
+XeLaTeX: not found
+Biber: not found

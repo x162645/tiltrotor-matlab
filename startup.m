@@ -9,6 +9,7 @@ addpath(fullfile(rootDir, 'model', 'rotor_reference'));
 addpath(fullfile(rootDir, 'model', 'parameter_sets'));
 addpath(fullfile(rootDir, 'analysis'));
 addpath(fullfile(rootDir, 'analysis', 'berger13'));
+addpath(fullfile(rootDir, 'analysis', 'control_stability'));
 addpath(fullfile(rootDir, 'analysis', 'generic_trim'));
 addpath(fullfile(rootDir, 'analysis', 'rotor_reference'));
 addpath(fullfile(rootDir, 'services'));
