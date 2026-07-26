@@ -18,7 +18,7 @@ NASA TM-86854 图 25 仅用于总距增加时推力增加的趋势方向对照�
 |\(p,q,r\)|机体系角速度|rad/s|
 |\(\phi,\theta,\psi\)|滚转、俯仰、偏航欧拉角|rad|
 |\(\beta_M\)|短舱构型角|rad|
-|\(\beta_{\rm slip}\)|侧滑角|rad|
+|\(\beta_{\mathrm{slip}}\)|侧滑角|rad|
 |\(\mathbf F_b,\mathbf M_b\)|机体系合力、关于重心的合力矩|N，N·m|
 |\(\mathbf A,\mathbf B\)|状态矩阵、输入矩阵|按状态与输入定义|
 |\(V,W\)|右、左特征向量矩阵|1|
@@ -118,7 +118,7 @@ $$
 c_\theta c_\psi&c_\theta s_\psi&-s_\theta\\
 s_\phi s_\theta c_\psi-c_\phi s_\psi&s_\phi s_\theta s_\psi+c_\phi c_\psi&s_\phi c_\theta\\
 c_\phi s_\theta c_\psi+s_\phi s_\psi&c_\phi s_\theta s_\psi-s_\phi c_\psi&c_\phi c_\theta
-\end{bmatrix} \\tag{1}
+\end{bmatrix} \tag{1}
 $$
 
 给出，其中 \(c_\bullet=\cos(\bullet)\)、\(s_\bullet=\sin(\bullet)\)，角度单位为 rad。
@@ -132,21 +132,21 @@ $$
 0&c_\phi&-s_\phi\\
 0&s_\phi/\cos\theta&c_\phi/\cos\theta
 \end{bmatrix}
-\begin{bmatrix}p\\q\\r\end{bmatrix}. \\tag{2}
+\begin{bmatrix}p\\q\\r\end{bmatrix}. \tag{2}
 $$
 
 该表示在 \(\cos\theta=0\) 处奇异，本文工况远离该区域。重力在机体系中的投影为
 
 $$
 \mathbf g_b=\mathbf C_b^g[0,0,g]^T
-=g[-\sin\theta,\ \sin\phi\cos\theta,\ \cos\phi\cos\theta]^T. \\tag{3}
+=g[-\sin\theta,\ \sin\phi\cos\theta,\ \cos\phi\cos\theta]^T. \tag{3}
 $$
 
 完整惯量矩阵写作
 
 $$
 \mathbf I_b=\begin{bmatrix}I_{xx}&-I_{xy}&-I_{xz}\\-I_{xy}&I_{yy}&-I_{yz}\\-I_{xz}&-I_{yz}&I_{zz}\end{bmatrix},
-\qquad \lambda_{\min}(\mathbf I_b)>0. \\tag{4}
+\qquad \lambda_{\min}(\mathbf I_b)>0. \tag{4}
 $$
 
 代码保留 \(I_{xz}\) 而没有套用仅适于对角惯量的标量转动方程。符号、重力方向和
@@ -160,14 +160,14 @@ $$
 
 $$
 \mathbf F_k^b=\mathbf C_b^k\mathbf F_k^{(k)},\qquad
-\mathbf M_{k,0}^b=\mathbf C_b^k\mathbf M_k^{(k)}. \\tag{5}
+\mathbf M_{k,0}^b=\mathbf C_b^k\mathbf M_k^{(k)}. \tag{5}
 $$
 
 若 \(\mathbf r_k^b\) 是从整机实际重心指向作用点的位置，整机载荷为
 
 $$
 \mathbf F_b=\sum_k\mathbf F_k^b,\qquad
-\mathbf M_b=\sum_k\left(\mathbf M_{k,0}^b+\mathbf r_k^b\times\mathbf F_k^b\right). \\tag{6}
+\mathbf M_b=\sum_k\left(\mathbf M_{k,0}^b+\mathbf r_k^b\times\mathbf F_k^b\right). \tag{6}
 $$
 
 叉乘次序不可交换。该统一接口使旋翼反扭矩、尾翼固有矩与作用点力矩只计入一次。
@@ -192,7 +192,7 @@ $$
 角速度rad/s。文献中以degree、rpm、英尺或磅力给出的量必须在进入参数表前换算，例如
 
 $$
-\Omega=\mathrm{rpm}\,\frac{2\pi}{60}. \\tag{7}
+\Omega=\mathrm{rpm}\,\frac{2\pi}{60}. \tag{7}
 $$
 
 短舱角端点通过推力方向检查：\(\beta=0\) 时正推力主要沿 \(-z_b\)，
@@ -246,7 +246,7 @@ $$
 左右桨毂 \(h\in\{L,R\}\) 的机体系局部来流同时包含质心速度和机体转动贡献：
 
 $$
-\mathbf V_h^b=\mathbf V_{\rm CG}^b+\boldsymbol\omega_b\times\mathbf r_h^b. \\tag{8}
+\mathbf V_h^b=\mathbf V_{\mathrm{CG}}^b+\boldsymbol\omega_b\times\mathbf r_h^b. \tag{8}
 $$
 
 旋翼轴单位向量由短舱角决定。以本文端点定义，\(\beta_h=0\) 为直升机侧，
@@ -254,34 +254,34 @@ $$
 
 $$
 \mathbf e_{A,h}^b=[\sin\beta_h,\ 0,\ -\cos\beta_h]^T,\qquad
-\|\mathbf e_{A,h}^b\|_2=1. \\tag{9}
+\|\mathbf e_{A,h}^b\|_2=1. \tag{9}
 $$
 
 与轴向正交的盘面基向量记为 \(\mathbf e_{D,h}^b,\mathbf e_{Y,h}^b\)，满足
 
 $$
-\mathbf e_{D,h}^b\times\mathbf e_{Y,h}^b=\mathbf e_{A,h}^b. \\tag{10}
+\mathbf e_{D,h}^b\times\mathbf e_{Y,h}^b=\mathbf e_{A,h}^b. \tag{10}
 $$
 
 桨叶径向坐标和方位角分别为
 
 $$
-r=r_{\rm hub}+\xi(R-r_{\rm hub}),\quad 0\le\xi\le1,\qquad
-\psi_j=\psi+\frac{2\pi(j-1)}{N_b}. \\tag{11}
+r=r_{\mathrm{hub}}+\xi(R-r_{\mathrm{hub}}),\quad 0\le\xi\le1,\qquad
+\psi_j=\psi+\frac{2\pi(j-1)}{N_b}. \tag{11}
 $$
 
 桨距包含总距、线性扭转和一阶纵向周期量：
 
 $$
-\theta_h(r,\psi)=\theta_{0,h}+\theta_{\rm tw}\frac{r-r_{\rm hub}}{R-r_{\rm hub}}
-+\theta_{1s,h}\sin\psi . \\tag{12}
+\theta_h(r,\psi)=\theta_{0,h}+\theta_{\mathrm{tw}}\frac{r-r_{\mathrm{hub}}}{R-r_{\mathrm{hub}}}
++\theta_{1s,h}\sin\psi . \tag{12}
 $$
 
 控制接口把正纵向周期定义为盘面法向共同向 \(+\mathbf e_D\) 倾斜。左右旋向
 \(s_h\in\{-1,+1\}\) 不同，内部映射为
 
 $$
-\theta_{1s,h}=-s_h\,\theta_{{\rm cyc},h}. \\tag{13}
+\theta_{1s,h}=-s_h\,\theta_{{\mathrm{cyc}},h}. \tag{13}
 $$
 
 因此对称外部指令在物理盘面上同向，而不是简单给左右旋翼相同的内部谐波符号。
@@ -292,7 +292,7 @@ $$
 
 $$
 U_T=s_h\Omega r+\mathbf V_h^b\cdot\mathbf e_t,\qquad
-U_P=\mathbf V_h^b\cdot\mathbf e_{A,h}+v_i+v_{1c}\cos\psi+v_{1s}\sin\psi. \\tag{14}
+U_P=\mathbf V_h^b\cdot\mathbf e_{A,h}+v_i+v_{1c}\cos\psi+v_{1s}\sin\psi. \tag{14}
 $$
 
 相对速度、入流角和攻角为
@@ -300,7 +300,7 @@ $$
 $$
 W=\sqrt{U_T^2+U_P^2},\qquad
 \varphi=\operatorname{atan2}(U_P,U_T),\qquad
-\alpha=\theta_h-\varphi . \\tag{15}
+\alpha=\theta_h-\varphi . \tag{15}
 $$
 
 二维翼型关系在概念模型有效攻角内写成 \(C_l=C_{l\alpha}\alpha\) 和
@@ -308,41 +308,41 @@ $$
 
 $$
 \mathrm dL=\tfrac12\rho W^2c\,C_l\,\mathrm dr,\qquad
-\mathrm dD=\tfrac12\rho W^2c\,C_d\,\mathrm dr. \\tag{16}
+\mathrm dD=\tfrac12\rho W^2c\,C_d\,\mathrm dr. \tag{16}
 $$
 
 轴向推力与气动扭矩微元分别为
 
 $$
 \mathrm dT=(\mathrm dL\cos\varphi-\mathrm dD\sin\varphi),\qquad
-\mathrm dQ=r(\mathrm dL\sin\varphi+\mathrm dD\cos\varphi). \\tag{17}
+\mathrm dQ=r(\mathrm dL\sin\varphi+\mathrm dD\cos\varphi). \tag{17}
 $$
 
 经径向积分、方位平均和桨叶求和得到
 
 $$
-T=\frac{N_b}{2\pi}\int_0^{2\pi}\int_{r_{\rm hub}}^R\mathrm dT\,\mathrm d\psi,
+T=\frac{N_b}{2\pi}\int_0^{2\pi}\int_{r_{\mathrm{hub}}}^R\mathrm dT\,\mathrm d\psi,
 \qquad
-Q=\frac{N_b}{2\pi}\int_0^{2\pi}\int_{r_{\rm hub}}^R\mathrm dQ\,\mathrm d\psi . \\tag{18}
+Q=\frac{N_b}{2\pi}\int_0^{2\pi}\int_{r_{\mathrm{hub}}}^R\mathrm dQ\,\mathrm d\psi . \tag{18}
 $$
 
 诱导速度由叶素推力与动量关系闭合。概念性写法为
 
 $$
 T=2\rho A v_i\sqrt{V_\parallel^2+v_i^2+V_\perp^2},
-\qquad A=\pi R^2, \\tag{19}
+\qquad A=\pi R^2, \tag{19}
 $$
 
 实际程序采用带松弛的迭代：
 
 $$
-v_i^{(n+1)}=(1-\gamma)v_i^{(n)}+\gamma\mathcal G(T^{(n)},\mathbf V_h), \\tag{20}
+v_i^{(n+1)}=(1-\gamma)v_i^{(n)}+\gamma\mathcal G(T^{(n)},\mathbf V_h), \tag{20}
 $$
 
 并显式报告迭代失败。`max(T,0)` 仅定义当前正推力 Eq.13 的诱导速度目标；最终仍以未截断叶素推力复算原始动量闭合残差。负推力载荷不改写为零，但由于尚无负推力/风车闭合，必须返回“不支持的物理分支”，不得作为成功点。一阶谐波挥舞写成
 
 $$
-\beta_f(\psi)=\beta_0+a_{1c}\cos\psi+b_{1s}\sin\psi, \\tag{21}
+\beta_f(\psi)=\beta_0+a_{1c}\cos\psi+b_{1s}\sin\psi, \tag{21}
 $$
 
 其中谐波系数通过稳态线性代数闭合，不是自由尾迹或瞬态弹性桨叶模型。旋翼合力和
@@ -350,7 +350,7 @@ $$
 
 $$
 \mathbf F_h^{(h)}=[F_D,F_Y,-T]^T,\qquad
-\mathbf M_{Q,h}^{(h)}=[0,0,-s_hQ]^T. \\tag{22}
+\mathbf M_{Q,h}^{(h)}=[0,0,-s_hQ]^T. \tag{22}
 $$
 
 随后使用短舱旋转矩阵转换到机体系。悬停附近两套旋翼路径的推力斜率方向一致，
@@ -361,22 +361,22 @@ $$
 第 \(h\) 侧半翼气动中心的速度为
 
 $$
-\mathbf V_{w,h}^b=\mathbf V_{\rm CG}^b+\boldsymbol\omega_b\times\mathbf r_{w,h}^b . \\tag{23}
+\mathbf V_{w,h}^b=\mathbf V_{\mathrm{CG}}^b+\boldsymbol\omega_b\times\mathbf r_{w,h}^b . \tag{23}
 $$
 
 自由流区和尾流区分别采用 \(\mathbf V_{\infty,h}\) 与
-\(\mathbf V_{{\rm slip},h}\)，其动压为
+\(\mathbf V_{{\mathrm{slip}},h}\)，其动压为
 
 $$
 q_{\infty,h}=\tfrac12\rho\|\mathbf V_{\infty,h}\|^2,\qquad
-q_{{\rm slip},h}=\tfrac12\rho\|\mathbf V_{{\rm slip},h}\|^2. \\tag{24}
+q_{{\mathrm{slip}},h}=\tfrac12\rho\|\mathbf V_{{\mathrm{slip}},h}\|^2. \tag{24}
 $$
 
 局部迎角与侧滑角采用
 
 $$
 \alpha_h=\operatorname{atan2}(w_h,u_h),\qquad
-\beta_{a,h}=\operatorname{atan2}(v_h,\sqrt{u_h^2+w_h^2}). \\tag{25}
+\beta_{a,h}=\operatorname{atan2}(v_h,\sqrt{u_h^2+w_h^2}). \tag{25}
 $$
 
 升力线分支写成
@@ -384,42 +384,42 @@ $$
 $$
 C_{L,h}=C_{L0}+C_{L\alpha}\alpha_h,\quad
 C_{D,h}=C_{D0}+k_wC_{L,h}^2,\quad
-C_{m,h}=C_{m0}+C_{m\alpha}\alpha_h . \\tag{26}
+C_{m,h}=C_{m0}+C_{m\alpha}\alpha_h . \tag{26}
 $$
 
 相应载荷为
 
 $$
 L_h=q_hS_hC_{L,h},\quad D_h=q_hS_hC_{D,h},\quad
-M_h=q_hS_h\bar c\,C_{m,h}. \\tag{27}
+M_h=q_hS_h\bar c\,C_{m,h}. \tag{27}
 $$
 
 近法向来流分支与升力线分支在同一局部速度上分别计算。令法向流比
-\(\chi=|V_n|/\max(\|\mathbf V\|,V_{\rm ref})\)，过渡坐标为
+\(\chi=|V_n|/\max(\|\mathbf V\|,V_{\mathrm{ref}})\)，过渡坐标为
 
 $$
 \zeta=\operatorname{clip}\left(\frac{\chi-(\chi_0-\Delta\chi)}
-{2\Delta\chi},0,1\right), \\tag{28}
+{2\Delta\chi},0,1\right), \tag{28}
 $$
 
 五次平滑权重为
 
 $$
-s(\zeta)=6\zeta^5-15\zeta^4+10\zeta^3. \\tag{29}
+s(\zeta)=6\zeta^5-15\zeta^4+10\zeta^3. \tag{29}
 $$
 
 正式载荷连续混合为
 
 $$
-\mathbf F_w=(1-s)\mathbf F_{\rm liftline}+s\mathbf F_{\rm normal}. \\tag{30}
+\mathbf F_w=(1-s)\mathbf F_{\mathrm{liftline}}+s\mathbf F_{\mathrm{normal}}. \tag{30}
 $$
 
 这里的 \(\chi\) 只表示机翼局部法向流比，对应代码中的 `normalFlowRatioActual`；转换配平的虚拟俯仰命令使用 `pitchCommand`，二者没有共享变量、传参或覆盖关系。本文 \(\chi_0=0.35\)、\(\Delta\chi=0.15\) 均属概念模型设定，连续化只消除人工硬
 切换，不代表该区间已经试验辨识。尾流覆盖面积记为
 
 $$
-S_{{\rm slip},h}=\operatorname{clip}\!\left(\mathcal A(\mu_h,\beta_h),0,S_h\right),
-\qquad \mu_h=\frac{V_{\perp,h}}{\Omega R}. \\tag{31}
+S_{{\mathrm{slip}},h}=\operatorname{clip}\!\left(\mathcal A(\mu_h,\beta_h),0,S_h\right),
+\qquad \mu_h=\frac{V_{\perp,h}}{\Omega R}. \tag{31}
 $$
 
 十三状态路径逐侧计算该非线性面积，九状态路径使用左右推进比平均值；当 \(p\) 或
@@ -431,26 +431,26 @@ $$
 
 $$
 \mathbf F_f^b=q_fS_f[C_X,\ C_Y,\ C_Z]^T,\qquad
-q_f=\tfrac12\rho\|\mathbf V_f^b\|^2 . \\tag{32}
+q_f=\tfrac12\rho\|\mathbf V_f^b\|^2 . \tag{32}
 $$
 
 平尾局部迎角把安装角、下洗和升降舵效能分开：
 
 $$
 \alpha_t=\operatorname{atan2}(w_t,u_t)+i_t-\epsilon,\qquad
-\epsilon=\epsilon_0+\frac{\partial\epsilon}{\partial\alpha}\alpha_w, \\tag{33}
+\epsilon=\epsilon_0+\frac{\partial\epsilon}{\partial\alpha}\alpha_w, \tag{33}
 $$
 
 $$
 C_{L,t}=C_{L0,t}+C_{L\alpha,t}\alpha_t+C_{L\delta_e,t}\delta_e,
-\quad L_t=q_tS_tC_{L,t}. \\tag{34}
+\quad L_t=q_tS_tC_{L,t}. \tag{34}
 $$
 
 垂尾以局部侧滑和方向舵形成侧力：
 
 $$
 C_{Y,v}=C_{Y\beta,v}\beta_v+C_{Y\delta_r,v}\delta_r,\qquad
-Y_v=q_vS_vC_{Y,v}. \\tag{35}
+Y_v=q_vS_vC_{Y,v}. \tag{35}
 $$
 
 ### 3.7.6 坐标转换与整机闭合
@@ -460,19 +460,19 @@ $$
 $$
 \mathbf F_h^b=\mathbf C_b^h(\beta_h)\mathbf F_h^{(h)},\qquad
 \mathbf M_h^b=\mathbf C_b^h\mathbf M_h^{(h)}
-+(\mathbf r_h^b-\mathbf r_{\rm CG}^b)\times\mathbf F_h^b. \\tag{36}
++(\mathbf r_h^b-\mathbf r_{\mathrm{CG}}^b)\times\mathbf F_h^b. \tag{36}
 $$
 
 总力与总矩进入六自由度方程：
 
 $$
 \dot{\mathbf V}_b=\frac{\mathbf F_b}{m}+\mathbf g_b
--\boldsymbol\omega_b\times\mathbf V_b, \\tag{37}
+-\boldsymbol\omega_b\times\mathbf V_b, \tag{37}
 $$
 
 $$
 \dot{\boldsymbol\omega}_b=\mathbf I_b^{-1}
-\left[\mathbf M_b-\boldsymbol\omega_b\times(\mathbf I_b\boldsymbol\omega_b)\right]. \\tag{38}
+\left[\mathbf M_b-\boldsymbol\omega_b\times(\mathbf I_b\boldsymbol\omega_b)\right]. \tag{38}
 $$
 
 低空速、零转速、极端迎角和诱导迭代失败均由显式状态或失败信息保留。本文没有以
@@ -501,7 +501,7 @@ $$
 近法向混合的五次函数在两端具有一阶和二阶连续性：
 
 $$
-s(0)=0,\quad s(1)=1,\quad s'(0)=s'(1)=s''(0)=s''(1)=0. \\tag{39}
+s(0)=0,\quad s(1)=1,\quad s'(0)=s'(1)=s''(0)=s''(1)=0. \tag{39}
 $$
 
 这减小了数值线性化跨越模型分支时的人为跳变。连续并不等于物理已验证；混合中心和
@@ -519,12 +519,12 @@ $$
 
 $$
 \theta_{0,L}=\theta_0+\Delta\theta_0,\qquad
-\theta_{0,R}=\theta_0-\Delta\theta_0, \\tag{40}
+\theta_{0,R}=\theta_0-\Delta\theta_0, \tag{40}
 $$
 
 $$
-\theta_{{\rm cyc},L}=\theta_{\rm cyc}+\Delta\theta_{\rm cyc},\qquad
-\theta_{{\rm cyc},R}=\theta_{\rm cyc}-\Delta\theta_{\rm cyc}. \\tag{41}
+\theta_{{\mathrm{cyc}},L}=\theta_{\mathrm{cyc}}+\Delta\theta_{\mathrm{cyc}},\qquad
+\theta_{{\mathrm{cyc}},R}=\theta_{\mathrm{cyc}}-\Delta\theta_{\mathrm{cyc}}. \tag{41}
 $$
 
 历史接口名 `diffCyclic` 在物理含义上指差动纵向周期变距。模型没有独立横向周期输入。
@@ -545,13 +545,13 @@ $$
 
 $$
 C_T=\frac{T}{\rho A(\Omega R)^2},\qquad
-C_Q=\frac{Q}{\rho A(\Omega R)^2R}. \\tag{42}
+C_Q=\frac{Q}{\rho A(\Omega R)^2R}. \tag{42}
 $$
 
 轴功率为
 
 $$
-P=Q\Omega, \\tag{43}
+P=Q\Omega, \tag{43}
 $$
 
 单位为W。若扭矩符号随旋向而改变，功率比较使用阻力矩对驱动轴所需功率的正值，而机体
@@ -577,7 +577,7 @@ $$
 
 $$
 \mathcal A\!\left(\frac{\mu_L+\mu_R}{2},\beta\right)
-\ne\frac{\mathcal A(\mu_L,\beta)+\mathcal A(\mu_R,\beta)}{2}. \\tag{44}
+\ne\frac{\mathcal A(\mu_L,\beta)+\mathcal A(\mu_R,\beta)}{2}. \tag{44}
 $$
 
 因此差异集中在产生左右速度梯度的角速度扰动，而不是所有九个共享状态。该解释既说明
@@ -650,20 +650,20 @@ $$\dot\beta_s=\frac{\dot\beta_L+\dot\beta_R}2,\quad
 对给定短舱角和空速，配平未知量写成
 
 $$
-\mathbf z=[\theta,\theta_0,\theta_{1s},\delta_e]^T, \\tag{45}
+\mathbf z=[\theta,\theta_0,\theta_{1s},\delta_e]^T, \tag{45}
 $$
 
 其中具体分量随配平模式定义。完整非线性模型回代形成原始残差
 
 $$
-\mathbf r(\mathbf z)=[\dot u,\dot w,\dot q,\ldots]^T . \\tag{46}
+\mathbf r(\mathbf z)=[\dot u,\dot w,\dot q,\ldots]^T . \tag{46}
 $$
 
 为避免平动加速度、角加速度与工况约束因量纲不同而支配求解，使用
 
 $$
 \widetilde{\mathbf r}=\mathbf W_r\mathbf r,\qquad
-J(\mathbf z)=\tfrac12\widetilde{\mathbf r}^{\,T}\widetilde{\mathbf r}. \\tag{47}
+J(\mathbf z)=\tfrac12\widetilde{\mathbf r}^{\,T}\widetilde{\mathbf r}. \tag{47}
 $$
 
 控制边界写为 \(\mathbf z_{\min}\le\mathbf z\le\mathbf z_{\max}\)。
@@ -671,7 +671,7 @@ $$
 
 $$
 m_i=\min\left(\frac{z_i-z_{i,\min}}{z_{i,\max}-z_{i,\min}},
-\frac{z_{i,\max}-z_i}{z_{i,\max}-z_{i,\min}}\right). \\tag{48}
+\frac{z_{i,\max}-z_i}{z_{i,\max}-z_{i,\min}}\right). \tag{48}
 $$
 
 可信度判断同时考察残差、有限实数、求解器退出状态、边界余度和局部可控性，不把
@@ -682,14 +682,14 @@ $$
 尺度化配平雅可比为
 
 $$
-\mathbf J_z=\frac{\partial\widetilde{\mathbf r}}{\partial\mathbf z}. \\tag{49}
+\mathbf J_z=\frac{\partial\widetilde{\mathbf r}}{\partial\mathbf z}. \tag{49}
 $$
 
 其奇异值分解
 
 $$
 \mathbf J_z=\mathbf U\boldsymbol\Sigma\mathbf V^T,\qquad
-\boldsymbol\Sigma=\operatorname{diag}(\sigma_1,\ldots,\sigma_n) \\tag{50}
+\boldsymbol\Sigma=\operatorname{diag}(\sigma_1,\ldots,\sigma_n) \tag{50}
 $$
 
 给出局部控制方向。采用相对阈值 \(\tau\) 时
@@ -697,7 +697,7 @@ $$
 $$
 \operatorname{rank}_\tau(\mathbf J_z)=
 \#\{i:\sigma_i>\tau\sigma_1\},\qquad
-\kappa_2=\frac{\sigma_1}{\sigma_n}. \\tag{51}
+\kappa_2=\frac{\sigma_1}{\sigma_n}. \tag{51}
 $$
 
 条件数大并不自动等于无解，但表示残差对参数或数值噪声敏感，必须与控制触界和回代
@@ -711,7 +711,7 @@ $$
 \delta\dot{\mathbf x}=\mathbf A\delta\mathbf x+\mathbf B\delta\mathbf u,
 \qquad
 \mathbf A=\left.\frac{\partial\mathbf f}{\partial\mathbf x}\right|_\star,\quad
-\mathbf B=\left.\frac{\partial\mathbf f}{\partial\mathbf u}\right|_\star . \\tag{52}
+\mathbf B=\left.\frac{\partial\mathbf f}{\partial\mathbf u}\right|_\star . \tag{52}
 $$
 
 第 \(j\) 列使用中心差分：
@@ -719,16 +719,16 @@ $$
 $$
 \mathbf A_{:j}\approx
 \frac{\mathbf f(\mathbf x_\star+h_j\mathbf e_j,\mathbf u_\star)
--\mathbf f(\mathbf x_\star-h_j\mathbf e_j,\mathbf u_\star)}{2h_j}. \\tag{53}
+-\mathbf f(\mathbf x_\star-h_j\mathbf e_j,\mathbf u_\star)}{2h_j}. \tag{53}
 $$
 
-步长按变量量级缩放 \(h_j=h_{\rm rel}\max(|x_{\star,j}|,s_j)\)。
-以 \(h_{\rm rel}/2\) 复算可定义导数步长差
+步长按变量量级缩放 \(h_j=h_{\mathrm{rel}}\max(|x_{\star,j}|,s_j)\)。
+以 \(h_{\mathrm{rel}}/2\) 复算可定义导数步长差
 
 $$
 \varepsilon_A=
 \frac{\|\mathbf A(h)-\mathbf A(h/2)\|_F}
-{\max(\|\mathbf A(h/2)\|_F,\varepsilon_{\rm ref})}. \\tag{54}
+{\max(\|\mathbf A(h/2)\|_F,\varepsilon_{\mathrm{ref}})}. \tag{54}
 $$
 
 ## 4.5 线性—非线性一致性
@@ -736,9 +736,9 @@ $$
 给定足够小的扰动，非线性增量与线性预测的相对误差定义为
 
 $$
-\varepsilon_{\rm LN}(t)=
-\frac{\|\mathbf x_{\rm NL}(t)-\mathbf x_\star-\delta\mathbf x_{\rm L}(t)\|_2}
-{\max(\|\delta\mathbf x_{\rm L}(t)\|_2,x_{\rm ref})}. \\tag{55}
+\varepsilon_{\mathrm{LN}}(t)=
+\frac{\|\mathbf x_{\mathrm{NL}}(t)-\mathbf x_\star-\delta\mathbf x_{\mathrm{L}}(t)\|_2}
+{\max(\|\delta\mathbf x_{\mathrm{L}}(t)\|_2,x_{\mathrm{ref}})}. \tag{55}
 $$
 
 该比较只能评价局部线性化的一致性，不能验证非线性气动模型。扰动若跨越控制限幅、
@@ -807,19 +807,19 @@ $$\mathbf{M}_g=-\boldsymbol{\Omega}_{tilt}\times\mathbf{H}_r.$$
 
 $$
 \mathbf x_{13}=[u,v,w,p,q,r,\phi,\theta,\psi,\beta_L,\beta_R,
-\dot\beta_L,\dot\beta_R]^T. \\tag{56}
+\dot\beta_L,\dot\beta_R]^T. \tag{56}
 $$
 
 对称与差动短舱变量定义为
 
 $$
 \beta_s=\frac{\beta_L+\beta_R}{2},\qquad
-\beta_d=\frac{\beta_L-\beta_R}{2}, \\tag{57}
+\beta_d=\frac{\beta_L-\beta_R}{2}, \tag{57}
 $$
 
 $$
 \dot\beta_s=\frac{\dot\beta_L+\dot\beta_R}{2},\qquad
-\dot\beta_d=\frac{\dot\beta_L-\dot\beta_R}{2}. \\tag{58}
+\dot\beta_d=\frac{\dot\beta_L-\dot\beta_R}{2}. \tag{58}
 $$
 
 逆变换为 \(\beta_L=\beta_s+\beta_d\)、\(\beta_R=\beta_s-\beta_d\)。
@@ -832,7 +832,7 @@ $$
 
 $$
 \ddot\beta_h^\circ=
-\omega_n^2(\beta_{c,h}-\beta_h)-2\zeta\omega_n\dot\beta_h. \\tag{59}
+\omega_n^2(\beta_{c,h}-\beta_h)-2\zeta\omega_n\dot\beta_h. \tag{59}
 $$
 
 角度、速率和加速度限制依次作用：
@@ -840,16 +840,16 @@ $$
 $$
 \beta_h\in[\beta_{\min},\beta_{\max}],\qquad
 |\dot\beta_h|\le\dot\beta_{\max},\qquad
-|\ddot\beta_h|\le\ddot\beta_{\max}. \\tag{60}
+|\ddot\beta_h|\le\ddot\beta_{\max}. \tag{60}
 $$
 
 若以等效转矩限制表达，还需满足
 
 $$
-|I_{\rm nac}\ddot\beta_h|\le\tau_{\max}. \\tag{61}
+|I_{\mathrm{nac}}\ddot\beta_h|\le\tau_{\max}. \tag{61}
 $$
 
-当前 \(I_{\rm nac}\)、\(\omega_n\)、\(\zeta\)、速率、加速度和转矩上限均为研究占位或
+当前 \(I_{\mathrm{nac}}\)、\(\omega_n\)、\(\zeta\)、速率、加速度和转矩上限均为研究占位或
 工程假设；外部资料只为转换速率提供量级约束。因此时域幅值用于机理比较，不能解释为
 真实执行机构性能。
 
@@ -858,44 +858,44 @@ $$
 规定短舱角加速度对机体的等效反作用力矩写作
 
 $$
-\mathbf M_{{\rm react},h}^b=-I_{{\rm nac},h}\ddot\beta_h\,\mathbf e_{{\rm hinge},h}^b. \\tag{62}
+\mathbf M_{{\mathrm{react}},h}^b=-I_{{\mathrm{nac}},h}\ddot\beta_h\,\mathbf e_{{\mathrm{hinge}},h}^b. \tag{62}
 $$
 
 转子角动量为
 
 $$
-\mathbf H_{R,h}^b=s_h I_{R,h}\Omega_h\mathbf e_{A,h}^b, \\tag{63}
+\mathbf H_{R,h}^b=s_h I_{R,h}\Omega_h\mathbf e_{A,h}^b, \tag{63}
 $$
 
 其机体系力矩包含
 
 $$
-\mathbf M_{{\rm gyro},h}^b=
+\mathbf M_{{\mathrm{gyro}},h}^b=
 -\boldsymbol\omega_b\times\mathbf H_{R,h}^b
 -s_hI_{R,h}\Omega_h\dot\beta_h
-(\mathbf e_{{\rm hinge},h}^b\times\mathbf e_{A,h}^b). \\tag{64}
+(\mathbf e_{{\mathrm{hinge}},h}^b\times\mathbf e_{A,h}^b). \tag{64}
 $$
 
 默认旋翼极惯量为研究占位值，陀螺通道在当前定量结果中不可作为型号结论。
 若移动短舱质点位置为
 
 $$
-\mathbf r_{{\rm nac},h}^b(\beta_h)=
-\mathbf r_{{\rm hinge},h}^b+\mathbf C_b^h(\beta_h)\mathbf r_{c,h}^{(h)}, \\tag{65}
+\mathbf r_{{\mathrm{nac}},h}^b(\beta_h)=
+\mathbf r_{{\mathrm{hinge}},h}^b+\mathbf C_b^h(\beta_h)\mathbf r_{c,h}^{(h)}, \tag{65}
 $$
 
 实际重心和总惯量分别为
 
 $$
-\mathbf r_{\rm CG}^b=\frac{1}{m}\sum_km_k\mathbf r_k^b, \\tag{66}
+\mathbf r_{\mathrm{CG}}^b=\frac{1}{m}\sum_km_k\mathbf r_k^b, \tag{66}
 $$
 
 $$
-\mathbf I_{\rm CG}=\sum_k\left[
+\mathbf I_{\mathrm{CG}}=\sum_k\left[
 \mathbf C_b^k\mathbf I_{k,c}\mathbf C_k^b
 +m_k\big((\mathbf d_k^T\mathbf d_k)\mathbf 1-\mathbf d_k\mathbf d_k^T\big)
 \right],
-\quad \mathbf d_k=\mathbf r_k^b-\mathbf r_{\rm CG}^b. \\tag{67}
+\quad \mathbf d_k=\mathbf r_k^b-\mathbf r_{\mathrm{CG}}^b. \tag{67}
 $$
 
 这一路径使短舱角通过重心、惯量、桨毂力臂和旋翼轴共同影响刚体；模型是单向规定运动，
@@ -913,7 +913,7 @@ $$
 
 $$
 \|\mathbf I-\mathbf I^T\|_F\le\varepsilon_I,\qquad
-\min_i\lambda_i(\mathbf I)>0. \\tag{68}
+\min_i\lambda_i(\mathbf I)>0. \tag{68}
 $$
 
 这两个条件能够排除非对称或非正定矩阵，却不能确认部件质量和质心半径来自真实型号。
@@ -1012,7 +1012,7 @@ B75/V040 与 B75/V060 的最小控制余度分别为 `-9.57255e-10` 与 `-4.5557
 
 $$
 \alpha=\operatorname{atan2}(w,u),\qquad
-\beta_{\rm slip}=\arcsin(v/V). \\tag{69}
+\beta_{\mathrm{slip}}=\arcsin(v/V). \tag{69}
 $$
 
 扰动迎角或侧滑角时保持 \(V=\sqrt{u^2+v^2+w^2}\) 不变。力系数以 \(q_\infty S\) 归一化，滚转和偏航矩系数以 \(q_\infty Sb\) 归一化，俯仰矩系数以 \(q_\infty S\bar c\) 归一化。角速度导数采用 \(pb/(2V)\)、\(q\bar c/(2V)\)、\(rb/(2V)\) 的无量纲角速度。
@@ -1020,7 +1020,7 @@ $$
 中心差分为
 
 $$
-f_\xi\approx\frac{f(\xi+h)-f(\xi-h)}{2h}. \\tag{70}
+f_\xi\approx\frac{f(\xi+h)-f(\xi-h)}{2h}. \tag{70}
 $$
 
 角度和物理控制采用 \(10^{-3},10^{-4},10^{-5}\) rad；角速度采用 \(10^{-2},10^{-3},10^{-4}\) rad/s。CSV 保存正负扰动力/矩、三档步长、有量纲与无量纲导数、离散差异和有效性状态。
@@ -1114,7 +1114,7 @@ $$
 $$
 \omega_n=\sqrt{\sigma^2+\omega^2},\qquad
 \zeta=-\frac{\sigma}{\omega_n},\qquad
-T=\frac{2\pi}{|\omega|}. \\tag{71}
+T=\frac{2\pi}{|\omega|}. \tag{71}
 $$
 
 稳定实根报告 \(\tau=-1/\lambda\)，不稳定根报告倍增时间 \(\ln 2/\Re(\lambda)\)。左右特征向量按 \(W^H V=I\) 双正交归一化，参与因子定义为 \(P_{ki}=V_{ki}W_{ik}\)，同时保存原始复数分量和按模态归一化的幅值。
