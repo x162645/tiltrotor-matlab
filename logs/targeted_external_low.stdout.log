@@ -1,0 +1,31 @@
+Tiltrotor forward model v2 paths added.
+Project root: E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726
+Tiltrotor forward model v2 paths added.
+Project root: E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726
+Low-collective quick audit
+==========================
+Started: 2026-07-26 16:46:21
+Root: E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726
+Output: E:\tiltrotor-worktrees\independent-logic-consistency-pr59-20260726\docs\low_collective_quick_audit
+Point  4 deg: diagnostic=CONVERGED iter=18 vi= 6.2063958e-05 T=-930.152042 N; production=UNSUPPORTED_NEGATIVE_THRUST_BRANCH
+Point  8 deg: diagnostic=COUPLED_MAX_ITER iter=20 vi= 5.99666419 T= 8065.59969 N; production=rotor_model_bemt:CoupledSolveNotConverged
+Point 10 deg: diagnostic=COUPLED_MAX_ITER iter=20 vi= 9.94100533 T= 10949.0505 N; production=rotor_model_bemt:CoupledSolveNotConverged
+Point 12 deg: diagnostic=CONVERGED iter=17 vi= 12.1956489 T= 16532.1799 N; production=PHYSICAL_CONVERGED
+Residual classification: CLEAR_SINGLE_ROOT
+Finished: 2026-07-26 16:46:32
+
+Low-collective quick-audit focused checks
+=========================================
+isolated baseline identity                              : PASS
+12 deg diagnostic matches production                    : PASS
+4 deg numerical return is physically rejected           : PASS
+8 deg production failure retained                       : PASS
+10 deg production failure retained                      : PASS
+all required generated artifacts exist                  : PASS
+residual probe has eleven valid finite points           : PASS
+seed matrix has four mandated trials                    : PASS
+summary schema is complete                              : PASS
+Residual classification: CLEAR_SINGLE_ROOT
+All focused checks passed: 1
+EXTERNAL_CURRENT_VALID=6 FAILURE=6 MAE=0.0645401712415 RMSE=0.0645831812267
+TARGETED_REGEN_ALL_PASSED=1

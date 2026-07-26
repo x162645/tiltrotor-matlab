@@ -43,4 +43,13 @@ point.base.eomOut = baseOut;
 point.finiteReal = isreal(xdot13) && all(isfinite(xdot13)) && ...
     isreal(eomOut.Ftotal) && all(isfinite(eomOut.Ftotal)) && ...
     isreal(eomOut.Mtotal) && all(isfinite(eomOut.Mtotal));
+point.physicalConverged = baseOut.physicalConverged && ...
+    eomOut.physicalConverged;
+point.physicalBranchSupported = baseOut.physicalBranchSupported && ...
+    eomOut.physicalBranchSupported;
+if ~baseOut.physicalConverged
+    point.physicalStatus = ['BASE_' baseOut.physicalStatus];
+else
+    point.physicalStatus = eomOut.physicalStatus;
+end
 end

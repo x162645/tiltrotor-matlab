@@ -58,6 +58,7 @@ end
 coupledConverged = false;
 viError = Inf;
 flapInfo = struct();
+positiveThrustGuardEverActive = false;
 eq13 = struct('CT',NaN,'mu',mu,'lambda0',NaN,'lambda1',NaN, ...
     'target',NaN,'old',NaN,'new',NaN,'positiveThrustGuardActive',false, ...
     'denominatorFloorActive',false);
@@ -97,6 +98,8 @@ for iter = 1:P.rotor.inducedMaxIter
     eq13.new = viNew;
     eq13.positiveThrustGuardActive = loads.T < 0;
     eq13.denominatorFloorActive = denomEq13 < denomEq13Used;
+    positiveThrustGuardEverActive = positiveThrustGuardEverActive || ...
+        eq13.positiveThrustGuardActive;
 
     vi = viNew;
     if viError < P.rotor.inducedTol && ...
@@ -114,6 +117,39 @@ if ~coupledConverged
 end
 
 loads = blade_loads(vi, zFlap);
+lambda0Final = -Vaxial/max(tipSpeed, eps);
+lambda1Final = lambda0Final-vi/max(tipSpeed, eps);
+denomFinal = sqrt(lambda1Final^2+mu^2);
+denomFinalUsed = max(denomFinal, 1e-12);
+CTFinal = max(loads.T,0)/(0.5*P.env.rho*A*tipSpeed^2);
+momentumThrust = 2*P.env.rho*A*tipSpeed*vi*denomFinal;
+closureResidual = loads.T-momentumThrust;
+closureScale = max([abs(loads.T), abs(momentumThrust), 1]);
+closureResidualRelative = abs(closureResidual)/closureScale;
+inducedSequenceConverged = viError < P.rotor.inducedTol;
+flapConverged = flapInfo.converged && ...
+    flapInfo.residualNorm <= P.rotor.flapResidualTol;
+% DIMENSIONLESS_AUDIT_CRITERION. This is a load-closure acceptance
+% threshold, not the dimensional induced-velocity iteration tolerance.
+% The factor two mirrors the half-relaxed fixed-point update.
+closureResidualRelativeTolerance = 2.0e-4;
+closureResidualSatisfied = closureResidualRelative <= ...
+    closureResidualRelativeTolerance;
+positiveThrustGuardActive = loads.T < 0;
+physicalBranchSupported = loads.T > 0;
+physicalConverged = coupledConverged && closureResidualSatisfied && ...
+    physicalBranchSupported;
+if loads.T < 0
+    physicalStatus = 'UNSUPPORTED_NEGATIVE_THRUST_BRANCH';
+elseif loads.T == 0
+    physicalStatus = 'UNSUPPORTED_ZERO_THRUST_BRANCH';
+elseif ~closureResidualSatisfied
+    physicalStatus = 'INDUCED_CLOSURE_RESIDUAL_NOT_SATISFIED';
+elseif ~coupledConverged
+    physicalStatus = 'NUMERICAL_ITERATION_NOT_CONVERGED';
+else
+    physicalStatus = 'PHYSICAL_CONVERGED';
+end
 
 beta0 = zFlap(1);
 beta1c = zFlap(2);
@@ -171,12 +207,28 @@ out.inducedVelocityUpdateOld = eq13.old;
 out.inducedVelocityUpdateNew = eq13.new;
 out.inducedVelocityUpdateWeight = 0.5;
 out.CT = eq13.CT;
+out.CTFinal = CTFinal;
 out.mu = eq13.mu;
 out.lambda0 = eq13.lambda0;
 out.lambda1 = eq13.lambda1;
+out.lambda0Final = lambda0Final;
+out.lambda1Final = lambda1Final;
 out.inducedClosureModel = 'NUAA_EQ13';
-out.positiveThrustGuardActive = eq13.positiveThrustGuardActive;
+out.positiveThrustGuardActive = positiveThrustGuardActive;
+out.positiveThrustGuardEverActive = positiveThrustGuardEverActive;
 out.inducedDenominatorFloorActive = eq13.denominatorFloorActive;
+out.inducedDenominatorFloorActiveFinal = denomFinal < denomFinalUsed;
+out.inducedMomentumThrust = momentumThrust;
+out.inducedClosureResidual = closureResidual;
+out.inducedClosureResidualRelative = closureResidualRelative;
+out.inducedClosureResidualRelativeTolerance = ...
+    closureResidualRelativeTolerance;
+out.inducedSequenceConverged = inducedSequenceConverged;
+out.flapConverged = flapConverged;
+out.closureResidualSatisfied = closureResidualSatisfied;
+out.physicalBranchSupported = physicalBranchSupported;
+out.physicalConverged = physicalConverged;
+out.physicalStatus = physicalStatus;
 out.inflowModel = loads.inflowModel;
 out.inducedVelocityField = loads.viField;
 out.inducedVelocityFieldMin = loads.viFieldMin;
@@ -185,7 +237,10 @@ out.inducedVelocityFieldAzimuthMeanError = loads.viFieldAzimuthMeanError;
 out.inducedVelocityFieldPsi = loads.psi;
 out.inducedVelocityFieldRadius = loads.rMid;
 out.iterations = iter;
+% Backward-compatible numerical flag. Physical acceptance must use
+% out.physicalConverged and out.physicalStatus.
 out.coupledConverged = coupledConverged;
+out.numericalConverged = coupledConverged;
 out.flap = flapInfo;
 out.F = Fbody;
 out.M = Mbody;

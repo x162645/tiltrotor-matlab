@@ -229,6 +229,8 @@ credibility.commandAppliedDifference = commandAppliedDifference;
 credibility.trimVariables = zTrim;
 credibility.trimResidual = residualBase;
 credibility.trimConverged = trimReport.converged;
+credibility.physicalConverged = trimReport.physicalConverged;
+credibility.physicalStatus = trimReport.physicalStatus;
 credibility.pointReproduction = struct( ...
     'maxStateDifference', pointStateDifference, ...
     'maxControlDifference', pointControlDifference, ...
@@ -310,7 +312,7 @@ if any(z < definition.bounds(:,1)) || any(z > definition.bounds(:,2))
     return;
 end
 try
-    [~, ~, residual, ~, xdot, ~, allocation] = ...
+    [~, ~, residual, ~, xdot, eomOut, allocation] = ...
         evaluate_trim_definition_point(condition, definition, z, P);
 catch ME
     if is_diagnostic_domain_error(ME)
@@ -327,7 +329,8 @@ if ~isempty(allocation)
         return;
     end
 end
-legal = is_real_finite(residual) && is_real_finite(xdot);
+legal = is_real_finite(residual) && is_real_finite(xdot) && ...
+    eomOut.physicalConverged;
 end
 
 function items = make_margin_items(z, allocation, definition, P)
@@ -373,6 +376,9 @@ failReasons = {};
 cautionReasons = {};
 if ~trimReport.converged
     failReasons{end+1} = 'TRIM_NOT_CONVERGED';
+end
+if ~trimReport.physicalConverged
+    failReasons{end+1} = trimReport.physicalStatus;
 end
 if ~is_real_finite(xTrim) || ~is_real_finite(uTrim) || ...
         ~is_real_finite(residual) || ...

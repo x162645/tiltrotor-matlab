@@ -11,7 +11,13 @@ if nargin < 3
     opts = struct();
 end
 validate_condition(condition);
-mode = get_option(opts, 'mode', select_mode(condition.betaM));
+if ~isfield(opts,'mode') || isempty(opts.mode)
+    error('trim_berger13_symmetric:ExplicitModeRequired', ...
+        ['opts.mode is required. The three longitudinal trim definitions ' ...
+         'are not selected implicitly from betaM because internal handoff ' ...
+         'continuity has not been established.']);
+end
+mode = opts.mode;
 definition = make_trim_definition(mode, condition, P13.base);
 if isfield(opts, 'initialValues')
     initialValues = opts.initialValues(:);
@@ -110,6 +116,9 @@ report.jacobianStepVariation = diagnostics.jacobianStepVariation;
 report.minimumUnknownMarginFraction = diagnostics.minimumMargin;
 report.activeLimits = diagnostics.activeLimits;
 report.finiteReal = point.finiteReal;
+report.physicalConverged = point.physicalConverged;
+report.physicalBranchSupported = point.physicalBranchSupported;
+report.physicalStatus = point.physicalStatus;
 report.appliedControls = applied_controls(point, P13);
 report.commandAppliedDifference = ...
     max(abs(report.appliedControls-uTrim));
@@ -197,6 +206,9 @@ if ~point.finiteReal || any(~isfinite(point.x13)) || ...
         any(~isfinite(point.u10Torque))
     status = 'NONPHYSICAL';
     reasons{end+1,1} = 'point contains non-finite, complex, or invalid values';
+elseif ~point.physicalConverged
+    status = 'UNSUPPORTED_PHYSICAL_BRANCH';
+    reasons{end+1,1} = point.physicalStatus;
 elseif ~baseReport.solverConverged || ...
         norm(point.residual) >= P13.base.trim.residualTolerance || ...
         max(abs(point.xdot13([1:6,10:13]))) >= ...
@@ -298,6 +310,7 @@ end
 
 function score = candidate_score(report)
 score = report.residualNorm + 1e3*double(~report.solverConverged) + ...
+    1e3*double(~report.physicalConverged) + ...
     1e2*double(report.atLimit || ~report.withinLimits);
 if ~isfinite(score)
     score = Inf;
@@ -310,18 +323,6 @@ for k = 1:numel(names)
     if any(strcmp(names{k},{'udot','vdot','wdot'}))
         scale(k) = P.env.g;
     end
-end
-end
-
-function mode = select_mode(betaM)
-if betaM < pi/3
-    if betaM > pi/6
-        mode = 'conversion_longitudinal';
-    else
-        mode = 'helicopter_longitudinal';
-    end
-else
-    mode = 'airplane_longitudinal';
 end
 end
 

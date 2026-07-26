@@ -88,10 +88,10 @@ def main() -> None:
         failures: list[float] = []
         for row in rows:
             x = float(row["collective_deg"])
-            # Preserve the PR #57 comparison gate: collective >= 4 deg and a
-            # successful solver return. This deliberately retains the 4 deg
-            # negative-thrust mismatch of the current model as evidence
-            # instead of silently excluding it.
+            # Compare collective >= 4 deg only when the producing model marks
+            # the point successful. Raw negative-thrust loads remain in the
+            # model CSV as evidence, but the current production path now
+            # rejects them as an unsupported physical branch.
             if (
                 x >= 4
                 and row["success"] == "1"

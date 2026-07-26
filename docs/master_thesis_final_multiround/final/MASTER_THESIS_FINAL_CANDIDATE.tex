@@ -43,7 +43,7 @@
 
 为表示短舱运动历史和左右不同步，在九状态刚体模型上增加左右短舱角及角速度，形成 十三状态规定运动模型。模型包含短舱二阶命令跟踪、移动质量、执行机构反作用力矩和 转子陀螺接口，并用对称/差动坐标区分纵向与横航向载荷通道。可信度分析由程序校核、 数值收敛、模型形式比较和公开试验图线关联组成；NASA TM-86854悬停曲线经过两次独立 数字化后用于未调参比较。
 
-结果表明，纵向等效参数联合优化模型在9个离散工况中有8个满足本文可信度门禁； 75°/40 m/s因低尾翼动压、俯仰力矩不足和升降舵触界而保留为失败点。三个可信代表点中， 对称短舱小扰动以纵向响应为主，差动小扰动均产生横侧向—航向响应；相邻时间步的最大 峰值变化为1.5248\%。NASA悬停曲线关联中，两条旋翼路径的推力斜率方向与试验一致， 但 \(C_T/\sigma\) 的平均绝对误差约为0.063至0.064，存在显著幅值偏差。
+结果表明，纵向等效参数联合优化模型在9个离散工况中有8个满足本文可信度门禁； 75°/40 m/s因低尾翼动压、俯仰力矩不足和升降舵触界而保留为失败点。三个可信代表点中， 对称短舱小扰动以纵向响应为主，差动小扰动均产生横侧向—航向响应；相邻时间步的最大 峰值变化为1.5248\%。NASA悬停曲线关联中，两条旋翼路径的推力斜率方向与试验一致， 但 \(C_T/\sigma\) 的平均绝对误差约为0.0641至0.0643，存在显著幅值偏差。
 
 本文结果支持概念模型在限定工况下的内部一致性、短舱载荷通道辨识和部件级公开数据 关联，不支持XV-15型号复现、飞行安全包线或完整伺服—铰链—结构耦合结论。
 
@@ -63,7 +63,7 @@ Public information is insufficient to uniquely identify a complete tiltrotor air
 
 Left and right nacelle angles and rates are added to the nine rigid-body states to represent motion history and actuator asymmetry. The resulting thirteen-state prescribed-motion model includes second-order command tracking, moving masses, actuator reaction moments, and an interface for rotor gyroscopic moments. Symmetric and differential coordinates separate the principal longitudinal and lateral-directional load paths. Credibility evidence combines code verification, numerical convergence, model-form comparison, and correlation with publicly available test curves. The hover data in NASA TM-86854 were digitized twice independently and were not used for tuning.
 
-Eight of nine discrete cases satisfy the adopted trim-credibility gates after joint optimization of effective longitudinal parameters. The 75-deg/40-m/s case remains infeasible because of low tail dynamic pressure, insufficient pitching moment, and elevator saturation. At three credible operating points, small symmetric nacelle inputs mainly excite longitudinal motion, whereas differential inputs produce lateral-directional responses. The maximum peak change between adjacent time steps is 1.5248\%. Both rotor implementations reproduce the positive slope of the public hover curve, but their mean absolute errors in \(C_T/\sigma\) are approximately 0.063--0.064, revealing a substantial amplitude bias.
+Eight of nine discrete cases satisfy the adopted trim-credibility gates after joint optimization of effective longitudinal parameters. The 75-deg/40-m/s case remains infeasible because of low tail dynamic pressure, insufficient pitching moment, and elevator saturation. At three credible operating points, small symmetric nacelle inputs mainly excite longitudinal motion, whereas differential inputs produce lateral-directional responses. The maximum peak change between adjacent time steps is 1.5248\%. Both rotor implementations reproduce the positive slope of the public hover curve, but their mean absolute errors in \(C_T/\sigma\) are approximately 0.0641--0.0643, revealing a substantial amplitude bias.
 
 The evidence supports the model's internal consistency. It also supports mechanism-based nacelle analysis and correlation of component-level outputs with public data over the stated conditions. It does not establish an XV-15 reproduction, a flight-safety envelope, or a fully coupled servo-hinge-structure model.
 
@@ -346,7 +346,7 @@ c_\phi s_\theta c_\psi+s_\phi s_\psi&c_\phi s_\theta s_\psi-s_\phi c_\psi&c_\phi
 
 轮毂局部速度由机体平动速度与角速度叉乘力臂叠加得到，再投影到旋翼轴向和盘面基。叶素切向速度包含旋转速度和盘内来流的一阶方位项，垂向速度包含轴向来流、诱导速度、挥舞角和挥舞角速度贡献。采用atan2计算入流角以保留象限，零转速、零空速和极小分母均由显式适用性检查处理，不能把非有限结果替换为零。
 
-正式旋翼路径采用稳态一阶谐波挥舞与诱导速度耦合迭代。南航公开公式参考路径则严格保留公开式的主链，并把翼型关系、坐标相位、结构质量分布和数值求解器标记为标准闭合或同参数输入。两条路径共享几何和气动参数时的比较可以揭示数学实现差异，却不能恢复作者未公开的原程序。负推力与风车制动分支未闭合时参考路径显式失败。
+正式旋翼路径采用稳态一阶谐波挥舞与诱导速度耦合迭代。南航公开公式参考路径则严格保留公开式的主链，并把翼型关系、坐标相位、结构质量分布和数值求解器标记为标准闭合或同参数输入。两条路径共享几何和气动参数时的比较可以揭示数学实现差异，却不能恢复作者未公开的原程序。两条路径均只支持正推力动量闭合；负推力载荷保留作诊断，但 \texttt{physicalConverged=false}，不能进入可信配平。
 
 叶素升阻力先分解为轴向和切向分力，经径向和方位积分得到推力、面内力及轴矩。旋翼轴系载荷经短舱姿态矩阵转到机体系；轮毂力臂矩按从实际重心指向轮毂的位置向量与机体系力的叉乘计算。左右反扭矩由旋向参数决定，不能简单令左右所有分量同号或异号。
 
@@ -364,7 +364,7 @@ c_\phi s_\theta c_\psi+s_\phi s_\psi&c_\phi s_\theta s_\psi-s_\phi c_\psi&c_\phi
 
 控制架构包括对称总距、差动总距、对称纵向周期变距和差动纵向周期变距。正对称纵向周期变距定义为左右盘面法向量共同向规定盘内方向倾斜；差动纵向周期变距使两侧盘面产生相反纵向倾斜。外部控制先分配到左右旋翼，旋翼内部再按旋向映射一阶谐波相位。
 
-模型不允许用数值截断掩盖物理分支缺失。任何NaN、Inf、复数、迭代不收敛、越界插值或负推力未闭合都必须作为显式状态进入证据矩阵。保护项只防止未定义运算，不把保护后的点自动判为可信。
+模型不允许用数值截断掩盖物理分支缺失。任何NaN、Inf、复数、迭代不收敛、越界插值或负推力未闭合都必须作为显式状态进入证据矩阵。旋翼输出区分数值序列收敛 \texttt{coupledConverged} 与物理闭合 \texttt{physicalConverged}，后者还要求正推力分支受支持且原始推力—动量残差达标。保护项只防止未定义运算，不把保护后的点自动判为可信。
 
 \section{左右旋翼模型的局部速度与几何}
 
@@ -461,7 +461,7 @@ T=2\rho A v_i\sqrt{V_\parallel^2+v_i^2+V_\perp^2},
 v_i^{(n+1)}=(1-\gamma)v_i^{(n)}+\gamma\mathcal G(T^{(n)},\mathbf V_h),
 \end{equation}
 
-并显式报告迭代失败，而不把 NaN 或负推力分支改写为零。一阶谐波挥舞写成
+并显式报告迭代失败。\texttt{max(T,0)} 仅定义当前正推力 Eq.13 的诱导速度目标；最终仍以未截断叶素推力复算原始动量闭合残差。负推力载荷不改写为零，但由于尚无负推力/风车闭合，必须返回“不支持的物理分支”，不得作为成功点。一阶谐波挥舞写成
 
 \begin{equation}
 \beta_f(\psi)=\beta_0+a_{1c}\cos\psi+b_{1s}\sin\psi,
@@ -532,7 +532,7 @@ s(\zeta)=6\zeta^5-15\zeta^4+10\zeta^3.
 \mathbf F_w=(1-s)\mathbf F_{\rm liftline}+s\mathbf F_{\rm normal}.
 \end{equation}
 
-本文 \(\chi_0=0.35\)、\(\Delta\chi=0.15\) 均属概念模型设定，连续化只消除人工硬 切换，不代表该区间已经试验辨识。尾流覆盖面积记为
+这里的 \(\chi\) 只表示机翼局部法向流比，对应代码中的 \texttt{normalFlowRatioActual}；转换配平的虚拟俯仰命令使用 \texttt{pitchCommand}，二者没有共享变量、传参或覆盖关系。本文 \(\chi_0=0.35\)、\(\Delta\chi=0.15\) 均属概念模型设定，连续化只消除人工硬 切换，不代表该区间已经试验辨识。尾流覆盖面积记为
 
 \begin{equation}
 S_{{\rm slip},h}=\operatorname{clip}\!\left(\mathcal A(\mu_h,\beta_h),0,S_h\right),
@@ -613,7 +613,7 @@ s(0)=0,\quad s(1)=1,\quad s'(0)=s'(1)=s''(0)=s''(1)=0.
 
 这减小了数值线性化跨越模型分支时的人为跳变。连续并不等于物理已验证；混合中心和 半宽仍是模型参数。对配平和线性化而言，函数连续性让残差雅可比更可解释，但不能修复 系数本身缺乏数据的问题。
 
-负推力、诱导迭代失败、NaN、Inf和非预期复数均必须沿调用链返回。配平求解器不能把 这些点当作高惩罚但可接受的平衡，更不能以零载荷替代。保留失败点使可行区边界能够 区分“控制触界”“数值失败”和“模型适用性不足”三类原因。
+负推力、诱导迭代失败、NaN、Inf和非预期复数均必须沿调用链返回。对正推力分支，配平门禁同时要求数值序列收敛与原始诱导闭合残差达标；对负推力分支，原载荷可以用于诊断，但在尚无风车/自转闭合时必须拒绝。配平求解器不能把这些点当作高惩罚但可接受的平衡，更不能以零载荷替代。保留失败点使可行区边界能够区分“控制触界”“数值失败”和“模型适用性不足”三类原因。
 
 \section{控制输入、左右分配与可辨识通道}
 
@@ -681,7 +681,7 @@ $$\min_{\mathbf{z}}\left\|\mathbf{W}_r\mathbf{r}(\mathbf{z})\right\|_2^2, \qquad
 
 其中 $\mathbf{z}$ 包括规定工况下的姿态和控制未知量，$\mathbf{W}_r$ 用于平衡平动加速度、角加速度和运动学约束的量级。求解器退出成功只说明某次数值迭代满足内部停止条件，不能自动说明物理可信。
 
-未知量和残差按物理尺度归一化。控制上下界保持可追溯，触界点单独标记。转换走廊计算采用相邻工况连续延拓和多初值策略，但多初值不能替代残差、边界与条件数检查。工况量较大时先做代表点和局部检查，再扩大扫描范围。
+未知量和残差按物理尺度归一化。控制上下界保持可追溯，触界点单独标记。相邻工况初值延拓只在同一个显式配平定义内使用；直升机、转换和固定翼三种纵向配平定义不得仅按短舱角隐式切换。当前正式网格是显式指定模式的离散可行性证据，不构成跨模式边界的连续控制路径。多初值不能替代残差、边界与条件数检查。工况量较大时先做代表点和局部检查，再扩大扫描范围。
 
 可信配平点必须同时满足：残差有限且小于规定门槛；未知量不出现非实数；控制量未违反边界；数值雅可比未达到病态判据；回代完整非线性模型后状态导数保持一致。配平失败点与数值病态点不进入定量动态结论。本文使用“可信配平点”“配平失败点”和“数值病态点”三个中文类别。
 
@@ -1181,9 +1181,9 @@ NASA悬停台架曲线满足旋翼部件、总距和无量纲推力的基本可�
 
 \section{NASA 悬停旋翼试验数据关联复核}
 
-两次独立数字化的逐点差不超过 \(0.003\)。在共同有效总距区间内，当前正式旋翼模型 使用7个点，\(C_T/\sigma\) 的 MAE 为0.06324、RMSE为0.06332、NMAE为0.4085， 最大绝对误差为0.06640，平均绝对相对误差为0.4926。试验斜率为 0.008872/deg，模型斜率为0.008533/deg，方向一致；6°、8°和10°三个计算点失败或 不满足有效门禁。南航公开公式参考模型使用7个有效点，MAE为0.06405、RMSE为0.06408、 NMAE为0.5893，0°至8°共五个点失败。
+两次独立数字化的逐点差不超过 \(0.003\)。在共同有效总距区间内，当前正式旋翼模型 使用6个点，\(C_T/\sigma\) 的 MAE 为0.06434、RMSE为0.06437、NMAE为0.7229， 最大绝对误差为0.06640，平均绝对相对误差为0.3982。试验斜率为 0.009030/deg，模型斜率为0.009220/deg，方向一致；0°、2°、4°、6°、8°和10°六个计算点失败或 不满足有效门禁。南航公开公式参考模型使用7个有效点，MAE为0.06405、RMSE为0.06408、 NMAE为0.5893，0°至8°共五个点失败。
 
-该结果显示两条未调参路径能够给出同方向推力增长趋势，却存在约0.063至0.064的系统 幅值偏差。偏差远大于数字化不确定度，不能归因于取点误差。更合理的解释是桨叶几何、 翼型、扭转、损失修正及试验构型不一致。最终证据表述为“基于公开试验图线的部件级 外部数据关联，趋势一致但幅值偏差显著”，不称为型号验证。
+该结果显示两条未调参路径能够给出同方向推力增长趋势，却存在约0.0641至0.0643的系统 幅值偏差。偏差远大于数字化不确定度，不能归因于取点误差。更合理的解释是桨叶几何、 翼型、扭转、损失修正及试验构型不一致。最终证据表述为“基于公开试验图线的部件级 外部数据关联，趋势一致但幅值偏差显著”，不称为型号验证。
 
 \begin{figure}[htbp]
 \centering
@@ -1199,7 +1199,7 @@ NASA悬停台架曲线满足旋翼部件、总距和无量纲推力的基本可�
 
 \section{最终代码回归与程序校核}
 
-冻结基线在MATLAB R2021a上执行26项完整回归，26项均满足现有判据，耗时728.07 s。 覆盖范围包括质量惯量、短舱端点、旋翼总距单调性、左右对称、南航公开公式闭合、机翼 速度链、旋翼力矩链、一阶谐波挥舞、气动部件、控制架构、十三状态接口/配平/线性化/ 研究时域、通用配平来源、控制分配、可信度诊断、机翼连续混合、速度平方律、旋翼网格 和线性化有限值。标准错误日志为空，没有在报告中发现NaN、Inf或非预期复数。
+本次独立复核分支在MATLAB R2021a上执行28项完整回归，28项均满足现有判据，耗时1777.31 s。 覆盖范围包括质量惯量、短舱端点、旋翼总距单调性、左右对称、南航公开公式闭合、旋翼 数值/物理收敛分离、机翼速度链、旋翼力矩链、一阶谐波挥舞、气动部件、控制架构、十三状态接口/配平/线性化/ 研究时域、通用配平来源、模式边界审计、控制分配、可信度诊断、机翼连续混合、速度平方律、旋翼网格 和线性化有限值。标准错误日志为空，没有在报告中发现NaN、Inf或非预期复数。
 
 回归的意义是防止论文重组与分析脚本改变已有模型行为，并确认冻结数据可以由当前代码 读取。测试集合由项目内部定义，其通过不构成外部验证。最终文档提交还需在最终HEAD 重复同一回归，以排除中间分析脚本和排版文件对路径或接口的意外影响。
 
@@ -1207,7 +1207,7 @@ NASA悬停台架曲线满足旋翼部件、总距和无量纲推力的基本可�
 
 旋翼网格检查同时比较推力、扭矩和关键面内力；中心差分使用不同相对步长复算；时域响应 使用相邻时间步比较峰值。三类检查分别约束空间积分、局部导数和时间积分，不能用其中 一种替代另外两种。迭代失败点、负推力分支和控制触界点保留在结果表中。
 
-外部悬停关联的当前旋翼在6°、8°、10°处失败，南航参考路径在0°至8°失败。这些点 没有参与共同有效区间的误差平均，但在失败计数中保留。75°/40 m/s的整机配平失败和 75°/80 m/s南航参考旋翼失败同样被保留。失败不是论文质量缺陷的同义词；隐去失败才会 使可用域和误差指标失真。
+外部悬停关联的当前旋翼在0°至10°处失败，其中4°是数值序列收敛但物理闭合不成立；南航参考路径在0°至8°失败。这些点 没有参与共同有效区间的误差平均，但在失败计数中保留。75°/40 m/s的整机配平失败和 75°/80 m/s南航参考旋翼失败同样被保留。失败不是论文质量缺陷的同义词；隐去失败才会 使可用域和误差指标失真。
 
 \section{同参数旋翼实现比较}
 
@@ -1598,12 +1598,12 @@ k\,\Delta\mathbf x(t;\,\Delta\beta_c).
 
 速度升至60 m/s后，机翼和平尾动压增加，联合优化模型得到 \(\delta_e=-15.8305^\circ\)，归一化控制余度约0.1042，未触及边界。该点相较40 m/s 更接近“控制权限随动压恢复”的解释，但仍依赖等效纵向参数。联合优化共得到9点中的 8个可信配平；优化目标使用模型内部残差和约束，没有使用NASA悬停曲线或XV-15整机 试验量，因此不是外部数据校准。
 
-配平走廊是离散工况和连续延拓共同支持的概念模型可行区，不等于真实飞行转换走廊。 75°/80 m/s在联合优化正式旋翼路径可可信配平，而南航参考旋翼路径在相同条件下失败， 说明高短舱角前飞结论对旋翼模型形式敏感。
+配平结果是由显式模式标签定义的离散概念模型可行性网格，不等于真实飞行转换走廊。内部边界专项审计在 45 m/s、30° 两侧得到可信解，但最小扰动下直接执行量/状态角最大跳变约为 4.50°；60° 两侧的旋翼物理闭合虽通过，整机配平残差门禁均未通过，诊断量最大跳变约为 11.67°。因此现有证据不能证明三种配平定义在 30°/60° 处连续衔接。75°/80 m/s在联合优化正式旋翼路径可可信配平，而南航参考旋翼路径在相同条件下失败，说明高短舱角前飞结论对旋翼模型形式敏感。
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.86\textwidth]{figures/figure_21.png}
-\caption{加密速度短舱角转换走廊}
+\caption{离散速度—短舱角配平可行性网格（归档图名保留“加密转换走廊”）}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -1647,7 +1647,7 @@ k\,\Delta\mathbf x(t;\,\Delta\beta_c).
 
 \section{配平可行区与稳健性分类}
 
-离散网格给出九点中8点可信，但“8/9”不说明未采样区域。加密走廊用于检查相邻速度/ 短舱角点之间是否出现控制突跳或求解分支切换。若连续延拓需要跨过未收敛、负推力或 边界敏感区，则可行区不能连成一条物理转换路径。
+离散网格给出九点中8点可信，但“8/9”不说明未采样区域，也不证明相邻模式定义之间连续。加密网格记录相邻采样点的可行性；新增 30°/60° 双侧扰动审计才直接检查定义交接。30° 的可信解间存在约 4.50° 直接量跳变；60° 双侧整机配平均未通过残差门禁，且诊断量相差约 11.67°。当前网格不能连成一条已证实连续的物理转换路径。
 
 结论稳健性分为三类。第一类是坐标和几何结构决定的结论，如短舱端点、力臂叉乘和 对称/差动定义；第二类是在参数扰动和旋翼替换下仍保持的趋势，如对称与差动通道； 第三类是对模型形式或等效参数敏感的定量量，如配平舵角、特征根和峰值。第三类结果 必须与具体参数集、工况和门禁一起引用。
 
@@ -1691,7 +1691,7 @@ k\,\Delta\mathbf x(t;\,\Delta\beta_c).
 
 \section{本章小结}
 
-本文完成统一部件模型、可信配平、左右短舱状态扩展和分层可信度分析。核心定量结果是 联合优化模型8/9可信点、代表响应时间步最大变化1.5248\%，以及悬停曲线 \(C_T/\sigma\) 约0.063—0.064的平均绝对偏差。三项贡献均在通用低阶模型范围内 成立；整机外部定量验证、真实执行机构辨识、非定常干扰和双向结构耦合仍待完成。
+本文完成统一部件模型、可信配平、左右短舱状态扩展和分层可信度分析。核心定量结果是 联合优化模型8/9可信点、代表响应时间步最大变化1.5248\%，以及悬停曲线 \(C_T/\sigma\) 约0.0641—0.0643的平均绝对偏差。三项贡献均在通用低阶模型范围内 成立；整机外部定量验证、真实执行机构辨识、非定常干扰和双向结构耦合仍待完成。
 
 \appendix
 \chapter{公式—代码—参数—测试追溯说明}
@@ -1724,7 +1724,7 @@ k\,\Delta\mathbf x(t;\,\Delta\beta_c).
 
 NASA TM-86854图25数字化采用PDF第54页（原文第52页），保存原始页和截图。两次取点 的横轴均为总距degree，纵轴为 \(C_T/\sigma\)。采用值取两次均值，比较门禁要求模型 求解成功且总距不低于4°。失败点保留在计数中，不进入MAE分子。改变门禁、插值或失败 处理会改变有效点数，必须同时报告新旧口径。
 
-当前正式旋翼的共同有效点数为7，失败点为6°、8°、10°；南航公开公式参考旋翼的 有效点数为7，失败点为0°、2°、4°、6°、8°。最终采用的MAE分别为0.0632355和 0.0640525，RMSE分别为0.0633217和0.0640844。任何图题和摘要引用均以这些二次复核值 为准。
+当前正式旋翼的共同有效点数为6，失败点为0°、2°、4°、6°、8°、10°；南航公开公式参考旋翼的 有效点数为7，失败点为0°、2°、4°、6°、8°。最终采用的MAE分别为0.0643402和 0.0640525，RMSE分别为0.0643727和0.0640844。任何图题和摘要引用均以这些二次复核值 为准。
 
 \section{结果表的使用原则}
 

@@ -81,6 +81,17 @@ info.components = actualComponents;
 info.massProperties = massProperties13;
 info.rotorLeft = rotorLoads.rotorLeft;
 info.rotorRight = rotorLoads.rotorRight;
+leftRotorData = rotorLoads.rotorLeft.independent.data;
+rightRotorData = rotorLoads.rotorRight.independent.data;
+info.physicalConverged = leftRotorData.physicalConverged && ...
+    rightRotorData.physicalConverged;
+info.physicalBranchSupported = ...
+    leftRotorData.physicalBranchSupported && ...
+    rightRotorData.physicalBranchSupported;
+info.physicalStatus = combined_rotor_status( ...
+    leftRotorData, rightRotorData);
+info.physicalValidity.rotorLeft = rotor_validity(leftRotorData);
+info.physicalValidity.rotorRight = rotor_validity(rightRotorData);
 info.wingIndependent = wingIndependent;
 info.wingIndependent.average = wingAverage;
 info.wingIndependent.deltaF = wingDeltaF;
@@ -106,6 +117,27 @@ end
 if abs(lateralApplied) > 1e-12
     info.warnings{end+1,1} = ['lateral cyclic changes namespace-local rotor ' ...
         'loads; baseline wing slipstream inputs remain lateral-free'];
+end
+
+function validity = rotor_validity(rotor)
+validity.numericalConverged = rotor.coupledConverged;
+validity.flapConverged = rotor.flapConverged;
+validity.closureResidualSatisfied = rotor.closureResidualSatisfied;
+validity.physicalBranchSupported = rotor.physicalBranchSupported;
+validity.physicalConverged = rotor.physicalConverged;
+validity.status = rotor.physicalStatus;
+validity.inducedClosureResidual = rotor.inducedClosureResidual;
+end
+
+function status = combined_rotor_status(left,right)
+if left.physicalConverged && right.physicalConverged
+    status = 'PHYSICAL_CONVERGED';
+elseif strcmp(left.physicalStatus,right.physicalStatus)
+    status = left.physicalStatus;
+else
+    status = sprintf('LEFT_%s__RIGHT_%s', ...
+        left.physicalStatus,right.physicalStatus);
+end
 end
 
 function comp = pack_component(name,loads,data)

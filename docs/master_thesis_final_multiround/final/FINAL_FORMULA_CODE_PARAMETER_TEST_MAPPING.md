@@ -18,14 +18,14 @@
 |入流角与攻角|`phi=atan2(UP,UT)`、`alpha=theta-phi`|叶素理论|`model/rotor_model_bemt.m`|`phiInflow,alpha`|标准理论|rotor checks|已核实|
 |叶素升阻力|`dL=0.5rho W^2 c Cl dr`|叶素理论|`model/rotor_model_bemt.m`|`dL,dD`|假设极曲线|grid checks|工程假设|
 |推力与扭矩积分|方位/半径数值积分|NUAA 式(9)--(11)附近|`model/rotor_model_bemt.m`|`blade_loads`|公开结构+数值离散|grid convergence|部分核实|
-|诱导速度|动量闭合迭代|NUAA 公开公式链|`model/rotor_model_bemt.m`|`viMean`|公开结构+工程闭合|induced convergence|部分核实|
+|诱导速度|正推力动量闭合迭代；最终复算未截断推力残差|NUAA 公开公式链|`model/rotor_model_bemt.m`|`viMean,inducedClosureResidual,physicalConverged`|公开结构+工程闭合；无量纲相对残差门限 \(2\times10^{-4}\) 为数值审计判据；负推力/风车分支缺失|`check_rotor_physical_convergence`|正推力部分核实；负推力明确不支持|
 |一阶谐波入流|`lambda=lambda0+lambda1c cos psi+...`|NUAA 式(12)|`model/rotor_model_bemt.m`|谐波入流项|公开公式|Eq12 checks|已核实|
 |稳态一阶挥舞|`beta=beta0+beta1c cos psi+beta1s sin psi`|NUAA 式(13)|`model/rotor_model_bemt.m`|`flapState`|公开形式+简化闭合|flapping checks|部分核实|
 |反扭矩与旋向|`M_Q=-rotDir Q eT`|旋翼力矩平衡|`model/rotor_model_bemt.m`|`rotDir,Q`|标准理论|mirror/torque tests|已核实|
 |机翼局部来流|`Vr=V+omega x r+Vwake`|NUAA 式(17)|`model/wing_model.m`|`Vlocal`|公开公式|Eq17 checks|已核实|
 |尾流覆盖|式(16)面积关系+物理限界|NUAA 式(16)|`model/wing_model.m`|`SslipHalf`|公开式+代码限界|Eq16 checks|部分核实|
 |机翼升阻力|`L=qSCL,D=qSCD`|低阶气动理论|`model/wing_model.m`|`CL,CD,Cm`|概念/等效参数|aero component tests|工程假设|
-|near-normal 混合|五次 smootherstep|代码连续化设计|`model/wing_model.m`|`branchWeight`|假设模型参数|blend continuity|工程假设|
+|near-normal 混合|局部法向流比上的五次 smootherstep|代码连续化设计|`model/wing_model.m`|`normalFlowRatioActual,branchWeight`|假设模型参数；与配平 `pitchCommand` 无共享变量或传参|blend continuity|工程假设|
 |机身载荷|动压与低阶系数|无同构试验源|`model/fuselage_model.m`|气动系数|概念参数|aero component tests|工程假设|
 |平尾/升降舵|局部来流、下洗和舵效|低阶尾翼理论|`model/horizontal_tail_model.m`|`incidence,downwashAlpha,CLelevator`|假设/等效参数|aero/trim tests|工程假设|
 |双垂尾/方向舵|侧滑与双尾合成|低阶尾翼理论|`model/vertical_tail_model.m`|`CYbeta,CYrudder`|概念参数|aero/mirror tests|工程假设|
