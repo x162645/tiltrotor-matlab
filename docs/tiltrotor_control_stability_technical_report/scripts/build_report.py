@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Build the independent control/stability technical report.
+"""Build the editable Word control/stability technical report.
 
 The script treats MATLAB CSV files as the numerical source of truth, retains
 the validated model-principle chapters from the historical report, and builds
-new Markdown, XeLaTeX and editable Word deliverables.  It does not change any
-production model or default parameter.
+one editable Word deliverable.  It does not change any production model or
+default parameter.
 """
 
 from __future__ import annotations
@@ -38,12 +38,7 @@ HISTORICAL_MD = (
     / "MASTER_THESIS_FINAL_CANDIDATE.md"
 )
 PANDOC = Path(r"C:\Program Files\Pandoc\pandoc.exe")
-MD_OUT = REPORT / "TECHNICAL_REPORT.md"
-DOCX_OUT = REPORT / "TECHNICAL_REPORT_EDITABLE.docx"
-TEX_DIR = REPORT / "xelatex_project"
-TEX_OUT = TEX_DIR / "main.tex"
-BIB_OUT = TEX_DIR / "references.bib"
-BUILD_LOG = REPORT / "logs" / "REPORT_SOURCE_BUILD.log"
+DOCX_OUT = REPORT / "TECHNICAL_REPORT_EDITABLE_REVISED.docx"
 
 
 REQUIRED_CSV = [
@@ -105,7 +100,7 @@ def md_table(data: list[dict[str, str]], columns: list[tuple[str, str]], limit=N
             value = row.get(key, "")
             value = {
                 "CREDIBLE": "可信",
-                "FAILED": "未满足可信度判据",
+                "FAILED": "不可行",
                 "VALID_CENTRAL_DIFFERENCE": "有效中心差分",
                 "true": "是",
                 "false": "否",
@@ -114,12 +109,171 @@ def md_table(data: list[dict[str, str]], columns: list[tuple[str, str]], limit=N
                 "NINE_STATE_PHYSICAL_CONTROL": "九状态直接物理操纵",
                 "THIRTEEN_STATE_TORQUE": "十三状态短舱力矩输入",
                 "THIRTEEN_STATE_ANGLE_COMMAND": "十三状态短舱角命令输入",
+                "FULL_CROSSCHECK": "完整交叉核查",
+                "MIXED_OR_UNCERTAIN_MODE": "混合或不确定模态",
+                "helicopter_longitudinal": "直升机模式纵向配平",
+                "conversion_longitudinal": "转换模式纵向配平",
+                "airplane_longitudinal": "飞机模式纵向配平",
+                "collective": "对称总距",
+                "diffCollective": "差动总距",
+                "cyclicLong": "对称纵向周期变距",
+                "diffCyclic": "差动纵向周期变距",
+                "aileron": "副翼",
+                "elevator": "升降舵",
+                "rudder": "方向舵",
+                "Cl_diffCollective": "滚转力矩系数对差动总距的导数",
+                "Cn_diffCollective": "偏航力矩系数对差动总距的导数",
+                "Cm_cyclicLong": "俯仰力矩系数对对称纵向周期变距的导数",
+                "Cl_diffCyclic": "滚转力矩系数对差动纵向周期变距的导数",
+                "Cn_diffCyclic": "偏航力矩系数对差动纵向周期变距的导数",
             }.get(value, value)
             if re.fullmatch(r"[-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?", value or ""):
                 value = fmt(value)
             values.append((value or "").replace("|", r"\|"))
         body.append("| " + " | ".join(values) + " |")
     return "\n".join([head, rule, *body])
+
+
+def normalize_report_prose(markdown: str) -> str:
+    replacements = {
+        "`FULL_CROSSCHECK`": "完整交叉核查（字段值 FULL_CROSSCHECK）",
+        "`MIXED_OR_UNCERTAIN_MODE`": "混合或不确定模态（分类标签 MIXED_OR_UNCERTAIN_MODE）",
+        "`physicalConverged=false`": "物理闭合标志为“否”（字段 physicalConverged=false）",
+        "`coupledConverged`": "数值序列收敛标志（coupledConverged）",
+        "`physicalConverged`": "物理闭合标志（physicalConverged）",
+        "`normalFlowRatioActual`": "局部法向流比字段（normalFlowRatioActual）",
+        "`pitchCommand`": "虚拟俯仰命令字段（pitchCommand）",
+        "`max(T,0)`": "正推力截断表达式 max(T,0)",
+        "`diffCyclic`": "历史接口名 diffCyclic",
+        "`atLimit`": "触界标志（字段 atLimit）",
+        "`COLL`": "NASA 字段 COLL",
+        "Berger文献": "Berger 文献",
+        "本文采用V形验模思想": "本文采用 V 形验模思想",
+        "模型内部统一使用SI制": "模型内部统一使用 SI 制",
+        "任何NaN、Inf": "任何 NaN、Inf",
+        "机体系采用右手系，x_b 轴向前、y_b 轴向右、z_b 轴向下；": "机体系采用右手系：机体纵轴 x_b 向前、机体横轴 y_b 向右、机体垂轴 z_b 向下；",
+        "短舱角 β=0 表示旋翼轴接近垂直、处于直升机侧，β=π/2 表示旋翼轴接近机体纵轴、处于飞机侧。Berger 文献采用相反端点的角度记号，二者映射为 β=π/2-δ_nac，引用其结果时必须先执行该转换。": (
+            "短舱角为 0 rad 时，旋翼轴接近垂直、处于直升机侧；短舱角为 90° 时，旋翼轴接近机体纵轴、处于飞机侧。Berger 文献采用相反端点的角度记号，本报告角度与该文献角度的换算为“本报告角度 = 90° − Berger 文献角度”，引用其结果时必须先执行该转换。"
+        ),
+        "地面系到机体系的姿态由3-2-1欧拉角描述。本文不在接近 θ=±π/2 的奇异区域形成结论。": "地面系到机体系的姿态由 3-2-1 欧拉角描述。本文不在俯仰角接近 ±90° 的奇异区域形成结论。",
+        "这里 I 为关于实际整机重心、在机体系表达的完整对称惯量矩阵。": "上式中的惯量矩阵 I 为关于实际整机重心、在机体系表达的完整对称惯量矩阵。",
+        "给出，其中 c_bullet=cos(bullet)、s_bullet=sin(bullet)，角度单位为 rad。": "给出，其中 c_•=cos(•)、s_•=sin(•)，角度单位为 rad。",
+        "短舱角端点通过推力方向检查：β=0 时正推力主要沿 -z_b，\nβ=π/2 时主要沿 +x_b。重力端点通过水平姿态\ng_b=[0,0,g]^T 检查。": "短舱角端点通过推力方向检查：短舱角为 0 rad 时正推力主要沿机体垂轴负方向，短舱角为 90° 时正推力主要沿机体纵轴正方向。重力端点通过水平姿态下的机体系重力向量检查。",
+        "长度m、质量kg、速度m/s、力N、力矩N·m、惯量kg·m²、角度rad、\n角速度rad/s": "长度 m、质量 kg、速度 m/s、力 N、力矩 N·m、惯量 kg·m²、角度 rad、角速度 rad/s",
+        "以degree、rpm、英尺或磅力": "以 degree、rpm、英尺或磅力",
+        "载荷合成。短舱角端点、左右旋向和SI单位": "载荷合成。短舱角端点、左右旋向和 SI 单位",
+        "公开XV-15": "公开 XV-15",
+        "采用atan2计算": "采用 atan2 计算",
+        "但 物理闭合状态为 false": "但物理闭合状态为 false",
+        "旋翼输出区分数值序列收敛 数值序列收敛标志（coupledConverged） 与物理闭合 物理闭合标志（physicalConverged）": "旋翼输出区分数值序列收敛标志（coupledConverged）与物理闭合标志（physicalConverged）",
+        "h∈L,R": "h∈{L,R}",
+        "s_h∈-1,+1": "s_h∈{-1,+1}",
+        "盘面法向共同向 +e_D 倾斜": "盘面法向共同向 +e_D 方向倾斜",
+        "C_l=C_lαα": "C_l=C_lα α",
+        "自由流区和尾流区分别采用 V_∞,h 与\nV_slip,h": "自由流区和尾流区分别采用自由流速度 V_∞,h 与尾流区速度 V_slip,h",
+        "χ=|V_n|/max(||V||,V_ref)": "χ=|V_n|/max(||V||, V_ref)",
+        "这里的 χ 只表示机翼局部法向流比，对应代码中的 局部法向流比字段（normalFlowRatioActual）；转换配平的虚拟俯仰命令使用 虚拟俯仰命令字段（pitchCommand）": "机翼局部法向流比 χ 对应局部法向流比字段（normalFlowRatioActual）；转换配平的虚拟俯仰命令使用虚拟俯仰命令字段（pitchCommand）",
+        "历史接口名 历史接口名 diffCyclic": "历史接口名 diffCyclic",
+        "周期使两个盘面法向共同沿 +e_D 倾斜": "周期使两个盘面法向共同沿 +e_D 方向倾斜",
+        "qSc_bar": "qS c_bar",
+        "I^-1M": "I^-1 M",
+        "μ_bar=(μ_L+μ_R)/2": "平均推进比 μ_bar=(μ_L+μ_R)/2",
+        "因此使用 A(μ_L,β_L) 和\nA(μ_R,β_R) 分别计算": "因此分别使用覆盖函数 A(μ_L,β_L) 和 A(μ_R,β_R) 计算左右半翼覆盖面积",
+        "若 A 为严格线性函数": "若覆盖函数 A 为严格线性函数",
+        "其中 z 包括规定工况下的姿态和控制未知量，W_r 用于平衡平动加速度、角加速度和运动学约束的量级。": "其中，配平未知量 z 包括规定工况下的姿态和控制量；残差权重 W_r 用于平衡平动加速度、角加速度和运动学约束的量级。",
+        "控制边界写为 z_min≤z≤z_max。": "控制边界写为 z_min≤z≤z_max。",
+        "在可信配平点 (x_★,u_★) 附近，": "在可信配平点 x_star、u_star 附近，",
+        "h_relmax": "h_rel max",
+        "h_rel/2": "h_rel/2",
+        "逆变换为 β_L=β_s+β_d、β_R=β_s-β_d。": "逆变换为左短舱角 β_L=β_s+β_d、右短舱角 β_R=β_s−β_d。",
+        "当前 I_nac、ω_n、ζ、速率、加速度和转矩上限均为研究占位或": "当前短舱等效惯量 I_nac、自然频率 ω_n、阻尼比 ζ、速率、加速度和转矩上限均为研究占位或",
+        "β_dot_h 有三类作用。": "短舱角速度 β_dot_h 有三类作用。",
+        "β_dot_h,β_ddot_h 直接项置零后的载荷差。": "将 β_dot_h 与 β_ddot_h 直接项置零后的载荷差。",
+        "A 和 B 分别是状态导数对状态和输入的 Jacobian": "状态矩阵 A 和输入矩阵 B 分别是状态导数对状态和输入的 Jacobian",
+        "NASA TM-86854 的 NASA 字段 COLL 是": "NASA TM-86854 中的 COLL 字段表示",
+        "九状态控制顺序为 `collective`、`diffCollective`、`cyclicLong`、历史接口名 diffCyclic、`aileron`、`elevator`、`rudder`。": "九状态控制顺序为 collective、diffCollective、cyclicLong、diffCyclic、aileron、elevator、rudder。",
+        "表中数值来自预先规定参数方案的完整非线性回代。它们只用于选择局部动态研究起点，不构成XV-15飞行配平数据。": (
+            "表中数值来自预先规定参数方案的完整非线性回代。该表只用于说明局部动态研究起点，不构成 XV-15 飞行配平数据。"
+        ),
+        "这些定义不提供气动精度，却决定": "这些定义不提供气动精度，但决定",
+        "两条路径共享几何和气动参数时的比较可以揭示数学实现差异，却不能恢复": "两条路径共享几何和气动参数时的比较可以揭示数学实现差异，但不能恢复",
+        "峰值幅度却依赖": "峰值幅度依赖",
+        "这两个条件能够排除非对称或非正定矩阵，却不能确认": "这两个条件能够排除非对称或非正定矩阵，但不能确认",
+        "刚体，却不能预测": "刚体，但不能预测",
+        "任何 NaN、Inf、复数": "任何非数值（NaN）、无穷值（Inf）、复数",
+        "这不是遗漏一个显然控制，而是当前左右旋翼稳态一阶挥舞映射的控制架构选择": "当前控制架构不包含独立横向周期输入，这是左右旋翼稳态一阶挥舞映射的既定选择",
+        "它把对称纵向通道和反对称横航向通道显式分开": "该坐标变换把对称纵向通道和反对称横航向通道显式分开",
+        "其执行机构相关特征根主要由概念带宽与阻尼参数决定": "十三状态模型的执行机构相关特征根主要由概念带宽与阻尼参数决定",
+        "由于升降舵同时处于 触界标志（字段 atLimit） 且": "由于升降舵的触界标志（字段 atLimit）同时为真，且",
+        "Jacobian/SVD 条件": "雅可比矩阵与奇异值分解（SVD）条件",
+        "九状态控制顺序为 collective、diffCollective、cyclicLong、diffCyclic、aileron、elevator、rudder。": (
+            "九状态控制顺序为对称总距（collective）、差动总距（diffCollective）、"
+            "对称纵向周期变距（cyclicLong）、差动纵向周期变距（历史接口名 diffCyclic）、"
+            "副翼（aileron）、升降舵（elevator）和方向舵（rudder）。"
+        ),
+        "该入口从默认 `params_berger13()` 参数集重新计算": "该入口调用默认参数函数 `params_berger13()`，重新计算",
+        "报告构建入口为 `docs/tiltrotor_control_stability_technical_report/scripts/build_report.py`。": "Word 报告构建入口为 `docs/tiltrotor_control_stability_technical_report/scripts/build_report.py`。",
+        "标记为 完整交叉核查": "标记为完整交叉核查",
+        "标为 混合或不确定模态": "标为混合或不确定模态",
+        "统一标记 混合或不确定模态": "统一标记为混合或不确定模态",
+        "但 物理闭合标志": "但物理闭合标志",
+        "文献中以 degree、rpm、英尺或磅力给出的量": "文献中以度、转每分钟、英尺或磅力给出的量",
+        "这里的 \\(\\chi\\) 只表示机翼局部法向流比，对应代码中的 局部法向流比字段（normalFlowRatioActual）；转换配平的虚拟俯仰命令使用 虚拟俯仰命令字段（pitchCommand）": (
+            "机翼局部法向流比 \\(\\chi\\) 对应局部法向流比字段（normalFlowRatioActual）；"
+            "转换配平的虚拟俯仰命令使用虚拟俯仰命令字段（pitchCommand）"
+        ),
+        "九状态路径的共同短舱角适合完全对称准静态工况。它用": "九状态路径的共同短舱角适用于完全对称准静态工况，并采用",
+        "模型没有独立横向周期输入。\n当前控制架构不包含独立横向周期输入，这是左右旋翼稳态一阶挥舞映射的既定选择": (
+            "模型没有独立横向周期输入；该设置源于左右旋翼稳态一阶挥舞映射的既定控制架构"
+        ),
+        "评估完整载荷与把": "评估完整载荷与将",
+        "分别是状态导数对状态和输入的 Jacobian": "分别为状态导数关于状态和输入的雅可比矩阵",
+        "因此既有 MAE/RMSE 只能称为": "因此，既有平均绝对误差和均方根误差（MAE/RMSE）只能称为",
+        "B 矩阵的 B9、十三状态短舱力矩输入和短舱角命令输入三列": "B 矩阵中的九状态输入矩阵（B9）、十三状态短舱力矩输入矩阵和短舱角命令输入矩阵",
+        "B 路径按 B9、十三状态短舱力矩输入和十三状态短舱角命令输入三列分别核查": (
+            "B 路径分别核查九状态输入矩阵（B9）、十三状态短舱力矩输入矩阵和十三状态短舱角命令输入矩阵"
+        ),
+        "现有B矩阵": "现有 B 矩阵",
+        "rpm/rad·s⁻¹": "转每分钟/弧度每秒",
+        "九状态控制顺序为对称总距（collective）、差动总距（diffCollective）、对称纵向周期变距（cyclicLong）、差动纵向周期变距（历史接口名 diffCyclic）、副翼（aileron）、升降舵（elevator）和方向舵（rudder）。十三状态、力矩输入和命令输入的完整顺序见接口审计。": (
+            "九状态控制顺序为对称总距（collective）、差动总距（diffCollective）、"
+            "对称纵向周期变距（cyclicLong）、差动纵向周期变距（历史接口名 diffCyclic）、"
+            "副翼（aileron）、升降舵（elevator）和方向舵（rudder）。"
+            "十三状态模型的力矩输入版本和角命令输入版本的完整输入顺序见接口审计。"
+        ),
+        "这里 \\(\\mathbf I\\) 为关于实际整机重心、在机体系表达的完整对称惯量矩阵。": (
+            "惯量矩阵 \\(\\mathbf I\\) 是关于实际整机重心、在机体系表达的完整对称矩阵。"
+        ),
+        "Berger 文献采用相反端点的角度记号，二者映射为 \\(\\beta=\\pi/2-\\delta_{\\rm nac}\\)": (
+            "Berger 文献采用相反端点的角度记号，本报告与该文献的换算关系为 \\(\\beta=\\pi/2-\\delta_{\\rm nac}\\)"
+        ),
+        "，而把它作为内部可信度守门量": "；该条件数仅作为内部可信度判据",
+        "它们不是等概率样本": "三个代表点不是等概率样本",
+        "它们决定重心移动量和惯量变化幅值": "这些概念参数决定重心移动量和惯量变化幅值",
+        "它只在对称参数和小扰动附近成立": "镜像关系只在对称参数和小扰动附近成立",
+        "它能回答速率、延迟和左右失配如何进入刚体": "该执行机构模型可用于分析速率、延迟和左右失配如何进入刚体运动",
+        "本报告不把它扩展为负推力、风车或机械卡滞载荷模型": "本报告不将十三状态模型扩展为负推力、风车或机械卡滞载荷模型",
+        "二者没有共享变量、传参或覆盖关系": "两个字段之间不存在共享变量、传参或覆盖关系",
+        "这里 $\\mathbf{I}$ 为": "惯量矩阵 $\\mathbf{I}$ 是",
+        "当前移动短舱质量900 kg和质心半径0.75 m属于通用概念参数；": (
+            "当前移动短舱质量为 900 kg，质心半径为 0.75 m，二者均属于通用概念参数；"
+        ),
+        "；它们决定": "；这些概念参数决定",
+        "；它能回答": "；该执行机构模型可用于分析",
+        "对称/差动坐标": "对称和差动坐标",
+    }
+    for old, new in replacements.items():
+        markdown = markdown.replace(old, new)
+    markdown = re.sub(r"(?<=[\u3400-\u9fff，。；：]) +(?=[\u3400-\u9fff])", "", markdown)
+    markdown = re.sub(r"(?<=[\u3400-\u9fff，。；：])\n(?=[\u3400-\u9fff])", "", markdown)
+    return markdown
+
+
+def normalize_word_math_source(source: str) -> str:
+    """Normalize legacy TeX forms that Pandoc cannot convert to Word OMML."""
+    source = re.sub(r"\{\\rm\s+([^{}]+)\}", r"\\mathrm{\1}", source)
+    source = re.sub(r"\\rm\s+([A-Za-z]+)", r"\\mathrm{\1}", source)
+    return source
 
 
 def extract_core_model_chapters() -> str:
@@ -160,6 +314,44 @@ def extract_core_model_chapters() -> str:
     }
     for old, new in replacements.items():
         core = core.replace(old, new)
+    trim_status_text = (
+        "本文采用四类互斥的配平可信度状态。可信点满足残差、有限性、控制边界、雅可比条件和完整非线性回代要求；"
+        "边界敏感点的残差仍可接受，但控制余度过低或条件数过大，只用于描述权限逼近；"
+        "不可行点在物理限位内无法同时闭合目标方程；数值失败点出现求解器、部件迭代或非有限值失败。"
+        "只有可信点进入定量动态结论。"
+    )
+    # Compatibility normalization for the historical source only.  The count
+    # guard prevents a broad pattern from silently changing other chapters.
+    core, status_replacements = re.subn(
+        r"可信配平点必须同时满足：.*?本文使用.*?三\s*个中文类别。",
+        trim_status_text,
+        core,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if status_replacements != 1:
+        raise RuntimeError("Historical trim-status definition was not normalized exactly once.")
+
+    trim_classification_text = (
+        "本节沿用 4.1 节的四类互斥状态，表 7.2 的“状态”列直接使用这些类别名称。分类优先级为："
+        "首先检查求解器、部件迭代和有限性；若发生此类问题，标记为“数值失败”；否则检查完整非线性"
+        "回代和目标方程，残差不达标或物理限位内无法闭合时标记为“不可行”；残差可接受但控制余度"
+        "过低或雅可比条件过差时标记为“边界敏感”；其余点标记为“可信”。只有“可信”点可作为定量"
+        "时域和模态分析的稳健初值。"
+    )
+    core, classification_replacements = re.subn(
+        r"本文把配平结果分为.*?部件迭代不收敛或函数非有限。",
+        trim_classification_text,
+        core,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if classification_replacements != 1:
+        raise RuntimeError("Historical trim-classification definition was not normalized exactly once.")
+    core = core.replace(
+        "三层比较定义如下：第一层为九状态准静态短舱模型，短舱角作为固定参数；第二层为十三状态模型的对称流形，左右短舱状态相同；第三层允许左右短舱独立运动，并通过差动指令激发非对称响应。三个层级使用同一预先规定参数方案和同一配平状态，不重新优化参数。",
+        "三层比较定义如下：第一层为九状态准静态短舱模型，短舱角作为固定参数；第二层为十三状态模型的对称流形，左右短舱状态相同；第三层允许左右短舱独立运动，并通过差动指令激发非对称响应。三个层级使用同一预先规定参数方案和同一配平状态，不重新优化参数。第 7.6 节的“短舱力矩输入”和“短舱角命令输入”是第三层模型内的两种输入类型，不是新的状态层级；第二层是第三层矩阵中的对称状态子空间。",
+    )
     return core.strip()
 
 
@@ -210,11 +402,31 @@ def build_markdown() -> str:
     control_key = select_mid(controls, key_control_names)
     full_a = sum(row.get("status") == "FULL_CROSSCHECK" for row in deriv_cross)
     partial_a = sum(row.get("status") == "PARTIAL_CROSSCHECK" for row in deriv_cross)
-    full_b = sum(row.get("status") == "FULL_CROSSCHECK" for row in control_cross)
-    partial_b = sum(row.get("status") == "PARTIAL_CROSSCHECK" for row in control_cross)
+    b9_full = sum(row.get("statusB9") == "FULL_CROSSCHECK" for row in control_cross)
+    b13_torque_full = sum(row.get("statusB13Torque") == "FULL_CROSSCHECK" for row in control_cross)
+    b13_command_full = sum(row.get("statusB13Command") == "FULL_CROSSCHECK" for row in control_cross)
+    b9_partial = sum(row.get("statusB9") == "PARTIAL_CROSSCHECK" for row in control_cross)
+    b13_torque_partial = sum(row.get("statusB13Torque") == "PARTIAL_CROSSCHECK" for row in control_cross)
+    b13_command_partial = sum(row.get("statusB13Command") == "PARTIAL_CROSSCHECK" for row in control_cross)
     unstable = sum(row.get("stability") == "UNSTABLE" for row in modal)
     pathological = sum(yes(row.get("pathologicalEigenvectors")) for row in conditioning)
     uncertain = sum(row.get("classification") == "MIXED_OR_UNCERTAIN_MODE" for row in classes)
+    modal_keys = {
+        (row.get("pointId"), row.get("modelKind"), row.get("modeIndex"))
+        for row in modal
+    }
+    unstable_keys = {
+        (row.get("pointId"), row.get("modelKind"), row.get("modeIndex"))
+        for row in modal
+        if row.get("stability") == "UNSTABLE"
+    }
+    uncertain_keys = {
+        (row.get("pointId"), row.get("modelKind"), row.get("modeIndex"))
+        for row in classes
+        if row.get("classification") == "MIXED_OR_UNCERTAIN_MODE"
+    }
+    modal_overlap = len(unstable_keys & uncertain_keys)
+    modal_total = len(modal_keys)
     max_bio = max(num(row.get("biorthogonalityError")) for row in conditioning)
     max_dt = max(num(row.get("relativeChangeFromFinest")) for row in step_dt)
     direction_fraction = sum(yes(row.get("directionAgreement")) for row in step_compare) / max(
@@ -226,7 +438,7 @@ def build_markdown() -> str:
 
 本报告在统一机体系和部件级载荷合成框架下，对通用低阶倾转旋翼机模型开展开环操纵稳定特性后处理。研究对象包括九状态刚体模型与包含左右短舱角、角速度的十三状态规定运动模型。三个代表点分别为短舱角 15°/20 m/s、45°/35 m/s 和 75°/80 m/s；复算结果显示三点可信度与旋翼物理闭合状态均为“{'满足' if all_rep else '存在未满足项'}”。分析采用保持空速模长的迎角和侧滑角重构、三档中心差分、完整质量与惯量换算、左右特征向量双正交归一化以及线性—非线性同时间步小扰动对照。
 
-结果文件给出静稳定导数、阻尼导数、七个物理控制通道的直接力/矩导数、九状态和十三状态全部特征根、参与因子、控制阶跃与分模式配平特性。A 矩阵链式反推中 {full_a} 项满足完整交叉核查，{partial_a} 项因刚体、重力或运动学耦合保留为部分核查；B 矩阵换算中 {full_b} 项满足完整交叉核查，{partial_b} 项保留为部分核查。全部模态表中记录 {unstable} 个局部不稳定根；{uncertain} 个根因状态参与不集中或数值条件限制标为 `MIXED_OR_UNCERTAIN_MODE`，没有强行套用经典模态名称。参与因子最大双正交误差为 {max_bio:.3e}。控制阶跃最细时间步相对差异最大值为 {max_dt:.3e}，线性与非线性响应方向一致比例为 {direction_fraction:.1%}。
+结果文件给出静稳定导数、阻尼导数、七个物理控制通道的直接力/矩导数、九状态和十三状态全部特征根、参与因子、控制阶跃与分模式配平特性。A 矩阵链式反推中 {full_a} 项满足完整交叉核查，{partial_a} 项因刚体、重力或运动学耦合保留为部分核查；B 矩阵的 B9、十三状态短舱力矩输入和短舱角命令输入三列各有 {b9_full}、{b13_torque_full} 和 {b13_command_full} 项标记为 `FULL_CROSSCHECK`。三个工况和三种模型共形成 {modal_total} 个模态根，其中 {unstable} 个局部不稳定根，{uncertain} 个根因状态参与不集中或数值条件限制标为 `MIXED_OR_UNCERTAIN_MODE`；按工况、模型和模态索引交叉核对，两个集合有 {modal_overlap} 个根重合。报告没有强行套用经典模态名称。参与因子最大双正交误差为 {max_bio:.3e}。控制阶跃最细时间步相对差异最大值为 {max_dt:.3e}，线性与非线性响应方向一致比例为 {direction_fraction:.1%}。
 
 NASA TM-86854 图 25 仅用于总距增加时推力增加的趋势方向对照。该文献横轴为 \(0.75R\) 桨距，而当前模型命令总距是叠加于既定扭转分布的控制量，尚未形成同构横坐标。因此既有 MAE/RMSE 只能称为“未经同构映射的原始曲线差异诊断”，不作为模型预测误差、型号验证或结论核心指标。
 
@@ -319,6 +531,8 @@ NASA TM-86854 的 `COLL` 是 \(0.75R\) 桨距；当前命令总距的零点与�
 
 图中各模式分别连线，仅用于同一显式配平定义内的离散变化展示。跨模式边界不计算连续梯度，也不将九点集合解释为连续转换走廊。
 
+B75/V040 与 B75/V060 的最小控制余度分别为 `-9.57255e-10` 与 `-4.55575e-10`。两者相对于零的偏差属于浮点舍入量；由于升降舵同时处于 `atLimit` 且完整动态残差未达标，表中标记为“不可行”，未将其解释为可用的负控制余度。
+
 # 第八章　静稳定性、阻尼导数和操纵导数
 
 ## 8.1 定义与归一化
@@ -381,7 +595,7 @@ $$
 
 ## 8.5 A/B 矩阵交叉核查
 
-\(\mathbf A\) 和 \(\mathbf B\) 分别是状态导数对状态和输入的 Jacobian，不直接等于气动力系数导数。反推过程使用质量、完整惯量矩阵、速度角链式关系和角速度运动学项。A 路径有 {full_a} 项满足完整核查、{partial_a} 项标记为部分核查；B 路径有 {full_b} 项满足完整核查、{partial_b} 项标记为部分核查。部分核查状态被保留，不伪造成一致。
+\(\mathbf A\) 和 \(\mathbf B\) 分别是状态导数对状态和输入的 Jacobian，不直接等于气动力系数导数。反推过程使用质量、完整惯量矩阵、速度角链式关系和角速度运动学项。A 路径有 {full_a} 项满足完整核查、{partial_a} 项标记为部分核查；B 路径按 B9、十三状态短舱力矩输入和十三状态短舱角命令输入三列分别核查，三列完整核查项分别为 {b9_full}、{b13_torque_full} 和 {b13_command_full}，部分核查项分别为 {b9_partial}、{b13_torque_partial} 和 {b13_command_partial}。部分核查状态被保留，不伪造成一致。
 
 # 第九章　特征根、模态参数及参与分析
 
@@ -410,11 +624,13 @@ $$
     ("pathologicalEigenvectors", "病态"),
 ])}
 
-本批次共有 {pathological} 个模型矩阵触发病态判据，最大双正交误差为 {max_bio:.3e}。测试还使用人工近重根矩阵核实：病态情形不会被强制命名。
+模态参数表中的阻尼比字段（`dampingRatio`）有 15 个 NaN，对应零频率根；实根的阻尼比按定义取 1，而振荡周期只对复根适用。因此振荡周期字段（`oscillationPeriodSeconds`）的 57 个 NaN 包含零频率根和实根，与阻尼比的 NaN 计数不同，不表示数值计算失败。
+
+本批次共有 {pathological} 个模型矩阵触发病态或近重根判据。三点短舱力矩输入的特征向量条件数为 5.10e18、1.08e18 和 1.75e19，双正交误差均为 1.41421；短舱角命令输入的条件数约为 212.67–343.91，双正交误差保持在 1e-15 量级，但近重根判据仍成立。1.41421 由病态矩阵采用伪逆诊断后的双正交残差直接计算，未设置饱和或截断上限；三点相同的数值反映该诊断中的数值秩亏结构。病态或近重根情形不会被强制命名。
 
 ## 9.3 分类原则与结果
 
-状态参与按纵向刚体、横航向刚体、短舱对称、短舱差动和执行机构速率分组。主导组得分不足、前两组差距过小、近重根或特征向量条件不良时统一标记 `MIXED_OR_UNCERTAIN_MODE`。本次共有 {uncertain} 个根采用该标签；报告不在证据不足时套用经典短周期、长周期、荷兰滚、螺旋或滚转收敛名称。
+状态参与按纵向刚体、横航向刚体、短舱对称、短舱差动和执行机构速率分组。主导组得分不足、前两组差距过小、近重根或特征向量条件不良时统一标记 `MIXED_OR_UNCERTAIN_MODE`。全部模态表共 {modal_total} 个根，其中 {unstable} 个根的实部为正，{uncertain} 个根采用该不确定标签；按工况、模型和模态索引交叉计数，两个集合有 {modal_overlap} 个根重合。报告不在证据不足时套用经典短周期、长周期、荷兰滚、螺旋或滚转收敛名称。
 
 ![九状态与十三状态开环特征根](figures/FIG02_OPEN_LOOP_EIGENVALUES.png)
 
@@ -461,15 +677,23 @@ $$
 
 1. 三个代表点在显式配平模式下保持可信并满足左右旋翼物理闭合，可作为本报告局部分析基点。
 2. 直接力/矩中心差分给出了可追溯的静稳定、阻尼和操纵导数；A/B 交叉核查严格区分完整与部分可比项。
-3. 九状态与十三状态根必须结合参与因子和条件数解释。局部正实部根被保留，数值可积不等于开环动态稳定。
+3. 九状态与十三状态根必须结合参与因子和条件数解释。局部正实部根被保留，数值可积不等于开环动态稳定。静稳定导数的恢复性方向与局部正实部根不构成矛盾：前者是静态必要条件而非动态稳定的充分条件，具体失稳根及其物理来源仍需结合特征根、参与因子和耦合结构判断。
 4. 六类 0.5° 物理操纵阶跃给出了初始角加速度、峰值、有效域和时间步收敛。相对效能随短舱角和速度改变，不代表型号级操纵品质等级。
 5. NASA 图 25 只支持原始坐标中的斜率方向对照；在 \(0.75R\) 桨距映射建立前，MAE/RMSE 不是模型预测误差。
 
-## 12.2 局限
+## 12.2 操稳特性结论
+
+三个代表点的静稳定、阻尼、操纵导数和特征根结果表明，短舱角与空速共同改变局部载荷导数及控制通道的相对量级；这些变化应在各自显式配平模式和局部线性化点内解释。
+
+纵向迎角与俯仰角速度导数在三个代表点均给出恢复性方向，差动总距和差动纵向周期变距的局部功效随短舱角向飞机侧变化而减弱。静态导数只说明局部扰动的恢复性方向，不能单独推出动态稳定；本报告保留的局部正实部根可能来自其他刚体耦合、短舱状态或非恢复性动态通道。模态结果必须同时结合状态参与度、根间距和特征向量条件性读取，不能以单一经典固定翼或直升机模态名称替代局部参与结构。
+
+本节结论止步于局部开环特征根和方向性操纵功效，不包含操纵品质等级评定、型号级稳定性结论或飞行安全包线判断。
+
+## 12.3 局限
 
 模型使用概念参数、稳态低阶旋翼与简化干扰关系，缺少同构型整机载荷、飞行辨识、短舱时历和执行机构载荷数据。三个代表点是离散局部证据，不是连续飞行包线。参与因子对状态尺度敏感，跨模式连续追踪尚未实施。
 
-## 12.3 后续工作
+## 12.4 后续工作
 
 后续可在不改变本报告结论的前提下，逐项引入来源明确的公开参数、同构控制坐标、更多同模式局部点和独立飞行辨识数据。动态入流、自由尾迹、CFD、动态失速、负推力/风车分支、正式操纵品质评级与飞控设计均属于独立后续任务。
 
@@ -505,10 +729,12 @@ MATLAB 入口为 `analysis/control_stability/run_full_assessment_batch.m`。该�
 - 南航公开论文 `references/NUAA_main_paper.pdf`：部件划分、坐标变换、六自由度方程、配平与数值线性化的方法参考。
 """.replace("\\\\", "\\")
 
-    return "\n\n".join([abstract, extract_core_model_chapters(), chapter7]) + "\n"
+    markdown = "\n\n".join([abstract, extract_core_model_chapters(), chapter7]).rstrip() + "\n"
+    return normalize_report_prose(markdown)
 
 
 def pandoc_latex_body(markdown_path: Path) -> str:
+    raise RuntimeError("Markdown/LaTeX report output is disabled; build the Word report only.")
     command = [
         str(PANDOC),
         str(markdown_path),
@@ -524,6 +750,7 @@ def pandoc_latex_body(markdown_path: Path) -> str:
 
 
 def build_tex(markdown_path: Path) -> None:
+    raise RuntimeError("Markdown/LaTeX report output is disabled; build the Word report only.")
     TEX_DIR.mkdir(parents=True, exist_ok=True)
     body = pandoc_latex_body(markdown_path)
     body = body.replace(r"\tightlist", "")
@@ -821,20 +1048,92 @@ def style_docx(path: Path) -> None:
     doc.save(path)
 
 
-def build_docx(markdown_path: Path) -> None:
+def _tab_run() -> OxmlElement:
+    run = OxmlElement("w:r")
+    run.append(OxmlElement("w:tab"))
+    return run
+
+
+def number_display_equations(path: Path) -> int:
+    """Center editable OMML equations and add continuous right-side numbers."""
+    doc = Document(path)
+    equation_number = 0
+    for paragraph in doc.paragraphs:
+        math_para = paragraph._p.find(qn("m:oMathPara"))
+        if math_para is None:
+            continue
+        equation = math_para.find(qn("m:oMath"))
+        if equation is None:
+            continue
+
+        equation_number += 1
+        math_para.remove(equation)
+        index = paragraph._p.index(math_para)
+        paragraph._p.remove(math_para)
+        paragraph._p.insert(index, _tab_run())
+        paragraph._p.insert(index + 1, equation)
+        paragraph._p.insert(index + 2, _tab_run())
+
+        number_run = OxmlElement("w:r")
+        number_properties = OxmlElement("w:rPr")
+        fonts = OxmlElement("w:rFonts")
+        fonts.set(qn("w:ascii"), "Times New Roman")
+        fonts.set(qn("w:hAnsi"), "Times New Roman")
+        fonts.set(qn("w:eastAsia"), "宋体")
+        number_properties.append(fonts)
+        size = OxmlElement("w:sz")
+        size.set(qn("w:val"), "21")
+        number_properties.append(size)
+        number_run.append(number_properties)
+        number_text = OxmlElement("w:t")
+        number_text.text = f"({equation_number})"
+        number_run.append(number_text)
+        paragraph._p.insert(index + 3, number_run)
+
+        properties = paragraph._p.get_or_add_pPr()
+        alignment = properties.find(qn("w:jc"))
+        if alignment is not None:
+            properties.remove(alignment)
+        old_tabs = properties.find(qn("w:tabs"))
+        if old_tabs is not None:
+            properties.remove(old_tabs)
+        tabs = OxmlElement("w:tabs")
+        for value, position in (("center", "4680"), ("right", "9360")):
+            tab = OxmlElement("w:tab")
+            tab.set(qn("w:val"), value)
+            tab.set(qn("w:pos"), position)
+            tabs.append(tab)
+        properties.append(tabs)
+
+    doc.save(path)
+    return equation_number
+
+
+def build_docx(source: str) -> None:
     command = [
         str(PANDOC),
-        str(markdown_path),
-        "--from=markdown+tex_math_dollars",
+        "--from=markdown+tex_math_dollars+tex_math_single_backslash",
         "--to=docx",
         f"--resource-path={REPORT}",
         "--output",
         str(DOCX_OUT),
     ]
-    result = subprocess.run(command, text=True, encoding="utf-8", capture_output=True)
-    if result.returncode:
+    result = subprocess.run(
+        command,
+        input=source,
+        text=True,
+        encoding="utf-8",
+        capture_output=True,
+    )
+    if result.returncode or result.stderr.strip():
         raise RuntimeError(result.stderr)
     style_docx(DOCX_OUT)
+    display_count = number_display_equations(DOCX_OUT)
+    expected_count = source.count("$$") // 2
+    if display_count != expected_count:
+        raise RuntimeError(
+            f"Display equation count mismatch: Word={display_count}, source={expected_count}"
+        )
 
 
 def docx_structure(path: Path) -> dict[str, int]:
@@ -845,8 +1144,9 @@ def docx_structure(path: Path) -> dict[str, int]:
         "paragraphs": len(doc.paragraphs),
         "tables": len(doc.tables),
         "figures": len(doc.inline_shapes),
-        "omml_display": xml.count("<m:oMathPara"),
+        "equation_numbers": len(re.findall(r"<w:t>\(\d+\)</w:t>", xml)),
         "omml_total": xml.count("<m:oMath"),
+        "raw_tex_markers": xml.count("$$"),
         "toc_fields": xml.count('TOC \\\\o') + xml.count('TOC \\o'),
     }
 
@@ -857,23 +1157,17 @@ def main() -> None:
         raise SystemExit("Missing MATLAB evidence: " + ", ".join(missing))
     if not PANDOC.exists():
         raise SystemExit(f"Pandoc missing: {PANDOC}")
-    (REPORT / "logs").mkdir(parents=True, exist_ok=True)
     (REPORT / "figures").mkdir(parents=True, exist_ok=True)
-    markdown = build_markdown()
-    MD_OUT.write_text(markdown, encoding="utf-8")
-    build_tex(MD_OUT)
-    build_docx(MD_OUT)
+    source = normalize_word_math_source(build_markdown())
+    build_docx(source)
     structure = docx_structure(DOCX_OUT)
     log = [
         f"timestamp={datetime.now().isoformat()}",
         f"python={sys.version}",
         f"pandoc={PANDOC}",
-        f"markdown={MD_OUT}",
-        f"tex={TEX_OUT}",
         f"docx={DOCX_OUT}",
         *(f"{key}={value}" for key, value in structure.items()),
     ]
-    BUILD_LOG.write_text("\n".join(log) + "\n", encoding="utf-8")
     print("\n".join(log))
 
 
