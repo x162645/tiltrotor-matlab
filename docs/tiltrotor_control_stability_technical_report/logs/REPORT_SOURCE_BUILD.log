@@ -1,0 +1,12 @@
+timestamp=2026-07-26T23:12:37.790216
+python=3.12.13 (main, Mar  3 2026, 15:01:35) [MSC v.1944 64 bit (AMD64)]
+pandoc=C:\Program Files\Pandoc\pandoc.exe
+markdown=E:\tiltrotor-control-stability-technical-report-20260726\docs\tiltrotor_control_stability_technical_report\TECHNICAL_REPORT.md
+tex=E:\tiltrotor-control-stability-technical-report-20260726\docs\tiltrotor_control_stability_technical_report\xelatex_project\main.tex
+docx=E:\tiltrotor-control-stability-technical-report-20260726\docs\tiltrotor_control_stability_technical_report\TECHNICAL_REPORT_EDITABLE.docx
+paragraphs=380
+tables=10
+figures=5
+omml_display=138
+omml_total=220
+toc_fields=1
