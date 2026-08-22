@@ -1,11 +1,11 @@
 item,currentModelField,currentBaseline,publicSourceValue,unit,source,locator,disposition,autoApplyV2,scientificReason
-blade_cutout,rotor.rootCut,0.18,0.0848,1,NASA CR-2017-219486,Appendix A Table A-1,SAFE_DIRECT_OVERLAY,true,Current field is aerodynamic integration start and is homologous to cutout radius divided by rotor radius
+blade_cutout,rotor.rootCut,0.18,0.0875,1,NASA CR-2016-219086,Table 2 XV-15 rotor characteristics,SAFE_DIRECT_OVERLAY,true,Current field is aerodynamic integration start and is homologous to the directly reported root-cutout r/R definition
 blade_flapping_inertia,rotor.Ib,216.6,142.360884574797,kg m^2,NASA CR-2017-219486,Appendix A Table A-1,SAFE_DIRECT_OVERLAY,true,Current flap equation uses per-blade flapping inertia
-rotor_speed_hover,rotor.Omega,62,59.166661642608,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,565 rpm is only helicopter or hover reference
+rotor_speed_hover,rotor.Omega,62,59.166661642608,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,565 rpm is only helicopter or hover reference in this compiled table
 rotor_speed_conversion,rotor.Omega,62,55.920349233898,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,534 rpm requires mode or nacelle-angle schedule
 rotor_speed_airplane,rotor.Omega,62,47.961647844804,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,458 rpm requires mode or nacelle-angle schedule
-blade_basic_chord,rotor.chord,0.38,0.3556,m,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_RADIAL_GEOMETRY,false,Root cuff is about 17 in at 0.0875R and tapers to 14 in by 0.25R so one constant chord is nonhomologous
-blade_total_twist,rotor.twistTip,-0.10471975512,-0.785398163397,rad,NASA CR-2017-219486,Appendix A Table A-1 and twist distribution,INTERFACE_BLOCKED_NONLINEAR_TWIST,false,Public total twist does not justify replacing current linear twist law with a linear minus 45 degree law
+blade_basic_chord,rotor.chord,0.38,0.3556,m,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_RADIAL_GEOMETRY,false,Root station is about 17 in at 0.0875R and transitions to 14 in by 0.25R so one constant chord is nonhomologous
+blade_total_twist,rotor.twistTip,-0.10471975512,-0.785398163397,rad,NASA CR-2017-219486,Appendix A Table A-1 and referenced twist distribution,INTERFACE_BLOCKED_NONLINEAR_TWIST,false,Public total twist does not justify replacing current linear twist law with a linear minus 45 degree law
 flapping_clearance,rotor.flapMax,0.314159265359,0.209439510239,rad,NASA CR-2017-219486,Appendix A Table A-1,SEMANTIC_MISMATCH_METADATA_ONLY,false,Source is mechanical design clearance while active solver uses a different divergence guard
 precone,no_active_field,,0.043633231300,rad,NASA CR-2017-219486,Appendix A Table A-1,MODEL_FIELD_MISSING,false,Current rotor model has no explicit precone field
 delta3,no_active_field,,-0.261799387799,rad,NASA CR-2017-219486,Appendix A Table A-1,MODEL_FIELD_MISSING,false,Current rotor model does not explicitly represent pitch-flap delta3 coupling
