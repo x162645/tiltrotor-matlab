@@ -15,7 +15,7 @@ cr2017Title = 'Hover Performance of Isolated Proprotors and Propellers--Experime
 cr2017Number = 'NASA CR-2017-219486';
 cr2017URL = ['https://rotorcraft.arc.nasa.gov/Publications/files/' ...
     'NASA%20CR-2017-219486_Final.pdf'];
-cr2016Title = 'Generation of Performance Model for the Aeolus Propeller';
+cr2016Title = 'Wind Tunnel Interference Effects on Tiltrotor Testing Using Computational Fluid Dynamics';
 cr2016Number = 'NASA CR-2016-219086';
 cr2016URL = ['https://rotorcraft.arc.nasa.gov/Publications/files/' ...
     'Koning%20CR-2016-219086_FINAL.pdf'];
