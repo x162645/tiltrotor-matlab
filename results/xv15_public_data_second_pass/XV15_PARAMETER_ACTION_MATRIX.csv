@@ -1,0 +1,15 @@
+item,currentModelField,currentBaseline,publicSourceValue,unit,source,locator,disposition,autoApplyV2,scientificReason
+blade_cutout,rotor.rootCut,0.18,0.0848,1,NASA CR-2017-219486,Appendix A Table A-1,SAFE_DIRECT_OVERLAY,true,Current field is aerodynamic integration start and is homologous to cutout radius divided by rotor radius
+blade_flapping_inertia,rotor.Ib,216.6,142.360884574797,kg m^2,NASA CR-2017-219486,Appendix A Table A-1,SAFE_DIRECT_OVERLAY,true,Current flap equation uses per-blade flapping inertia
+rotor_speed_hover,rotor.Omega,62,59.166661642608,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,565 rpm is only helicopter or hover reference
+rotor_speed_conversion,rotor.Omega,62,55.920349233898,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,534 rpm requires mode or nacelle-angle schedule
+rotor_speed_airplane,rotor.Omega,62,47.961647844804,rad/s,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_MODE_SCHEDULE,false,458 rpm requires mode or nacelle-angle schedule
+blade_basic_chord,rotor.chord,0.38,0.3556,m,NASA CR-2017-219486,Appendix A Table A-1,INTERFACE_BLOCKED_RADIAL_GEOMETRY,false,Root cuff is about 17 in at 0.0875R and tapers to 14 in by 0.25R so one constant chord is nonhomologous
+blade_total_twist,rotor.twistTip,-0.10471975512,-0.785398163397,rad,NASA CR-2017-219486,Appendix A Table A-1 and twist distribution,INTERFACE_BLOCKED_NONLINEAR_TWIST,false,Public total twist does not justify replacing current linear twist law with a linear minus 45 degree law
+flapping_clearance,rotor.flapMax,0.314159265359,0.209439510239,rad,NASA CR-2017-219486,Appendix A Table A-1,SEMANTIC_MISMATCH_METADATA_ONLY,false,Source is mechanical design clearance while active solver uses a different divergence guard
+precone,no_active_field,,0.043633231300,rad,NASA CR-2017-219486,Appendix A Table A-1,MODEL_FIELD_MISSING,false,Current rotor model has no explicit precone field
+delta3,no_active_field,,-0.261799387799,rad,NASA CR-2017-219486,Appendix A Table A-1,MODEL_FIELD_MISSING,false,Current rotor model does not explicitly represent pitch-flap delta3 coupling
+lock_number,no_active_field,,3.83,1,NASA CR-2017-219486,Appendix A Table A-1,MODEL_FIELD_MISSING,false,Useful for reconstruction consistency but no active field exists
+mast_spring_rate,no_active_field,,17478.595401182,N m/rad,NASA CR-2017-219486,Appendix A Table A-1,MODEL_FIELD_MISSING,false,Current first-harmonic flap model has no homologous hub spring parameter
+fuselage_aero_table,fuselage scalar coefficient family,generic polynomials,public XV-15 wind-tunnel coefficient tables,table,NASA CR-166536A,Subsystem 3 Appendix B B-26 through B-30,TABLE_MODEL_REQUIRED,false,Lookup or fitted surface required and direct scalar substitution would destroy variable dependence
+wing_pylon_aero_table,wing scalar coefficient family,generic CL-CD-Cm scalars,public wing-pylon coefficient tables and corrections,table,NASA CR-166536A,Subsystem 4 and Appendix B,TABLE_MODEL_REQUIRED,false,Lookup or fitted surface required before public GTRS data can replace equivalent scalar coefficients
