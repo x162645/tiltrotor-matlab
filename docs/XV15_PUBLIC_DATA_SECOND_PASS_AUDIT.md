@@ -13,26 +13,26 @@
 
 | 当前字段/物理量 | 当前基线 | 公开 XV-15 信息 | 处置 | 原因 |
 |---|---:|---:|---|---|
-| `rotor.rootCut` | 0.18 R | 1.06/12.5 = **0.0848 R** | **SAFE_DIRECT_OVERLAY** | 当前字段就是叶素积分起点，与公开 blade cutout radius/R 语义同构 |
+| `rotor.rootCut` | 0.18 R | **0.0875 R** | **SAFE_DIRECT_OVERLAY** | NASA CR-2016-219086 Table 2 直接给出 root cutout = 0.0875 r/R；与当前叶素积分起点语义同构 |
 | `rotor.Ib` | 216.6 kg m² | 105 slug ft² = **142.3608846 kg m²** | **SAFE_DIRECT_OVERLAY** | 当前挥舞方程按单桨叶挥舞惯量使用 `Ib`，与公开 per-blade flapping inertia 同构 |
 | `rotor.Omega` | 62 rad/s 单标量 | 565 rpm 直升机、534 rpm 转换、458 rpm 飞机 | **INTERFACE_BLOCKED_MODE_SCHEDULE** | 一个全局标量不能表达构型相关转速 |
-| `rotor.chord` | 0.38 m 常弦长 | 基本弦长 14 in；根部约 0.0875R 为 17 in cuff，至 0.25R 过渡到 14 in | **INTERFACE_BLOCKED_RADIAL_GEOMETRY** | 当前常弦长字段无法表达径向 cuff/taper |
-| `rotor.twistTip` | 线性总扭转 -6° | 总扭转约 -45°，公开资料给出非线性径向分布 | **INTERFACE_BLOCKED_NONLINEAR_TWIST** | 把 -45° 塞进现有字段会把真实非线性分布强制变成线性 |
+| `rotor.chord` | 0.38 m 常弦长 | 基本弦长 14 in；根部 0.0875R 处约 17 in，至 0.25R 过渡到 14 in | **INTERFACE_BLOCKED_RADIAL_GEOMETRY** | 当前常弦长字段无法表达径向根部过渡 |
+| `rotor.twistTip` | 线性总扭转 -6° | 总扭转约 -45°且有径向分布 | **INTERFACE_BLOCKED_NONLINEAR_TWIST** | 把 -45° 塞进现有字段会把公开径向分布压缩成当前简单线性律 |
 | `rotor.flapMax` | 18°，兼容字段 | ±12° flapping design clearance | **SEMANTIC_MISMATCH_METADATA_ONLY** | 公开量是机械设计间隙，当前 active flap solver 实际使用的是另一发散角门限 |
 | 预锥 | 无 active field | +2.5° | **MODEL_FIELD_MISSING** | 模型未显式表示 |
 | `delta3` | 无 active field | -15° | **MODEL_FIELD_MISSING** | 当前挥舞/桨距耦合没有同构参数 |
 | Lock number | 无 active field | 3.83 | **MODEL_FIELD_MISSING** | 可用于参数重建一致性核查，但不能直接写入现有模型 |
 | mast/hub spring rate | 无 active field | 2700 in·lbf/deg ≈ **17478.6 N·m/rad** | **MODEL_FIELD_MISSING** | 当前一阶谐波挥舞模型没有同构弹簧项 |
 
-来源：NASA CR-2017-219486 Appendix A / Table A-1（原始金属桨 XV-15 proprotor 汇编）。该报告同时整理了 OARF/WADC 悬停试验数据，可作为原始金属桨部件验证的首选公开来源。
+`rootCut` 采用 NASA CR-2016-219086 Table 2 的直接无量纲值。其余上述旋翼特性主要由 NASA CR-2017-219486 Appendix A / Table A-1 交叉核对；该报告同时整理了 OARF/WADC 悬停试验数据，可作为原始金属桨部件验证的重要公开来源。
 
 ## 3. 对 PR #53 旧 overlay 的修正
 
 PR #53 的第一轮 overlay 将 `rotor.Omega=565 rpm`、`rotor.chord=14 in`、`rotor.twistTip=-45 deg` 作为可应用字段。这些数值本身来自公开资料，但第二轮审计发现其**字段语义并不完全同构**：
 
-- 565 rpm 只对应直升机/悬停参考，转换和飞机模式分别存在 534 rpm、458 rpm；
-- 14 in 是基本桨叶弦长，根部 cuff 并非恒定 14 in；
-- -45° 是总扭转量，实际径向扭转分布不是当前代码中的简单线性律。
+- 565 rpm 只对应 CR-2017-219486 所列直升机/悬停参考；同一表还列出转换 534 rpm、飞机 458 rpm；
+- 14 in 是基本桨叶弦长，根部 0.0875R 处约 17 in，并向 0.25R 过渡；
+- -45° 是总扭转描述，公开资料同时给出径向扭转分布，不能把它等同于当前代码的简单线性 `twistTip` 参数。
 
 因此 V2 overlay 保留第一轮审计以保证历史可追溯性，但明确阻止这三个字段自动覆盖。换言之，本轮不是否定来源，而是提升“来源值—代码字段”同源性要求。
 
@@ -69,14 +69,14 @@ NASA CR-166536A 的 Generic Tilt-Rotor Simulation 来源于 Bell 的 XV-15 模�
 
 ### 已有公开值且可立即同构回填
 
-- 原始金属桨 blade cutout ratio：0.0848；
+- 原始/基准 XV-15 旋翼 root cutout ratio：0.0875；
 - 单桨叶 flapping inertia：142.3608846 kg m²。
 
 ### 已有公开值但当前接口不支持
 
-- 565/534/458 rpm 构型相关转速；
-- 根部 cuff/taper 径向弦长；
-- 非线性径向扭转；
+- 565/534/458 rpm 构型相关转速（CR-2017-219486 所列工况）；
+- 根部径向弦长过渡；
+- 径向扭转分布；
 - precone、delta3、Lock number、mast/hub spring；
 - GTRS 机身与翼-短舱多维气动表。
 
