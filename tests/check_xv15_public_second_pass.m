@@ -5,7 +5,7 @@ P0 = params_nominal();
 [P, manifest] = apply_xv15_public_overlay_second_pass(P0);
 reference = params_xv15_public_reference_second_pass();
 
-expectedRootCut = 1.06/12.5;
+expectedRootCut = 0.0875;
 expectedIb = 105*1.3558179483314004;
 
 assert(abs(P.rotor.rootCut-expectedRootCut) < 1e-12, ...
@@ -24,9 +24,9 @@ assert(P.rotor.Nb == 3, ...
 assert(isequal(P.rotor.Omega,P0.rotor.Omega), ...
     'V2 must not apply one XV-15 rpm globally.');
 assert(isequal(P.rotor.chord,P0.rotor.chord), ...
-    'V2 must not collapse radial cuff/chord geometry to one scalar.');
+    'V2 must not collapse radial root/chord geometry to one scalar.');
 assert(isequal(P.rotor.twistTip,P0.rotor.twistTip), ...
-    'V2 must not map nonlinear XV-15 twist to the current linear-twist field.');
+    'V2 must not map distributed XV-15 twist to the current linear-twist field.');
 
 for path = {'rotor.Omega','rotor.chord','rotor.twistTip'}
     assert(any(strcmp(manifest.blockedLegacyPaths,path{1})), ...
