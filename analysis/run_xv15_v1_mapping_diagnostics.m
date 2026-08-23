@@ -2,7 +2,7 @@ function results = run_xv15_v1_mapping_diagnostics(testPoint, sourceData, output
 %RUN_XV15_V1_MAPPING_DIAGNOSTICS Audit the V1 low-order mapping itself.
 %
 % This function deliberately does NOT read or compare TM-86833 hold-out
-% performance curves.  It only verifies the transformation from explicit
+% performance curves. It only verifies the transformation from explicit
 % XV-15/test inputs into the program fields used by the frozen low-order
 % model, and exports the associated reduction/readiness diagnostics.
 
@@ -24,11 +24,20 @@ Pbase = params_nominal();
 [P, mapping] = build_xv15_v1_hover_validation_instance( ...
     Pbase, testPoint, sourceData);
 
-%% Chord reduction diagnostic.
+%% Chord source and selected constant-chord representation.
 chordTable = table(mapping.chord.rR(:), mapping.chord.chord_m(:), ...
-    repmat(mapping.chord.chordEq_m, numel(mapping.chord.rR), 1), ...
-    'VariableNames', {'r_over_R','sourceChord_m','equivalentChord_m'});
+    repmat(mapping.chord.selectedEq_m, numel(mapping.chord.rR), 1), ...
+    'VariableNames', {'r_over_R','sourceChord_m','selectedEquivalentChord_m'});
 writetable(chordTable, fullfile(outputDir, 'V1_CHORD_REDUCTION.csv'));
+
+candidatePolicy = {'AREA_PRESERVING'; 'HOVER_THRUST_R2'; 'HOVER_TORQUE_R3'};
+candidateChord_m = [mapping.chord.areaPreservingEq_m; ...
+    mapping.chord.hoverThrustR2Eq_m; mapping.chord.hoverTorqueR3Eq_m];
+isSelected = strcmp(candidatePolicy, mapping.chord.selectedPolicy);
+chordCandidateTable = table(candidatePolicy, candidateChord_m, isSelected, ...
+    'VariableNames', {'policy','equivalentChord_m','selected'});
+writetable(chordCandidateTable, ...
+    fullfile(outputDir, 'V1_CHORD_EQUIVALENT_CANDIDATES.csv'));
 
 %% Twist reduction diagnostic, only when source stations were supplied.
 if mapping.twist.available
@@ -71,11 +80,18 @@ summary = struct();
 summary.variantName = mapping.variantName;
 summary.readyForMappingDiagnostics = mapping.readiness.readyForMappingDiagnostics;
 summary.readyForHoldout = mapping.readiness.readyForHoldout;
-summary.chordEq_m = mapping.chord.chordEq_m;
-summary.chordAreaRelativeResidual = mapping.chord.relativeAreaResidual;
+summary.chordSelectedPolicy = mapping.chord.selectedPolicy;
+summary.chordPolicyExplicit = mapping.chord.policyExplicit;
+summary.chordSelectedEq_m = mapping.chord.selectedEq_m;
+summary.chordAreaPreservingEq_m = mapping.chord.areaPreservingEq_m;
+summary.chordHoverThrustR2Eq_m = mapping.chord.hoverThrustR2Eq_m;
+summary.chordHoverTorqueR3Eq_m = mapping.chord.hoverTorqueR3Eq_m;
+summary.chordCandidateSpread_m = mapping.chord.candidateSpread_m;
+summary.chordRelativeCandidateSpread = mapping.chord.relativeCandidateSpread;
 summary.twistAvailable = mapping.twist.available;
 summary.twistTipEq_rad = mapping.twist.twistTipEq_rad;
 summary.twistRmsResidual_rad = mapping.twist.rmsResidual_rad;
+summary.twistWeightedRmsResidual_rad = mapping.twist.weightedRmsResidual_rad;
 summary.twistMaxAbsResidual_rad = mapping.twist.maxAbsResidual_rad;
 summary.theta75Available = mapping.collective.theta75Available;
 summary.modelCollective_rad = mapping.collective.modelCollective_rad;
@@ -114,10 +130,25 @@ fprintf(fid, '- Ready for mapping diagnostics: %d\n', ...
     mapping.readiness.readyForMappingDiagnostics);
 fprintf(fid, '- Ready for hold-out validation: %d\n', ...
     mapping.readiness.readyForHoldout);
-fprintf(fid, '- Area-equivalent chord: %.12g m\n', mapping.chord.chordEq_m);
-fprintf(fid, '- Chord relative area residual: %.3e\n', ...
-    mapping.chord.relativeAreaResidual);
+fprintf(fid, '- Chord selected policy: `%s` (explicit=%d)\n', ...
+    mapping.chord.selectedPolicy, mapping.chord.policyExplicit);
+fprintf(fid, '- Chord selected equivalent: %.12g m\n', ...
+    mapping.chord.selectedEq_m);
+fprintf(fid, '- Chord area-preserving candidate: %.12g m\n', ...
+    mapping.chord.areaPreservingEq_m);
+fprintf(fid, '- Chord hover-thrust r^2 candidate: %.12g m\n', ...
+    mapping.chord.hoverThrustR2Eq_m);
+fprintf(fid, '- Chord hover-torque r^3 candidate: %.12g m\n', ...
+    mapping.chord.hoverTorqueR3Eq_m);
+fprintf(fid, '- Chord candidate relative spread: %.6g\n', ...
+    mapping.chord.relativeCandidateSpread);
 fprintf(fid, '- Twist reconstruction available: %d\n', mapping.twist.available);
+if mapping.twist.available
+    fprintf(fid, '- Twist weighted RMS shape residual: %.6e rad\n', ...
+        mapping.twist.weightedRmsResidual_rad);
+    fprintf(fid, '- Twist max shape residual: %.6e rad\n', ...
+        mapping.twist.maxAbsResidual_rad);
+end
 fprintf(fid, '- Section-aero reconstruction available: %d\n', ...
     mapping.sectionAero.available);
 fprintf(fid, '- Ib/Sblade closure available: %d\n\n', mapping.flapMass.closed);
@@ -132,6 +163,7 @@ results = struct();
 results.parameterSet = P;
 results.mapping = mapping;
 results.chordTable = chordTable;
+results.chordCandidateTable = chordCandidateTable;
 results.twistTable = twistTable;
 results.readinessTable = readinessTable;
 results.appliedTable = appliedTable;
