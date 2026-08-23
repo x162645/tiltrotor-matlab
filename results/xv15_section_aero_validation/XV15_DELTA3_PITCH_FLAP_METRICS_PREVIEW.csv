@@ -1,0 +1,3 @@
+range,CT_MAPE_baseline_pct,CT_MAPE_nominalFullBeta_pct,CT_MAPE_nominalHarmonicOnly_pct,CT_MAPE_reversedFullBeta_pct,CT_MAPE_reversedHarmonicOnly_pct,CP_MAPE_baseline_pct,CP_MAPE_nominalFullBeta_pct,CP_MAPE_nominalHarmonicOnly_pct,CP_MAPE_reversedFullBeta_pct,CP_MAPE_reversedHarmonicOnly_pct,FM_MAPE_baseline_pct,FM_MAPE_nominalFullBeta_pct,FM_MAPE_nominalHarmonicOnly_pct,FM_MAPE_reversedFullBeta_pct,FM_MAPE_reversedHarmonicOnly_pct
+6to11,34.139317,36.867246,34.131024,31.047309,34.131018,45.376431,48.349410,45.365075,41.901390,45.365469,4.528711,5.020398,4.528627,4.140276,4.528555
+9to11,28.683655,31.860079,28.673477,25.106879,28.673468,41.061632,44.708758,41.047500,36.817565,41.048009,2.312224,2.282640,2.310992,2.569912,2.311369
