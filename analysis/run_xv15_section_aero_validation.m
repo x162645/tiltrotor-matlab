@@ -1,17 +1,17 @@
 function results = run_xv15_section_aero_validation(outputDir)
-%RUN_XV15_SECTION_AERO_VALIDATION Independent section-aero validation update.
+%RUN_XV15_SECTION_AERO_VALIDATION XV-15 C81 -> low-order section-aero test.
 %
-% This runner extends the PR67 XV-15 original-metal-blade hover comparison
-% without fitting to OARF CT/CP. The scalar zero-lift angle is reduced from
-% the published XV-15 NACA 64-series section distribution and the NACA
-% design-lift-coefficient nomenclature. A second opt-in variant applies one
-% bounded Prandtl-Glauert-equivalent lift-slope factor at 0.75R.
+% This runner keeps the PR67 geometry/input mapping and asks one controlled
+% question: what changes when the generic scalar section-aero coefficients
+% are replaced by scalar values reduced from the public NASA CAMRAD II XV-15
+% C81 tables, without using OARF CT/CP/FM to identify those values?
 %
 % Important claim boundary:
-% - alpha0L_eq is a LOW-ORDER DERIVED EQUIVALENT, not a NASA-reported scalar;
-% - no OARF CT/CP/FM value is used to identify alpha0L or the PG factor;
-% - the PR67 +7.70 deg post-validation shift is NOT used here;
-% - the unchanged production rotor_model_bemt remains the baseline.
+% - C81 tables are NASA reference-model inputs, not raw airfoil measurements;
+% - the scalar reduction is therefore an XV-15 REFERENCE-EQUIVALENT parameter
+%   set for the present generic low-order equations;
+% - OARF Run 15 remains external validation data and is not used in fitting;
+% - the earlier design-Cl -> alpha0L approximation is superseded here.
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 if nargin < 1 || isempty(outputDir)
@@ -26,7 +26,7 @@ d2r = pi/180;
 R = 3.81;
 rootCut = 0.0875;
 
-%% OARF Run 15 original-metal-blade hover data
+%% OARF Run 15 original-metal-blade hover data: external comparison only
 collective75_deg = [0; 2; 4; 6; 7; 8; 9; 10; 11];
 Vtip_fps = [769.0; 768.7; 768.4; 768.4; 768.4; 768.4; 768.0; 768.0; 767.7];
 CT_exp = [0.004063; 0.005581; 0.007391; 0.009208; 0.010104; ...
@@ -36,7 +36,7 @@ CP_exp = [0.000315; 0.000426; 0.000588; 0.000796; 0.000913; ...
 FM_exp = [0.5814; 0.6921; 0.7641; 0.7849; 0.7866; ...
           0.7881; 0.7858; 0.7797; 0.7632];
 
-%% Same low-order geometry mapping frozen in PR67
+%% Same geometry/input reduction frozen from PR67
 xGeom = linspace(rootCut, 1, 4001).';
 chord_in = 14*ones(size(xGeom));
 inboard = xGeom <= 0.25;
@@ -53,44 +53,15 @@ shapeTarget = thetaSource_deg-theta75Source_deg;
 twistTipEq_deg = trapz(xGeom, shapeCoordinate.*shapeTarget) / ...
     trapz(xGeom, shapeCoordinate.^2);
 
-%% Independent NACA 64-series section-aero reduction
-% Published XV-15 original-metal-blade section stations:
-%   0.09R NACA 64-935
-%   0.17R NACA 64-528
-%   0.51R NACA 64-118
-%   0.80R NACA 64-(1.5)12
-%   1.00R NACA 64-208
-%
-% In NACA 6-series nomenclature, the design lift coefficient is represented
-% by the design-Cl digit/parenthesized value. This gives the independent
-% design-Cl anchors below. We do NOT equate design Cl with measured Cl at
-% alpha=0; instead, for a deliberately low-order linear reduction we use
-% alpha0L(r) ~= -Cl_design(r)/a0 with the generic baseline lift slope a0.
-airfoil_rR = [0.09; 0.17; 0.51; 0.80; 1.00];
-airfoil_name = {'NACA 64-935'; 'NACA 64-528'; 'NACA 64-118'; ...
-    'NACA 64-(1.5)12'; 'NACA 64-208'};
-designCl = [0.90; 0.50; 0.10; 0.15; 0.20];
-alpha0_station_rad = -designCl/Pbase.rotor.liftSlope;
-alpha0_station_deg = alpha0_station_rad/d2r;
+%% Independent section-aero parameter source: NASA XV-15 C81 reference tables
+c81 = build_xv15_c81_low_order_section_aero();
 
-% Hover elemental lift sensitivity scales approximately with q*c*dr and
-% q~(Omega*r)^2, so c(r)*(r/R)^2 is used as a transparent reduction weight.
-designClField = interp1(airfoil_rR, designCl, xGeom, 'linear', 'extrap');
-alpha0Field_rad = -designClField/Pbase.rotor.liftSlope;
-weight = chord_m.*xGeom.^2;
-alpha0Eq_rad = trapz(xGeom, alpha0Field_rad.*weight)/trapz(xGeom, weight);
-alpha0Eq_deg = alpha0Eq_rad/d2r;
-
-sourceTable = table(airfoil_rR, airfoil_name, designCl, ...
-    alpha0_station_deg, ...
-    'VariableNames', {'r_over_R','airfoil','design_Cl', ...
-    'low_order_alpha0L_from_designCl_deg'});
-writetable(sourceTable, fullfile(outputDir, 'XV15_NACA_ALPHA0_REDUCTION_INPUT.csv'));
-
-%% Validation variants
-variantName = {'BASELINE'; 'NACA_ALPHA0_EQ'; 'NACA_ALPHA0_EQ_PG075'};
-variantAlpha0 = [0; alpha0Eq_rad; alpha0Eq_rad];
-variantCompressibility = [false; false; true];
+variantName = {'BASELINE_GENERIC_SECTION_AERO'; 'NASA_C81_LOW_ORDER_SECTION_AERO'};
+variantAlpha0 = [0; c81.alpha0L_rad];
+variantLiftSlope = [Pbase.rotor.liftSlope; c81.liftSlope];
+variantCLmax = [Pbase.rotor.CLmax; c81.CLmax];
+variantCD0 = [Pbase.rotor.CD0; c81.CD0];
+variantKCD = [Pbase.rotor.kCD; c81.kCD];
 
 Ptemplate = Pbase;
 Ptemplate.rotor.R = R;
@@ -98,12 +69,12 @@ Ptemplate.rotor.Nb = 3;
 Ptemplate.rotor.rootCut = rootCut;
 Ptemplate.rotor.chord = chordEq_m;
 Ptemplate.rotor.twistTip = twistTipEq_deg*d2r;
+% Keep the same generic uniform blade-mass closure as PR67.  This is not
+% claimed to be an XV-15 mass-distribution reconstruction.
 Ptemplate.rotor.Ib = Ptemplate.rotor.bladeMass*R^2/3;
 Ptemplate.rotor.Sblade = Ptemplate.rotor.bladeMass*R/2;
-Ptemplate.env.aSound = 340.0;
-Ptemplate.rotor.compressibilityReferenceRadius = 0.75;
-Ptemplate.rotor.compressibilityMachCap = 0.75;
 
+%% Run unchanged low-order rotor equations with only section parameters varied
 rows = table();
 for v = 1:numel(variantName)
     for k = 1:numel(collective75_deg)
@@ -111,7 +82,14 @@ for v = 1:numel(variantName)
         Vtip_mps = Vtip_fps(k)*0.3048;
         P.rotor.Omega = Vtip_mps/R;
         P.rotor.alpha0L = variantAlpha0(v);
-        P.rotor.enableCompressibilityCorrection = variantCompressibility(v);
+        P.rotor.liftSlope = variantLiftSlope(v);
+        P.rotor.CLmax = variantCLmax(v);
+        P.rotor.CD0 = variantCD0(v);
+        P.rotor.kCD = variantKCD(v);
+        % C81 reduction already represents spanwise Mach-dependent reference
+        % tables at the nominal hover tip speed. Do not stack the separate PG
+        % wrapper correction on top of it.
+        P.rotor.enableCompressibilityCorrection = false;
 
         modelCollective_deg = collective75_deg(k)-twistTipEq_deg*x75;
         ctrl = struct('collective', modelCollective_deg*d2r, 'cyclicLong', 0);
@@ -119,15 +97,9 @@ for v = 1:numel(variantName)
         returned = false;
         physicalConverged = false;
         physicalStatus = 'NOT_RUN';
-        CT_model = NaN;
-        CP_model = NaN;
-        FM_model = NaN;
-        inducedVelocity_mps = NaN;
-        iterations = NaN;
-        closureResidualRelative = NaN;
-        referenceMach = NaN;
-        liftSlopeFactor = NaN;
-        errorIdentifier = '';
+        CT_model = NaN; CP_model = NaN; FM_model = NaN;
+        inducedVelocity_mps = NaN; iterations = NaN;
+        closureResidualRelative = NaN; errorIdentifier = '';
 
         try
             [~, ~, out] = rotor_model_bemt_section_aero( ...
@@ -138,8 +110,6 @@ for v = 1:numel(variantName)
             inducedVelocity_mps = out.inducedVelocity;
             iterations = out.iterations;
             closureResidualRelative = out.inducedClosureResidualRelative;
-            referenceMach = out.compressibilityReferenceMachUsed;
-            liftSlopeFactor = out.sectionLiftSlopeFactor;
 
             A = pi*R^2;
             CT_model = out.thrust/(P.env.rho*A*Vtip_mps^2);
@@ -154,23 +124,23 @@ for v = 1:numel(variantName)
 
         local = table(variantName(v), collective75_deg(k), Vtip_fps(k), ...
             P.rotor.Omega*60/(2*pi), modelCollective_deg, ...
-            variantAlpha0(v)/d2r, variantCompressibility(v), ...
-            referenceMach, liftSlopeFactor, CT_exp(k), CT_model, ...
+            P.rotor.alpha0L/d2r, P.rotor.liftSlope, P.rotor.CLmax, ...
+            P.rotor.CD0, P.rotor.kCD, CT_exp(k), CT_model, ...
             CP_exp(k), CP_model, FM_exp(k), FM_model, returned, ...
             physicalConverged, {physicalStatus}, inducedVelocity_mps, ...
             iterations, closureResidualRelative, {errorIdentifier}, ...
             'VariableNames', {'variant','collective75_deg','Vtip_fps','rpm', ...
-            'modelCollective_deg','alpha0L_deg','compressibility_enabled', ...
-            'referenceMach','liftSlopeFactor','CT_exp','CT_model','CP_exp', ...
-            'CP_model','FM_exp','FM_model','returned','physicalConverged', ...
-            'physicalStatus','inducedVelocity_mps','iterations', ...
-            'closureResidualRelative','errorIdentifier'});
+            'modelCollective_deg','alpha0L_deg','liftSlope','CLmax','CD0','kCD', ...
+            'CT_exp','CT_model','CP_exp','CP_model','FM_exp','FM_model', ...
+            'returned','physicalConverged','physicalStatus', ...
+            'inducedVelocity_mps','iterations','closureResidualRelative', ...
+            'errorIdentifier'});
         rows = [rows; local]; %#ok<AGROW>
     end
 end
 writetable(rows, fullfile(outputDir, 'XV15_SECTION_AERO_MATLAB_VALIDATION.csv'));
 
-%% Fair metrics on the six common positive-load points used in PR67
+%% Fair comparison on the same common converged range used in PR67
 commonCollectives = [6; 7; 8; 9; 10; 11];
 metricRows = table();
 for v = 1:numel(variantName)
@@ -179,9 +149,7 @@ for v = 1:numel(variantName)
         rows.physicalConverged;
     local = rows(mask,:);
     if height(local) ~= numel(commonCollectives)
-        CT_MAPE_pct = NaN;
-        CP_MAPE_pct = NaN;
-        FM_MAPE_pct = NaN;
+        CT_MAPE_pct = NaN; CP_MAPE_pct = NaN; FM_MAPE_pct = NaN;
         commonPointCount = height(local);
     else
         CT_MAPE_pct = 100*mean(abs(local.CT_model-local.CT_exp)./local.CT_exp);
@@ -196,23 +164,24 @@ for v = 1:numel(variantName)
 end
 writetable(metricRows, fullfile(outputDir, 'XV15_SECTION_AERO_MATLAB_METRICS.csv'));
 
-reductionName = {'alpha0L_eq_deg'; 'weight_definition_code'; ...
-    'baseline_liftSlope_1_per_rad'; 'PG_reference_r_over_R'; ...
-    'PG_Mach_cap'; 'sound_speed_mps'; 'twistTipEq_deg'; 'chordEq_m'};
-reductionValue = {alpha0Eq_deg; 'c(r)*(r/R)^2'; Pbase.rotor.liftSlope; ...
-    0.75; 0.75; Ptemplate.env.aSound; twistTipEq_deg; chordEq_m};
+%% Reduction audit
+reductionName = {'source_class'; 'source'; 'nominal_Vtip_fps'; ...
+    'Mtip'; 'alpha0L_eq_deg'; 'liftSlope_eq_1_per_rad'; 'CLmax_eq'; ...
+    'CD0_eq'; 'kCD_eq'; 'CL_fit_weighted_RMS'; 'CD_fit_weighted_RMS'; ...
+    'twistTipEq_deg'; 'chordEq_m'};
+reductionValue = {c81.sourceClass; c81.source; c81.nominalVtip_fps; ...
+    c81.Mtip; c81.alpha0L_deg; c81.liftSlope; c81.CLmax; c81.CD0; ...
+    c81.kCD; c81.clWeightedRms; c81.cdWeightedRms; twistTipEq_deg; chordEq_m};
 reductionTable = table(reductionName, reductionValue);
 writetable(reductionTable, fullfile(outputDir, 'XV15_SECTION_AERO_REDUCTION_SUMMARY.csv'));
 
 results = struct();
 results.validationTable = rows;
 results.metricTable = metricRows;
-results.sourceTable = sourceTable;
 results.reductionTable = reductionTable;
-results.alpha0Eq_rad = alpha0Eq_rad;
-results.alpha0Eq_deg = alpha0Eq_deg;
-results.claimBoundary = ['INDEPENDENT_NACA_SECTION_AERO_REDUCTION_' ...
-    'NO_OARF_PARAMETER_FIT'];
+results.c81 = c81;
+results.claimBoundary = ['NASA_C81_REFERENCE_AERO_REDUCTION_TO_GENERIC_' ...
+    'LOW_ORDER_FIELDS_NO_OARF_PARAMETER_FIT'];
 save(fullfile(outputDir, 'XV15_SECTION_AERO_VALIDATION_RESULTS.mat'), 'results');
 end
 
