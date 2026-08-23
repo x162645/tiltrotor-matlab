@@ -1,12 +1,13 @@
 function report = check_rotor_section_aero_extension()
 %CHECK_ROTOR_SECTION_AERO_EXTENSION Internal checks for opt-in section aero.
 %
-% These are model-consistency checks only. They do not constitute XV-15
-% external validation.
+% These are model-consistency and reduction-contract checks only. They do
+% not constitute XV-15 external validation.
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 addpath(rootDir);
 addpath(fullfile(rootDir, 'model'));
+addpath(fullfile(rootDir, 'analysis'));
 
 P = params_nominal();
 d2r = pi/180;
@@ -60,6 +61,37 @@ loadOk = oc.thrust > oa.thrust;
 add_case('compressibility raises representative hover lift', loadOk, ...
     'Expected the positive PG-equivalent lift-slope correction to raise thrust.');
 
+%% 5) NASA C81 -> low-order reduction contract must be physically sane
+c81 = build_xv15_c81_low_order_section_aero();
+c81Finite = all(isfinite([c81.alpha0L_rad, c81.liftSlope, c81.CLmax, ...
+    c81.CD0, c81.kCD, c81.clWeightedRms, c81.cdWeightedRms]));
+c81Range = c81.alpha0L_rad < 0 && c81.alpha0L_rad > -3*d2r && ...
+    c81.liftSlope > 6 && c81.liftSlope < 9 && ...
+    c81.CLmax > 0.8 && c81.CLmax < 1.6 && ...
+    c81.CD0 > 0 && c81.CD0 < 0.03 && ...
+    c81.kCD > 0 && c81.kCD < 0.10;
+c81Source = strcmp(c81.sourceClass,'NASA_CAMRADII_C81_REFERENCE_INPUT_REDUCTION') && ...
+    ~isempty(strfind(c81.claimBoundary,'NO_OARF_FIT')); %#ok<STREMP>
+add_case('NASA C81 reduction returns sane independent parameters', ...
+    c81Finite && c81Range && c81Source, ...
+    'C81 reduction is nonfinite, out of broad physical bounds, or lost its no-OARF-fit provenance.');
+
+%% 6) C81 reduction must not silently reactivate the separate PG correction
+P81 = P;
+P81.rotor.alpha0L = c81.alpha0L_rad;
+P81.rotor.liftSlope = c81.liftSlope;
+P81.rotor.CLmax = c81.CLmax;
+P81.rotor.CD0 = c81.CD0;
+P81.rotor.kCD = c81.kCD;
+P81.rotor.enableCompressibilityCorrection = false;
+[~,~,o81] = rotor_model_bemt_section_aero( ...
+    x, ctrl, 0, -1, zeros(3,1), P81);
+noDoubleCompressibility = ~o81.compressibilityCorrectionEnabled && ...
+    o81.sectionLiftSlopeFactor == 1 && isfinite(o81.thrust) && isfinite(o81.torque);
+add_case('C81 parameter path does not double-count PG correction', ...
+    noDoubleCompressibility, ...
+    'Separate compressibility correction was unexpectedly active on the C81-reduced path.');
+
 report.allPassed = all([report.cases.passed]);
 
 fprintf('\nRotor section-aero extension checks\n');
@@ -70,7 +102,7 @@ for k = 1:numel(report.cases)
     else
         status = 'FAIL';
     end
-    fprintf('%-48s : %s\n', report.cases(k).name, status);
+    fprintf('%-56s : %s\n', report.cases(k).name, status);
     if ~report.cases(k).passed
         fprintf('  %s\n', report.cases(k).message);
     end
