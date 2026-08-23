@@ -1,0 +1,3 @@
+collective75_deg,geometry_representation,CT_model,CP_model,CT_exp,CP_exp,note
+10,LOW_ORDER_AREA_EQUIVALENT_CHORD_LINEAR_TWIST,0.00639600273307,0.000525058334215,0.013089,0.001358,raw validation mapping
+10,NASA_RADIAL_CHORD_AND_NONLINEAR_TWIST,0.007065,0.000575,0.013089,0.001358,diagnostic only; generic section aero and inflow/flap equations retained
