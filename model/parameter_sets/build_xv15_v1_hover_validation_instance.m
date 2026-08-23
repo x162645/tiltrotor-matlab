@@ -1,11 +1,11 @@
 function [P, mapping] = build_xv15_v1_hover_validation_instance(Pbase, testPoint, sourceData)
 %BUILD_XV15_V1_HOVER_VALIDATION_INSTANCE Build a low-order XV-15 V1 instance.
 %
-% This function does not turn the generic model into an XV-15 model.  It
+% This function does not turn the generic model into an XV-15 model. It
 % maps the XV-15 original-metal-blade hover validation configuration into
 % the parameter fields that the current low-order production code actually
-% reads.  Real distributed quantities are reduced only through explicit,
-% auditable rules.  Missing reconstruction inputs remain blockers rather
+% reads. Distributed quantities are reduced only through explicit,
+% auditable rules. Missing reconstruction inputs remain blockers rather
 % than being silently replaced with plausible values.
 %
 % Inputs
@@ -17,6 +17,9 @@ function [P, mapping] = build_xv15_v1_hover_validation_instance(Pbase, testPoint
 %   sourceData - optional struct. Supported fields:
 %                 chord.rR
 %                 chord.chord_m or chord.chord_in
+%                 chord.reductionPolicy (optional for diagnostics, required
+%                     before hold-out freeze): AREA_PRESERVING,
+%                     HOVER_THRUST_R2, or HOVER_TORQUE_R3
 %                 twist.rR
 %                 twist.theta_rad or twist.theta_deg
 %                 twist.weights (optional)
@@ -33,9 +36,10 @@ function [P, mapping] = build_xv15_v1_hover_validation_instance(Pbase, testPoint
 %   mapping  - provenance, reduction diagnostics, readiness flags and the
 %              converted model collective command when theta_0.75 is given.
 %
-% V1 hold-out readiness is intentionally strict.  A complete validation
-% pack requires explicit test-point rho/rpm/theta75, a twist reduction,
-% section-aero reconstruction, and a closed Ib/Sblade treatment.
+% V1 hold-out readiness is intentionally strict. A complete validation pack
+% requires explicit test-point rho/rpm/theta75, a frozen chord-reduction
+% policy, a twist reduction, section-aero reconstruction, and a closed
+% Ib/Sblade treatment.
 
 if nargin < 1 || isempty(Pbase)
     Pbase = params_nominal();
@@ -57,6 +61,8 @@ in2m = 0.0254;
 slugft2_to_kgm2 = 1.3558179483314004;
 
 % Public XV-15 original-metal-blade reference facts used by the V1 mapping.
+% Detailed source/locator/unit records are retained in
+% docs/XV15_V1_VALIDATION_INSTANCE.md and the PR #64 evidence registry.
 public.R_m = 3.81;
 public.Nb = 3;
 public.rootCut = 0.0875;
@@ -100,7 +106,7 @@ mapping.testCondition.rpm = rpm;
 mapping.testCondition.rpmExplicit = rpmExplicit;
 mapping.testCondition.rpmDisposition = rpmDisposition;
 
-%% Test-point density.  Do not invent a density when the experiment does not
+%% Test-point density. Do not invent a density when the experiment does not
 % supply one; retain the base value but mark the hold-out contract incomplete.
 if isfield(testPoint, 'rho') && is_valid_positive_scalar(testPoint.rho)
     P.env.rho = testPoint.rho;
@@ -112,7 +118,12 @@ end
 mapping.testCondition.rho = P.env.rho;
 mapping.testCondition.rhoExplicit = rhoExplicit;
 
-%% Radial chord -> area-preserving constant-chord reduction.
+%% Radial chord -> current constant-chord field.
+% The production BEMT multiplies chord by local W^2 in both dL and dD and
+% multiplies in-plane force by r again for torque. Therefore one constant
+% chord cannot simultaneously preserve planform area, hover-force weighting
+% and hover-torque weighting. Compute all three geometry-only reductions,
+% then require an explicit policy before the final hold-out parameter freeze.
 [chordRR, chordM, chordSource] = chord_source(sourceData, public, in2m);
 validate_radial_profile(chordRR, chordM, 'chord');
 if abs(chordRR(1)-public.rootCut) > 1e-10 || abs(chordRR(end)-1) > 1e-10
@@ -120,26 +131,63 @@ if abs(chordRR(1)-public.rootCut) > 1e-10 || abs(chordRR(end)-1) > 1e-10
         'Chord profile must span exactly from rootCut=%.6g to r/R=1.', ...
         public.rootCut);
 end
-chordEq = trapz(chordRR, chordM)/(1-public.rootCut);
-areaDistributed = trapz(chordRR, chordM);
-areaEquivalent = chordEq*(1-public.rootCut);
+
+[chordArea, areaNumerator, areaDenominator] = ...
+    piecewise_linear_weighted_equivalent(chordRR, chordM, 0);
+[chordR2, r2Numerator, r2Denominator] = ...
+    piecewise_linear_weighted_equivalent(chordRR, chordM, 2);
+[chordR3, r3Numerator, r3Denominator] = ...
+    piecewise_linear_weighted_equivalent(chordRR, chordM, 3);
+[reductionPolicy, policyExplicit] = chord_reduction_policy(sourceData);
+
+switch reductionPolicy
+    case 'AREA_PRESERVING'
+        chordEq = chordArea;
+    case 'HOVER_THRUST_R2'
+        chordEq = chordR2;
+    case 'HOVER_TORQUE_R3'
+        chordEq = chordR3;
+    otherwise
+        error('build_xv15_v1_hover_validation_instance:ChordPolicyInternal', ...
+            'Unhandled chord-reduction policy: %s', reductionPolicy);
+end
+
 P.rotor.chord = chordEq;
 mapping.appliedPaths = append_path(mapping.appliedPaths, 'rotor.chord');
 mapping.chord.source = chordSource;
 mapping.chord.rR = chordRR;
 mapping.chord.chord_m = chordM;
-mapping.chord.chordEq_m = chordEq;
-mapping.chord.areaIntegralDistributed_m = areaDistributed;
-mapping.chord.areaIntegralEquivalent_m = areaEquivalent;
-mapping.chord.areaResidual_m = areaEquivalent-areaDistributed;
-mapping.chord.relativeAreaResidual = abs(areaEquivalent-areaDistributed)/ ...
-    max(abs(areaDistributed), eps);
-mapping.chord.disposition = 'EQUIVALENT_REDUCTION_AREA_PRESERVING';
+mapping.chord.areaPreservingEq_m = chordArea;
+mapping.chord.hoverThrustR2Eq_m = chordR2;
+mapping.chord.hoverTorqueR3Eq_m = chordR3;
+mapping.chord.chordEq_m = chordEq; % backward-compatible selected-value name
+mapping.chord.selectedEq_m = chordEq;
+mapping.chord.selectedPolicy = reductionPolicy;
+mapping.chord.policyExplicit = policyExplicit;
+mapping.chord.areaIntegralDistributed_m = areaNumerator;
+mapping.chord.areaIntegralEquivalentSelected_m = ...
+    chordEq*areaDenominator;
+mapping.chord.areaResidualSelected_m = ...
+    mapping.chord.areaIntegralEquivalentSelected_m-areaNumerator;
+mapping.chord.r2WeightedNumerator = r2Numerator;
+mapping.chord.r2WeightDenominator = r2Denominator;
+mapping.chord.r3WeightedNumerator = r3Numerator;
+mapping.chord.r3WeightDenominator = r3Denominator;
+candidates = [chordArea, chordR2, chordR3];
+mapping.chord.candidateSpread_m = max(candidates)-min(candidates);
+mapping.chord.relativeCandidateSpread = mapping.chord.candidateSpread_m/ ...
+    max(abs(chordArea), eps);
+mapping.chord.disposition = ['EQUIVALENT_REDUCTION_' reductionPolicy];
+if ~policyExplicit
+    mapping.blockingIssues{end+1,1} = 'CHORD_REDUCTION_POLICY_NOT_FROZEN';
+end
 
 %% Radial twist -> current rootCut-to-tip linear-twist representation.
-% The fit includes an intercept even though the production twist field does
-% not.  Absolute pitch is supplied by the collective adapter; the fitted
-% slope is therefore the quantity that maps into P.rotor.twistTip.
+% Production collective is an absolute pitch offset and the validation
+% collective is referenced at 0.75R. Therefore fit the twist SHAPE relative
+% to 0.75R directly; this makes the reduction invariant to arbitrary absolute
+% pitch offsets in the source profile and makes the reported residual equal
+% to the profile error actually used by the collective adapter.
 [twistAvailable, twistData] = twist_source(sourceData);
 if twistAvailable
     validate_radial_profile(twistData.rR, twistData.thetaRad, 'twist');
@@ -148,14 +196,32 @@ if twistAvailable
         error('build_xv15_v1_hover_validation_instance:TwistRange', ...
             'Twist stations must lie within rootCut <= r/R <= 1.');
     end
-    x = (twistData.rR-public.rootCut)/(1-public.rootCut);
-    A = [ones(size(x)), x];
-    sqrtW = sqrt(twistData.weights);
-    coeff = (A.*sqrtW) \ (twistData.thetaRad.*sqrtW);
-    thetaFit = A*coeff;
-    residual = twistData.thetaRad-thetaFit;
 
-    P.rotor.twistTip = coeff(2);
+    spanCoversRootToTip = ...
+        min(twistData.rR) <= public.rootCut+1e-10 && ...
+        max(twistData.rR) >= 1-1e-10;
+    if min(twistData.rR) > 0.75 || max(twistData.rR) < 0.75
+        error('build_xv15_v1_hover_validation_instance:TwistReferenceCoverage', ...
+            'Twist profile must cover r/R=0.75 for the collective-reference mapping.');
+    end
+
+    x = (twistData.rR-public.rootCut)/(1-public.rootCut);
+    x75 = (0.75-public.rootCut)/(1-public.rootCut);
+    theta75Source = interp1(twistData.rR, twistData.thetaRad, 0.75, 'linear');
+    dx = x-x75;
+    dtheta = twistData.thetaRad-theta75Source;
+    denominator = sum(twistData.weights.*dx.^2);
+    if ~(isfinite(denominator) && denominator > 0)
+        error('build_xv15_v1_hover_validation_instance:TwistFitDegenerate', ...
+            'Twist stations do not provide a valid slope about r/R=0.75.');
+    end
+    twistTipEq = sum(twistData.weights.*dx.*dtheta)/denominator;
+    thetaFit = theta75Source+twistTipEq*dx;
+    residual = twistData.thetaRad-thetaFit;
+    weightedRms = sqrt(sum(twistData.weights.*residual.^2)/ ...
+        sum(twistData.weights));
+
+    P.rotor.twistTip = twistTipEq;
     mapping.appliedPaths = append_path(mapping.appliedPaths, 'rotor.twistTip');
     mapping.twist.available = true;
     mapping.twist.rR = twistData.rR;
@@ -163,18 +229,21 @@ if twistAvailable
     mapping.twist.thetaFit_rad = thetaFit;
     mapping.twist.residual_rad = residual;
     mapping.twist.weights = twistData.weights;
-    mapping.twist.intercept_rad = coeff(1);
-    mapping.twist.twistTipEq_rad = coeff(2);
+    mapping.twist.theta75Source_rad = theta75Source;
+    mapping.twist.rootReferenceFromSourceFit_rad = ...
+        theta75Source-twistTipEq*x75;
+    mapping.twist.twistTipEq_rad = twistTipEq;
     mapping.twist.rmsResidual_rad = sqrt(mean(residual.^2));
+    mapping.twist.weightedRmsResidual_rad = weightedRms;
     mapping.twist.maxAbsResidual_rad = max(abs(residual));
-    mapping.twist.spanCoversRootToTip = ...
-        min(twistData.rR) <= public.rootCut+1e-10 && ...
-        max(twistData.rR) >= 1-1e-10;
-    mapping.twist.disposition = 'EQUIVALENT_REDUCTION_WEIGHTED_LINEAR_FIT';
+    mapping.twist.spanCoversRootToTip = spanCoversRootToTip;
+    mapping.twist.disposition = ...
+        'EQUIVALENT_REDUCTION_LINEAR_SHAPE_FIT_ANCHORED_AT_075R';
 else
     mapping.twist.available = false;
     mapping.twist.twistTipEq_rad = NaN;
     mapping.twist.rmsResidual_rad = NaN;
+    mapping.twist.weightedRmsResidual_rad = NaN;
     mapping.twist.maxAbsResidual_rad = NaN;
     mapping.twist.spanCoversRootToTip = false;
     mapping.twist.disposition = 'BLOCKED_SOURCE_RADIAL_TWIST_REQUIRED';
@@ -195,7 +264,8 @@ if theta75Available && mapping.twist.available
     mapping.collective.theta75Reconstructed_rad = theta75Reconstructed;
     mapping.collective.reconstructionError_rad = ...
         theta75Reconstructed-theta75Rad;
-    mapping.collective.disposition = 'VALIDATION_INPUT_ADAPTER_THETA75_TO_MODEL_ROOTCUT_REFERENCE';
+    mapping.collective.disposition = ...
+        'VALIDATION_INPUT_ADAPTER_THETA75_TO_MODEL_ROOTCUT_REFERENCE';
 else
     mapping.collective.modelCollective_rad = NaN;
     mapping.collective.theta75Reconstructed_rad = NaN;
@@ -206,7 +276,7 @@ else
     end
 end
 
-%% Section-aero reconstruction.  These four fields are exactly what the
+%% Section-aero reconstruction. These four fields are exactly what the
 % current BEMT consumes, so only a complete reconstructed set is applied.
 [aeroAvailable, aero] = section_aero_source(sourceData);
 if aeroAvailable
@@ -228,7 +298,7 @@ else
 end
 
 %% Coupled flapping mass-property closure.
-% Do not apply the public Ib by itself.  It is only activated together with
+% Do not apply the public Ib by itself. It is only activated together with
 % a supplied first blade-mass moment Sblade used by the same flap residual.
 SbladeAvailable = false;
 Sblade = NaN;
@@ -268,8 +338,8 @@ end
 
 %% Readiness contract.
 mapping.readiness.directGeometry = true;
-mapping.readiness.chordReduction = isfinite(chordEq) && chordEq > 0 && ...
-    mapping.chord.relativeAreaResidual < 1e-12;
+mapping.readiness.chordReduction = all(isfinite(candidates)) && all(candidates > 0);
+mapping.readiness.chordPolicyFrozen = policyExplicit;
 mapping.readiness.twistReduction = mapping.twist.available && ...
     mapping.twist.spanCoversRootToTip;
 mapping.readiness.testPointRpm = rpmExplicit;
@@ -282,6 +352,7 @@ mapping.readiness.readyForMappingDiagnostics = ...
 mapping.readiness.readyForHoldout = ...
     mapping.readiness.directGeometry && ...
     mapping.readiness.chordReduction && ...
+    mapping.readiness.chordPolicyFrozen && ...
     mapping.readiness.twistReduction && ...
     mapping.readiness.testPointRpm && ...
     mapping.readiness.testPointRho && ...
@@ -318,6 +389,54 @@ else
     chordM = public.chord_in*in2m;
     source = 'PUBLIC_XV15_ROOT_TAPER_PIECEWISE_RECONSTRUCTION';
 end
+end
+
+function [policy, explicit] = chord_reduction_policy(sourceData)
+policy = 'AREA_PRESERVING';
+explicit = false;
+if isfield(sourceData, 'chord') && isstruct(sourceData.chord) && ...
+        isfield(sourceData.chord, 'reductionPolicy')
+    raw = sourceData.chord.reductionPolicy;
+    if isstring(raw) && isscalar(raw)
+        raw = char(raw);
+    end
+    if ~ischar(raw)
+        error('build_xv15_v1_hover_validation_instance:ChordPolicyType', ...
+            'chord.reductionPolicy must be a character vector or scalar string.');
+    end
+    policy = upper(strtrim(raw));
+    explicit = true;
+end
+allowed = {'AREA_PRESERVING','HOVER_THRUST_R2','HOVER_TORQUE_R3'};
+if ~any(strcmp(policy, allowed))
+    error('build_xv15_v1_hover_validation_instance:ChordPolicy', ...
+        'Unsupported chord-reduction policy: %s', policy);
+end
+end
+
+function [ceq, numerator, denominator] = ...
+        piecewise_linear_weighted_equivalent(rR, chordM, power)
+% Exact integral for a piecewise-linear chord profile times (r/R)^power.
+numerator = 0;
+denominator = 0;
+for k = 1:numel(rR)-1
+    r1 = rR(k);
+    r2 = rR(k+1);
+    c1 = chordM(k);
+    c2 = chordM(k+1);
+    slope = (c2-c1)/(r2-r1);
+    intercept = c1-slope*r1;
+    numerator = numerator + ...
+        intercept*(r2^(power+1)-r1^(power+1))/(power+1) + ...
+        slope*(r2^(power+2)-r1^(power+2))/(power+2);
+    denominator = denominator + ...
+        (r2^(power+1)-r1^(power+1))/(power+1);
+end
+if ~(isfinite(denominator) && denominator > 0)
+    error('build_xv15_v1_hover_validation_instance:ChordWeightDegenerate', ...
+        'Chord weighting integral is not positive and finite.');
+end
+ceq = numerator/denominator;
 end
 
 function [available, data] = twist_source(sourceData)
