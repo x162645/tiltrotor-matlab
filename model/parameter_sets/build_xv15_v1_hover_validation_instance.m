@@ -502,6 +502,7 @@ if aero.liftSlope <= 0 || aero.CLmax <= 0 || aero.CD0 < 0 || aero.kCD < 0
     error('build_xv15_v1_hover_validation_instance:InvalidSectionAero', ...
         'Section-aero equivalent parameters must satisfy physical sign constraints.');
 end
+available = true;
 end
 
 function validate_radial_profile(rR, values, label)

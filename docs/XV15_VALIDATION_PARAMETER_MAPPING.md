@@ -67,13 +67,27 @@ c_{eq}\approx0.3624\;m.
 thetaBlade = rotorCtrl.collective + twist + theta1s*sin(psi);
 ```
 
-因此 `rotorCtrl.collective` 是当前低阶线性扭转律的基准桨距。若 NASA 试验的 collective 定义为 `theta_0.75R`，则试验输入不能直接赋值给程序 collective。对于已确定的等效扭转，应使用
+因此 `rotorCtrl.collective` 是当前低阶线性扭转律在 `r_0=rootCut*R` 处的数学截距，不是作动器角，也不应直接称为实测根部桨距。完整的模型定义是
 
 \[
-\theta_{model}=\theta_{0.75,test}-\theta_{twist,eq}(0.75R).
+x=\frac{r/R-r_0/R}{1-r_0/R},\qquad
+\theta(r)=\theta_{model}+\theta_{twist,eq}x .
 \]
 
-该转换属于**验证输入同构问题**，不要求改变通用模型控制接口。
+NASA Run 15 的 collective 是零转速 0.75R 处总距 `theta_75,0`，所以适配器必须使用
+
+\[
+x_{75}=\frac{0.75-r_0/R}{1-r_0/R},\qquad
+\theta_{model}=\theta_{75,0}-\theta_{twist,eq}x_{75}.
+\]
+
+冻结值为 `r_0/R=0.0875`、`x_75=0.726027397`、`theta_twist,eq=-36.347913°`，于是
+
+\[
+\theta_{model}=\theta_{75,0}+26.389581^\circ .
+\]
+
+例如，试验 6°点进入模型时为 32.389581°，但回代 0.75R 后仍严格是 6°。这个数值换算是**验证输入同构问题**，不是额外物理变距，也不要求改变通用模型控制接口。它闭合的是静态参考站位；旋转受载后的实际桨距传递仍未闭合，执行门槛见 `docs/XV15_SOURCE_CONTRACT_CLOSURE.md`。
 
 ### 2.4 `rotor.Omega` 在单工况验证中可直接赋值，不需要先实现完整 RPM schedule
 

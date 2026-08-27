@@ -28,6 +28,8 @@ references\NASA_TM_81244.pdf
 
 本文件是可持续更新的审查记录，不是自动证明模型正确的证据。
 
+盛文论文中已确认的错行、量纲问题、特征值问题及其是否进入本项目，统一记录在 `docs/SHENG_PAPER_ERRATA_INHERITANCE_AUDIT.md`。该审计优先于本文件中的历史性概括。
+
 ---
 
 ## 2. 与 AGENTS.md 的关系
@@ -696,7 +698,7 @@ tests\check_article_trends.m
 | 控制向量 | `uCtrl = [collective diffCollective cyclic diffCyclic aileron elevator rudder]'` | `model\total_forces_moments.m`；`analysis\linearize_numeric.m` | NUAA PDF页12，原文页12，式(40)给出七个控制量；符号命名需人工核对 | `SIMILAR` |
 | 机体系 | 代码注释为 `x前、y右、z下` | `model\tiltrotor_eom.m`；`model\aero_force_body.m` | NUAA Figure 2 需要人工视觉核对 | `UNVERIFIED` |
 | 惯性/地轴系 | 代码仅通过 Euler 321 运动学隐含使用，未显式输出位置状态 | `model\tiltrotor_eom.m` | NUAA PDF页3 假设地轴系为惯性系；代码缺少位置方程 | `MISSING_IN_CODE` |
-| 短舱角 `betaM` | `0` 时推力向上，`pi/2` 时推力向前；`eT=[sin(betaM);0;-cos(betaM)]` | `model\rotor_model_bemt.m` | NUAA 文本采用 `theta_M`；NASA_TM_81244 PDF页6称 XV-15 指示逻辑为 airplane 0、helicopter 90，与本代码相反 | `UNVERIFIED` |
+| 短舱角 `betaM` | `0` 时推力向上，`pi/2` 时推力向前；`eT=[sin(betaM);0;-cos(betaM)]` | `model\rotor_model_bemt.m` | NUAA 图 1 标为直升机 90°、飞机 0°，但式（16）、（17）的变量必须采用直升机 0°、飞机 90°才能得到相应端点；代码明确选择公式约定，不复制图 1 标注 | `DIFFERENT` |
 | 旋翼轴系 | `eT,eD,eY` 为代码局部轴；`eT` 推力轴，`eD` 盘内纵向，`eY` 机体右向 | `model\rotor_model_bemt.m` | NUAA 旋翼轴变换矩阵在 PDF页5 式(14)(15)，抽取不完整 | `UNVERIFIED` |
 | 角度单位 | 参数文件声明内部角度为 rad；输入演示用 deg 转 rad | `params_nominal.m`；`run_demo.m` | NUAA/NASA 多数图表为 deg，进入代码前需转换 | `SIMILAR` |
 
@@ -706,9 +708,9 @@ tests\check_article_trends.m
 
 | 严重度 | 分类 | 位置 | 风险 | 需要的后续确认 |
 |---|---|---|---|---|
-| `HIGH` | 坐标系或符号错误 | `model\rotor_model_bemt.m` | 本代码 `betaM=0` 为直升机模式、`pi/2` 为飞机模式；NASA_TM_81244 PDF页6的 XV-15 指示逻辑为 airplane 0、helicopter 90，存在定义相反风险 | 明确本项目 `betaM` 是否为论文符号还是代码自定义符号 |
-| `HIGH` | 物理模型错误 | `model\rotor_model_bemt.m` | 论文 PDF页4 式(4)给出挥舞运动方程；代码采用一阶谐波准定常闭合且无挥舞状态 | 若要复现论文，需要确认该闭合是否可接受 |
-| `HIGH` | 模型缺失 | `model\tiltrotor_eom.m` | 状态只有 9 个，未包含惯性位置；论文 6DOF 框架含地轴假设，代码不能直接输出轨迹位置 | 需要决定是否加入位置状态或保持小扰动模型 |
+| `RESOLVED_HIGH` | 坐标系或符号错误 | `model\rotor_model_bemt.m` | 盛文图 1 与其式（16）、（17）使用互补的角度基准；代码已经明确采用公式变量约定，即 `betaM=0` 为直升机模式、`pi/2` 为飞机模式 | 两个端点已有测试；外部数据进入代码前必须显式转换角度基准 |
+| `ACCEPTED_REDUCTION` | 模型降阶 | `model\rotor_model_bemt.m` | 论文 PDF页4 式(4)给出挥舞运动方程；代码采用一阶谐波准定常闭合且无独立挥舞状态，这是当前低阶模型边界，不是自动判定的代码错误 | 当前严格停止扩模；只有独立动态证据直接指向该降阶时才重新评估 |
+| `OUT_OF_SCOPE` | 输出范围 | `model\tiltrotor_eom.m` | 状态只有 9 个，未包含惯性位置，因此不能直接输出轨迹位置；当前配平、线性化和稳定性任务并不需要位置积分 | 当前不加入位置状态；若研究目标明确变为轨迹仿真，再单独立项 |
 | `HIGH` | 文献依据不足 | `params_nominal.m` | 质量、惯量、几何、气动系数为概念参数，尚未追溯到 NASA 表格或图 | 建立参数来源表并逐项标记 |
 | `MEDIUM` | 数值计算错误 | `model\tiltrotor_eom.m` | Euler 321 在 `cos(theta)` 接近零时用 `1e-6` 替代，避免除零但改变奇异点附近动力学 | 需要极限工况测试和姿态范围约束 |
 | `MEDIUM` | 数值计算错误 | `model\rotor_model_bemt.m` | `phiInflow = atan2(UP, max(abs(UT),1e-8))` 丢失 `UT` 符号，反向流工况可能失真 | 需要反向流/低转速工况检查 |
@@ -736,7 +738,7 @@ tests\check_article_trends.m
 | M-011 | 机翼滑流区局部速度 | 6 | 6 of 18 | 式(17) | `model\wing_model.m` | `one_region` | `VrigidLocal,v1dEq17,VwakeEq17,VwakeBasis,eq17BasisError,eq17ReconstructionError,Vlocal` | `VrigidLocal=Vbody+cross(omegaBody,rAC)`；滑流区 `VwakeEq17=[v1d*sin(betaM);0;-v1d*cos(betaM)]`；`Vlocal=VrigidLocal+VwakeEq17`；自由流区只用刚体局部速度 | 机体系局部速度 | m/s | 当前代码坐标中 `rotor.eT=[sin(betaM);0;-cos(betaM)]`，因此 `v1d*rotor.eT` 与论文式(17)向量完全等价；`eq17BasisError` 和 `eq17ReconstructionError` 作为诊断输出 | `P.rotor.wakeFactor` 已废弃且生产机翼模型不再读取；负值或非有限 `v1d` 显式报错，不静默钳位 | `EXACT` | `localVelocityModel=NUAA_EQ17` 或 `FREE_STREAM_RIGID_BODY`; `wakeFactorUsed=false` |
 | M-011A | 机翼作用点重心修正 | 6 | 6 of 18 | 式(18) | `model\wing_model.m`; `tests\check_nuaa_eq17_wing_velocity.m` | `wing_model`; `test_eq18_rac_shift_identity` | `rFree0,rSlip0,cgShift,rAC` | `rAC=rAC0-cgShift`，其中自由流和滑流区域使用各自等效横向作用点 | 机体系位置 | m | 与论文式(18)同构；当前代码以 `cgShift=[Delta x;0;Delta z]` 的三维变量形式允许更一般输入 | 测试逐区域验证等式；自由流两个子区目前仍合并为等效自由流区 | `SIMILAR` | 当前横向作用点为概念参数，仍需真实几何来源 |
 | M-011B | 机翼气动力变换 | 6 | 6 of 18 | 式(19)(21) | `model\aero_force_body.m`; `model\wing_model.m`; `tests\check_nuaa_eq17_wing_velocity.m` | `aero_force_body`; `one_region`; `test_eq19_21_force_transform_identity` | `D,Y,L,alpha,beta,FNear,FLiftLine,F` | 零侧滑时 `aero_force_body(D,0,L,alpha,0)=[-D*cos(alpha)+L*sin(alpha);0;-D*sin(alpha)-L*cos(alpha)]`；生产模型使用同一三维风轴到机体系函数 | 机体系力 | N | 式(19)、(21)为论文纵向公式；代码保留侧滑项 `Y,beta`，是三维推广 | 测试验证零侧滑严格退化到论文纵向表达式；自由流两个子区目前合并为等效自由流区 | `SIMILAR` | 侧滑三维推广需后续用风轴定义继续核对 |
-| M-011C | 机翼力矩合成 | 6 | 6 of 18 | 式(20)(22) | `model\wing_model.m`; `tests\check_nuaa_eq17_wing_velocity.m` | `one_region`; `test_eq20_22_moment_and_symmetry` | `M,MNear,MLiftLine,Marm,Maero` | `M=cross(rAC,F)+Maero`，近法向分支、升力线分支和混合输出均满足该恒等式 | 机体系力矩 | N*m | 与论文式(20)、(22)的力臂矩阵表达等价；代码直接用 `cross(rAC,F)` | 测试验证逐区域力矩恒等式和零副翼左右对称关系 | `EXACT` | `Maero` 系数仍为概念模型，不代表试验验证 |
+| M-011C | 机翼力矩合成 | 6 | 6 of 18 | 式(20)(22) | `model\wing_model.m`; `tests\check_nuaa_eq17_wing_velocity.m` | `one_region`; `test_eq20_22_moment_and_symmetry` | `M,MNear,MLiftLine,Marm,Maero` | `M=cross(rAC,F)+Maero`，近法向分支、升力线分支和混合输出均满足该恒等式 | 机体系力矩 | N*m | PDF 原图复核确认式（20）、（22）第二行第一列均为正 `z`，与正确的 `r×F` 矩阵等价；此前的负号怀疑已撤回 | 测试验证逐区域力矩恒等式和零副翼左右对称关系 | `EXACT` | `Maero` 系数仍为概念模型，不代表试验验证 |
 | M-010A | 机翼 near-normal / lift-line 连续混合 | N/A | N/A | CODE_ONLY | `model\wing_model.m`; `params_nominal.m`; `tests\check_wing_normal_flow_blend.m` | `one_region` | `normalFlowRatio,normalFlowBlendHalfWidth,normalFlowBranchWeight,FNear,FLiftLine` | 两套概念气动分支在同一局部来流下分别计算，并用 quintic smootherstep 混合力和气动力矩 | 机体系局部作用点 | ratio, N, N*m | 无论文数据；用于消除人工硬切换 | `normalFlowRatio=0.35` 为过渡中心，`normalFlowBlendHalfWidth=0.15` 为 `ASSUMED_MODEL_PARAMETER` | `CODE_ONLY` | 连续化不代表机翼气动已被试验验证；0.15 是基于连续性、混合覆盖范围和敏感性分析选取的暂定概念值，无文献或试验依据；相对 0.20 缩小混合影响范围，当前粗扫未恢复原人工跳变，后续仍需局部流动数据、风洞数据或高保真计算校正 |
 | M-011 | 机身气动力和力矩 | 7 | 7 of 18 | 式(23)(24) | `model\fuselage_model.m` | `fuselage_model` | `alpha,beta,D,L,Y,Maero` | 风轴力经 `aero_force_body` 转机体系，`M=cross(rAC,F)+Maero` | 机体系/风轴 | N, N*m | 论文气动系数来源未映射 | 阻尼导数 `Clp,Cmq,Cnr` 等 | `UNVERIFIED` | 风轴到机体系矩阵和力正号需视觉核对 |
 | M-012 | 平尾与升降舵 | 7-8 | 7-8 of 18 | 式(25)(26) | `model\horizontal_tail_model.m` | `horizontal_tail_model` | `alphaEff,elevator,CL,CD,Cm` | 固定翼尾翼模型，`M=cross(rAC,F)+Maero` | 机体系/风轴 | N, N*m | 论文公式文本抽取不完整 | 下洗修正 `downwashAlpha` | `UNVERIFIED` | 平尾局部来流和力矩符号未完成三方核验 |
@@ -744,25 +746,18 @@ tests\check_article_trends.m
 | M-014 | 整机合力 | 8 | 8 of 18 | 式(31) | `model\total_forces_moments.m` | `total_forces_moments` | `Ftotal,FrotL,FrotR,Fwing,Ffus,Fht,Fvt` | 各部件机体系力直接求和 | 机体系 | N | 论文将左右机翼和左右垂尾分列；代码将机翼/垂尾内部合并 | 诊断结构 `info.components` | `UNVERIFIED` | 各部件坐标统一性需逐项核验 |
 | M-015 | 整机合矩 | 8 | 8 of 18 | 式(32) | `model\total_forces_moments.m` | `total_forces_moments` | `Mtotal,Mrot*,Mwing,Mfus,Mht,Mvt` | 各部件已含 `cross(r,F)` 和气动力矩，总矩直接求和 | 机体系 | N*m | 各部件自带力矩参考点需逐项确认 | 陀螺反扭矩加入旋翼矩 | `UNVERIFIED` | `r×F` 顺序正确，但参考点/坐标需逐项核验 |
 | M-016 | 平动动力学 | 8 | 8 of 18 | 式(33) | `model\tiltrotor_eom.m` | `tiltrotor_eom` | `Vdot,Ftotal,Fg,omega,Vbody` | `Vdot=Ftotal/m-cross(omega,Vbody)` | 机体系，重力投影到机体系 | m/s^2 | 论文重力矩阵符号需视觉核对 | 重力在 EOM 单独加入 | `UNVERIFIED` | 重力投影和机体系正方向需视觉核对 |
-| M-017 | 转动动力学 | 8 | 8 of 18 | 式(34)(35) | `model\tiltrotor_eom.m` | `tiltrotor_eom` | `omegaDot,mp.I,Mtotal` | `omegaDot=I\(M-cross(omega,I*omega))` | 机体系 | rad/s^2 | 惯量来源未核验 | 使用完整惯量矩阵 | `UNVERIFIED` | 惯量轴、交叉惯量符号和力矩坐标未核验 |
+| M-017 | 转动动力学 | 8 | 8 of 18 | 式(34)(35) | `model\tiltrotor_eom.m` | `tiltrotor_eom` | `omegaDot,mp.I,Mtotal` | `omegaDot=I\(M-cross(omega,I*omega))` | 机体系 | rad/s^2 | 论文式（34）印刷式缺少角动量项最后的 `omega` 向量，维数不闭合 | 代码使用完整惯量矩阵和完整欧拉刚体方程 | `DIFFERENT` | 论文印刷错误未继承；惯量来源、惯量轴和交叉惯量符号仍是独立未核验项 |
 | M-018 | Euler 321 运动学 | 8-9 | 8-9 of 18 | 式(36) | `model\tiltrotor_eom.m` | `tiltrotor_eom` | `T321,eulerDot` | `eulerDot=T321*omega` | 321 Euler 角 | rad/s | 接近奇异点处理未见论文对应 | `cosTheta` 最小值替代 | `UNVERIFIED` | Euler 角旋转顺序和角定义需人工核对 |
 | M-019 | 非线性模型结构 | 9 | 9 of 18 | Figure 4 | 多文件 | 主调用链 | 各部件 `F,M,out` | 部件力矩输入 EOM | 机体系 | SI | Simulink S-function 结构未实现 | MATLAB 函数式实现 | `UNVERIFIED` | 架构相近，但部件坐标统一性未核验 |
 | M-020 | 配平方法 | 9-10 | 9-10 of 18 | Figure 5-6；trim function | `analysis\trim_symmetric.m` | `trim_symmetric` | `z=[theta,collective,pitchCommand]` | `fminsearch` 最小化 `[udot,wdot,qdot]` | 对称纵向状态 | rad, m/s^2, rad/s^2 | 未配平全部六分量、无边界求解器 | 罚函数和混控 `eta=sin(betaM)^2` | `DIFFERENT` | 论文使用 MATLAB/Simulink `trim`，代码为简化对称配平 |
 | M-021 | 平衡点定义 | 12 | 12 of 18 | 式(37) | `analysis\linearize_numeric.m`；`analysis\trim_symmetric.m` | `linearize_numeric`；`trim_symmetric` | `xe,ue,report.f0` | `f(xe,ue)=0` 作为线性化前提 | 状态空间 | SI/rad | 未强制检查 `report.f0` 足够小 | 输出 `report.f0` | `UNVERIFIED` | 线性化点是否真实配平需 MATLAB 回代确认 |
-| M-022 | 状态空间线性化 | 12 | 12 of 18 | 式(38)(41)(42) | `analysis\linearize_numeric.m` | `linearize_numeric` | `A,B,dx,du` | 中心差分 `A(:,j)=(fp-fm)/(2dx)` | 9状态、7控制 | 各状态/控制单位 | 未做步长敏感性 | 中心差分优于论文 Linmod 黑箱，但可能跨限幅 | `DIFFERENT` | 论文使用 `Linmod`，代码用数值中心差分 |
-| M-023 | 特征值和稳定性分析 | 13-15 | 13-15 of 18 | Tables 1-3 等 | `analysis\stability_report.m` | `stability_report` | `eig(A),idxLong,idxLat` | 全系统和纵/横向子矩阵特征值 | 状态空间 | 1/s | 无模态参与度、频率阻尼整理、论文表格对比 | `openLoopStable` 布尔判据 | `SIMILAR` | 都做特征值分析，但解释深度不同 |
+| M-022 | 状态空间线性化 | 12 | 12 of 18 | 式(38)(41)(42) | `analysis\linearize_numeric.m` | `linearize_numeric` | `A,B,dx,du` | 中心差分 `A(:,j)=(fp-fm)/(2dx)` | 9状态、7控制 | 各状态/控制单位 | 未做步长敏感性；论文式（41）印成 `mg` 且导数归一化不明，式（42）还有下标错字 | 中心差分直接作用于完整状态导数，不构造论文手写矩阵 | `DIFFERENT` | 论文印刷问题未继承；代码自身仍需独立检查差分步长和配平点 |
+| M-023 | 特征值和稳定性分析 | 13-15 | 13-15 of 18 | Tables 1-6 | `analysis\stability_report.m` | `stability_report` | `eig(A),idxLong,idxLat` | 全系统和纵/横向子矩阵特征值 | 状态空间 | 1/s | 无模态参与度和频率阻尼整理；论文表 1 的 `0.0452` 错行，表 6 纵向 `−0.5295` 应为约 `−0.085158`，两处文字还误判根的符号或类型 | `openLoopStable` 布尔判据；所有根由本项目矩阵实时计算 | `SIMILAR` | 方法类型相似，但不导入论文表格或模态解释；论文稳定性数值不得作为外部验证基准 |
 | M-024 | 演示与批量工况 | 9-12 | 9-12 of 18 | Figure 5-8 | `run_demo.m` | 脚本 | `cases,results` | 多工况调用配平/线性化/稳定性 | 代码定义 | SI/rad，输出 deg | 未对应论文具体 XV-15 工况 | 保存 `demo_results.mat` 和图 | `CODE_ONLY` | 论文无该 MATLAB 脚本；代码为项目演示入口 |
 
-### 21.1 状态数量
+### 21.1 状态说明
 
-| 状态 | 数量 |
-|---|---:|
-| `EXACT` | 0 |
-| `SIMILAR` | 1 |
-| `DIFFERENT` | 3 |
-| `MISSING_IN_CODE` | 0 |
-| `CODE_ONLY` | 1 |
-| `UNVERIFIED` | 19 |
+本表包含 `M-011A`、`M-011B`、`M-011C`、`M-010A` 等扩展条目，并保留若干历史编号，因此不再维护容易失真的手工状态计数。判断应以每一行的当前状态和 `docs/SHENG_PAPER_ERRATA_INHERITANCE_AUDIT.csv` 为准。
 
 ---
 
@@ -779,7 +774,7 @@ tests\check_article_trends.m
 | `NASA_TM_X_62407.pdf` | 21 | 18 | Figure 3.7.1 | Rotor blade aerodynamic twist | deg vs r/R | `P.rotor.twistTip` | `-6 deg` | `UNVERIFIED` | 图需数字化，不能用文本抽取 |
 | `NASA_TM_X_62407.pdf` | 22 | 19 | 3.8 Tip Speed | Hover 740 ft/s 565 rpm；Cruise 600 ft/s 458 rpm | ft/s, rpm | `P.rotor.Omega` | `62 rad/s` | `UNVERIFIED` | 当前转速约 592 rpm，需确认工况 |
 | `NASA_TM_81244.pdf` | 4 | 约2 | Design characteristics | 25 ft prop-rotor diameter, 45 deg blade twist, 32 ft spinner-to-spinner span, 42 ft length | ft, deg | `P.rotor.R`, `P.rotor.twistTip`, `P.wing.b` | 多项 | `UNVERIFIED` | 综述性数据，适合交叉核对 |
-| `NASA_TM_81244.pdf` | 6 | 约4 | Conversion angle indicator | Angle logic airplane `0`, helicopter `90` | deg | `betaM` | `0` helicopter, `pi/2` airplane | `UNVERIFIED` | 与当前代码短舱角定义相反，是最高优先级人工核对点 |
+| `NASA_TM_81244.pdf` | 6 | 约4 | Conversion angle indicator | Angle logic airplane `0`, helicopter `90` | deg | `betaM` | `0` helicopter, `pi/2` airplane | `DIFFERENT` | NASA 指示角与代码公式变量互为余角；进入代码前必须显式转换，不能直接比较数值 |
 | `NASA_TM_81244.pdf` | 8 | 约6 | Airplane mode flight | Airplane mode rpm reduction 98%/589 to 86%/517, 76%/458 | rpm | `P.rotor.Omega` | `62 rad/s` | `UNVERIFIED` | 需确认是否采用飞行试验还是设计值 |
 | `NASA_TM_81244.pdf` | 14 | 图页 | Figure 4 | XV-15 dimensions | ft/in | 几何参数 | 多项 | `UNVERIFIED` | 图形尺寸需视觉读取 |
 
@@ -793,7 +788,7 @@ tests\check_article_trends.m
 | 2 | `NUAA_main_paper.pdf` | 5 | 5 of 18 | 式(14)(15) | 旋翼力/矩从旋翼轴到机体系的矩阵抽取不可靠 |
 | 3 | `NUAA_main_paper.pdf` | 7 | 7 of 18 | 式(23)(24) | 风轴到机体系力/矩转换符号需与 `aero_force_body` 对照 |
 | 4 | `NUAA_main_paper.pdf` | 8 | 8 of 18 | 式(31)-(36) | 合力、合矩、重力投影和 Euler 运动学矩阵需视觉确认 |
-| 5 | `NASA_TM_81244.pdf` | 6 | 约4 | Conversion angle indicator | XV-15 角度逻辑与当前代码 `betaM` 定义相反，不能混用 |
+| 5 | `NASA_TM_81244.pdf` | 6 | 约4 | Conversion angle indicator | 已确认 NASA 指示角与代码 `betaM` 互为余角；后续只需检查外部输入是否执行显式转换 |
 
 ---
 
