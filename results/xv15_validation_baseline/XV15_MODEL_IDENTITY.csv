@@ -1,0 +1,10 @@
+item,path,role,baselineM0Allowed,modelIdentity,reason
+params_nominal,params_nominal.m,BASELINE_M0,YES,M0_PRODUCTION_LOW_ORDER,Provides the generic self-consistent parameter baseline; XV-15 validation overlays only fields already consumed by M0
+rotor_model_bemt,model/rotor_model_bemt.m,BASELINE_M0,YES,M0_PRODUCTION_LOW_ORDER,Production low-order BEMT rotor model used by the pure V1 baseline
+run_xv15_metal_hover_validation,analysis/run_xv15_metal_hover_validation.m,VALIDATION_ADAPTER,YES,M0_VALIDATION_ADAPTER,Maps original-metal-blade XV-15 geometry and test inputs into existing M0 fields and directly calls rotor_model_bemt; historical evidence labels are superseded by the canonical wrapper
+run_xv15_v1_baseline_correlation,analysis/run_xv15_v1_baseline_correlation.m,CANONICAL_VALIDATION_ENTRY,YES,M0_CANONICAL_VALIDATION,Canonical V1 entry; applies evidence-role correction without changing predictions or production physics
+audit_xv15_v1_baseline_model_identity,analysis/audit_xv15_v1_baseline_model_identity.m,VERIFICATION_GUARD,YES,M0_IDENTITY_GUARD,Static guard that rejects known post-validation extension tokens from the baseline computation path
+rotor_model_bemt_section_aero,model/rotor_model_bemt_section_aero.m,POST_VALIDATION_DIAGNOSTIC,NO,M1_SECTION_AERO_EXTENSION,Adds nonzero zero-lift-angle and optional compressibility behavior that is absent from M0
+build_xv15_c81_low_order_section_aero,analysis/build_xv15_c81_low_order_section_aero.m,POST_VALIDATION_DIAGNOSTIC,NO,M1_PARAMETER_RECONSTRUCTION,Builds section-aero quantities including alpha0L used by the section-aero extension; excluded from pure M0 validation
+run_xv15_frozen_low_order_validation,analysis/run_xv15_frozen_low_order_validation.m,POST_VALIDATION_DIAGNOSTIC,NO,M1_EXTERNAL_CORRELATION,Calls rotor_model_bemt_section_aero and therefore does not validate the original M0 identity
+run_xv15_frozen_external_correlation,analysis/run_xv15_frozen_external_correlation.m,METADATA_WRAPPER_FOR_M1,NO,M1_EXTERNAL_CORRELATION,Corrects evidence metadata but intentionally preserves the underlying section-aero-extension numerical path
