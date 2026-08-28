@@ -9,7 +9,6 @@ on:
       - 'analysis/**'
       - 'model/**'
       - 'params_nominal.m'
-      - 'results/xv15_validation_baseline/**'
       - 'XV15_VALIDATION_TASKS.txt'
   workflow_dispatch:
 
