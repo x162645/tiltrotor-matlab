@@ -1,0 +1,54 @@
+name: M1 stage-5 WADC post-freeze holdout
+
+on:
+  push:
+    branches:
+      - research/m1-xv15-physics-enhanced-20260828
+    paths:
+      - '.github/workflows/m1-stage5-wadc-holdout.yml'
+      - 'analysis/run_m1_stage5_wadc_holdout.m'
+      - 'analysis/data/xv15_wadc_metal_table_a3.csv'
+      - 'analysis/run_m1_stage3_corrigan_stall_delay.m'
+      - 'analysis/xv15_c81_corrigan_stall_delay.m'
+      - 'analysis/xv15_c81_section_lookup.m'
+      - 'model/rotor_model_bemt.m'
+      - 'params_nominal.m'
+      - 'docs/M1_HOLDOUT_FREEZE.md'
+      - 'docs/M1_STAGE5_WADC_SOURCE_AUDIT.md'
+      - 'CODEX_TASK.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m1-stage5-wadc-holdout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run frozen M0 and M1 WADC validation
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            artifactRoot = fullfile(pwd,'ci_artifacts','m1_stage5_wadc_holdout');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            results = run_m1_stage5_wadc_holdout(artifactRoot);
+            fid = fopen(fullfile(artifactRoot,'M1_STAGE5_WADC_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nclaimBoundary=%s\n',results.claimBoundary);
+            fprintf(fid,'m1IdentityMaxAbsDifference=%.12g\n',results.maxM1IdentityDifference);
+            fclose(fid);
+
+      - name: Upload Stage-5 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-stage5-wadc-holdout-evidence
+          path: ci_artifacts/m1_stage5_wadc_holdout
+          if-no-files-found: error
