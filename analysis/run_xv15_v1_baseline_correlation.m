@@ -53,7 +53,7 @@ T.datasetIndependence = repmat({datasetIndependence}, n, 1);
 T.claimBoundary = repmat({claimBoundary}, n, 1);
 T.reportMembership = repmat({'OUTSIDE_FIXED_REPORT_WINDOW'}, n, 1);
 fixedWindow = ismember(T.collective75_deg, [6; 7; 8; 9; 10; 11]);
-T.reportMembership(fixedWindow) = {reportWindow};
+T.reportMembership(fixedWindow) = repmat({reportWindow}, sum(fixedWindow), 1);
 
 writetable(T, fullfile(outputDir, 'XV15_V1_M0_BASELINE_POINTS.csv'));
 
