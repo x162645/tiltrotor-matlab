@@ -1,0 +1,161 @@
+XV-15低阶飞行动力学模型验证任务目标与执行步骤
+版本：1.0
+日期：2026-08-28
+
+一、总体任务目标
+
+针对XV-15建立一套可复现、可审计、可追溯的低阶模型外部验证流程。验证对象为冻结的现有低阶生产模型M0，验证过程中不得为了改善与试验数据的一致性而修改M0的物理方程、经验模型或求解逻辑。
+
+本阶段研究目标不是构建XV-15高保真数字孪生，而是回答以下问题：
+1. 冻结低阶模型M0能够在多大程度上复现XV-15的旋翼悬停性能和整机飞行动力学特征。
+2. 模型与试验之间的偏差中，哪些来自参数/输入定义映射，哪些属于模型形式误差。
+3. 在满足工况、构型、输入、输出和信号链同构条件时，M0能否复现XV-15飞行试验识别得到的动态响应特征。
+4. 基于外部证据确定M0的可信适用范围及主要限制，而不是通过验证数据反向调参得到更好的拟合结果。
+
+二、验证对象冻结原则
+
+M0定义为仓库现有production low-order model，包括：
+- 现有rotor_model_bemt旋翼模型；
+- 现有机翼、机身、尾翼等气动力模型；
+- 现有配平、运动方程和状态方程；
+- 现有9状态/13状态飞行动力学模型；
+- 现有数值线性化、模态分析和控制响应计算链。
+
+允许在XV-15验证实例中修改的内容：
+- 将XV-15真实构型参数映射至M0已经存在的参数字段；
+- 进行单位换算、坐标转换、符号转换和输入定义转换；
+- 对真实分布参数进行有明确物理意义的低阶等效映射，但必须记录映射方法和信息损失；
+- 根据试验记录设置对应的飞行状态、质量状态和控制输入。
+
+不得计入M0基线验证的新增能力包括但不限于：
+- 非零零升力角alpha0L修正；
+- 新增压缩性修正；
+- 径向分段叶片几何；
+- C81二维气动表；
+- 新增Prandtl根部/尖部损失模型；
+- Mangler或其他新增入流模型；
+- prescribed/free wake；
+- 其他在原production model中不存在的物理机制。
+
+上述新增能力如需研究，只能作为验证完成后的诊断模型变体M1、M2……，不得回溯性地重新定义为M0。
+
+三、外部证据角色
+
+1. XV-15 OARF Run 15
+角色：DEVELOPMENT_EXTERNAL_CORRELATION。
+说明：该数据已经参与前期误差诊断，因此不得再作为blind hold-out/final independent validation使用。
+用途：用于冻结基线结果记录、模型局限识别和后续机理诊断。
+
+2. NASA TM-86009
+角色：候选整机飞行动力学外部验证数据。
+要求：只有通过同构性审计的试验工况和输入/输出通道才允许进行定量误差评价。
+
+3. 参考仿真模型或其他非飞行试验数据
+角色：MODEL_BENCHMARK。
+用途：用于模型间趋势和机制比较，不等价于真实飞行试验验证证据。
+
+四、执行步骤
+
+阶段0：建立可追溯基线
+0.1 从当前XV-15验证工作的已审计Git提交点建立独立分支。
+0.2 记录基线commit SHA、MATLAB版本/运行环境、入口脚本和关键依赖。
+0.3 确认本阶段不修改production physics。
+0.4 建立任务文件、结果目录和证据目录。
+
+阶段1：冻结M0模型身份
+1.1 建立XV15_MODEL_IDENTITY.csv。
+1.2 枚举XV-15验证实际调用的模型函数、参数字段和处理模块。
+1.3 对每项标记：BASELINE_M0、VALIDATION_ADAPTER、POST_VALIDATION_DIAGNOSTIC。
+1.4 检查现有XV-15脚本是否调用rotor_model_bemt_section_aero或其他扩展模型。
+1.5 将任何扩展模型从M0基线执行链中剥离，但不删除原有诊断代码。
+
+阶段2：建立XV-15参数与输入映射账本
+2.1 建立XV15_PARAMETER_MAPPING.csv。
+2.2 对每个关键参数记录XV-15原始物理量、来源、原始单位、M0目标字段、转换公式、映射类型、映射不确定性及其对验证结论的影响。
+2.3 特别审计rotor radius、blade number、chord/solidity、twist、root cutout、rotor speed、collective/cyclic定义、airfoil representation、mass/CG/inertia、nacelle angle和flight-condition variables。
+2.4 不允许利用OARF误差反向调整这些映射参数。
+
+阶段3：重新建立纯M0的XV-15 V1悬停基线
+3.1 新建或重构独立入口run_xv15_v1_baseline_correlation.m。
+3.2 基线入口只调用M0，不调用section-aero或其他新增物理扩展。
+3.3 保留所有可映射的原始试验点，包括误差较大的点。
+3.4 输出逐点collective、CT_test/CT_model/residual、CP_test/CP_model/residual、FM_test/FM_model/residual以及validity/status flag。
+3.5 计算MAPE、RMSE、mean bias和maximum absolute/relative error。
+3.6 将结果保存为机器可读CSV和简洁报告。
+3.7 不因结果较差而修改M0。
+
+阶段4：形成V1验证结论和模型形式局限
+4.1 区分数据/参数映射不确定性、数值求解问题和模型形式误差。
+4.2 对M0无法表示的XV-15真实特性进行显式记录。
+4.3 将已有section-aero等扩展结果单列为POST_VALIDATION_DIAGNOSTIC，不与M0基线指标混用。
+4.4 固化OARF Run 15的证据角色，禁止重新标记为blind validation。
+
+阶段5：NASA TM-86009同构性审计
+5.1 提取TM-86009中可用于验证的XV-15试验工况。
+5.2 对每个候选case审计airspeed/Mach、altitude/density、nacelle angle、rotor RPM、aircraft mass、CG、inertia、trim condition和pilot/control-system configuration。
+5.3 审计输入定义：pilot stick、actuator、swashplate、longitudinal/lateral cyclic、collective及pedal/yaw input。
+5.4 审计输出定义：p/q/r、phi/theta/psi、accelerations、velocities、coordinate system、signs、units和filtering。
+5.5 审计输入至旋翼之间是否存在未建模的actuator/mixer/control-system dynamics。
+5.6 建立TM86009_HOMOLOGY_MATRIX.csv，对每个case给出HIGH、MEDIUM、LOW或INVALID。
+5.7 只有HIGH同构case进入严格定量验证；MEDIUM原则上仅允许趋势比较；LOW/INVALID不用于定量结论。
+
+阶段6：XV-15整机动态外部验证
+6.1 在HIGH同构试验点对M0进行对应配平。
+6.2 数值线性化得到A、B、C、D。
+6.3 生成与飞行试验相同输入/输出定义的传递函数或频率响应。
+6.4 与TM-86009 flight-ID结果比较。
+6.5 主要指标包括frequency-dependent gain error、phase error、natural frequency、damping ratio、modal coupling、bandwidth、peak/crossover frequency及time-domain response（若存在同构数据）。
+6.6 仅在试验数据有效频带和相干性支持的频率范围内评价。
+6.7 不利用TM-86009验证数据反向调节M0。
+
+阶段7：确定可信适用域
+7.1 汇总V1旋翼性能和整机动态验证结果。
+7.2 区分已验证、部分支持和未验证区域。
+7.3 给出M0适用于何种研究问题、飞行状态、频率范围和精度层级。
+7.4 明确不应由M0支撑的结论。
+7.5 将失败验证保留为正式科研结果，而非删除或规避。
+
+五、停止规则
+
+1. 验证失败不得自动触发production model修改。
+2. 验证数据不得用于确定经验系数、参数、误差窗口或筛选阈值。
+3. 不得因某试验点降低总体指标而删除该点。
+4. M0无法表示的真实物理特性应记录为model-form limitation。
+5. 已参与模型诊断的数据不得重新称为blind hold-out。
+6. 只有独立且满足同构条件的数据才能作为最终外部验证证据。
+7. 后续模型改进必须作为新的模型身份M1/M2管理，并重新进行验证。
+8. 若TM-86009不存在足够同构的case，应明确结论为“当前公开证据不足以进行严格定量动态验证”，不得强行比较。
+
+六、计划交付物
+
+1. XV15_VALIDATION_TASKS.txt
+2. XV15_MODEL_IDENTITY.csv
+3. XV15_VALIDATION_DATA_ROLE_LEDGER.csv
+4. XV15_PARAMETER_MAPPING.csv
+5. run_xv15_v1_baseline_correlation.m
+6. XV15_V1_BASELINE_RESULTS.csv
+7. XV15_V1_BASELINE_REPORT.md或.txt
+8. TM86009_HOMOLOGY_MATRIX.csv
+9. TM-86009动态验证脚本、结果和验证报告
+10. XV15_VALIDATION_APPLICABILITY_STATEMENT.md
+
+七、阶段验收标准
+
+A. M0基线脚本不得调用任何POST_VALIDATION_DIAGNOSTIC扩展模型。
+B. 本验证工作不得修改production physics。
+C. 所有关键XV-15参数和输入均具有可追溯来源与映射说明。
+D. 所有失败/无效试验点均被保留并给出状态原因。
+E. OARF Run 15与TM-86009的数据角色明确且不可混淆。
+F. TM-86009定量比较必须经过HIGH同构门槛。
+G. 所有指标均可通过固定入口脚本重复生成。
+H. 最终结论描述的是M0的可信能力与适用域，而不是“通过调参后能否拟合XV-15”。
+
+八、首批立即执行任务
+
+1. 从当前已审计XV-15验证提交点建立独立工作分支。
+2. 将本任务文件加入仓库。
+3. 建立XV15_MODEL_IDENTITY.csv与XV15_VALIDATION_DATA_ROLE_LEDGER.csv。
+4. 审计当前XV-15验证入口是否混入section-aero等扩展。
+5. 建立只调用rotor_model_bemt的纯M0 V1基线入口。
+6. 执行静态检查和可运行性检查，保存结果。
+7. 建立独立draft PR，记录Summary、Validation和后续TM-86009同构性审计任务。
