@@ -1,0 +1,61 @@
+name: XV-15 frozen-M0 validation
+
+on:
+  push:
+    branches:
+      - codex/xv15-validation-baseline-execution
+    paths:
+      - '.github/workflows/xv15-validation-baseline.yml'
+      - 'analysis/**'
+      - 'model/**'
+      - 'params_nominal.m'
+      - 'results/xv15_validation_baseline/**'
+      - 'XV15_VALIDATION_TASKS.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  xv15-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run pure-M0 V1 baseline and TM-86009 gate
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = pwd;
+            artifactRoot = fullfile(root,'ci_artifacts');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            v1Dir = fullfile(artifactRoot,'v1_hover');
+            results = run_xv15_v1_baseline_correlation(v1Dir);
+            fid = fopen(fullfile(artifactRoot,'V1_EXECUTION_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nmodelIdentity=%s\ndatasetRole=%s\nreportWindow=%s\n',results.modelIdentity,results.datasetRole,results.reportWindow);
+            fclose(fid);
+            try
+                [homologyTable,highRows] = audit_tm86009_homology_gate();
+                fid = fopen(fullfile(artifactRoot,'TM86009_GATE_STATUS.txt'),'w');
+                fprintf(fid,'status=UNLOCKED\nhighCaseCount=%d\n',sum(highRows));
+                fclose(fid);
+                writetable(homologyTable(highRows,:),fullfile(artifactRoot,'TM86009_HIGH_CASES.csv'));
+            catch ME
+                fid = fopen(fullfile(artifactRoot,'TM86009_GATE_STATUS.txt'),'w');
+                fprintf(fid,'status=BLOCKED\nidentifier=%s\nmessage=%s\n',ME.identifier,ME.message);
+                fclose(fid);
+            end;
+
+      - name: Upload validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: xv15-validation-evidence
+          path: ci_artifacts
+          if-no-files-found: error
