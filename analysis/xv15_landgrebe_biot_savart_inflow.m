@@ -73,6 +73,8 @@ contract = Acontract + (1-Acontract)*exp(-gammaContract*psiNode);
 zNorm = k1*min(psiNode,psi1) + k2*max(psiNode-psi1,0);
 
 vTotal = zeros(numel(rEval_m),3);
+vByEdge = zeros(numel(rEval_m),3,numel(rEdges_m));
+vByBlade = zeros(numel(rEval_m),3,Nb);
 skippedNearSingular = 0;
 activeFilaments = 0;
 
@@ -107,14 +109,19 @@ for ib = 1:Nb
                     continue;
                 end
                 coeff = G/(4*pi)*dot(r0,r1/n1-r2/n2)/c2;
-                vTotal(ip,:) = vTotal(ip,:) + coeff*c12;
+                dv = coeff*c12;
+                vTotal(ip,:) = vTotal(ip,:) + dv;
+                vByEdge(ip,:,ie) = vByEdge(ip,:,ie) + dv;
+                vByBlade(ip,:,ib) = vByBlade(ip,:,ib) + dv;
             end
         end
     end
 end
 
 viDown = -vTotal(:,3).';
-if any(~isfinite(viDown))
+viDownByEdge = -squeeze(vByEdge(:,3,:));
+viDownByBlade = -squeeze(vByBlade(:,3,:));
+if any(~isfinite(viDown)) || any(~isfinite(viDownByEdge(:))) || any(~isfinite(viDownByBlade(:)))
     error('xv15_landgrebe_biot_savart_inflow:NonfiniteVelocity', ...
         'Biot-Savart integration produced nonfinite induced velocity.');
 end
@@ -134,6 +141,8 @@ meta.segmentsPerRev = segmentsPerRev;
 meta.activeFilaments = activeFilaments;
 meta.skippedNearSingular = skippedNearSingular;
 meta.edgeStrength_m2ps = edgeStrength;
+meta.viDownByEdge_mps = viDownByEdge;
+meta.viDownByBlade_mps = viDownByBlade;
 meta.rawVz_mps = vTotal(:,3).';
 meta.claimBoundary = [ ...
     'NONLOCAL_WAKE_SHAPE_DIAGNOSTIC_NO_OARF_FIT_' ...
