@@ -1,0 +1,52 @@
+name: M1 stage-4 XV-15 nonlocal wake
+
+on:
+  push:
+    branches:
+      - research/m1-xv15-physics-enhanced-20260828
+    paths:
+      - '.github/workflows/m1-stage4-nonlocal-wake.yml'
+      - 'analysis/xv15_landgrebe_biot_savart_inflow.m'
+      - 'analysis/run_m1_stage4_nonlocal_wake.m'
+      - 'analysis/run_m1_stage3_corrigan_stall_delay.m'
+      - 'analysis/xv15_c81_corrigan_stall_delay.m'
+      - 'analysis/xv15_c81_section_lookup.m'
+      - 'analysis/nasa_metal_twist_deg.m'
+      - 'docs/M1_STAGE4_NONLOCAL_WAKE_SOURCE_AUDIT.md'
+      - 'CODEX_TASK.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m1-stage4-nonlocal-wake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run M1-F nonlocal wake study
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = pwd;
+            artifactRoot = fullfile(root,'ci_artifacts','m1_stage4_nonlocal_wake');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            results = run_m1_stage4_nonlocal_wake(artifactRoot);
+            fid = fopen(fullfile(artifactRoot,'M1_STAGE4_NONLOCAL_WAKE_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nclaimBoundary=%s\n',results.claimBoundary);
+            fclose(fid);
+
+      - name: Upload M1 stage-4 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-stage4-nonlocal-wake-evidence
+          path: ci_artifacts/m1_stage4_nonlocal_wake
+          if-no-files-found: error
