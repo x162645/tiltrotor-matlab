@@ -28,7 +28,7 @@ jobs:
         with:
           release: R2021a
 
-      - name: Run pure-M0 V1 baseline and TM-86009 gate
+      - name: Run frozen-M0 XV-15 validations and TM-86009 gate
         uses: matlab-actions/run-command@v3
         with:
           command: >-
@@ -36,10 +36,15 @@ jobs:
             root = pwd;
             artifactRoot = fullfile(root,'ci_artifacts');
             if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
-            v1Dir = fullfile(artifactRoot,'v1_hover');
+            v1Dir = fullfile(artifactRoot,'v1_run15_development_correlation');
             results = run_xv15_v1_baseline_correlation(v1Dir);
-            fid = fopen(fullfile(artifactRoot,'V1_EXECUTION_STATUS.txt'),'w');
+            fid = fopen(fullfile(artifactRoot,'V1_RUN15_EXECUTION_STATUS.txt'),'w');
             fprintf(fid,'status=EXECUTED\nmodelIdentity=%s\ndatasetRole=%s\nreportWindow=%s\n',results.modelIdentity,results.datasetRole,results.reportWindow);
+            fclose(fid);
+            run14Dir = fullfile(artifactRoot,'v1_run14_external_validation');
+            run14 = run_xv15_v1_run14_external_validation(run14Dir);
+            fid = fopen(fullfile(artifactRoot,'V1_RUN14_EXECUTION_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nmodelIdentity=%s\ndatasetRole=%s\ndatasetIndependence=%s\nreportWindow=%s\n',run14.modelIdentity,run14.datasetRole,run14.datasetIndependence,run14.reportWindow);
             fclose(fid);
             try
                 [homologyTable,highRows] = audit_tm86009_homology_gate();
