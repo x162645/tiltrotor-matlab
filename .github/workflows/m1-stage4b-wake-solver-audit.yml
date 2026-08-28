@@ -1,0 +1,48 @@
+name: M1 stage-4b wake solver audit
+
+on:
+  push:
+    branches:
+      - research/m1-xv15-physics-enhanced-20260828
+    paths:
+      - '.github/workflows/m1-stage4b-wake-solver-audit.yml'
+      - 'analysis/run_m1_stage4b_wake_solver_audit.m'
+      - 'analysis/xv15_landgrebe_biot_savart_inflow.m'
+      - 'analysis/xv15_c81_corrigan_stall_delay.m'
+      - 'analysis/xv15_c81_section_lookup.m'
+      - 'analysis/nasa_metal_twist_deg.m'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m1-stage4b-wake-solver-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run M1-F numerical coupling audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            artifactRoot = fullfile(pwd,'ci_artifacts','m1_stage4b_wake_solver_audit');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            results = run_m1_stage4b_wake_solver_audit(artifactRoot);
+            fid = fopen(fullfile(artifactRoot,'M1_STAGE4B_WAKE_SOLVER_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nclaimBoundary=%s\n',results.claimBoundary);
+            fclose(fid);
+
+      - name: Upload solver audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-stage4b-wake-solver-audit-evidence
+          path: ci_artifacts/m1_stage4b_wake_solver_audit
+          if-no-files-found: error
