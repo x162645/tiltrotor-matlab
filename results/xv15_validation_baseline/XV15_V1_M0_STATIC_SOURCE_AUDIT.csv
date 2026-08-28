@@ -8,4 +8,4 @@ FORBID_PRANDTL_EXTENSION,TRUE,No Prandtl extension in baseline runner,CONNECTOR_
 FORBID_MANGLER_EXTENSION,TRUE,No Mangler extension in baseline runner,CONNECTOR_SOURCE_AUDIT_20260828
 FORBID_PRESCRIBED_WAKE_EXTENSION,TRUE,No prescribed-wake extension in baseline runner,CONNECTOR_SOURCE_AUDIT_20260828
 FORBID_XV15_SECTION_AERO_OVERWRITE,TRUE,Generic liftSlope CLmax CD0 and kCD are retained from params_nominal,CONNECTOR_SOURCE_AUDIT_20260828
-PRODUCTION_PHYSICS_CHANGED_BY_THIS_BRANCH,TRUE,Branch diff from ec35d115 shows no model or params_nominal modifications,CONNECTOR_COMPARE_AUDIT_20260828
+NO_PRODUCTION_PHYSICS_CHANGE_IN_BRANCH,TRUE,Branch diff from ec35d115 shows no model or params_nominal modifications,CONNECTOR_COMPARE_AUDIT_20260828
