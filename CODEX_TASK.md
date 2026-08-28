@@ -1,6 +1,6 @@
 # CODEX_TASK.md
 
-STATUS: M1 XV-15 PHYSICS-ENHANCED LOW-ORDER RESEARCH / STAGE 4 NONLOCAL WAKE / 2026-08-28
+STATUS: M1 XV-15 PHYSICS-ENHANCED LOW-ORDER RESEARCH / STAGE 4 NONLOCAL WAKE EXECUTION / 2026-08-28
 
 ## 版本契约
 
@@ -123,3 +123,9 @@ M1-E-2 明确属于 `NONINDEPENDENT_XV15_OARF_CORRELATED_VARIANT`，只用于复
 - 若 M1-F1 相对 M1-E-1 有明显、数值稳定的改善：先冻结该模型身份，再用不同设施数据检验，不能继续围绕 Run 15 调尾迹；
 - 若改善很小或方向相反：明确记录，说明经典规定尾迹/当前内段推广不足以解释主要残差，再决定是否进入更高阶自由尾迹或保持低阶可信域结论；
 - 若结果对尾迹转数/离散显著敏感：先解决数值收敛，不进行物理解读。
+
+## 当前执行状态
+
+- 已冻结 M1-F 主基线为 M1-E-1（Corrigan n=1）。
+- 已预先固定主尾迹离散与 10°数值核查组合。
+- 本次提交仅触发 Stage 4 MATLAB R2021a 正式执行；禁止依据输出回改上述参数。
