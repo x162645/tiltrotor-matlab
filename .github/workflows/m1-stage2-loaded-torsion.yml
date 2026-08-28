@@ -1,0 +1,52 @@
+name: M1 stage-2 XV-15 loaded torsion
+
+on:
+  push:
+    branches:
+      - research/m1-xv15-physics-enhanced-20260828
+    paths:
+      - '.github/workflows/m1-stage2-loaded-torsion.yml'
+      - 'analysis/build_xv15_metal_torsion_reference.m'
+      - 'analysis/xv15_c81_moment_lookup.m'
+      - 'analysis/xv15_c81_section_lookup.m'
+      - 'analysis/run_m1_stage2_loaded_torsion.m'
+      - 'analysis/run_xv15_actual_geometry_c81_crosscheck.m'
+      - 'CODEX_TASK.md'
+      - 'M1_RESEARCH_CHARTER.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m1-stage2-loaded-torsion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run M1-D loaded torsion study
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = pwd;
+            artifactRoot = fullfile(root,'ci_artifacts','m1_stage2_loaded_torsion');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            results = run_m1_stage2_loaded_torsion(artifactRoot);
+            fid = fopen(fullfile(artifactRoot,'M1_STAGE2_EXECUTION_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nclaimBoundary=%s\n',results.claimBoundary);
+            fprintf(fid,'rigidConsistencyCT_pp=%.12g\nrigidConsistencyCP_pp=%.12g\nrigidConsistencyFM_pp=%.12g\n',results.rigidConsistency_pp(1),results.rigidConsistency_pp(2),results.rigidConsistency_pp(3));
+            fclose(fid);
+
+      - name: Upload M1 stage-2 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-stage2-loaded-torsion-evidence
+          path: ci_artifacts/m1_stage2_loaded_torsion
+          if-no-files-found: error
