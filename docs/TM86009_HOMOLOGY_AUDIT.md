@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This document is a validation gate for the frozen production low-order model M0. It does not claim that an XV-15 dynamic-validation case is already homologous. Quantitative comparison is prohibited until the corresponding row in `results/xv15_validation_baseline/TM86009_HOMOLOGY_MATRIX.csv` reaches `HIGH` after report-level source audit.
+This document is the evidence gate for dynamic validation of the frozen production low-order model M0. The purpose is not to force a comparison with every published XV-15 response, but to determine whether a report case is sufficiently homologous to M0 for a defensible quantitative validation claim.
+
+Quantitative dynamic validation remains prohibited unless a row in `results/xv15_validation_baseline/TM86009_HOMOLOGY_MATRIX.csv` reaches `HIGH` and explicitly allows `QUANTITATIVE_DYNAMIC_VALIDATION`.
 
 ## Source identity
 
@@ -11,63 +13,110 @@ This document is a validation gate for the frozen production low-order model M0.
 - Authors: Mark B. Tischler, Joseph G. M. Leung, and Daniel C. Dugan.
 - Publication: August 1984.
 - NTRS document ID: 19840026374.
+- Report-level audit copy: Tenth European Rotorcraft Forum Paper No. 75, same title/authors, 1984.
 
-The accessible NASA NTRS metadata/abstract establishes that frequency-domain methods were applied to XV-15 flight-test data in cruise at 170 knots, that transfer-function forms were fitted to the extracted frequency responses, and that time-domain step-response matching was used for cruise and hover flight conditions. It also identifies unmodeled rotor-RPM dynamics as a likely cause of at least one cruise response discrepancy.
+The report was audited at report level rather than from metadata alone. Page references below use the ERF paper pagination shown as 75-x in the report.
 
-Current evidence level in this audit is `NTRS_METADATA_ABSTRACT_PLUS_REPORT_LEVEL_DETAIL_PENDING`. No page/table/figure-specific claim is treated as closed yet.
+## Closed report-level facts
 
-## Why rotor RPM and the control chain are validation gates
+### Flight condition
 
-TM-86009 is not automatically homologous to the repository simply because both describe XV-15 dynamics. A measured flight-test frequency response is defined by the exact experimental input and output signals. If the report input is upstream of actuators, mixers, swashplate/control-surface dynamics, RPM governor dynamics, or other control-system elements that are absent from M0, then comparing that response directly with an M0 B-column or direct-control step response mixes aircraft-dynamics error with input-chain error.
+Section 3, page 75-4, states the cruise identification condition as:
 
-Rotor-RPM/governor treatment receives an explicit gate because the NTRS abstract itself attributes a reported discrepancy to unmodeled rotor-RPM dynamics. The baseline study must therefore establish whether RPM was effectively fixed, measured and reproduced as an exogenous schedule, or dynamically coupled to the tested response before accepting a quantitative comparison.
+- indicated airspeed: 170 knots;
+- nacelle incidence: 0 deg;
+- altitude: 8000 ft.
 
-## Required homology fields
+The same section identifies the primary bare-airframe cruise responses as:
 
-Every candidate case must freeze the following before a `HIGH` classification is permitted:
+- `q/delta_e`: pitch-rate response to elevator surface deflection;
+- `az/delta_e`: normal-acceleration response to elevator surface deflection;
+- `p/delta_a`: roll-rate response to aileron surface deflection;
+- `beta_cg/delta_r`: sideslip at aircraft CG response to rudder surface deflection.
 
-1. flight regime and true/equivalent airspeed definition;
-2. altitude, atmospheric state, and density;
-3. nacelle angle/conversion state;
-4. rotor RPM and governor behavior;
-5. aircraft mass/weight;
-6. center of gravity;
-7. inertia tensor or sufficient matched mass-property definition;
-8. trim state and steady controls;
-9. exact excitation signal and where it is measured in the control chain;
-10. actuator, mixer, swashplate, control-surface, and augmentation-system participation;
-11. exact response signal;
-12. axes, signs, units, and attitude/rate conventions;
-13. filtering, differentiation/integration, time alignment, and signal conditioning;
-14. frequency-response estimator definition and coherence/usable bandwidth when applicable;
-15. exact valid frequency interval for any gain/phase error metric.
+### Excitation and usable frequency range
 
-## Classification rule
+Section 2, page 75-2, states that the pilot-generated frequency sweep excites approximately 0.2-6.0 rad/s. Each run begins at trim, includes two approximately 20 s low-frequency cycles, then increases to about 6 rad/s, with an overall duration of approximately 90 s. Repeat runs are concatenated to reduce random-noise effects.
 
-- `HIGH`: test condition and input/output chain are sufficiently matched for quantitative gain/phase or time-history error metrics.
-- `MEDIUM`: a limited comparison is defensible, but a known unresolved mismatch affects magnitude/phase; use for trends or bounded claims only.
-- `LOW`: material configuration or signal-chain mismatch prevents a quantitative M0 validation claim.
-- `INVALID`: the source quantity is not a homologous observable for the requested comparison.
-- `PENDING_REPORT_LEVEL_SOURCE_AUDIT`: accessible evidence is not yet sufficient to assign one of the above classes.
+For `q/delta_e`, pages 75-5 through 75-8 show strong coherence over the principal frequency range. The report fits the pitch response over approximately 0.3-10 rad/s, but the commanded sweep range is approximately 0.2-6 rad/s. For repository validation, 0.3-6 rad/s is therefore retained as a conservative overlap range unless a later source provides stronger case-specific evidence.
 
-No row is currently assigned `HIGH` merely from the NTRS abstract.
+### Experimental input definition
+
+Page 75-2 explicitly defines the open-loop transfer-function input as the measured **surface deflection**, not merely the pilot stick command. For the longitudinal case, total elevator surface deflection contains both pilot input and SCAS-feedback contributions. Page 75-4 states that elevator surface deflection was measured directly and that longitudinal cruise testing was conducted with SCAS engaged.
+
+For the lateral-directional case, page 75-2 states that correlated SCAS rudder activity prevented the desired SISO extraction from the initial closed-loop runs. The lateral-directional tests were therefore repeated with SCAS disengaged.
+
+This is a major homology improvement relative to the previous metadata-only audit because the repository must compare the report to a surface-deflection input path, not silently equate the experiment to a pilot-command input.
+
+### Output definitions and processing
+
+The report gives the following additional information relevant to adapters:
+
+- page 75-4 reports a regular elevator surface amplitude of approximately 2 deg during the cruise sweeps;
+- page 75-4 states that the displayed pitch-rate signal used a 2.5 Hz low-pass filter for presentation only;
+- page 75-7 defines `az` as positive downward and uses units of `g/deg-elevator` for the acceleration transfer function;
+- page 75-9 states that the sideslip sensor is located approximately 18 ft ahead of the aircraft CG and that `beta_cg` is obtained by correcting the measured signal using yaw rate and airspeed; sensor-dynamics correction was not applied because it was considered insignificant within the identification bandwidth.
+
+These definitions must be reproduced by coordinate/unit/signal adapters before any comparison is promoted beyond a bounded correlation.
+
+### Rotor-RPM limitation identified by the source
+
+Pages 75-8 and 75-16 explicitly identify unmodeled rotor-RPM dynamics as a probable contributor to the cruise normal-acceleration/elevator mismatch. Page 75-8 also mentions rotor inflow dynamics as a possible contributor above approximately 2 rad/s.
+
+This is not permission to add RPM or inflow dynamics to M0 during validation. For the frozen-model study it is evidence that `az/delta_e` has a known model-form/input-chain mismatch and should receive a lower homology rating unless the experiment's RPM behavior can be reproduced without altering M0 physics.
+
+## Evidence still missing for strict matched-condition validation
+
+The audited TM-86009 report does not close the following quantities for the exact tested records:
+
+1. exact test mass or gross weight for the identified cruise records;
+2. exact center of gravity;
+3. exact inertia tensor;
+4. exact rotor RPM for the test records;
+5. governor/RPM dynamic behavior or a measured RPM time history suitable for an exogenous adapter;
+6. test-day atmospheric density/temperature beyond the reported altitude;
+7. a complete sign/axis conversion from the report channels to the repository channels;
+8. machine-readable raw flight-test frequency-response/time-history data.
+
+Generic XV-15 design mass, CG, inertia, or RPM values from other documents must not be substituted and relabeled as the TM-86009 test condition unless an explicit same-record provenance link is established.
+
+## Current classification
+
+The report-level audit now supports the following classifications:
+
+- `q/delta_e` in cruise: **MEDIUM**. The flight condition, surface-deflection input, output channel, SCAS context, and conservative frequency range are known, but exact loading, inertia, density, RPM/governor state, and repository sign mapping remain unresolved.
+- `az/delta_e` in cruise: **LOW**. In addition to the unresolved matched-condition data, the source itself identifies RPM/inflow dynamics as a material explanation of the observed high-frequency discrepancy.
+- `p/delta_a` in cruise: **MEDIUM**. The lateral-directional test was repeated with SCAS disengaged and the surface input/output relation is identifiable, but exact loading/RPM/atmosphere and program-axis mapping remain unresolved.
+- `beta_cg/delta_r` in cruise: **MEDIUM**. The source defines the CG sideslip reconstruction, but the same matched-condition gaps remain and a sensor-to-program adapter still requires an explicit audit.
+- published cruise step-response plots: **MEDIUM as plot-level correlation evidence only**, not strict quantitative M0 validation, because the raw matched input/output records and full loading state are not published in machine-readable form in TM-86009.
+- hover step-response material summarized in TM-86009: **PENDING**, because the detailed hover identification case is delegated to Ref. 3 and has not yet been closed in this branch.
+
+No audited TM-86009 case is currently `HIGH`.
+
+## Consequence for the present study
+
+The correct current conclusion is therefore:
+
+> TM-86009 is a strong external flight-test source for identifying candidate XV-15 dynamic observables and for bounded trend/model-form comparisons, but the currently audited public evidence does not yet support a strict matched-condition quantitative dynamic validation of frozen M0.
+
+This is an evidence limitation, not a reason to alter the production model or to fill missing test-condition data with generic XV-15 values.
 
 ## Program-side gate
 
-The repository already contains useful dynamic-analysis infrastructure: a nine-state body-dynamics interface, a thirteen-state nacelle-dynamics extension, symmetric trim, boundary-aware numerical linearization, and direct-control step-response simulation. Their existence is not evidence of experimental homology. `TM86009_PROGRAM_CAPABILITY_MAPPING.csv` records which pieces can be reused and which experimental adapters remain unresolved.
+The repository already contains useful dynamic-analysis infrastructure: nine-state body dynamics, a thirteen-state nacelle extension, symmetric trim, boundary-aware numerical linearization, modal utilities, and direct-control time-response simulation. Their existence is not evidence of experimental homology.
 
-The 13-state command interface currently exposes collective, differential collective, longitudinal cyclic, differential longitudinal cyclic, lateral cyclic, aileron, elevator, rudder, and left/right nacelle-angle commands. These program inputs must not be silently equated to the TM-86009 excitation channels until the report-level signal definition is verified.
+`TM86009_PROGRAM_CAPABILITY_MAPPING.csv` records the reusable program elements and the remaining adapters. In particular, the repository command interface must not be equated to pilot stick inputs because TM-86009's identified open-loop cruise responses use measured surface deflections.
 
-## Validation rule after the audit
+## Validation rule if a future HIGH case is established
 
-For each `HIGH` case:
+For each future `HIGH` case:
 
-1. map only independently sourced XV-15 configuration and condition data into fields already consumed by the frozen M0 model;
-2. obtain the matched trim without fitting to the measured dynamic response;
+1. map only independently sourced XV-15 configuration and matched-condition quantities into fields already consumed by frozen M0;
+2. obtain the matched trim without fitting to measured dynamic response data;
 3. linearize M0 at the matched operating point;
-4. construct the exact experimental input/output transfer path, adding only coordinate/unit/signal-definition adapters that do not introduce new aircraft physics;
-5. compare over the source-supported frequency band or time window;
-6. report gain error, phase error, modal quantities, and/or time-domain residuals together with the case homology record;
-7. retain poor agreement as a validation result rather than changing M0 to reduce the error.
+4. construct the exact experimental input/output path using only coordinate, unit, and signal-definition adapters that introduce no new aircraft physics;
+5. compare only over the source-supported frequency/time interval;
+6. report gain, phase, modal, and/or time-domain residuals together with the homology record;
+7. retain poor agreement as a validation result and do not modify M0 to reduce the error.
 
-If no candidate reaches `HIGH`, the correct conclusion is that currently audited public evidence is insufficient for strict quantitative TM-86009/M0 dynamic validation. A forced comparison is not permitted.
+If no case reaches `HIGH`, the dynamic-validation stage must remain blocked and the insufficiency of matched public evidence must be reported explicitly.
