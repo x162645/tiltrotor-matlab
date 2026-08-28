@@ -1,5 +1,6 @@
 name: M1 stage-4 XV-15 nonlocal wake
 
+# Execution marker 2026-08-28: trigger the frozen Stage-4 physics contract without changing model settings.
 on:
   push:
     branches:
