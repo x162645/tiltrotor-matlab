@@ -1,80 +1,75 @@
 # CODEX_TASK.md
 
-STATUS: XV-15 FROZEN-M0 VALIDATION BASELINE EXECUTION / 2026-08-28
+STATUS: M1 XV-15 PHYSICS-ENHANCED LOW-ORDER RESEARCH / STAGE 1 / 2026-08-28
 
-## Version contract
+## 版本契约
 
-- Repository: `x162645/tiltrotor-matlab`.
-- Base Draft PR: #69.
-- Base branch: `audit/xv15-codex-handoff-metadata-consistency-20260828`.
-- Exact base SHA: `ec35d115c65823dbb9e8b4892e8d8f6a510e80f2`.
-- Task branch: `codex/xv15-validation-baseline-execution`.
-- Draft PR: #70.
-- Canonical task definition: `XV15_VALIDATION_TASKS.txt`.
-- MATLAB execution environment for reproducible CI evidence: MATLAB R2021a on GitHub-hosted Actions.
+- 原仓库：`x162645/tiltrotor-matlab`。
+- M0 冻结分支：`frozen/m0-xv15-hover-v1-20260828`。
+- M0 冻结提交：`27f40883633ca14acc0e928649b62d7abb855491`。
+- 当前 M1 临时研究分支：`research/m1-xv15-physics-enhanced-20260828`。
+- M1 研究章程：`M1_RESEARCH_CHARTER.md`。
+- 新仓库建议名：`x162645/tiltrotor-matlab-m1`；当前连接器不支持创建仓库，因此本分支必须保持可整体迁移。
 
-## Objective
+## M0 冻结科学边界
 
-Validate, rather than modify, the frozen generic low-order production model M0 using XV-15 external evidence. The study must determine the error structure, supported operating domain, and limitations of M0 without changing production physics or tuning parameters against validation targets.
+M0 只允许作为通用低阶基线。当前外部证据支持它在 XV-15 原始金属桨 OARF 悬停约 6°–11°总距区间内复现 CT/CP 随总距增加的定性趋势，并暴露稳定的系统性低估和低总距适用性限制。
 
-The present branch is limited to:
+M0 不允许被描述为已经定量复现 XV-15。
 
-1. closing the M0 model identity and XV-15 validation-data role ledger;
-2. executing the original-metal-blade V1 hover external correlation through the direct `rotor_model_bemt` path;
-3. preserving failed and unsupported OARF points;
-4. auditing NASA TM-86009 at report level for matched-condition and signal-chain homology;
-5. allowing strict quantitative dynamic validation only if a case passes the explicit HIGH-homology gate;
-6. packaging actual MATLAB execution evidence and the final applicability conclusion.
+M0 冻结分支不再接受模型物理、参数或验证映射修改。
 
-## Frozen scientific boundary
+## M1 总目标
 
-M0 is the existing production low-order model. This task shall not modify production physical-model functions, default generic model physics, state/input ordering, or the physical equations in order to improve XV-15 agreement.
+在不使用 OARF CT/CP/FM 反调参数的前提下，引入有外部来源约束的 XV-15 物理信息，研究低阶模型定量误差的来源和可修复程度。
 
-The following are excluded from the M0 baseline validation path:
+## 第一阶段任务
 
-- `rotor_model_bemt_section_aero`;
-- nonzero `alpha0L` extension;
-- added compressibility correction;
-- added Prandtl losses;
-- Mangler or other new inflow models;
-- prescribed/free-wake or Biot-Savart extensions;
-- C81/radially resolved airfoil extensions not present in production M0.
+同一 MATLAB R2021a 执行链中比较：
 
-Such items may only be retained as post-validation diagnostic/model-variant work and may not be used to redefine M0 after observing the validation error.
+1. `M0`：纯生产 `rotor_model_bemt` 基线；
+2. `M1-A`：XV-15 实际径向弦长 + 非线性扭转 + 独立 C81 标量约化 + 全局动量；
+3. `M1-B`：M1-A 几何 + 完整四段 C81 + 局部马赫数 + 全局动量；
+4. `M1-C`：M1-B + 独立径向环带动量闭合。
 
-## Evidence roles
+主要入口：
 
-- XV-15 OARF Run 15: `DEVELOPMENT_EXTERNAL_CORRELATION`; it is not a blind holdout because it was used in prior diagnostics.
-- NASA TM-86009: candidate aircraft-dynamics external evidence; quantitative validation requires report-level HIGH homology.
-- Generic XV-15 values from unrelated reports: may support parameter/context research but must not be silently substituted for the exact TM-86009 test condition.
-- Reference simulations: model benchmarks only; not independent physical ground truth.
+- `analysis/run_xv15_v1_baseline_correlation.m`
+- `analysis/run_xv15_actual_geometry_c81_crosscheck.m`
 
-## Required execution stages
+第一阶段目标是误差归因，不设定目标 MAPE，不允许为了达到某个误差水平进行参数搜索。
 
-1. Model-identity gate and validation-data-role closure.
-2. Pure-M0 V1 MATLAB R2021a execution.
-3. Numerical-convergence and failed-point preservation audit.
-4. Commit textual V1 evidence and execution provenance.
-5. TM-86009 report-level condition/input/output audit.
-6. Rerun the TM-86009 gate after schema and evidence closure.
-7. If at least one case is HIGH, execute matched-condition dynamic validation without tuning.
-8. If no case is HIGH, stop strict dynamic validation and record the public-evidence limitation as the scientific result.
-9. Update Draft PR #70 with executed results and unresolved evidence blockers.
+## 输出要求
 
-## Stop conditions
+- 保存 M0 与 M1-A/B/C 的逐点 CT/CP/FM；
+- 保存 6°–11°固定窗口 MAPE；
+- 保存每一级相对 M0 的误差变化；
+- 保存收敛状态；
+- 明确每一级模型身份；
+- 不删除失败点；
+- 不把 MATLAB 未执行结果写成已执行证据。
 
-- Do not modify production physics to reduce XV-15 error.
-- Do not fit parameter values to OARF CT/CP/FM or TM-86009 response data.
-- Do not delete failed or high-error points.
-- Do not relabel OARF Run 15 as blind validation.
-- Do not promote MEDIUM/LOW/PENDING TM-86009 cases to quantitative validation.
-- Do not fill missing exact test mass, CG, inertia, RPM, or atmospheric state using unrelated generic XV-15 values.
-- Do not call a successful regression test proof of aircraft validation.
-- Do not fabricate page numbers, raw time histories, frequency-response data, uncertainty, or provenance.
-- Do not merge any pull request without explicit user authorization.
+## 数据角色
 
-## Current execution checkpoint
+- OARF Run 15：`DEVELOPMENT_EXTERNAL_CORRELATION`，允许用于模型开发后的相关性比较，但禁止用其输出拟合物理参数。
+- OARF Run 14：分析者已经读取，不能称盲验证；可做重复性外部比较，但第一阶段不用于模型选择。
+- WADC 原始金属桨数据：保留为后续不同设施外部验证候选；在 M1 第一阶段模型身份冻结前，不使用其输出选择模型或调参。
 
-The first GitHub-hosted MATLAB R2021a execution was run at commit `06c0769af9edc6140f1bf9c19bf36ef9e19a74cb`, workflow run `33142436573`.
+## 停止规则
 
-The pure-M0 V1 runner executed successfully. The initial TM-86009 gate reached the intended blocking stage but exposed an R2021a CSV-import/schema issue; that validation-tool issue is being corrected without altering aircraft physics. Report-level TM-86009 audit currently contains no HIGH-homology case.
+- 禁止经验 CT/CP 增益；
+- 禁止根据 OARF 误差反求总距偏置；
+- 禁止 MAPE 优化式调参；
+- 禁止把 M1 改动回写到 M0 冻结分支；
+- 禁止把环带动量称为非局部尾迹；
+- 禁止在缺少来源时填入“XV-15 真值”；
+- 禁止删除不收敛点或高误差点；
+- 未经用户明确授权不得合并 PR。
+
+## 下一门槛
+
+第一阶段 MATLAB 结果完成后：
+
+- 若实际几何/C81 已显著降低残差，则冻结第一阶段最简有效模型身份，再进入受载桨距或尾迹研究；
+- 若改善有限，则保留失败结果，优先研究非局部尾迹和旋转受载桨距输入契约；
+- 任何下一阶段模型都必须与 M0 和前一级 M1 保持可追溯差分。
