@@ -1,0 +1,51 @@
+name: Stage 9 Sheng public-formula XV-15 comparison
+
+on:
+  push:
+    branches:
+      - research/sheng-comparison-m2-nacelle-20260829
+    paths:
+      - '.github/workflows/stage9-sheng-xv15-comparison.yml'
+      - 'analysis/run_stage9_sheng_xv15_comparison.m'
+      - 'SHENG_COMPARISON_M2_CHARTER.md'
+      - 'CODEX_TASK.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage9-sheng-xv15:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run frozen Stage 9 comparison
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = pwd;
+            artifactRoot = fullfile(root,'ci_artifacts','stage9_sheng_xv15_comparison');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            results = run_stage9_sheng_xv15_comparison(artifactRoot);
+            fid = fopen(fullfile(artifactRoot,'STAGE9_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\n');
+            fprintf(fid,'claimBoundary=%s\n',results.claimBoundary);
+            fprintf(fid,'s0ScaleRole=DIAGNOSTIC_ONLY_NOT_MODEL_NOT_VALIDATION_SCORE\n');
+            for i=1:height(results.rawMetrics), fprintf(fid,'%s_%s_MAPE_pct=%.12g\n',results.rawMetrics.modelIdentity{i},results.rawMetrics.quantity{i},results.rawMetrics.MAPE_pct(i)); end;
+            for i=1:height(results.s0ScaleShapeDiagnostic), fprintf(fid,'S0_%s_k=%.12g\nS0_%s_scaledDiagnosticMAPE_pct=%.12g\nS0_%s_localRatioCV=%.12g\n',results.s0ScaleShapeDiagnostic.quantity{i},results.s0ScaleShapeDiagnostic.leastSquaresScale_k(i),results.s0ScaleShapeDiagnostic.quantity{i},results.s0ScaleShapeDiagnostic.scaledMAPE_pct(i),results.s0ScaleShapeDiagnostic.quantity{i},results.s0ScaleShapeDiagnostic.localRatioCV(i)); end;
+            fclose(fid);
+
+      - name: Upload Stage 9 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage9-sheng-xv15-comparison-evidence
+          path: ci_artifacts/stage9_sheng_xv15_comparison
+          if-no-files-found: error
