@@ -1,0 +1,7 @@
+model_id,physics_identity,evidence_role,target_dependent,modifies_frozen_m0,modifies_frozen_m1,external_validation_role,claim_boundary
+S0_XV15_MAPPED_PUBLIC_FORMULA_REFERENCE,NUAA_PUBLIC_FORMULA_REFERENCE,MODEL_FORM_DIAGNOSTIC,NO,NO,NO,DEVELOPMENT_EXTERNAL_CORRELATION,"Public Sheng formula chain with documented closures under XV-15 mapped inputs; not author code and not an XV-15 model"
+S0-N,POSTPROCESS_SCALE_SHAPE_DIAGNOSTIC,DIAGNOSTIC_ONLY,YES,NO,NO,NOT_VALIDATION,"Least-squares scale uses observed target; never fed back to any model"
+M0_PRODUCTION_LOW_ORDER,FROZEN_M0,FROZEN_BASELINE,NO,NO,NO,DEVELOPMENT_EXTERNAL_CORRELATION,"Frozen generic low-order baseline"
+M1_HOLDOUT_V1,FROZEN_GENERIC_CORRIGAN_N1,FROZEN_PHYSICS_ENHANCED_REFERENCE,NO,NO,NO,"OARF development correlation plus post-freeze WADC cross-facility validation","Do not retune from OARF or WADC"
+D13_ONE_WAY_NACELLE,13_STATE_COMMANDED_NACELLE_SCAFFOLD,INTERNAL_DYNAMIC_MODEL_HIERARCHY,NO,NO,NO,INTERNAL_VERIFICATION_ONLY,"Nacelle angle/rate states plus actuator reaction and rate gyro; prescribed one-way coupling; no external hinge-load feedback"
+M2_TWO_WAY_NACELLE,RESERVED_NEW_MODEL_IDENTITY,FUTURE_PHYSICS_MODEL,NO,NO,NO,REQUIRES_NEW_VALIDATION_SPLIT,"Reserved for source/derivation-constrained two-way nacelle mechanics; not yet implemented or validated"
