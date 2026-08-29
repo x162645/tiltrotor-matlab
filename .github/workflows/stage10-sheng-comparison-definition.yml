@@ -1,0 +1,48 @@
+name: Stage 10 Sheng comparison-definition isolation
+
+on:
+  push:
+    branches:
+      - research/sheng-comparison-m2-nacelle-20260829
+    paths:
+      - '.github/workflows/stage10-sheng-comparison-definition.yml'
+      - 'analysis/run_stage10_sheng_comparison_definition.m'
+      - 'CODEX_TASK.md'
+      - 'SHENG_COMPARISON_M2_CHARTER.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage10-sheng-comparison-definition:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MATLAB R2021a
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+
+      - name: Run Stage 10 comparison-definition isolation
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = pwd;
+            artifactRoot = fullfile(root,'ci_artifacts','stage10_sheng_comparison_definition');
+            if ~exist(artifactRoot,'dir'), mkdir(artifactRoot); end;
+            results = run_stage10_sheng_comparison_definition(artifactRoot);
+            fid = fopen(fullfile(artifactRoot,'STAGE10_STATUS.txt'),'w');
+            fprintf(fid,'status=EXECUTED\nclaimBoundary=%s\n',results.claimBoundary);
+            for i=1:height(results.summary), fprintf(fid,'%s_productionSupported=%d\n%s_paperSupported=%d\n%s_pairedSupported=%d\n',results.summary.caseName{i},results.summary.productionSupported(i),results.summary.caseName{i},results.summary.paperSupported(i),results.summary.caseName{i},results.summary.pairBothSupported(i)); end;
+            fclose(fid);
+
+      - name: Upload Stage 10 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage10-sheng-comparison-definition-evidence
+          path: ci_artifacts/stage10_sheng_comparison_definition
+          if-no-files-found: error
