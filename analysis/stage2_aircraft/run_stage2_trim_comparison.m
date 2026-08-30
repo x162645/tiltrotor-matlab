@@ -2,9 +2,9 @@ function results = run_stage2_trim_comparison(outputRoot)
 %RUN_STAGE2_TRIM_COMPARISON Formal whole-aircraft M0/M1 trim propagation.
 %
 % Six primary solves are executed from the canonical explicit trim seeds:
-%   B15_V020 x {M0,M1_EVIDENCE_V1}
-%   B45_V035 x {M0,M1_EVIDENCE_V1}
-%   B75_V080 x {M0,M1_EVIDENCE_V1}
+%   B15_V020 x {M0_MATCHED_PRODUCTION,M1_EVIDENCE_V1_PROPAGATION}
+%   B45_V035 x {M0_MATCHED_PRODUCTION,M1_EVIDENCE_V1_PROPAGATION}
+%   B75_V080 x {M0_MATCHED_PRODUCTION,M1_EVIDENCE_V1_PROPAGATION}
 % No failed primary solve is replaced by a tuned/continued result.  A delta
 % row is scientifically comparable only when both primary solves are credible.
 
@@ -22,7 +22,7 @@ conditions(2) = struct('name','B45_V035','V',35,'betaM',45*d2r,'gamma',0, ...
     'mode','conversion_longitudinal');
 conditions(3) = struct('name','B75_V080','V',80,'betaM',75*d2r,'gamma',0, ...
     'mode','airplane_longitudinal');
-models = {'M0','M1_EVIDENCE_V1'};
+models = {'M0_MATCHED_PRODUCTION','M1_EVIDENCE_V1_PROPAGATION'};
 
 emptyRow = make_empty_row();
 rows = repmat(emptyRow,numel(conditions)*numel(models),1);
@@ -96,8 +96,8 @@ end
 deltas = struct2table(deltaRows);
 writetable(deltas,fullfile(outputRoot,'STAGE2_M0_M1_TRIM_DELTAS.csv'));
 
-summary = table(sum(points.credible & strcmp(points.modelIdentity,'M0')), ...
-    sum(points.credible & strcmp(points.modelIdentity,'M1_EVIDENCE_V1')), ...
+summary = table(sum(points.credible & strcmp(points.modelIdentity,'M0_MATCHED_PRODUCTION')), ...
+    sum(points.credible & strcmp(points.modelIdentity,'M1_EVIDENCE_V1_PROPAGATION')), ...
     sum(deltas.comparable), sum(points.solveReturned), ...
     'VariableNames',{'M0CredibleCount','M1CredibleCount', ...
     'ComparableCaseCount','ReturnedSolveCount'});
