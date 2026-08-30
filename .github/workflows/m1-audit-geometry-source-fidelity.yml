@@ -1,0 +1,40 @@
+name: M1 audit geometry source fidelity
+
+on:
+  push:
+    branches:
+      - research/m1-xv15-physics-enhanced-20260828
+    paths:
+      - '.github/workflows/m1-audit-geometry-source-fidelity.yml'
+      - 'analysis/run_m1_geometry_source_fidelity_audit.m'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  geometry-source-fidelity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run source-fidelity sensitivity
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = fullfile(pwd,'ci_artifacts','m1_geometry_source_fidelity_audit');
+            if ~exist(root,'dir'), mkdir(root); end;
+            results = run_m1_geometry_source_fidelity_audit(root);
+            disp(results.metricTable);
+            disp(results.decisionTable);
+            disp(results.identityDiff_pp);
+            assert(all(results.identityDiff_pp <= 1e-6));
+      - name: Upload geometry source-fidelity evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-audit-geometry-source-fidelity
+          path: ci_artifacts/m1_geometry_source_fidelity_audit/
+          if-no-files-found: error

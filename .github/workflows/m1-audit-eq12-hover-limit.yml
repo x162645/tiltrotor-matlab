@@ -1,0 +1,43 @@
+name: M1 audit strict-hover Eq12 limit
+
+on:
+  push:
+    branches:
+      - research/m1-xv15-physics-enhanced-20260828
+    paths:
+      - '.github/workflows/m1-audit-eq12-hover-limit.yml'
+      - 'analysis/run_m1_hover_eq12_limit_audit.m'
+      - 'analysis/run_xv15_flap_inflow_interaction_diagnostic.m'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hover-eq12-limit-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run strict-hover Eq12 limit audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = fullfile(pwd,'ci_artifacts','m1_audit_eq12_hover_limit');
+            if ~exist(root,'dir'), mkdir(root); end;
+            results = run_m1_hover_eq12_limit_audit(root);
+            disp(results.summary);
+            disp(results.table);
+            disp(results.identityDiff);
+            assert(all(results.table.physicalConverged_eq12));
+            assert(all(results.table.physicalConverged_uniform));
+            assert(all(results.identityDiff <= 1e-12));
+      - name: Upload strict-hover Eq12 audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-audit-eq12-hover-limit
+          path: ci_artifacts/m1_audit_eq12_hover_limit/
+          if-no-files-found: error
