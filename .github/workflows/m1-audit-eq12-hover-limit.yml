@@ -6,8 +6,8 @@ on:
       - research/m1-xv15-physics-enhanced-20260828
     paths:
       - '.github/workflows/m1-audit-eq12-hover-limit.yml'
+      - 'analysis/run_m1_hover_eq12_limit_audit.m'
       - 'analysis/run_xv15_flap_inflow_interaction_diagnostic.m'
-      - 'analysis/run_xv15_hover_inflow_cancellation_diagnostic.m'
   workflow_dispatch:
 
 permissions:
@@ -17,25 +17,24 @@ jobs:
   hover-eq12-limit-audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: matlab-actions/setup-matlab@v2
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
         with:
           release: R2021a
       - name: Run strict-hover Eq12 limit audit
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: >-
             startup;
             root = fullfile(pwd,'ci_artifacts','m1_audit_eq12_hover_limit');
             if ~exist(root,'dir'), mkdir(root); end;
-            interaction = run_xv15_flap_inflow_interaction_diagnostic(root);
-            cancellation = run_xv15_hover_inflow_cancellation_diagnostic(root);
-            disp(interaction.metrics);
-            disp(interaction.table(:,{'collective75_deg','beta1c_eq12_deg','beta1s_eq12_deg','beta1c_uniform_deg','beta1s_uniform_deg'}));
-            disp(cancellation.table);
-            assert(all(isfinite(interaction.table.CT_eq12_full)));
-            assert(all(isfinite(interaction.table.CT_uniform_full)));
-            assert(all(isfinite(cancellation.table.beta1sPlusLambdaInduced)));
+            results = run_m1_hover_eq12_limit_audit(root);
+            disp(results.summary);
+            disp(results.table);
+            disp(results.identityDiff);
+            assert(all(results.table.physicalConverged_eq12));
+            assert(all(results.table.physicalConverged_uniform));
+            assert(all(results.identityDiff <= 1e-12));
       - name: Upload strict-hover Eq12 audit evidence
         uses: actions/upload-artifact@v4
         with:
