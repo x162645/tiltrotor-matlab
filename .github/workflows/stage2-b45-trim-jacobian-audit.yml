@@ -30,7 +30,7 @@ jobs:
             outDir=fullfile(pwd,'ci_artifacts','stage2_b45_trim_jacobian_audit');
             results=run_stage2_b45_trim_jacobian_audit(outDir);
             s=results.summary;
-            fprintf('STAGE2_B45_JACOBIAN|base_res=%.12g|rank=%d|cond=%.12g|alpha_bound=%.12g|best_line_res=%.12g|best_alpha=%.12g|class=%s\n',s.baseResidualNormRaw(2),s.rankScaled(2),s.conditionScaled(2),s.alphaToFirstBound(2),s.bestSupportedLineSearchRawResidual(2),s.bestSupportedLineSearchAlpha(2),s.classification{2});
+            fprintf('STAGE2_B45_JACOBIAN|base_res=%.12g|rank=%d|cond=%.12g|alpha_bound=%.12g|best_line_res=%.12g|best_alpha=%.12g|class=%s\n',s.baseResidualNormRaw(1),s.rankScaled(1),s.conditionScaled(1),s.alphaToFirstBound(1),s.bestSupportedLineSearchRawResidual(1),s.bestSupportedLineSearchAlpha(1),s.classification{1});
       - name: Upload B45 Jacobian evidence
         uses: actions/upload-artifact@v4
         with:
