@@ -10,7 +10,7 @@ function out = rotor_m1_hover_model_form(P, pitchCommand, cfg)
 %       four-region C81, Corrigan n=1. pitchCommand is theta75 [rad].
 %   'GENERIC_NOMINAL_INSTANCE' - reads only the supplied generic P rotor
 %       geometry/aero fields. pitchCommand is the existing generic root
-%       collective [rad]. Corrigan n=1 is the only added section mechanism.
+%       collective [rad]. cfg.corriganMode may be 'OFF' or 'N1'.
 %
 % No OARF/WADC target is read by this function.
 
@@ -29,9 +29,17 @@ Pwork = P;
 if ~isfield(Pwork.env,'aSound') || isempty(Pwork.env.aSound)
     Pwork.env.aSound = 340.0;
 end
+corriganMode = 'N1';
+if isfield(cfg,'corriganMode') && ~isempty(cfg.corriganMode)
+    corriganMode = upper(char(cfg.corriganMode));
+end
 
 switch instanceType
     case 'XV15_VALIDATION_INSTANCE'
+        if ~strcmp(corriganMode,'N1')
+            error('rotor_m1_hover_model_form:FrozenXV15Mode', ...
+                'Frozen XV-15 validation identity requires Corrigan N1.');
+        end
         Pwork.rotor.R = 3.81;
         Pwork.rotor.Nb = 3;
         Pwork.rotor.rootCut = 0.0875;
@@ -40,6 +48,10 @@ switch instanceType
         aeroMode = 'XV15_C81_CORRIGAN_N1';
         pitchReference = 'THETA75';
     case 'GENERIC_NOMINAL_INSTANCE'
+        if ~any(strcmp(corriganMode,{'OFF','N1'}))
+            error('rotor_m1_hover_model_form:InvalidCorriganMode', ...
+                'Generic cfg.corriganMode must be OFF or N1.');
+        end
         required = {'R','Nb','rootCut','chord','twistTip','liftSlope', ...
             'CLmax','CD0','kCD','Omega','nRadial','nAzimuth'};
         for k = 1:numel(required)
@@ -48,7 +60,11 @@ switch instanceType
                     'Generic P.rotor.%s is required.',required{k});
             end
         end
-        aeroMode = 'GENERIC_SCALAR_CORRIGAN_N1';
+        if strcmp(corriganMode,'OFF')
+            aeroMode = 'GENERIC_SCALAR_OFF';
+        else
+            aeroMode = 'GENERIC_SCALAR_CORRIGAN_N1';
+        end
         pitchReference = 'ROOT_COLLECTIVE';
     otherwise
         error('rotor_m1_hover_model_form:InvalidInstanceType', ...
@@ -112,7 +128,8 @@ closure = abs(loads.T-momentumThrust)/ ...
 physical = converged && flapInfo.converged && loads.T > 0 && closure <= 2e-4;
 
 out.instanceType = instanceType;
-out.modelForm = 'M1_HOVER_RADIAL_BEMT_CORRIGAN_N1';
+out.modelForm = 'M1_HOVER_RADIAL_BEMT_OPTIONAL_CORRIGAN_N1';
+out.corriganMode = corriganMode;
 out.pitchReference = pitchReference;
 out.pitchCommand = pitchCommand;
 out.thrust = loads.T;
@@ -136,7 +153,7 @@ out.KLMinApplied = loads.KLMinApplied;
 out.KLMaxApplied = loads.KLMaxApplied;
 out.alphaClampCount = loads.alphaClampCount;
 out.machClampCount = loads.machClampCount;
-out.parameterBoundary = parameter_boundary(instanceType);
+out.parameterBoundary = parameter_boundary(instanceType,corriganMode);
 
     function [z,info] = solve_flap(viNow,z0)
         z = z0(:);
@@ -211,23 +228,25 @@ out.parameterBoundary = parameter_boundary(instanceType);
                 machClampCount=meta.machClampCount;
                 KLMinApplied=meta.KLMinApplied;
                 KLMaxApplied=meta.KLMaxApplied;
-            case 'GENERIC_SCALAR_CORRIGAN_N1'
+            case {'GENERIC_SCALAR_OFF','GENERIC_SCALAR_CORRIGAN_N1'}
                 CLbase=Pwork.rotor.CLmax*tanh( ...
                     Pwork.rotor.liftSlope*alpha/Pwork.rotor.CLmax);
                 CD=Pwork.rotor.CD0+Pwork.rotor.kCD*CLbase.^2;
-                r_m=max(rField*R,1e-8);
-                KL=1.291*(chordField./r_m).^0.0775;
-                alphaDeg=alpha*180/pi;
-                apply=alphaDeg>0 & alphaDeg<30 & CLbase>0;
                 CL=CLbase;
-                CL(apply)=KL(apply).*CLbase(apply);
+                KLMinApplied=1; KLMaxApplied=1;
+                if strcmp(aeroMode,'GENERIC_SCALAR_CORRIGAN_N1')
+                    r_m=max(rField*R,1e-8);
+                    KL=1.291*(chordField./r_m).^0.0775;
+                    alphaDeg=alpha*180/pi;
+                    apply=alphaDeg>0 & alphaDeg<30 & CLbase>0;
+                    CL(apply)=KL(apply).*CLbase(apply);
+                    if any(apply(:))
+                        KLMinApplied=min(KL(apply));
+                        KLMaxApplied=max(KL(apply));
+                    end
+                end
                 alphaClampCount=0;
                 machClampCount=0;
-                KLMinApplied=NaN; KLMaxApplied=NaN;
-                if any(apply(:))
-                    KLMinApplied=min(KL(apply));
-                    KLMaxApplied=max(KL(apply));
-                end
         end
         q=0.5*rho*W.^2;
         dL=q.*chord_m.*CL.*dr;
@@ -252,10 +271,12 @@ function theta_deg=nasa_metal_twist_deg(x)
 theta_deg=289.98*x.^5-892.87*x.^4+987.06*x.^3-438.31*x.^2+15.695*x+32.057;
 end
 
-function txt=parameter_boundary(instanceType)
+function txt=parameter_boundary(instanceType,corriganMode)
 if strcmp(instanceType,'XV15_VALIDATION_INSTANCE')
     txt=['XV15_VALIDATION_PARAMETERS_ONLY_DO_NOT_EXPORT_TO_GENERIC_AIRCRAFT_' ...
         'HOVER_ONLY'];
+elseif strcmp(corriganMode,'OFF')
+    txt='GENERIC_PARAMS_NOMINAL_M0_LIMIT_IDENTITY_CHECK_HOVER_ONLY';
 else
     txt=['GENERIC_PARAMS_NOMINAL_ONLY_CORRIGAN_N1_MODEL_FORM_TRANSFER_' ...
         'NOT_XV15_AIRCRAFT_VALIDATION_HOVER_ONLY'];
