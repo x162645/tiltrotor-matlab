@@ -12,7 +12,8 @@ function results = run_m1_wadc_input_homology_sensitivity(outputDir)
 %    a numerical sensitivity range, NOT a claim about the actual test rho.
 %
 % No variant is selected by validation error and no result is fed back into
-% M1_HOLDOUT_V1.
+% M1_HOLDOUT_V1. Sensitivity-branch failures are retained as evidence. Only
+% the frozen Stage-5 reproduction branch is required to remain 15/15.
 
 rootDir = fileparts(fileparts(mfilename('fullpath')));
 if nargin < 1 || isempty(outputDir)
@@ -25,8 +26,10 @@ stage5 = run_m1_stage5_wadc_holdout(fullfile(outputDir,'frozen_stage5_recheck'))
 source = stage5.validationManifest;
 refRows = stage5.points(strcmp(stage5.points.modelIdentity, ...
     'M1_HOLDOUT_V1_GENERIC_CORRIGAN_N1'),:);
-if height(source) ~= 15 || height(refRows) ~= 15
-    error('run_m1_wadc_input_homology_sensitivity:Reference','Expected 15 frozen M1 WADC points.');
+m0Rows = stage5.points(strcmp(stage5.points.modelIdentity, ...
+    'M0_PRODUCTION_LOW_ORDER'),:);
+if height(source) ~= 15 || height(refRows) ~= 15 || height(m0Rows) ~= 15
+    error('run_m1_wadc_input_homology_sensitivity:Reference','Expected 15 frozen WADC points per model.');
 end
 
 Pbase = params_nominal();
@@ -67,24 +70,27 @@ for iv = 1:numel(variantName)
             source.CT_exp(k),CT,100*(CT-source.CT_exp(k))/source.CT_exp(k), ...
             source.CP_exp(k),CP,100*(CP-source.CP_exp(k))/source.CP_exp(k), ...
             source.FM_exp(k),FM,100*(FM-source.FM_exp(k))/source.FM_exp(k), ...
-            out.physicalConverged,out.inducedVelocity_mps,out.closureResidualRelative, ...
+            out.physicalConverged,out.iterations,out.flapConverged,out.flapResidualNorm, ...
+            out.inducedVelocity_mps,out.closureResidualRelative, ...
             out.alphaClampCount,out.machClampCount,out.KLMinApplied,out.KLMaxApplied, ...
             'VariableNames',{'variant','useReportedMtipForSoundSpeed','rhoFactor', ...
             'run','point','Vtip_fps','Mtip_reported','aSoundDerived_mps','aSoundUsed_mps', ...
             'rhoUsed_kgm3','collective75_deg','CT_exp','CT_model','CT_relativeError_pct', ...
             'CP_exp','CP_model','CP_relativeError_pct','FM_exp','FM_model', ...
-            'FM_relativeError_pct','physicalConverged','inducedVelocity_mps', ...
-            'closureResidualRelative','alphaClampCount','machClampCount', ...
-            'KLMinApplied','KLMaxApplied'});
+            'FM_relativeError_pct','physicalConverged','iterations','flapConverged', ...
+            'flapResidualNorm','inducedVelocity_mps','closureResidualRelative', ...
+            'alphaClampCount','machClampCount','KLMinApplied','KLMaxApplied'});
         rows = [rows;one]; %#ok<AGROW>
     end
 end
 writetable(rows,fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_POINTS.csv'));
 
-% Fail closed: copied frozen environment branch must reproduce Stage 5.
+% Fail closed: copied frozen environment branch must reproduce Stage 5 and
+% must retain the original 15/15 physical support.
 base = rows(strcmp(rows.variant,'FROZEN_A340_RHO1P0'),:);
-if height(base) ~= height(refRows)
-    error('run_m1_wadc_input_homology_sensitivity:BaseCount','Frozen branch count mismatch.');
+if height(base) ~= height(refRows) || ~all(base.physicalConverged)
+    error('run_m1_wadc_input_homology_sensitivity:FrozenBaseSupport', ...
+        'Frozen Stage-5 reproduction must remain 15/15 physically supported.');
 end
 keyBase = base.run*1000+base.point;
 keyRef = refRows.run*1000+refRows.point;
@@ -97,55 +103,140 @@ if ~(isfinite(identityDiff) && identityDiff <= 1e-10)
         'Copied frozen M1 equations drifted from Stage 5: %.12g.',identityDiff);
 end
 
+% Per-variant metrics retain support loss instead of aborting or deleting it.
 metrics = table();
 for iv = 1:numel(variantName)
     for runId = [1 2 3 0]
-        mask = strcmp(rows.variant,variantName{iv}) & rows.physicalConverged;
-        if runId ~= 0, mask = mask & rows.run==runId; end
+        candidate = strcmp(rows.variant,variantName{iv});
         expected = 15; label = 'ALL_RUNS';
-        if runId ~= 0, expected=5; label=sprintf('RUN_%d',runId); end
-        if sum(mask) ~= expected
-            error('run_m1_wadc_input_homology_sensitivity:Incomplete', ...
-                '%s %s has only %d supported points.',variantName{iv},label,sum(mask));
+        if runId ~= 0
+            candidate = candidate & rows.run==runId;
+            expected = 5; label = sprintf('RUN_%d',runId);
         end
-        one = table(variantName(iv),{label},sum(mask), ...
-            mean(abs(rows.CT_relativeError_pct(mask))), ...
-            mean(abs(rows.CP_relativeError_pct(mask))), ...
-            mean(abs(rows.FM_relativeError_pct(mask))), ...
-            mean(rows.CT_relativeError_pct(mask)),mean(rows.CP_relativeError_pct(mask)), ...
-            mean(rows.FM_relativeError_pct(mask)),max(rows.alphaClampCount(mask)), ...
-            max(rows.machClampCount(mask)), ...
-            'VariableNames',{'variant','validationGroup','supportedPointCount', ...
+        valid = candidate & rows.physicalConverged & ...
+            isfinite(rows.CT_model) & rows.CT_model>0 & ...
+            isfinite(rows.CP_model) & rows.CP_model>0 & isfinite(rows.FM_model);
+        count = sum(valid);
+        if count > 0
+            ctMape = mean(abs(rows.CT_relativeError_pct(valid)));
+            cpMape = mean(abs(rows.CP_relativeError_pct(valid)));
+            fmMape = mean(abs(rows.FM_relativeError_pct(valid)));
+            ctSigned = mean(rows.CT_relativeError_pct(valid));
+            cpSigned = mean(rows.CP_relativeError_pct(valid));
+            fmSigned = mean(rows.FM_relativeError_pct(valid));
+            maxAlpha = max(rows.alphaClampCount(valid));
+            maxMach = max(rows.machClampCount(valid));
+        else
+            ctMape=NaN; cpMape=NaN; fmMape=NaN;
+            ctSigned=NaN; cpSigned=NaN; fmSigned=NaN;
+            maxAlpha=NaN; maxMach=NaN;
+        end
+        one = table(variantName(iv),{label},expected,count,expected-count,count/expected, ...
+            ctMape,cpMape,fmMape,ctSigned,cpSigned,fmSigned,maxAlpha,maxMach, ...
+            'VariableNames',{'variant','validationGroup','expectedPointCount', ...
+            'supportedPointCount','failedPointCount','supportFraction', ...
             'CT_MAPE_pct','CP_MAPE_pct','FM_MAPE_pct','CT_meanSigned_pct', ...
             'CP_meanSigned_pct','FM_meanSigned_pct','maxAlphaClampCount','maxMachClampCount'});
         metrics = [metrics;one]; %#ok<AGROW>
     end
 end
-baseAll = metrics(strcmp(metrics.variant,'FROZEN_A340_RHO1P0') & ...
-    strcmp(metrics.validationGroup,'ALL_RUNS'),:);
-metrics.CT_deltaFromFrozenPooled_pp = metrics.CT_MAPE_pct-baseAll.CT_MAPE_pct;
-metrics.CP_deltaFromFrozenPooled_pp = metrics.CP_MAPE_pct-baseAll.CP_MAPE_pct;
-metrics.FM_deltaFromFrozenPooled_pp = metrics.FM_MAPE_pct-baseAll.FM_MAPE_pct;
+for i = 1:height(metrics)
+    ref = metrics(strcmp(metrics.variant,'FROZEN_A340_RHO1P0') & ...
+        strcmp(metrics.validationGroup,metrics.validationGroup{i}),:);
+    metrics.CT_deltaFromFrozenSameGroup_pp(i) = metrics.CT_MAPE_pct(i)-ref.CT_MAPE_pct;
+    metrics.CP_deltaFromFrozenSameGroup_pp(i) = metrics.CP_MAPE_pct(i)-ref.CP_MAPE_pct;
+    metrics.FM_deltaFromFrozenSameGroup_pp(i) = metrics.FM_MAPE_pct(i)-ref.FM_MAPE_pct;
+end
 writetable(metrics,fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_METRICS.csv'));
+
+% Common-support comparison is diagnostic only: failed points remain in the
+% point table and are never silently removed from the formal Stage-5 holdout.
+sourceKey = source.run*1000+source.point;
+commonSupport = true(height(source),1);
+for k = 1:height(source)
+    key = sourceKey(k);
+    q = rows(rows.run*1000+rows.point==key,:);
+    commonSupport(k) = height(q)==numel(variantName) && all(q.physicalConverged) && ...
+        all(isfinite(q.CT_model)) && all(q.CT_model>0) && ...
+        all(isfinite(q.CP_model)) && all(q.CP_model>0) && all(isfinite(q.FM_model));
+end
+commonKeys = sourceKey(commonSupport);
+commonMetrics = table();
+for iv = 1:numel(variantName)
+    mask = strcmp(rows.variant,variantName{iv}) & ismember(rows.run*1000+rows.point,commonKeys);
+    one = table(variantName(iv),sum(mask), ...
+        mean(abs(rows.CT_relativeError_pct(mask))), ...
+        mean(abs(rows.CP_relativeError_pct(mask))), ...
+        mean(abs(rows.FM_relativeError_pct(mask))), ...
+        'VariableNames',{'variant','commonSupportedPointCount','CT_MAPE_pct','CP_MAPE_pct','FM_MAPE_pct'});
+    commonMetrics = [commonMetrics;one]; %#ok<AGROW>
+end
+m0Common = ismember(m0Rows.run*1000+m0Rows.point,commonKeys) & m0Rows.physicalConverged;
+m0CommonCT = mean(abs(m0Rows.CT_relativeError_pct(m0Common)));
+m0CommonCP = mean(abs(m0Rows.CP_relativeError_pct(m0Common)));
+m0CommonFM = mean(abs(m0Rows.FM_relativeError_pct(m0Common)));
+commonMetrics.M0_common_CT_MAPE_pct = repmat(m0CommonCT,height(commonMetrics),1);
+commonMetrics.M0_common_CP_MAPE_pct = repmat(m0CommonCP,height(commonMetrics),1);
+commonMetrics.M0_common_FM_MAPE_pct = repmat(m0CommonFM,height(commonMetrics),1);
+commonMetrics.M1minusM0_common_CT_MAPE_pp = commonMetrics.CT_MAPE_pct-m0CommonCT;
+commonMetrics.M1minusM0_common_CP_MAPE_pp = commonMetrics.CP_MAPE_pct-m0CommonCP;
+commonMetrics.M1minusM0_common_FM_MAPE_pp = commonMetrics.FM_MAPE_pct-m0CommonFM;
+writetable(commonMetrics,fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_COMMON_SUPPORT.csv'));
+
+failureRows = rows(~rows.physicalConverged | ~isfinite(rows.FM_model) | rows.CP_model<=0 | rows.CT_model<=0,:);
+writetable(failureRows,fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_FAILURES.csv'));
 
 soundAudit = unique(rows(:,{'run','point','Vtip_fps','Mtip_reported','aSoundDerived_mps'}));
 soundAudit.aSoundDifferenceFrom340_pct = 100*(soundAudit.aSoundDerived_mps-340)/340;
 writetable(soundAudit,fullfile(outputDir,'M1_WADC_REPORTED_MTIP_SOUND_SPEED_AUDIT.csv'));
 
+% Evidence-level decision: no sensitivity variant is allowed to redefine the
+% original 15-point holdout. Full robustness requires full support; if a
+% hypothetical density branch loses support, the cross-facility advantage
+% can be retained only with an explicit support caveat.
+soundAll = metrics(strcmp(metrics.variant,'REPORTED_MTIP_A_RHO1P0') & strcmp(metrics.validationGroup,'ALL_RUNS'),:);
+rhoLowAll = metrics(strcmp(metrics.variant,'REPORTED_MTIP_A_RHO0P9') & strcmp(metrics.validationGroup,'ALL_RUNS'),:);
+rhoHighAll = metrics(strcmp(metrics.variant,'REPORTED_MTIP_A_RHO1P1') & strcmp(metrics.validationGroup,'ALL_RUNS'),:);
+commonAdvantage = all(commonMetrics.M1minusM0_common_CT_MAPE_pp < 0) && ...
+    all(commonMetrics.M1minusM0_common_CP_MAPE_pp < 0) && ...
+    all(commonMetrics.M1minusM0_common_FM_MAPE_pp < 0);
+if soundAll.supportedPointCount==15 && rhoLowAll.supportedPointCount==15 && ...
+        rhoHighAll.supportedPointCount==15 && commonAdvantage
+    decision = 'WADC_INPUT_HOMOLOGY_ROBUST_FULL_15_POINT_SUPPORT';
+elseif soundAll.supportedPointCount==15 && rhoHighAll.supportedPointCount==15 && ...
+        commonAdvantage && rhoLowAll.supportedPointCount>=14
+    decision = 'WADC_ADVANTAGE_ROBUST_ON_COMMON_SUPPORT_WITH_LOW_DENSITY_SUPPORT_LIMITATION';
+else
+    decision = 'WADC_INPUT_HOMOLOGY_NOT_ROBUST_REQUIRES_EVIDENCE_DOWNGRADE';
+end
+summary = table(identityDiff,numel(commonKeys),height(failureRows), ...
+    soundAll.supportedPointCount,rhoLowAll.supportedPointCount,rhoHighAll.supportedPointCount, ...
+    commonAdvantage,{decision}, ...
+    'VariableNames',{'frozenIdentityMaxAbsDifference','commonSupportedPointCount', ...
+    'sensitivityFailureRowCount','reportedMtipRho1SupportedCount', ...
+    'reportedMtipRho0p9SupportedCount','reportedMtipRho1p1SupportedCount', ...
+    'M1BeatsM0OnAllCommonSupportVariants','decision'});
+writetable(summary,fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_SUMMARY.csv'));
+
 metadataName = {'stage';'role';'original_holdout_modified';'model_parameter_fit'; ...
     'sound_speed_test';'density_test';'density_range_role';'variant_selection_by_error'; ...
+    'sensitivity_failures_retained';'common_support_role'; ...
     'frozen_identity_max_abs_difference';'claim_boundary'};
 metadataValue = {'POST_STAGE5_INPUT_HOMOLOGY_AUDIT'; ...
     'POSTHOC_INPUT_HOMOLOGY_SENSITIVITY';'NO';'NO'; ...
     'A_SOUND_EQUALS_VTIP_DIV_REPORTED_MTIP'; ...
     'FROZEN_GENERIC_RHO_TIMES_0P9_1P0_1P1'; ...
     'NUMERICAL_SENSITIVITY_NOT_ACTUAL_WADC_DENSITY_CLAIM';'NO'; ...
+    'YES_NO_POINT_DELETION_NO_SOLVER_RELAXATION'; ...
+    'DIAGNOSTIC_ONLY_FORMAL_STAGE5_REMAINS_ALL_15_POINTS'; ...
     sprintf('%.12g',identityDiff); ...
     'DO_NOT_REDEFINE_OR_RETUNE_FROZEN_WADC_HOLDOUT'};
 metadata = table(metadataName,metadataValue);
 writetable(metadata,fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_METADATA.csv'));
 
-results = struct(); results.points=rows; results.metrics=metrics; results.soundAudit=soundAudit;
+results = struct();
+results.points=rows; results.metrics=metrics; results.commonMetrics=commonMetrics;
+results.failures=failureRows; results.summary=summary; results.soundAudit=soundAudit;
 results.identityDiff=identityDiff; results.metadata=metadata;
 results.claimBoundary=metadataValue{end};
 save(fullfile(outputDir,'M1_WADC_INPUT_HOMOLOGY_RESULTS.mat'),'results');
@@ -164,7 +255,7 @@ chord_m=chord_in*0.0254; thetaSource_deg=nasa_metal_twist_deg(x);
 theta75Source_deg=nasa_metal_twist_deg(0.75);
 thetaBlade=(theta75_deg+thetaSource_deg-theta75Source_deg)*pi/180; UT=Omega*rMid;
 vi=sqrt(max(P.mass.m*P.env.g/2,1)/(2*rho*A)); zFlap=P.rotor.flapInitial(:); converged=false;
-flapInfo=struct('converged',false,'iterations',0,'residualNorm',Inf);
+flapInfo=struct('converged',false,'iterations',0,'residualNorm',Inf); err=Inf;
 for iter=1:P.rotor.inducedMaxIter
     [zFlap,flapInfo]=solve_flap(vi,zFlap); if ~flapInfo.converged, break; end
     loads=blade_loads(vi,zFlap); lambda1=-vi/max(tipSpeed,eps);
@@ -180,6 +271,7 @@ momentumThrust=2*rho*A*tipSpeed*vi*abs(lambda1);
 closure=abs(loads.T-momentumThrust)/max([abs(loads.T),abs(momentumThrust),1]);
 physical=converged && flapInfo.converged && loads.T>0 && closure<=2e-4;
 out=struct('thrust',loads.T,'torque',loads.Q,'physicalConverged',physical, ...
+    'iterations',iter,'flapConverged',flapInfo.converged,'flapResidualNorm',flapInfo.residualNorm, ...
     'inducedVelocity_mps',vi,'closureResidualRelative',closure, ...
     'alphaClampCount',loads.alphaClampCount,'machClampCount',loads.machClampCount, ...
     'KLMinApplied',loads.KLMinApplied,'KLMaxApplied',loads.KLMaxApplied);
