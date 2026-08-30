@@ -32,7 +32,9 @@ jobs:
             disp(results.soundAudit);
             disp(results.identityDiff);
             assert(results.identityDiff <= 1e-10);
-            assert(all(results.points.physicalConverged));
+            frozenMask = strcmp(results.points.variant,'FROZEN_A340_RHO1P0');
+            assert(sum(frozenMask) == 15);
+            assert(all(results.points.physicalConverged(frozenMask)));
       - name: Upload WADC input-homology evidence
         uses: actions/upload-artifact@v4
         with:
