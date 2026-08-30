@@ -1,0 +1,44 @@
+name: Aircraft hover M0 vs M1 model-form transfer
+
+on:
+  push:
+    branches:
+      - research/aircraft-m1-model-form-separation-20260830
+    paths:
+      - 'model/rotor_m1_hover_model_form.m'
+      - 'analysis/audit_m1_model_form_instance_separation.m'
+      - 'analysis/run_aircraft_hover_m0_m1_model_form_transfer.m'
+      - '.github/workflows/aircraft-hover-m0-m1-model-form-transfer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hover-transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run identity gates and generic hover propagation
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            root = fullfile(pwd,'ci_artifacts','aircraft_hover_m0_m1_transfer');
+            if ~exist(root,'dir'), mkdir(root); end;
+            results = run_aircraft_hover_m0_m1_model_form_transfer(root);
+            disp(results.summary);
+            disp(results.delta);
+            disp(results.commonControl);
+            assert(results.identityAudit.maxIdentityDiff <= 1e-10);
+            assert(results.identityAudit.maxM0LimitRelDiff <= 1e-8);
+            assert(all(results.summary.physicalConverged));
+      - name: Upload aircraft hover propagation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: aircraft-hover-m0-m1-model-form-transfer
+          path: ci_artifacts/aircraft_hover_m0_m1_transfer/
+          if-no-files-found: error
