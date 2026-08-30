@@ -11,11 +11,14 @@ This file is the authoritative research-state checkpoint for the current M1 bran
 
 ## Completed / screened M1 work
 
-- `M1-A_SOURCE_INFORMED_RADIAL_GEOMETRY_SCALAR_C81` — `FORMALLY_RUN_REAUDIT_REQUIRED`
-  - MATLAB R2021a Stage-1 evidence exists.
-  - 6–11 deg: CT/CP/FM MAPE = 33.9549 / 45.2392 / 4.4100%.
-  - Audit correction: current chord and twist representations are source-informed reconstruction/fit, not unqualified exact geometry truth.
-  - Requires geometry source-fidelity sensitivity before final paper causal attribution.
+- `M1-A_SOURCE_INFORMED_RADIAL_GEOMETRY_SCALAR_C81` — `FORMALLY_RUN_SOURCE_FIDELITY_AUDIT_PASS`
+  - MATLAB R2021a Stage-1 evidence: 6–11 deg CT/CP/FM MAPE = 33.9549 / 45.2392 / 4.4100%.
+  - Geometry source-fidelity audit run `33289747465` compared current reconstruction, direct Appendix-A TWISTA, TP narrative chord, and TP Appendix-A CAMRAD chord with no OARF/WADC-based selection.
+  - All four source interpretations retained lower CT/CP/FM MAPE than DIAG_SECTION; total source-interpretation spread = 1.5855 / 1.5515 / 0.4322 pp.
+  - Current branch reproduced the canonical M1-A result with 0 pp identity difference under the 1e-6 pp gate.
+  - Scientific wording is corrected from unqualified `actual/real geometry` to `source-informed radial chord and nonlinear-twist representation`.
+  - Direct TWISTA is a stronger source contract than the polynomial representation, but it does not retroactively replace the frozen M1 identity used for WADC evidence.
+  - Detailed audit: `docs/M1_GEOMETRY_SOURCE_FIDELITY_AUDIT.md`.
 
 - `M1-B_TP_FOUR_REGION_C81_LOCAL_MACH` — `FORMALLY_RUN_PASS_WITH_CAVEAT`
   - 6–11 deg: CT/CP/FM MAPE = 37.8538 / 50.5150 / 7.5480%.
@@ -73,29 +76,32 @@ This file is the authoritative research-state checkpoint for the current M1 bran
 
 These must not be recycled as new mainline tasks without genuinely new evidence or a changed hypothesis.
 
-## NEXT_ALLOWED — audit blockers only
+## Closed audit blockers
 
-No new M1 physical mechanism is allowed until the following four source/limit/homology checks are closed. See `docs/M1_FULL_PHYSICS_AUDIT_20260830.md`.
+1. `GEOMETRY_SOURCE_FIDELITY_AUDIT` — `CLOSED_PASS`
+   - MATLAB R2021a run `33289747465`, artifact `9725590921`, SHA-256 `a4a65fa869d8cb29240f7ee1dee6e3128a89154923f99fb465612a9e4c04e6ac`.
+   - M1-A geometry-attribution direction is robust across the tested legitimate public-source interpretations.
+   - No downstream rollback required.
 
-1. `GEOMETRY_SOURCE_FIDELITY_AUDIT`
-   - Compare current chord reconstruction, TP text-faithful chord, TP Appendix-A CAMRAD CHORD, and direct 51-point TWISTA interpolation.
-   - No OARF/WADC-based selection.
+## NEXT_ALLOWED — remaining audit blockers only
 
-2. `HOVER_EQ12_LIMIT_AUDIT`
+No new M1 physical mechanism is allowed until the following three limit/provenance/homology checks are closed. See `docs/M1_FULL_PHYSICS_AUDIT_20260830.md`.
+
+1. `HOVER_EQ12_LIMIT_AUDIT`
    - Formal MATLAB Eq. (12) versus uniform-hover inflow comparison.
    - Must include CT/CP/FM plus beta harmonics, H forces and 1/rev/local-load harmonics.
 
-3. `CORRIGAN_N1_PROVENANCE_CORRECTION`
+2. `CORRIGAN_N1_PROVENANCE_CORRECTION`
    - Numerical model identity stays frozen.
    - Correct n=1 evidence role from literature-default language to a predeclared in-range model-form assumption.
 
-4. `WADC_INPUT_HOMOLOGY_SENSITIVITY`
+3. `WADC_INPUT_HOMOLOGY_SENSITIVITY`
    - Preserve original holdout unchanged.
    - Post-hoc sensitivity using reported Vtip/Mtip-derived sound speed and a transparent density range if density remains unavailable.
 
 ## Downstream decision
 
-After the four audit blockers close:
+After the remaining audit blockers close:
 
 - if the main M1/WADC conclusions are robust, freeze the corrected evidence package and return to whole-aircraft M0-vs-M1 trim/conversion/linear-dynamics studies;
 - if any blocker materially changes the conclusions, repair the model identity/evidence chain before considering any new M2 physics.
