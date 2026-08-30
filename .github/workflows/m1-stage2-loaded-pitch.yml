@@ -1,0 +1,26 @@
+name: M1 Stage2 Loaded Pitch
+
+on:
+  push:
+    branches:
+      - research/m1d-loaded-pitch-20260830
+  workflow_dispatch:
+
+jobs:
+  matlab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: matlab-actions/setup-matlab@v2
+        with:
+          release: R2021a
+      - name: Run M1-D quasi-static loaded-pitch diagnostic
+        uses: matlab-actions/run-command@v2
+        with:
+          command: startup; results = run_m1_stage2_loaded_pitch; disp(results.metrics); disp(results.points(:,{'collective75_deg','caseName','theta75Loaded_deg','maxAbsElasticTwist_deg','iterations','converged'})); assert(results.allFinite);
+      - name: Upload M1-D results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-stage2-loaded-pitch-results
+          path: results/m1_stage2_loaded_pitch/

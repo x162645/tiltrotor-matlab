@@ -29,6 +29,22 @@ This file is the authoritative research-state checkpoint for the current M1 bran
   - 6–11 deg: CT MAPE 35.7519%, CP MAPE 47.9006%, FM MAPE 5.9849%.
   - Annular momentum gives only modest improvement and does not close the main residual.
 
+- `M1-D_LOADED_PITCH_TORSIONAL_FLEXIBILITY` — `FORMALLY_RUN_NEGATIVE_DIAGNOSTIC`
+  - PR: #72.
+  - MATLAB R2021a workflow run: `33284559105`, success.
+  - Artifact: `9724006601`, SHA-256 `0d0ad7da250c07e98e9f9c54fcb37060ca6a4d86229e5a15b91332d7de311e1e`.
+  - Scope: analysis-only quasi-static comparison of rigid, blade-GJ-only, control-compliance-only, and combined flexibility.
+  - Structural inputs: NASA/TP-2004-212262 Appendix A reference-model `GJ(r)`, `XQC(r)`, twist, and `KPL=22400 ft-lb/rad`; these are `NASA_REFERENCE_MODEL_INPUT`, not matched OARF Run 14/15 structural measurements.
+  - Same-solver 6–11 deg diagnostic metrics:
+    - rigid: CT MAPE 30.8742%, CP MAPE 41.0856%;
+    - blade GJ only: CT 35.5729%, CP 46.4690%;
+    - control compliance only: CT 33.2340%, CP 43.6762%;
+    - combined: CT 37.7791%, CP 48.7759%.
+  - Flexible cases unload the blade rather than recover missing thrust: mean theta75 shift is about -0.656 deg for blade GJ, -0.282 deg for control compliance, and -0.937 deg combined; maximum blade elastic twist is about 1.20 deg.
+  - 7–11 deg flexible cases converge; 6 deg blade-GJ and combined cases reach the 160-iteration limit and remain explicit boundary failures.
+  - Interpretation boundary: the absolute rigid metrics above belong to the compact M1-D diagnostic solver and must not replace formal M1-C metrics. The valid conclusion is the incremental rigid-versus-flexible direction and magnitude within M1-D.
+  - Conclusion: quasi-static loaded-pitch/torsional compliance is not a credible explanation for the remaining systematic thrust deficit under the tested independently sourced reference inputs. Do not reopen as a mainline task without new structural evidence or a materially different aeroelastic hypothesis.
+
 ## Previously screened directions
 
 - `LOCAL_PRANDTL_ROOT_TIP_LOSS` — `FORMALLY_SCREENED_NEGATIVE`
@@ -44,32 +60,27 @@ This file is the authoritative research-state checkpoint for the current M1 bran
 
 ## NEXT_ALLOWED
 
-### `M1-D_LOADED_PITCH_TORSIONAL_FLEXIBILITY`
+### `M1-E_NONLOCAL_WAKE`
 
 Research question:
 
-> Can physically sourced loaded-pitch changes from blade torsional flexibility and control-system compliance explain a substantial part of the remaining systematic CT/CP discrepancy after M1-C?
+> Does an independently constrained finite-blade nonlocal wake model materially alter the radial/azimuthal induced-velocity field and rotor loading enough to explain a meaningful part of the remaining systematic CT/CP discrepancy after the local/annular and loaded-pitch hypotheses have been screened?
 
 Allowed implementation scope:
 
-1. analysis-only path; production M0 remains unchanged;
-2. use NASA/TP-2004-212262 public structural/reference-model inputs only as `NASA_REFERENCE_MODEL_INPUT`, not as OARF Run 14/15 measured truth;
-3. compare four cases: rigid, blade-GJ only, control-system compliance only, combined flexibility;
-4. compute resulting radial loaded-pitch change and propagate it through the same M1 aerodynamic/inflow chain;
-5. no fitting of stiffness, pitch offset, gain, or correction factor to OARF CT/CP/FM;
-6. preserve zero/negative result if flexibility is too small or acts in the wrong direction.
+1. analysis-only path initially; frozen M0 and production core remain unchanged;
+2. implement a genuinely nonlocal finite-blade wake, not a renamed Prandtl/Mangler/local-annular correction;
+3. preferred first model: prescribed helical wake + lifting-line/circulation closure + Biot-Savart induced velocity;
+4. circulation and induced velocity must be solved self-consistently or by a clearly documented iterative closure;
+5. wake pitch, contraction, vortex-core treatment and truncation must come from independent literature/theory or transparent conservation relations;
+6. no fitting of wake contraction, core radius, pitch, empirical induction multiplier, or circulation gain to OARF CT/CP/FM;
+7. compare against the existing rigid M1-C/local-annular layer on the same declared conditions and preserve negative results;
+8. include convergence with radial discretization, wake age/revolutions, azimuthal discretization and vortex-core regularization before interpreting performance changes.
 
 Primary decision criterion:
 
-- If loaded-pitch physics changes CT/CP by a physically meaningful fraction of the remaining M1-C discrepancy, freeze it as a justified M1 layer and proceed to independent validation.
-- If its effect is small or wrong-sign, close M1-D as a negative result and advance to `M1-E_NONLOCAL_WAKE`.
-
-## Deferred next stage
-
-- `M1-E_NONLOCAL_WAKE` — `BLOCKED_BY_M1-D`
-  - prescribed helical wake / lifting-line / Biot-Savart nonlocal induced coupling;
-  - no OARF-based tuning of wake contraction, vortex core, pitch, or empirical induction gain;
-  - only starts after M1-D is closed.
+- If nonlocal wake physics produces a material, physically interpretable improvement that survives numerical convergence checks, freeze it as the next justified M1 layer and then test against reserved independent evidence.
+- If the effect is small, wrong-sign, numerically non-robust, or requires OARF-driven tuning, close M1-E as a negative result rather than adding empirical gains.
 
 ## Rule
 
