@@ -15,7 +15,9 @@ function [CL, CD, meta] = xv15_c81_corrigan_stall_delay(alphaRad, Mach, rOverR, 
 %
 % Allowed modes are discrete evidence roles, not a tunable numeric input:
 %   OFF                 : no rotational correction.
-%   CORRIGAN_GENERIC_N1 : n=1.0, literature-generic first-order variant.
+%   CORRIGAN_GENERIC_N1 : n=1.0, predeclared in-range model-form choice.
+%                         Koning documents an n range rather than establishing
+%                         n=1 as a unique or universal literature default.
 %   KONING_XV15_N1P8    : n=1.8, published XV-15/OARF-correlated variant;
 %                         explicitly NOT independent validation evidence.
 %
@@ -32,7 +34,7 @@ switch mode
         independence = 'BASELINE';
     case 'CORRIGAN_GENERIC_N1'
         nExp = 1.0;
-        sourceClass = 'GENERAL_CORRIGAN_SCHILLINGS_LITERATURE_DEFAULT';
+        sourceClass = 'PREDECLARED_IN_RANGE_CORRIGAN_N1_MODEL_FORM_ASSUMPTION';
         independence = 'NOT_SELECTED_FROM_CURRENT_OARF_TARGETS';
     case 'KONING_XV15_N1P8'
         nExp = 1.8;
@@ -70,6 +72,6 @@ end
 meta.sourceClassRotational = sourceClass;
 meta.independence = independence;
 meta.claimBoundary = [ ...
-    'CORRIGAN_STALL_DELAY_DISCRETE_LITERATURE_VARIANT_' ...
+    'CORRIGAN_STALL_DELAY_DISCRETE_PREDECLARED_VARIANT_' ...
     'NO_CURRENT_OARF_PARAMETER_SEARCH'];
 end
