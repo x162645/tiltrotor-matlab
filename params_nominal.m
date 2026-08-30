@@ -109,8 +109,15 @@ P.wing.CD0             = 0.025;
 P.wing.kInduced        = 0.055;
 P.wing.CYbeta          = -0.35;
 
+% CALIBRATED_EFFECTIVE_PARAMETER: bounded trim-trend correction; not a
+% directly measured XV-15 component value. Cm0=-0.03 preserves a nonzero
+% baseline intrinsic wing pitching moment about the current aerodynamic
+% reference point, while lift/drag still contribute through rAC x F.
 P.wing.Cm0             = -0.03;
-P.wing.Cmalpha         = -0.45;
+% INITIAL_MECHANISTIC_ASSUMPTION: the current wing rAC is treated as an
+% equivalent aerodynamic center, so direct attached-flow Cm_alpha is set to
+% zero for now. This is not a statement that the real slope is zero.
+P.wing.Cmalpha         = 0.00;
 P.wing.CLaileron       = 0.45;
 P.wing.Cmaileron       = -0.08;
 
@@ -141,7 +148,10 @@ P.fuselage.Clbeta      = -0.08;
 P.fuselage.Clp         = -0.30;
 P.fuselage.Clr         = 0.08;
 P.fuselage.Cm0         = 0.00;
-P.fuselage.Cmalpha     = -0.20;
+% INITIAL_MECHANISTIC_ASSUMPTION: reliable fuselage/wing-body pitch-moment
+% slope data are not yet available. Aerodynamic forces and their moment arms
+% remain active; the real direct Cm_alpha may be nonzero.
+P.fuselage.Cmalpha     = 0.00;
 P.fuselage.Cmq         = -4.0;
 P.fuselage.Cnbeta      = 0.12;
 P.fuselage.Cnp         = -0.04;
@@ -151,13 +161,20 @@ P.fuselage.Cnr         = -0.30;
 P.htail.S              = 4.5;
 P.htail.c              = 1.0;
 P.htail.rAC            = [-5.0; 0.0; 0.15];
-P.htail.incidence      = 0.0*d2r;
-P.htail.downwashAlpha  = 0.25;
+% CALIBRATED_EFFECTIVE_PARAMETER: bounded trim-trend correction; not a
+% directly measured XV-15 component value. Downwash and incidence compensate
+% each other in the current 70 m/s airplane trim and are not uniquely
+% identified by this diagnostic alone.
+P.htail.incidence      = -2.0*d2r;
+P.htail.downwashAlpha  = 0.40;
 
 P.htail.CL0            = 0.0;
 P.htail.CLalpha        = 4.5;
 P.htail.CLmax          = 1.25;
-P.htail.CLelevator     = 1.60;
+% CALIBRATED_EFFECTIVE_PARAMETER: bounded trim-trend correction; not a
+% directly measured XV-15 component value. This changes elevator authority
+% per degree, not the zero-elevator baseline tail load.
+P.htail.CLelevator     = 2.00;
 P.htail.CD0            = 0.018;
 P.htail.kInduced       = 0.060;
 P.htail.Cm0            = 0.0;
@@ -178,7 +195,7 @@ P.vtail.CYrudder       = 0.70;
 P.control.collectiveLim = [0, 70]*d2r;
 P.control.cyclicLim     = [-35, 35]*d2r;
 P.control.aileronLim    = [-30, 30]*d2r;
-P.control.elevatorLim   = [-40, 40]*d2r;
+P.control.elevatorLim   = [-20, 20]*d2r;
 P.control.rudderLim     = [-30, 30]*d2r;
 
 %% 配平

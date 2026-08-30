@@ -57,6 +57,7 @@ infos = {infoHigh,infoLow,infoCollectiveHigh,infoCollectiveLow, ...
     infoCyclicHigh,infoCyclicLow,infoDiffCollective,infoDiffCyclic};
 
 names = {
+    'default elevator limit is +/-20 deg';
     'commanded controls preserved';
     'upper conventional-surface limits applied';
     'lower conventional-surface limits applied';
@@ -72,55 +73,58 @@ names = {
 passed = false(numel(names),1);
 messages = cell(numel(names),1);
 
-passed(1) = all_commanded_preserved(infos, commands, tol);
-messages{1} = 'Diagnostic commandedControls must preserve the original input vector.';
+passed(1) = max(abs(P.control.elevatorLim(:)/d2r - [-20; 20])) < tol;
+messages{1} = 'Default elevator limits must remain +/-20 deg after Issue #23 calibration.';
 
-passed(2) = norm(infoHigh.appliedControls(5:7) - ...
+passed(2) = all_commanded_preserved(infos, commands, tol);
+messages{2} = 'Diagnostic commandedControls must preserve the original input vector.';
+
+passed(3) = norm(infoHigh.appliedControls(5:7) - ...
     [P.control.aileronLim(2); P.control.elevatorLim(2); ...
      P.control.rudderLim(2)]) < tol;
-messages{2} = 'Aileron, elevator, and rudder upper limits were not applied consistently.';
+messages{3} = 'Aileron, elevator, and rudder upper limits were not applied consistently.';
 
-passed(3) = norm(infoLow.appliedControls(5:7) - ...
+passed(4) = norm(infoLow.appliedControls(5:7) - ...
     [P.control.aileronLim(1); P.control.elevatorLim(1); ...
      P.control.rudderLim(1)]) < tol;
-messages{3} = 'Aileron, elevator, and rudder lower limits were not applied consistently.';
+messages{4} = 'Aileron, elevator, and rudder lower limits were not applied consistently.';
 
-passed(4) = norm(infoCollectiveHigh.appliedControls(1:4) - ...
+passed(5) = norm(infoCollectiveHigh.appliedControls(1:4) - ...
     [P.control.collectiveLim(2); 0; 0; 0]) < tol && ...
     norm(infoCollectiveLow.appliedControls(1:4) - ...
     [P.control.collectiveLim(1); 0; 0; 0]) < tol;
-messages{4} = 'Collective upper/lower limits were not reflected in appliedControls.';
+messages{5} = 'Collective upper/lower limits were not reflected in appliedControls.';
 
-passed(5) = norm(infoCyclicHigh.appliedControls(1:4) - ...
+passed(6) = norm(infoCyclicHigh.appliedControls(1:4) - ...
     [base(1); 0; P.control.cyclicLim(2); 0]) < tol && ...
     norm(infoCyclicLow.appliedControls(1:4) - ...
     [base(1); 0; P.control.cyclicLim(1); 0]) < tol;
-messages{5} = 'Cyclic upper/lower limits were not reflected in appliedControls.';
+messages{6} = 'Cyclic upper/lower limits were not reflected in appliedControls.';
 
-passed(6) = norm(infoDiffCollective.appliedControls(1:4) - ...
+passed(7) = norm(infoDiffCollective.appliedControls(1:4) - ...
     rotor_equivalent(infoDiffCollective)) < tol && ...
     infoDiffCollective.appliedRotorControls.left.collective == P.control.collectiveLim(1) && ...
     infoDiffCollective.appliedRotorControls.right.collective < P.control.collectiveLim(2);
-messages{6} = 'Differential collective saturation was not reconstructed from side controls.';
+messages{7} = 'Differential collective saturation was not reconstructed from side controls.';
 
-passed(7) = norm(infoDiffCyclic.appliedControls(1:4) - ...
+passed(8) = norm(infoDiffCyclic.appliedControls(1:4) - ...
     rotor_equivalent(infoDiffCyclic)) < tol && ...
     infoDiffCyclic.appliedRotorControls.right.cyclicLong == P.control.cyclicLim(2) && ...
     abs(infoDiffCyclic.appliedRotorControls.left.cyclicLong) < tol;
-messages{7} = 'Differential cyclic saturation was not reconstructed from side controls.';
+messages{8} = 'Differential cyclic saturation was not reconstructed from side controls.';
 
-passed(8) = all_rotor_controls_within_limits(infos, P, tol);
-messages{8} = 'At least one applied left/right rotor control is outside model limits.';
+passed(9) = all_rotor_controls_within_limits(infos, P, tol);
+messages{9} = 'At least one applied left/right rotor control is outside model limits.';
 
-passed(9) = all_rotor_equivalents_match(infos, tol);
-messages{9} = 'appliedControls(1:4) must match values reconstructed from left/right rotor controls.';
+passed(10) = all_rotor_equivalents_match(infos, tol);
+messages{10} = 'appliedControls(1:4) must match values reconstructed from left/right rotor controls.';
 
 applied = [];
 for k = 1:numel(infos)
     applied = [applied; infos{k}.appliedControls(:); rotor_equivalent(infos{k})]; %#ok<AGROW>
 end
-passed(10) = isreal(applied) && all(isfinite(applied));
-messages{10} = 'Applied control vectors contain NaN, Inf, or complex values.';
+passed(11) = isreal(applied) && all(isfinite(applied));
+messages{11} = 'Applied control vectors contain NaN, Inf, or complex values.';
 
 for k = 1:numel(passed)
     if passed(k)
