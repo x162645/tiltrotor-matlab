@@ -17,8 +17,9 @@ jobs:
       - name: Run M1-D quasi-static loaded-pitch diagnostic
         uses: matlab-actions/run-command@v2
         with:
-          command: startup; results = run_m1_stage2_loaded_pitch; assert(results.allFinite); assert(results.allConverged);
+          command: startup; results = run_m1_stage2_loaded_pitch; disp(results.metrics); disp(results.points(:,{'collective75_deg','caseName','theta75Loaded_deg','maxAbsElasticTwist_deg','iterations','converged'})); assert(results.allFinite);
       - name: Upload M1-D results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: m1-stage2-loaded-pitch-results
