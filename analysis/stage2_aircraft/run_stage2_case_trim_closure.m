@@ -79,7 +79,7 @@ if summary.credible
     if isfield(closure,'finalPoint'), fp=closure.finalPoint; else, fp=finalPoint; end
     summary.theta_deg=fp.x9(8)/d2r; summary.collective_deg=fp.u7(1)/d2r; summary.cyclicLong_deg=fp.u7(3)/d2r; summary.elevator_deg=fp.u7(6)/d2r;
 end
-summaryTable=struct2table(summary); writetable(summaryTable,fullfile(outputRoot,[condition.name '_TRIM_CLOSURE_SUMMARY.csv']));
+summaryTable=struct2table(summary,'AsArray',true); writetable(summaryTable,fullfile(outputRoot,[condition.name '_TRIM_CLOSURE_SUMMARY.csv']));
 results=struct('condition',condition,'seedTable',seedTable,'reports',{reports},'summary',summaryTable,'closure',closure, ...
     'seedContract','CANONICAL__M0__MIDPOINT__M0_PLUS_MINUS_HALF_EXISTING_SCALE_PER_VARIABLE', ...
     'claimBoundary','COMPUTATIONAL_DECOMPOSITION_ONLY_SHARED_STAGE2_METHOD_NO_PHYSICS_PARAMETER_TOLERANCE_BOUND_DOF_OR_PRODUCTION_ITERATION_CHANGE');
