@@ -4,6 +4,16 @@
 
 Does the rotor evidence improvement frozen as `M1_EVIDENCE_V1` materially change whole-aircraft trim, rotor/wing load allocation, linear dynamics, stability/control, or nacelle-dynamics conclusions relative to the permanent M0 production control?
 
+## Current phase decision — 2026-08-31
+
+The temporary `B45 numerical closure` substage is closed. Stage 2 has formally returned to its original mainline:
+
+`B15–B45–B75 whole-aircraft propagation -> paper closure`.
+
+B45 is retained as a sufficiently diagnosed intermediate conversion case: the M1 credible equilibrium and supported control-effectiveness propagation are accepted, while incomplete full-state linearization is retained as an explicit limitation rather than pursued through further B45-only solver complexity.
+
+See `docs/STAGE2_B45_NUMERICAL_CLOSURE_EXIT_20260831.md` for the frozen phase-exit decision and reopening rule.
+
 ## Fixed controls
 
 - M0 production rotor and production whole-aircraft defaults are read-only.
@@ -44,6 +54,8 @@ No continuous conversion corridor is inferred from these three discrete points.
 - per-rotor thrust, torque/power, induced velocity and in-plane force;
 - wing loads/slipstream quantities already exposed by the model;
 - after trim closure: linear A/B matrices, eigenvalues, modal classification/participation and supported control-stability metrics.
+
+Only quantities that pass their declared credibility gate may enter M0–M1 comparison. A blocked quantity at one representative point does not justify case-specific retuning or expansion of numerical complexity solely to complete a table.
 
 ## Claim boundary
 
