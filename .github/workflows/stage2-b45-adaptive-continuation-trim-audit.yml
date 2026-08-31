@@ -1,0 +1,37 @@
+name: Stage 2 B45 adaptive continuation trim audit
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/run_stage2_b45_adaptive_continuation_trim_audit.m'
+      - 'analysis/stage2_aircraft/stage2_total_forces_moments.m'
+      - '.github/workflows/stage2-b45-adaptive-continuation-trim-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b45-adaptive-continuation-trim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run B45 adaptive continuation trim audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_b45_adaptive_continuation_trim');
+            results=run_stage2_b45_adaptive_continuation_trim_audit(outDir);
+      - name: Upload adaptive continuation trim evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-adaptive-continuation-trim-audit
+          path: ci_artifacts/stage2_b45_adaptive_continuation_trim/
+          if-no-files-found: error
