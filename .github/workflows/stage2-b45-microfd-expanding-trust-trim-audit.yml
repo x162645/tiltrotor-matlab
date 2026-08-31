@@ -1,0 +1,29 @@
+name: Stage 2 B45 micro-FD expanding-trust trim audit
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/run_stage2_b45_microfd_expanding_trust_trim_audit.m'
+      - '.github/workflows/stage2-b45-microfd-expanding-trust-trim-audit.yml'
+  workflow_dispatch:
+
+jobs:
+  b45-microfd-expanding-trust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run B45 micro-FD expanding-trust trim audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: startup; addpath(fullfile(pwd,'analysis','stage2_aircraft')); outDir=fullfile(pwd,'ci_artifacts','stage2_b45_microfd_expanding_trust'); results=run_stage2_b45_microfd_expanding_trust_trim_audit(outDir);
+      - name: Upload B45 micro-FD expanding-trust evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-microfd-expanding-trust-trim-audit
+          path: ci_artifacts/stage2_b45_microfd_expanding_trust/
+          if-no-files-found: error
