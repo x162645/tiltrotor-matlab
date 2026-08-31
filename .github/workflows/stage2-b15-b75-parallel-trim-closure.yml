@@ -1,0 +1,43 @@
+name: Stage 2 B15 B75 parallel shared trim closure
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/run_stage2_case_trim_closure.m'
+      - 'analysis/stage2_aircraft/stage2_branch_aware_trim_continuation.m'
+      - '.github/workflows/stage2-b15-b75-parallel-trim-closure.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  case-trim-closure:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        caseName: [B75_V080, B15_V020]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run fixed seed contract and shared continuation
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_parallel_trim_closure','${{ matrix.caseName }}');
+            results=run_stage2_case_trim_closure('${{ matrix.caseName }}',outDir);
+            disp(results.summary);
+            assert(height(results.summary)==1);
+      - name: Upload per-case trim closure evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-trim-closure-${{ matrix.caseName }}
+          path: ci_artifacts/stage2_parallel_trim_closure/${{ matrix.caseName }}/
+          if-no-files-found: error
