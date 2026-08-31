@@ -1,9 +1,9 @@
 function audit = stage2_trim_definition_jacobian(modelIdentity,condition,definition,z,P,opts)
 %STAGE2_TRIM_DEFINITION_JACOBIAN Local feasibility audit on exact trim DOFs.
-% Finite differences follow stage2_evaluate_trim_point, including any
-% conversion-mode virtual-command allocation. No additional control DOF is
-% introduced and no model parameter is changed. Unsupported finite-difference
-% neighbors are retained as diagnostic evidence; they are never imputed.
+% Finite differences follow stage2_evaluate_trim_point by default, including
+% any conversion-mode virtual-command allocation. An optional pointEvaluator
+% can be supplied for numerical continuation diagnostics without changing
+% trim DOFs, model parameters, equations, or the default evaluation path.
 
 if nargin < 6, opts = struct(); end
 if ~isfield(opts,'stepFraction') || isempty(opts.stepFraction), opts.stepFraction = 1.0e-2; end
@@ -12,6 +12,11 @@ if ~isfield(opts,'robustnessFractions') || isempty(opts.robustnessFractions)
 end
 if ~isfield(opts,'lineSearchAlphas') || isempty(opts.lineSearchAlphas)
     opts.lineSearchAlphas = [1 0.5 0.25 0.125 0.0625];
+end
+if ~isfield(opts,'pointEvaluator') || isempty(opts.pointEvaluator)
+    pointEvaluator = @(mi,c,d,zz,pp) stage2_evaluate_trim_point(mi,c,d,zz,pp);
+else
+    pointEvaluator = opts.pointEvaluator;
 end
 
 z = z(:); scale = definition.variableScale(:);
@@ -24,7 +29,7 @@ if any(~isfinite(scale)) || any(scale <= 0)
         'definition.variableScale must be finite and positive.');
 end
 
-base = stage2_evaluate_trim_point(modelIdentity,condition,definition,z,P);
+base = pointEvaluator(modelIdentity,condition,definition,z,P);
 residualScale = ones(numel(definition.residualNames),1);
 for i = 1:numel(definition.residualNames)
     if any(strcmp(definition.residualNames{i},{'udot','vdot','wdot'})), residualScale(i) = P.env.g; end
@@ -75,7 +80,7 @@ for k = 1:numel(alphas)
     line(k).withinBounds = all(zTrial >= definition.bounds(:,1)-1e-12 & ...
         zTrial <= definition.bounds(:,2)+1e-12);
     try
-        pt = stage2_evaluate_trim_point(modelIdentity,condition,definition,zTrial,P);
+        pt = pointEvaluator(modelIdentity,condition,definition,zTrial,P);
         line(k).evaluationReturned = true;
         line(k).physicalConverged = pt.physicalConverged;
         line(k).physicalBranchSupported = pt.physicalBranchSupported;
@@ -156,7 +161,7 @@ audit.claimBoundary = 'LOCAL_TRIM_FEASIBILITY_DIAGNOSTIC_ONLY_NO_NEW_CONTROL_DOF
         r = NaN(3,1); supported = false; status = 'NOT_EVALUATED';
         if any(zn < definition.bounds(:,1) | zn > definition.bounds(:,2)), status = 'OUTSIDE_TRIM_BOUNDS'; return; end
         try
-            pt = stage2_evaluate_trim_point(modelIdentity,condition,definition,zn,P);
+            pt = pointEvaluator(modelIdentity,condition,definition,zn,P);
             r = pt.residual; supported = pt.finiteReal && pt.physicalConverged && pt.physicalBranchSupported;
             status = pt.physicalStatus;
         catch ME
