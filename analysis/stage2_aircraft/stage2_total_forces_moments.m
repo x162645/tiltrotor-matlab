@@ -1,6 +1,10 @@
 function [Ftotal,Mtotal,info] = stage2_total_forces_moments(modelIdentity,x,uCtrl,betaM,P)
 %STAGE2_TOTAL_FORCES_MOMENTS Production-equivalent component stack with
 % an explicit M0/M1 rotor backend. Gravity remains in stage2_tiltrotor_eom.
+%
+% Optional P.stage2Numerics.flapInitialLeft / flapInitialRight are analysis-
+% only numerical initial-state overrides. They do not change rotor equations,
+% physical parameters, tolerances, iteration limits, or default behavior.
 
 x=x(:); uCtrl=uCtrl(:);
 if numel(x)~=9 || numel(uCtrl)~=7
@@ -23,8 +27,28 @@ uApplied(5)=clamp(uApplied(5),P.control.aileronLim);
 uApplied(6)=clamp(uApplied(6),P.control.elevatorLim);
 uApplied(7)=clamp(uApplied(7),P.control.rudderLim);
 
-[FrotL,MrotL,rotL]=stage2_rotor_backend(modelIdentity,x,ctrlLeft,betaM,-1,mp.cgShift,P);
-[FrotR,MrotR,rotR]=stage2_rotor_backend(modelIdentity,x,ctrlRight,betaM,+1,mp.cgShift,P);
+PL=P; PR=P; leftSeedOverride=false; rightSeedOverride=false;
+if strcmpi(char(modelIdentity),'M1_EVIDENCE_V1_PROPAGATION') && isfield(P,'stage2Numerics')
+    if isfield(P.stage2Numerics,'flapInitialLeft') && ~isempty(P.stage2Numerics.flapInitialLeft)
+        seed=P.stage2Numerics.flapInitialLeft(:);
+        if numel(seed)~=3 || any(~isfinite(seed)) || ~isreal(seed)
+            error('stage2_total_forces_moments:InvalidLeftFlapInitial', ...
+                'stage2Numerics.flapInitialLeft must be a finite real 3-vector.');
+        end
+        PL.rotor.flapInitial=seed; leftSeedOverride=true;
+    end
+    if isfield(P.stage2Numerics,'flapInitialRight') && ~isempty(P.stage2Numerics.flapInitialRight)
+        seed=P.stage2Numerics.flapInitialRight(:);
+        if numel(seed)~=3 || any(~isfinite(seed)) || ~isreal(seed)
+            error('stage2_total_forces_moments:InvalidRightFlapInitial', ...
+                'stage2Numerics.flapInitialRight must be a finite real 3-vector.');
+        end
+        PR.rotor.flapInitial=seed; rightSeedOverride=true;
+    end
+end
+
+[FrotL,MrotL,rotL]=stage2_rotor_backend(modelIdentity,x,ctrlLeft,betaM,-1,mp.cgShift,PL);
+[FrotR,MrotR,rotR]=stage2_rotor_backend(modelIdentity,x,ctrlRight,betaM,+1,mp.cgShift,PR);
 [Fwing,Mwing,wing]=wing_model(x,uApplied,betaM,mp.cgShift,rotL,rotR,P);
 [Ffus,Mfus,fus]=fuselage_model(x,mp.cgShift,P);
 [Fht,Mht,htail]=horizontal_tail_model(x,uApplied(6),mp.cgShift,P);
@@ -41,6 +65,8 @@ info.massProperties=mp; info.commandedControls=uCtrl; info.appliedControls=uAppl
 info.appliedRotorControls.left=ctrlLeft; info.appliedRotorControls.right=ctrlRight;
 info.rotorLeft=rotL; info.rotorRight=rotR; info.wing=wing; info.fuselage=fus;
 info.horizontalTail=htail; info.verticalTail=vtail;
+info.stage2Numerics=struct('leftFlapInitialOverride',leftSeedOverride, ...
+    'rightFlapInitialOverride',rightSeedOverride);
 info.physicalConverged=rotL.physicalConverged && rotR.physicalConverged;
 info.physicalBranchSupported=rotL.physicalBranchSupported && rotR.physicalBranchSupported;
 if info.physicalConverged, info.physicalStatus='PHYSICAL_CONVERGED';
