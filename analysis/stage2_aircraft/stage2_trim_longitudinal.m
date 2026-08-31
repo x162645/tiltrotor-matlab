@@ -19,7 +19,7 @@ atLimit=any(margin<=1e-8) || any(below>0) || any(above>0);
 withinLimits=~any(below>1e-8 | above>1e-8);
 resNorm=norm(point.residual); solverConverged=exitflag>0;
 credible=solverConverged && resNorm<P.trim.residualTolerance && point.finiteReal && ...
-    point.physicalConverged && ~atLimit && withinLimits;
+    point.physicalConverged && point.physicalBranchSupported && ~atLimit && withinLimits;
 xTrim=point.x9; uTrim=point.u7;
 report=struct(); report.modelIdentity=char(modelIdentity); report.mode=opts.mode; report.definition=definition;
 report.trimVariableVector=zOpt; report.trimVariables=named_struct(definition.unknownNames,zOpt);
@@ -42,7 +42,9 @@ report.claimBoundary='WHOLE_AIRCRAFT_PROPAGATION_SENSITIVITY_NOT_XV15_AIRCRAFT_V
         end
         rs=p.residual; rs(ismember(definition.residualNames,{'udot','vdot','wdot'}))=rs(ismember(definition.residualNames,{'udot','vdot','wdot'}))/P.env.g;
         J=rs.'*rs+p.penalty;
-        if ~p.physicalConverged, invalidCount=invalidCount+1; invalidIds{end+1}=p.physicalStatus; end
+        if ~p.physicalConverged || ~p.physicalBranchSupported
+            invalidCount=invalidCount+1; invalidIds{end+1}=p.physicalStatus;
+        end
         if ~isfinite(J) || ~isreal(J), J=1e30; end
     end
 end
