@@ -36,8 +36,9 @@ jobs:
             disp(results.summary);
             assert(height(results.summary)==1);
       - name: Upload per-case trim closure evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: stage2-trim-closure-${{ matrix.caseName }}
           path: ci_artifacts/stage2_parallel_trim_closure/${{ matrix.caseName }}/
-          if-no-files-found: error
+          if-no-files-found: warn
