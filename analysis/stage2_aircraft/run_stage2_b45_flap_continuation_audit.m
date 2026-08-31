@@ -29,7 +29,7 @@ for j=1:3
     try
         [~,~,outDefault]=eval_left_rotor(target,P,condition,definition,cgShift);
         row.defaultReturned=true; row.defaultStatus=outDefault.physicalStatus;
-        row.defaultResidual=outDefault.flapResidualNorm;
+        row.defaultResidual=outDefault.inducedClosureResidualRelative;
     catch ME
         row.defaultErrorIdentifier=ME.identifier; row.defaultErrorMessage=ME.message;
     end
@@ -39,7 +39,7 @@ for j=1:3
     try
         [~,~,outWarm]=eval_left_rotor(target,Pw,condition,definition,cgShift);
         row.centerWarmReturned=true; row.centerWarmStatus=outWarm.physicalStatus;
-        row.centerWarmResidual=outWarm.flapResidualNorm;
+        row.centerWarmResidual=outWarm.inducedClosureResidualRelative;
         row.centerWarmZ1=outWarm.zFlap(1); row.centerWarmZ2=outWarm.zFlap(2); row.centerWarmZ3=outWarm.zFlap(3);
     catch ME
         row.centerWarmErrorIdentifier=ME.identifier; row.centerWarmErrorMessage=ME.message;
@@ -64,7 +64,7 @@ for j=1:3
     row.continuationReachedFraction=reached;
     if continuationOk
         row.continuationStatus=lastOut.physicalStatus;
-        row.continuationResidual=lastOut.flapResidualNorm;
+        row.continuationResidual=lastOut.inducedClosureResidualRelative;
         row.continuationZ1=lastOut.zFlap(1); row.continuationZ2=lastOut.zFlap(2); row.continuationZ3=lastOut.zFlap(3);
     end
     rows(j)=row;
@@ -80,7 +80,7 @@ save(fullfile(outputRoot,'STAGE2_B45_FLAP_CONTINUATION_AUDIT.mat'),'results');
 disp(points);
 for k=1:height(points)
     fprintf(['B45_CONTINUATION|var=%s|default=%d|center_warm=%d|continuation=%d|' ...
-        'reached=%.7g|warm_res=%.9e|cont_res=%.9e|default_err=%s|warm_err=%s|cont_err=%s\n'], ...
+        'reached=%.7g|warm_closure=%.9e|cont_closure=%.9e|default_err=%s|warm_err=%s|cont_err=%s\n'], ...
         points.variableName{k},points.defaultReturned(k),points.centerWarmReturned(k), ...
         points.continuationReturned(k),points.continuationReachedFraction(k), ...
         points.centerWarmResidual(k),points.continuationResidual(k), ...
