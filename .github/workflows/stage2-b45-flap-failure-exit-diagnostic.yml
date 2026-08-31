@@ -27,11 +27,14 @@ jobs:
 
           path = Path('analysis/stage2_aircraft/m1_evidence_v1_forward_rotor.m')
           text = path.read_text()
+          start = text.index('    function [z,info]=solve_flap(viNow,z0)')
+          stop = text.index('    function [res,scale]=flap_residual(z,viNow)', start)
+          segment = text[start:stop]
 
           replacements = [
               (
-                  "    function [z,info]=solve_flap(viNow,z0)\n        z=z0(:);\n        info=struct('converged',false,'iterations',0,'residualNorm',Inf);",
-                  "    function [z,info]=solve_flap(viNow,z0)\n        z=z0(:);\n        info=struct('converged',false,'iterations',0,'residualNorm',Inf, ...\n            'failureCause','FLAP_MAX_ITER','jacobianRcond',NaN,'stepNorm',NaN, ...\n            'lineSearchTrials',0,'angleGuardRejects',0,'nonfiniteTrialRejects',0, ...\n            'noDecreaseRejects',0);"
+                  "        info=struct('converged',false,'iterations',0,'residualNorm',Inf);",
+                  "        info=struct('converged',false,'iterations',0,'residualNorm',Inf, ...\n            'failureCause','FLAP_MAX_ITER','jacobianRcond',NaN,'stepNorm',NaN, ...\n            'lineSearchTrials',0,'angleGuardRejects',0,'nonfiniteTrialRejects',0, ...\n            'noDecreaseRejects',0);"
               ),
               (
                   "            rn=res/scale;\n            if norm(rn)<=P.rotor.flapResidualTol",
@@ -57,20 +60,23 @@ jobs:
                   "            if ~accepted, return; end",
                   "            if ~accepted\n                if info.angleGuardRejects==P.rotor.flapLineSearchMaxIter\n                    info.failureCause='FLAP_LINE_SEARCH_ANGLE_GUARD';\n                elseif info.nonfiniteTrialRejects==P.rotor.flapLineSearchMaxIter\n                    info.failureCause='FLAP_LINE_SEARCH_NONFINITE_TRIAL';\n                else\n                    info.failureCause='FLAP_LINE_SEARCH_NO_DECREASE';\n                end\n                return;\n            end"
               ),
-              (
-                  "        error('m1_evidence_v1_forward_rotor:FlapNotConverged', ...\n            'M1 propagation flapping failed for side %+d.',side);",
-                  "        error('m1_evidence_v1_forward_rotor:FlapNotConverged', ...\n            ['M1 propagation flapping failed for side %+d (cause=%s, flap_iter=%d, ' ...\n             'flap_res=%.6e, JTJ_rcond=%.6e, step_norm=%.6e, ls_trials=%d, ' ...\n             'angle_rejects=%d, nonfinite_rejects=%d, no_decrease=%d, ' ...\n             'induced_iter=%d, vi=%.6e).'], ...\n            side,flapInfo.failureCause,flapInfo.iterations,flapInfo.residualNorm, ...\n            flapInfo.jacobianRcond,flapInfo.stepNorm,flapInfo.lineSearchTrials, ...\n            flapInfo.angleGuardRejects,flapInfo.nonfiniteTrialRejects, ...\n            flapInfo.noDecreaseRejects,iter,vi);"
-              ),
           ]
 
           for old, new in replacements:
-              count = text.count(old)
+              count = segment.count(old)
               if count != 1:
-                  raise RuntimeError(f'expected exactly one match, got {count}: {old[:100]!r}')
-              text = text.replace(old, new, 1)
+                  raise RuntimeError(f'solve_flap expected one match, got {count}: {old[:100]!r}')
+              segment = segment.replace(old, new, 1)
+
+          text = text[:start] + segment + text[stop:]
+          old_outer = "        error('m1_evidence_v1_forward_rotor:FlapNotConverged', ...\n            'M1 propagation flapping failed for side %+d.',side);"
+          new_outer = "        error('m1_evidence_v1_forward_rotor:FlapNotConverged', ...\n            ['M1 propagation flapping failed for side %+d (cause=%s, flap_iter=%d, ' ...\n             'flap_res=%.6e, JTJ_rcond=%.6e, step_norm=%.6e, ls_trials=%d, ' ...\n             'angle_rejects=%d, nonfinite_rejects=%d, no_decrease=%d, ' ...\n             'induced_iter=%d, vi=%.6e).'], ...\n            side,flapInfo.failureCause,flapInfo.iterations,flapInfo.residualNorm, ...\n            flapInfo.jacobianRcond,flapInfo.stepNorm,flapInfo.lineSearchTrials, ...\n            flapInfo.angleGuardRejects,flapInfo.nonfiniteTrialRejects, ...\n            flapInfo.noDecreaseRejects,iter,vi);"
+          if text.count(old_outer) != 1:
+              raise RuntimeError('outer FlapNotConverged site drifted')
+          text = text.replace(old_outer, new_outer, 1)
 
           path.write_text(text)
-          print('DIAGNOSTIC_PATCH_APPLIED|replacements=%d' % len(replacements))
+          print('DIAGNOSTIC_PATCH_APPLIED|solve_flap_replacements=%d|outer=1' % len(replacements))
           PY
       - name: Run B45 signed-neighbor audit with failure-exit diagnostics
         uses: matlab-actions/run-command@v3
