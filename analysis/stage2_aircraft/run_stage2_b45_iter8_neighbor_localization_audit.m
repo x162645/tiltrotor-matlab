@@ -40,7 +40,7 @@ for f=fractions
             row.withinBounds=all(zt>=definition.bounds(:,1) & zt<=definition.bounds(:,2));
             if ~row.withinBounds, row.status='OUTSIDE_TRIM_BOUNDS'; rows(idx)=row; continue; end
             try
-                [pt,tr]=advance_from_base(base,z8,zt,f);
+                [pt,tr]=advance_from_base(base,z8,zt,P,condition,definition,f);
                 row.evaluationReturned=true; row.physicalConverged=pt.physicalConverged;
                 row.physicalBranchSupported=pt.physicalBranchSupported; row.status=pt.physicalStatus;
                 row.residualNorm=norm(pt.residual); row.residual1=pt.residual(1); row.residual2=pt.residual(2); row.residual3=pt.residual(3);
@@ -85,21 +85,21 @@ for k=1:height(points)
 end
 end
 
-function [pt,tr]=advance_from_base(base,zStart,zTarget,f)
-scaleDist=max(abs((zTarget-zStart)./([1;1;1]))); %#ok<NASGU>
-% Use two or more continuation substeps across every requested FD displacement.
-nSteps=max(2,ceil(2));
+function [pt,tr]=advance_from_base(base,zStart,zTarget,P,condition,definition,f)
+% Exactly two substeps reproduce the local audit's continuation resolution:
+% each f=1e-3 FD neighbor is traversed in two 5e-4 scaled increments, and
+% smaller FD fractions become proportionally finer without changing physics.
+nSteps=2;
 leftSeed=base.eomOut.components.rotorLeft.zFlap(:);
 rightSeed=base.eomOut.components.rotorRight.zFlap(:);
 pt=base;
 for kk=1:nSteps
     zk=zStart+(kk/nSteps)*(zTarget-zStart);
-    Pk=evalin('caller','P'); condition=evalin('caller','condition'); definition=evalin('caller','definition');
-    Pk.stage2Numerics.flapInitialLeft=leftSeed; Pk.stage2Numerics.flapInitialRight=rightSeed;
+    Pk=P; Pk.stage2Numerics.flapInitialLeft=leftSeed; Pk.stage2Numerics.flapInitialRight=rightSeed;
     pt=stage2_evaluate_trim_point('M1_EVIDENCE_V1_PROPAGATION',condition,definition,zk,Pk);
     if ~(pt.finiteReal && pt.physicalConverged && pt.physicalBranchSupported)
         error('run_stage2_b45_iter8_neighbor_localization_audit:UnsupportedSubstep', ...
-            'Unsupported substep %d/%d at fraction %.7g: %s',kk,nSteps,f,pt.physicalStatus);
+            'Unsupported substep %d/%d at requested fraction %.7g: %s',kk,nSteps,f,pt.physicalStatus);
     end
     leftSeed=pt.eomOut.components.rotorLeft.zFlap(:); rightSeed=pt.eomOut.components.rotorRight.zFlap(:);
 end
