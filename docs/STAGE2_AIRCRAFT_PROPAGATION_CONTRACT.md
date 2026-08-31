@@ -46,6 +46,75 @@ Use the already frozen explicit-mode representative definitions:
 
 No continuous conversion corridor is inferred from these three discrete points.
 
+## Three-case comparison gates — frozen before B15/B75 result inspection
+
+The following gates apply identically to B15, B45 and B75. They are frozen before inspecting the new B15/B75 closure outputs so that result quality cannot change the acceptance rule.
+
+### Trim gate
+
+An operating point may enter a matched M0–M1 comparison only when the existing production trim credibility definition is satisfied, including:
+
+- finite-real state and control solution;
+- trim residual below the existing `P.trim.residualTolerance`;
+- physical rotor convergence;
+- `physicalBranchSupported = true`;
+- all existing trim bounds satisfied and no active-limit solution admitted as a credible interior trim.
+
+Branch-aware continuation may change only the numerical path used to reach the same fixed trim problem. It may not change model equations, physical parameters, tolerances, production iteration limits, trim bounds or trim/control DOFs.
+
+### Fixed finite-difference contract
+
+All accepted whole-aircraft numerical linearizations use the same predeclared central-difference probes already established by the B45 audit:
+
+- states `[u v w p q r phi theta psi]`;
+- controls `[collective diffCollective cyclicLong diffCyclicLong aileron elevator rudder]`;
+- base state steps `[0.05 0.05 0.05 5e-4 5e-4 5e-4 5e-4 5e-4 5e-4]`;
+- base control step `5e-4 rad` for every control coordinate;
+- two numerical scales: `1.0` and `0.5`.
+
+M1 perturbations may carry only converged left/right flap states from the accepted center or along a branch-tracked path to the exact same prescribed endpoint. A failed endpoint may not be moved, clipped, sign-flipped or replaced by a tuned perturbation.
+
+### A-matrix / modal gate
+
+A complete state Jacobian is admissible at a model/case point only if:
+
+- the center trim is credible and the center EOM evaluation is physically supported;
+- all `9/9` state columns have both plus and minus endpoints physically supported at both fixed step scales;
+- both A matrices are finite and real.
+
+Eigenvalues, spectral abscissa, unstable-root count, damping/frequency and modal-shift claims require this complete-A gate. If even one state column is blocked, no complete eigenstructure claim is admitted for that model/case point.
+
+### B-matrix / control-effectiveness gate
+
+A complete control Jacobian is admissible independently of the A gate when:
+
+- the center trim is credible and the center EOM evaluation is physically supported;
+- all `7/7` control columns have both plus and minus endpoints physically supported at both fixed step scales;
+- both B matrices are finite and real.
+
+Therefore a case such as the frozen B45 M1 result may support quantitative control-effectiveness propagation while its full modal comparison remains blocked.
+
+### Partial-column gate
+
+A single state or control derivative column may be retained as explicitly partial evidence only when the same named column is supported at both fixed scales for both compared model identities. A partial-column result must not be used to reconstruct or imply a complete A/B matrix, eigenstructure or handling-quality conclusion.
+
+### Two-scale numerical sensitivity
+
+For every complete A or B matrix, report the relative Frobenius difference between the `1.0` and `0.5` step scales. For retained individual columns, report the corresponding two-scale column difference. Step-size sensitivity is numerical-quality evidence, not a model calibration target: perturbation sizes are not changed after viewing M0–M1 differences.
+
+Any M0–M1 physical interpretation must be presented together with its two-scale numerical sensitivity. A model-to-model shift that is of the same order as, or smaller than, its finite-difference step sensitivity is treated as numerically unresolved rather than as a physical M1 effect.
+
+### Comparison hierarchy
+
+The paper-facing evidence hierarchy is:
+
+1. credible trim and equilibrium load/control allocation;
+2. complete or explicitly partial B/control-effectiveness propagation;
+3. complete A/stability derivatives;
+4. eigenstructure/modal evolution only where the complete-A gate passes.
+
+A blocked higher-level quantity does not invalidate lower-level quantities that independently pass their own gate, and does not justify case-specific solver retuning solely to complete a table.
+
 ## First accepted observables
 
 - trim credibility / physical support / residual;
