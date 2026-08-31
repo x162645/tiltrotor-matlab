@@ -1,0 +1,43 @@
+name: Stage 2 B15 B75 generic trim closure
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/stage2_branch_aware_trim_continuation.m'
+      - 'analysis/stage2_aircraft/run_stage2_b15_b75_trim_closure.m'
+      - 'analysis/stage2_aircraft/run_stage2_m1_trim_multistart_diagnostic.m'
+      - 'analysis/stage2_aircraft/stage2_trim_longitudinal.m'
+      - 'analysis/stage2_aircraft/stage2_evaluate_trim_point.m'
+      - 'analysis/stage2_aircraft/stage2_total_forces_moments.m'
+      - '.github/workflows/stage2-b15-b75-trim-closure.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b15-b75-trim-closure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run predeclared multistart plus shared branch-aware closure
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_b15_b75_trim_closure');
+            results=run_stage2_b15_b75_trim_closure(outDir);
+            disp(results.summary);
+            assert(height(results.summary)==2);
+      - name: Upload B15 B75 trim-closure evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b15-b75-trim-closure
+          path: ci_artifacts/stage2_b15_b75_trim_closure/
+          if-no-files-found: error
