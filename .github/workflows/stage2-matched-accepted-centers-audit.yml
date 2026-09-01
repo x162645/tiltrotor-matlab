@@ -1,0 +1,75 @@
+name: Stage 2 matched accepted centers audit
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/evidence/STAGE2_ACCEPTED_MATCHED_TRIM_CENTERS.csv'
+      - 'analysis/stage2_aircraft/run_stage2_matched_trim_load_audit.m'
+      - 'analysis/stage2_aircraft/run_stage2_matched_direct_linearization_audit.m'
+      - 'analysis/stage2_aircraft/stage2_tiltrotor_eom.m'
+      - 'analysis/stage2_aircraft/stage2_total_forces_moments.m'
+      - 'analysis/stage2_aircraft/stage2_matched_rotor_parameters.m'
+      - '.github/workflows/stage2-matched-accepted-centers-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matched-trim-load:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Re-evaluate six frozen accepted centers and component loads
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_matched_trim_load');
+            results=run_stage2_matched_trim_load_audit(outDir);
+            disp(results.summary);
+            assert(results.summary.ReproducedCenterCount==6);
+            assert(results.summary.ComparableCaseCount==3);
+      - name: Upload matched trim load evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-matched-trim-load-audit
+          path: ci_artifacts/stage2_matched_trim_load/
+          if-no-files-found: warn
+
+  matched-direct-linearization:
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [B15_V020, B45_V035, B75_V080]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run direct-only fixed-endpoint two-scale audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            caseName='${{ matrix.case }}';
+            outDir=fullfile(pwd,'ci_artifacts',['stage2_matched_direct_' caseName]);
+            results=run_stage2_matched_direct_linearization_audit(outDir,caseName);
+            disp(results.summary);
+            assert(height(results.summary)==4);
+      - name: Upload per-case direct linearization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-matched-direct-${{ matrix.case }}
+          path: ci_artifacts/stage2_matched_direct_${{ matrix.case }}/
+          if-no-files-found: warn

@@ -1,0 +1,50 @@
+name: Stage 2 B45 M1 seed diagnostic
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - '.github/workflows/stage2-b45-m1-seed-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b45-seed-diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Re-seed M1 from the credible M0 B45 trim
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            P=stage2_matched_rotor_parameters();
+            condition=struct('V',35,'betaM',45*pi/180,'gamma',0);
+            mode='conversion_longitudinal';
+            [x0,u0,r0]=stage2_trim_longitudinal('M0_MATCHED_PRODUCTION',condition,P,struct('mode',mode));
+            assert(r0.credible);
+            opts=struct('mode',mode,'initialValues',r0.trimVariableVector);
+            try;
+              [x1,u1,r1]=stage2_trim_longitudinal('M1_EVIDENCE_V1_PROPAGATION',condition,P,opts);
+              fprintf('STAGE2_B45_DIAG|M0|credible=%d|res=%.12g|theta_deg=%.9g|collective_deg=%.9g\n',r0.credible,r0.residualNorm,x0(8)*180/pi,u0(1)*180/pi);
+              fprintf('STAGE2_B45_DIAG|M1_FROM_M0_SEED|credible=%d|solver=%d|physical=%d|res=%.12g|theta_deg=%.9g|collective_deg=%.9g|cyclic_deg=%.9g|elevator_deg=%.9g|Tmean_N=%.9g|Ptotal_kW=%.9g|vi_mean=%.9g\n',r1.credible,r1.solverConverged,r1.physicalConverged,r1.residualNorm,x1(8)*180/pi,u1(1)*180/pi,u1(3)*180/pi,u1(6)*180/pi,0.5*(r1.point.eomOut.components.rotorLeft.thrust+r1.point.eomOut.components.rotorRight.thrust),(r1.point.eomOut.components.rotorLeft.torque+r1.point.eomOut.components.rotorRight.torque)*P.rotor.Omega/1000,0.5*(r1.point.eomOut.components.rotorLeft.inducedVelocity+r1.point.eomOut.components.rotorRight.inducedVelocity));
+              outDir=fullfile(pwd,'ci_artifacts','stage2_b45_seed_diag'); if ~exist(outDir,'dir'),mkdir(outDir);end;
+              save(fullfile(outDir,'B45_M1_FROM_M0_SEED.mat'),'condition','r0','x0','u0','r1','x1','u1');
+            catch ME;
+              fprintf('STAGE2_B45_DIAG|M1_FROM_M0_SEED|credible=0|status=ERROR_%s\n',ME.identifier);
+              outDir=fullfile(pwd,'ci_artifacts','stage2_b45_seed_diag'); if ~exist(outDir,'dir'),mkdir(outDir);end;
+              save(fullfile(outDir,'B45_M1_FROM_M0_SEED_ERROR.mat'),'condition','r0','x0','u0','ME');
+            end;
+      - name: Upload diagnostic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-m1-seed-diagnostic
+          path: ci_artifacts/stage2_b45_seed_diag/
+          if-no-files-found: error

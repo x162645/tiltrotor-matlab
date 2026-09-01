@@ -1,0 +1,68 @@
+name: Stage 2 aircraft trim parallel cross-check
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - '.github/workflows/stage2-aircraft-trim-parallel.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trim-case:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - caseName: B15_V020
+            V: 20
+            betaDeg: 15
+            mode: helicopter_longitudinal
+          - caseName: B45_V035
+            V: 35
+            betaDeg: 45
+            mode: conversion_longitudinal
+          - caseName: B75_V080
+            V: 80
+            betaDeg: 75
+            mode: airplane_longitudinal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run canonical M0/M1 trim pair
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            P=stage2_matched_rotor_parameters();
+            condition=struct('V',${{ matrix.V }},'betaM',${{ matrix.betaDeg }}*pi/180,'gamma',0);
+            opts=struct('mode','${{ matrix.mode }}');
+            models={'M0_MATCHED_PRODUCTION','M1_EVIDENCE_V1_PROPAGATION'};
+            outDir=fullfile(pwd,'ci_artifacts','stage2_parallel','${{ matrix.caseName }}');
+            if ~exist(outDir,'dir'), mkdir(outDir); end;
+            reports=cell(2,1); xTrims=cell(2,1); uTrims=cell(2,1); statuses=cell(2,1);
+            for k=1:2;
+              try;
+                [x,u,r]=stage2_trim_longitudinal(models{k},condition,P,opts);
+                reports{k}=r; xTrims{k}=x; uTrims{k}=u;
+                if r.credible, statuses{k}='CREDIBLE'; elseif ~r.solverConverged, statuses{k}='SOLVER_NOT_CONVERGED'; elseif ~r.physicalConverged, statuses{k}=['PHYSICAL_' r.physicalStatus]; elseif r.atLimit || ~r.withinLimits, statuses{k}='BOUNDARY_LIMITED'; else, statuses{k}='RESIDUAL_OR_OTHER'; end;
+                fprintf('STAGE2_RESULT|${{ matrix.caseName }}|%s|status=%s|credible=%d|solver=%d|physical=%d|res=%.12g|theta_deg=%.9g|collective_deg=%.9g|cyclic_deg=%.9g|elevator_deg=%.9g|Tmean_N=%.9g|Ptotal_kW=%.9g|vi_mean=%.9g\n',models{k},statuses{k},r.credible,r.solverConverged,r.physicalConverged,r.residualNorm,x(8)*180/pi,u(1)*180/pi,u(3)*180/pi,u(6)*180/pi,0.5*(r.point.eomOut.components.rotorLeft.thrust+r.point.eomOut.components.rotorRight.thrust),(r.point.eomOut.components.rotorLeft.torque+r.point.eomOut.components.rotorRight.torque)*P.rotor.Omega/1000,0.5*(r.point.eomOut.components.rotorLeft.inducedVelocity+r.point.eomOut.components.rotorRight.inducedVelocity));
+              catch ME;
+                statuses{k}=['ERROR_' ME.identifier]; reports{k}=ME;
+                fprintf('STAGE2_RESULT|${{ matrix.caseName }}|%s|status=%s|credible=0\n',models{k},statuses{k});
+              end;
+            end;
+            save(fullfile(outDir,'trim_pair.mat'),'condition','opts','models','reports','xTrims','uTrims','statuses');
+      - name: Upload case evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-trim-${{ matrix.caseName }}
+          path: ci_artifacts/stage2_parallel/${{ matrix.caseName }}/
+          if-no-files-found: error

@@ -1,0 +1,41 @@
+name: Stage 2 rotor propagation gates
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - '.github/workflows/stage2-rotor-propagation-gates.yml'
+      - 'analysis/stage2_aircraft/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rotor-propagation-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run M0/M1 propagation identity gates
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            root=fullfile(pwd,'ci_artifacts','stage2_rotor_propagation_gates');
+            if ~exist(root,'dir'), mkdir(root); end;
+            results=run_stage2_rotor_propagation_gates(root);
+            disp(results.summary);
+            assert(results.summary.M0BackendMaxAbsDifference <= 1e-12);
+            assert(results.summary.M1HoverMaxAbsDifference <= 1e-10);
+            assert(results.summary.M1HoverAllPhysical);
+      - name: Upload stage-2 rotor gate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-rotor-propagation-gates
+          path: ci_artifacts/stage2_rotor_propagation_gates/
+          if-no-files-found: error

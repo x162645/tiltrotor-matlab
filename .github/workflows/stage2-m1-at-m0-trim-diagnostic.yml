@@ -1,0 +1,60 @@
+name: Stage 2 M1 at M0 trim diagnostic
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - '.github/workflows/stage2-m1-at-m0-trim-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fixed-point:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - caseName: B15_V020
+            V: 20
+            betaDeg: 15
+            mode: helicopter_longitudinal
+          - caseName: B45_V035
+            V: 35
+            betaDeg: 45
+            mode: conversion_longitudinal
+          - caseName: B75_V080
+            V: 80
+            betaDeg: 75
+            mode: airplane_longitudinal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Evaluate M1 at the credible M0 trim point
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            P=stage2_matched_rotor_parameters();
+            condition=struct('V',${{ matrix.V }},'betaM',${{ matrix.betaDeg }}*pi/180,'gamma',0);
+            mode='${{ matrix.mode }}';
+            [x0,u0,r0]=stage2_trim_longitudinal('M0_MATCHED_PRODUCTION',condition,P,struct('mode',mode));
+            assert(r0.credible);
+            definition=make_trim_definition(mode,condition,P);
+            p1=stage2_evaluate_trim_point('M1_EVIDENCE_V1_PROPAGATION',condition,definition,r0.trimVariableVector,P);
+            fprintf('STAGE2_FIXED|${{ matrix.caseName }}|M0|res=[%.12g %.12g %.12g]|norm=%.12g|theta_deg=%.9g|collective_deg=%.9g\n',r0.residual(1),r0.residual(2),r0.residual(3),r0.residualNorm,x0(8)*180/pi,u0(1)*180/pi);
+            fprintf('STAGE2_FIXED|${{ matrix.caseName }}|M1_AT_M0|physical=%d|branch=%d|status=%s|res=[%.12g %.12g %.12g]|norm=%.12g|Tmean_N=%.9g|Ptotal_kW=%.9g|vi_mean=%.9g\n',p1.physicalConverged,p1.physicalBranchSupported,p1.physicalStatus,p1.residual(1),p1.residual(2),p1.residual(3),norm(p1.residual),0.5*(p1.eomOut.components.rotorLeft.thrust+p1.eomOut.components.rotorRight.thrust),(p1.eomOut.components.rotorLeft.torque+p1.eomOut.components.rotorRight.torque)*P.rotor.Omega/1000,0.5*(p1.eomOut.components.rotorLeft.inducedVelocity+p1.eomOut.components.rotorRight.inducedVelocity));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_fixed','${{ matrix.caseName }}'); if ~exist(outDir,'dir'),mkdir(outDir);end;
+            save(fullfile(outDir,'M1_AT_M0_TRIM.mat'),'condition','mode','r0','x0','u0','definition','p1');
+      - name: Upload fixed-point evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-m1-at-m0-${{ matrix.caseName }}
+          path: ci_artifacts/stage2_fixed/${{ matrix.caseName }}/
+          if-no-files-found: error

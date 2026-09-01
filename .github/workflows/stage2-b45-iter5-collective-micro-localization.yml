@@ -1,0 +1,29 @@
+name: Stage 2 B45 iter5 collective micro localization
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/run_stage2_b45_iter5_collective_micro_localization.m'
+      - '.github/workflows/stage2-b45-iter5-collective-micro-localization.yml'
+  workflow_dispatch:
+
+jobs:
+  b45-iter5-collective-micro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run B45 iter5 collective micro localization
+        uses: matlab-actions/run-command@v3
+        with:
+          command: startup; addpath(fullfile(pwd,'analysis','stage2_aircraft')); outDir=fullfile(pwd,'ci_artifacts','stage2_b45_iter5_collective_micro'); results=run_stage2_b45_iter5_collective_micro_localization(outDir);
+      - name: Upload B45 iter5 collective micro evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-iter5-collective-micro-localization
+          path: ci_artifacts/stage2_b45_iter5_collective_micro/
+          if-no-files-found: error

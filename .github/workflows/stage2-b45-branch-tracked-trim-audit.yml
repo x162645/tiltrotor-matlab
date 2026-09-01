@@ -1,0 +1,39 @@
+name: Stage 2 B45 branch-tracked trim audit
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/stage2_total_forces_moments.m'
+      - 'analysis/stage2_aircraft/stage2_trim_definition_jacobian.m'
+      - 'analysis/stage2_aircraft/stage2_evaluate_trim_point_continuation.m'
+      - 'analysis/stage2_aircraft/run_stage2_b45_branch_tracked_trim_audit.m'
+      - '.github/workflows/stage2-b45-branch-tracked-trim-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b45-branch-tracked-trim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run B45 branch-tracked trim audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_b45_branch_tracked_trim');
+            results=run_stage2_b45_branch_tracked_trim_audit(outDir);
+      - name: Upload branch-tracked trim evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-branch-tracked-trim-audit
+          path: ci_artifacts/stage2_b45_branch_tracked_trim/
+          if-no-files-found: error

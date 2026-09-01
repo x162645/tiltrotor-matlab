@@ -1,0 +1,96 @@
+name: Stage 2 B45 flap failure-exit diagnostic
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - '.github/workflows/stage2-b45-flap-failure-exit-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b45-flap-failure-exit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Inject diagnostic-only flap exit instrumentation into CI checkout
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('analysis/stage2_aircraft/m1_evidence_v1_forward_rotor.m')
+          text = path.read_text()
+          start = text.index('    function [z,info]=solve_flap(viNow,z0)')
+          stop = text.index('    function [res,scale]=flap_residual(z,viNow)', start)
+          segment = text[start:stop]
+
+          replacements = [
+              (
+                  "        info=struct('converged',false,'iterations',0,'residualNorm',Inf);",
+                  "        info=struct('converged',false,'iterations',0,'residualNorm',Inf, ...\n            'failureCause','FLAP_MAX_ITER','jacobianRcond',NaN,'stepNorm',NaN, ...\n            'lineSearchTrials',0,'angleGuardRejects',0,'nonfiniteTrialRejects',0, ...\n            'noDecreaseRejects',0);"
+              ),
+              (
+                  "            rn=res/scale;\n            if norm(rn)<=P.rotor.flapResidualTol",
+                  "            rn=res/scale;\n            info.iterations=kk; info.residualNorm=norm(rn);\n            if norm(rn)<=P.rotor.flapResidualTol"
+              ),
+              (
+                  "info.converged=true; info.iterations=kk; info.residualNorm=norm(rn); return;",
+                  "info.converged=true; info.iterations=kk; info.residualNorm=norm(rn); info.failureCause='NONE'; return;"
+              ),
+              (
+                  "            if any(~isfinite(J(:))) || rcond(J.'*J)<1e-14, return; end",
+                  "            if any(~isfinite(J(:)))\n                info.failureCause='FLAP_JACOBIAN_NONFINITE'; return;\n            end\n            info.jacobianRcond=rcond(J.'*J);\n            if info.jacobianRcond<1e-14\n                info.failureCause='FLAP_JACOBIAN_ILL_CONDITIONED'; return;\n            end"
+              ),
+              (
+                  "            dz=-(J.'*J+P.rotor.flapNewtonRegularization*eye(3))\\(J.'*rn);\n            step=1; accepted=false;",
+                  "            dz=-(J.'*J+P.rotor.flapNewtonRegularization*eye(3))\\(J.'*rn);\n            info.stepNorm=norm(dz);\n            step=1; accepted=false;\n            info.lineSearchTrials=0; info.angleGuardRejects=0;\n            info.nonfiniteTrialRejects=0; info.noDecreaseRejects=0;"
+              ),
+              (
+                  "                if all(isfinite(zc)) && max(abs(betaCheck))<P.rotor.flapDivergenceAngle\n                    [rc,sc]=flap_residual(zc,viNow);\n                    if norm(rc/sc)<norm(rn), z=zc; accepted=true; break; end\n                end\n                step=step*P.rotor.flapNewtonDamping;",
+                  "                info.lineSearchTrials=trial;\n                trialFinite=all(isfinite(zc));\n                trialAngleOk=trialFinite && max(abs(betaCheck))<P.rotor.flapDivergenceAngle;\n                if ~trialFinite\n                    info.nonfiniteTrialRejects=info.nonfiniteTrialRejects+1;\n                elseif ~trialAngleOk\n                    info.angleGuardRejects=info.angleGuardRejects+1;\n                end\n                if trialAngleOk\n                    [rc,sc]=flap_residual(zc,viNow);\n                    if norm(rc/sc)<norm(rn), z=zc; accepted=true; break; end\n                    info.noDecreaseRejects=info.noDecreaseRejects+1;\n                end\n                step=step*P.rotor.flapNewtonDamping;"
+              ),
+              (
+                  "            if ~accepted, return; end",
+                  "            if ~accepted\n                if info.angleGuardRejects==P.rotor.flapLineSearchMaxIter\n                    info.failureCause='FLAP_LINE_SEARCH_ANGLE_GUARD';\n                elseif info.nonfiniteTrialRejects==P.rotor.flapLineSearchMaxIter\n                    info.failureCause='FLAP_LINE_SEARCH_NONFINITE_TRIAL';\n                else\n                    info.failureCause='FLAP_LINE_SEARCH_NO_DECREASE';\n                end\n                return;\n            end"
+              ),
+          ]
+
+          for old, new in replacements:
+              count = segment.count(old)
+              if count != 1:
+                  raise RuntimeError(f'solve_flap expected one match, got {count}: {old[:100]!r}')
+              segment = segment.replace(old, new, 1)
+
+          text = text[:start] + segment + text[stop:]
+          old_outer = "        error('m1_evidence_v1_forward_rotor:FlapNotConverged', ...\n            'M1 propagation flapping failed for side %+d.',side);"
+          new_outer = "        error('m1_evidence_v1_forward_rotor:FlapNotConverged', ...\n            ['M1 propagation flapping failed for side %+d (cause=%s, flap_iter=%d, ' ...\n             'flap_res=%.6e, JTJ_rcond=%.6e, step_norm=%.6e, ls_trials=%d, ' ...\n             'angle_rejects=%d, nonfinite_rejects=%d, no_decrease=%d, ' ...\n             'induced_iter=%d, vi=%.6e).'], ...\n            side,flapInfo.failureCause,flapInfo.iterations,flapInfo.residualNorm, ...\n            flapInfo.jacobianRcond,flapInfo.stepNorm,flapInfo.lineSearchTrials, ...\n            flapInfo.angleGuardRejects,flapInfo.nonfiniteTrialRejects, ...\n            flapInfo.noDecreaseRejects,iter,vi);"
+          if text.count(old_outer) != 1:
+              raise RuntimeError('outer FlapNotConverged site drifted')
+          text = text.replace(old_outer, new_outer, 1)
+
+          path.write_text(text)
+          print('DIAGNOSTIC_PATCH_APPLIED|solve_flap_replacements=%d|outer=1' % len(replacements))
+          PY
+      - name: Run B45 signed-neighbor audit with failure-exit diagnostics
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_b45_flap_failure_exit');
+            results=run_stage2_b45_signed_neighbor_audit(outDir);
+            p=results.points;
+            for k=1:height(p), if strlength(string(p.errorIdentifier{k}))>0, fprintf('B45_FLAP_EXIT|frac=%.12g|var=%s|sign=%+d|id=%s|message=%s\n',p.stepFraction(k),p.variableName{k},p.sign(k),p.errorIdentifier{k},p.errorMessage{k}); end; end;
+      - name: Upload diagnostic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-flap-failure-exit-diagnostic
+          path: ci_artifacts/stage2_b45_flap_failure_exit/
+          if-no-files-found: error

@@ -1,0 +1,45 @@
+name: Stage 2 matched branch-tracked linearization audit
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/evidence/STAGE2_ACCEPTED_MATCHED_TRIM_CENTERS.csv'
+      - 'analysis/stage2_aircraft/run_stage2_matched_branch_tracked_linearization_audit.m'
+      - '.github/workflows/stage2-matched-branch-tracked-linearization-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matched-branch-tracked-linearization:
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [B15_V020, B45_V035, B75_V080]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run shared fixed-endpoint branch-tracked two-scale audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            caseName='${{ matrix.case }}';
+            outDir=fullfile(pwd,'ci_artifacts',['stage2_matched_branch_' caseName]);
+            results=run_stage2_matched_branch_tracked_linearization_audit(outDir,caseName);
+            disp(results.summary);
+            assert(height(results.summary)==4);
+      - name: Upload per-case branch-tracked linearization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-matched-branch-${{ matrix.case }}
+          path: ci_artifacts/stage2_matched_branch_${{ matrix.case }}/
+          if-no-files-found: warn

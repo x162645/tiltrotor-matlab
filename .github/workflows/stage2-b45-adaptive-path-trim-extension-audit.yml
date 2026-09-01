@@ -1,0 +1,27 @@
+name: Stage 2 B45 adaptive-path trim extension audit
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/run_stage2_b45_adaptive_path_trim_extension_audit.m'
+      - '.github/workflows/stage2-b45-adaptive-path-trim-extension-audit.yml'
+  workflow_dispatch:
+jobs:
+  b45-adaptive-path-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run B45 adaptive-path trim extension audit
+        uses: matlab-actions/run-command@v3
+        with:
+          command: startup; addpath(fullfile(pwd,'analysis','stage2_aircraft')); outDir=fullfile(pwd,'ci_artifacts','stage2_b45_adaptive_path_extension'); results=run_stage2_b45_adaptive_path_trim_extension_audit(outDir);
+      - name: Upload B45 adaptive-path extension evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-b45-adaptive-path-trim-extension-audit
+          path: ci_artifacts/stage2_b45_adaptive_path_extension/
+          if-no-files-found: error

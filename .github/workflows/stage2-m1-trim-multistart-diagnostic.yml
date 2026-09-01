@@ -1,0 +1,39 @@
+name: Stage 2 M1 trim multistart diagnostic
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/run_stage2_m1_trim_multistart_diagnostic.m'
+      - '.github/workflows/stage2-m1-trim-multistart-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m1-trim-multistart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Run predeclared local multistart diagnostic
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_m1_trim_multistart');
+            results=run_stage2_m1_trim_multistart_diagnostic(outDir);
+            fprintf('STAGE2_M1_MULTISTART|B15|credible=%d|supported=%d|best_res=%.12g|best_seed=%s\n',results.summary.credibleCount(1),results.summary.supportedPhysicalCount(1),results.summary.bestSupportedResidualNorm(1),results.summary.bestSupportedSeed{1});
+            fprintf('STAGE2_M1_MULTISTART|B45|credible=%d|supported=%d|best_res=%.12g|best_seed=%s\n',results.summary.credibleCount(2),results.summary.supportedPhysicalCount(2),results.summary.bestSupportedResidualNorm(2),results.summary.bestSupportedSeed{2});
+            fprintf('STAGE2_M1_MULTISTART|B75|credible=%d|supported=%d|best_res=%.12g|best_seed=%s\n',results.summary.credibleCount(3),results.summary.supportedPhysicalCount(3),results.summary.bestSupportedResidualNorm(3),results.summary.bestSupportedSeed{3});
+      - name: Upload diagnostic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-m1-trim-multistart-diagnostic
+          path: ci_artifacts/stage2_m1_trim_multistart/
+          if-no-files-found: error
