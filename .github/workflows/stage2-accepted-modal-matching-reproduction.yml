@@ -5,7 +5,10 @@ on:
     branches:
       - research/stage2-aircraft-m0-m1-propagation-20260830
     paths:
-      - 'analysis/stage2_aircraft/evidence/STAGE2_ACCEPTED_FULL_A_MATRICES_SCALE05.csv'
+      - 'analysis/stage2_aircraft/evidence/full_a/STAGE2_ACCEPTED_A_B15_M0_SCALE05.csv'
+      - 'analysis/stage2_aircraft/evidence/full_a/STAGE2_ACCEPTED_A_B15_M1_SCALE05.csv'
+      - 'analysis/stage2_aircraft/evidence/full_a/STAGE2_ACCEPTED_A_B75_M0_SCALE05.csv'
+      - 'analysis/stage2_aircraft/evidence/full_a/STAGE2_ACCEPTED_A_B75_M1_SCALE05.csv'
       - 'analysis/stage2_aircraft/evidence/STAGE2_ACCEPTED_MODAL_MATCHING.csv'
       - 'analysis/stage2_aircraft/run_stage2_accepted_modal_matching_reproduction.m'
       - '.github/workflows/stage2-accepted-modal-matching-reproduction.yml'
