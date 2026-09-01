@@ -3,7 +3,8 @@ function results = run_stage2_accepted_modal_matching_reproduction(outputRoot)
 % Reproduce accepted B15/B75 M0->M1 modal matching using base MATLAB R2021a.
 %
 % Evidence contract:
-%   * frozen accepted fine-scale full-A matrices only;
+%   * consume four exact 81-element fine-scale A blocks copied from the
+%     accepted direct-linearization artifacts;
 %   * no retrim, relinearization, continuation, model or solver changes;
 %   * one positive-imaginary representative per complex conjugate pair;
 %   * global assignment cost = normalized eigenvalue distance + (1 - MAC);
@@ -15,7 +16,7 @@ end
 if ~exist(outputRoot,'dir'), mkdir(outputRoot); end
 
 here=fileparts(mfilename('fullpath'));
-E=readtable(fullfile(here,'evidence','STAGE2_ACCEPTED_FULL_A_MATRICES_SCALE05.csv'),'TextType','string');
+E=load_exact_A_blocks(here);
 F=readtable(fullfile(here,'evidence','STAGE2_ACCEPTED_MODAL_MATCHING.csv'),'TextType','string');
 validate_snapshot(E);
 
@@ -66,7 +67,9 @@ writetable(V,fullfile(outputRoot,'STAGE2_MODAL_MATCHING_VALIDATION.csv'));
 writetable(C,fullfile(outputRoot,'STAGE2_MODAL_MATCHING_COST_MATRIX.csv'));
 writetable(A,fullfile(outputRoot,'STAGE2_MODAL_MATCHING_ASSIGNMENT.csv'));
 writetable(summary,fullfile(outputRoot,'STAGE2_MODAL_MATCHING_REPRODUCTION_SUMMARY.csv'));
-metadata=table(["FROZEN_ACCEPTED_FINE_SCALE_FULL_A_ONLY"; ...
+metadata=table(["FOUR_EXACT_ACCEPTED_FINE_SCALE_A_BLOCKS"; ...
+    "SOURCE_B15_ARTIFACT_9781737622"; ...
+    "SOURCE_B75_ARTIFACT_9781761914"; ...
     "NO_RETRIM_NO_RELINEARIZATION_NO_CONTINUATION"; ...
     "POSITIVE_IMAGINARY_REPRESENTATIVE_FOR_COMPLEX_PAIR"; ...
     "NORMALIZED_EIGEN_DISTANCE_ABS_DELTA_OVER_MAX_1_ABS_LAMBDA"; ...
@@ -78,7 +81,7 @@ metadata=table(["FROZEN_ACCEPTED_FINE_SCALE_FULL_A_ONLY"; ...
     'VariableNames',{'metadataValue'});
 writetable(metadata,fullfile(outputRoot,'STAGE2_MODAL_MATCHING_REPRODUCTION_METADATA.csv'));
 
-must(height(E)==324,'Accepted full-A snapshot must contain 324 elements.');
+must(height(E)==324,'Accepted full-A evidence must contain 324 elements.');
 must(height(R)==13,'Expected 13 collapsed accepted modes.');
 must(all(V.rowPass),'MATLAB reproduction does not match frozen accepted modal table.');
 results=struct('reproduced',R,'validation',V,'costMatrix',C,'assignment',A, ...
@@ -86,6 +89,22 @@ results=struct('reproduced',R,'validation',V,'costMatrix',C,'assignment',A, ...
     'claimBoundary','WHOLE_AIRCRAFT_PROPAGATION_SENSITIVITY_NOT_XV15_AIRCRAFT_VALIDATION');
 save(fullfile(outputRoot,'STAGE2_ACCEPTED_MODAL_MATCHING_REPRODUCTION.mat'),'results');
 disp(summary); disp(V);
+end
+
+function E=load_exact_A_blocks(here)
+d=fullfile(here,'evidence','full_a');
+paths={ ...
+    fullfile(d,'STAGE2_ACCEPTED_A_B15_M0_SCALE05.csv'), ...
+    fullfile(d,'STAGE2_ACCEPTED_A_B15_M1_SCALE05.csv'), ...
+    fullfile(d,'STAGE2_ACCEPTED_A_B75_M0_SCALE05.csv'), ...
+    fullfile(d,'STAGE2_ACCEPTED_A_B75_M1_SCALE05.csv')};
+parts=cell(4,1);
+for k=1:4
+    must(exist(paths{k},'file')==2,['Missing accepted A evidence block: ' paths{k}]);
+    parts{k}=readtable(paths{k},'TextType','string');
+    must(height(parts{k})==81,['Accepted A evidence block must have 81 rows: ' paths{k}]);
+end
+E=[parts{1};parts{2};parts{3};parts{4}];
 end
 
 function validate_snapshot(E)
