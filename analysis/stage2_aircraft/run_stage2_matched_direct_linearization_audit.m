@@ -33,8 +33,8 @@ baseDu = 5e-4*ones(7,1);
 stepScales = [1.0 0.5];
 
 nCenter = height(T);
-centers = repmat(struct(),nCenter,1);
-for i=1:nCenter, centers(i)=center_from_table(T,i); end
+centers = repmat(center_from_table(T,1),nCenter,1);
+for i=2:nCenter, centers(i)=center_from_table(T,i); end
 
 summaryRows = repmat(empty_summary_row(),nCenter*numel(stepScales),1);
 endpointRows = repmat(empty_endpoint_row(),0,1);
@@ -192,7 +192,7 @@ end
 try
     [xdot,out]=stage2_tiltrotor_eom(center.modelIdentity,x,u,center.betaM,Pk);
     ok=isreal(xdot)&&all(isfinite(xdot))&&logical(out.physicalConverged)&&logical(out.physicalBranchSupported);
-    if ok, status=char(out.physicalStatus); else, status=char(out.physicalStatus); end
+    status=char(out.physicalStatus);
 catch ME
     if is_expected_model_domain_error(ME)
         xdot=NaN(9,1); out=struct(); ok=false; status=['ERROR:' ME.identifier];
