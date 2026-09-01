@@ -1,0 +1,43 @@
+name: Stage 2 accepted modal matching reproduction
+
+on:
+  push:
+    branches:
+      - research/stage2-aircraft-m0-m1-propagation-20260830
+    paths:
+      - 'analysis/stage2_aircraft/evidence/STAGE2_ACCEPTED_FULL_A_MATRICES_SCALE05.csv'
+      - 'analysis/stage2_aircraft/evidence/STAGE2_ACCEPTED_MODAL_MATCHING.csv'
+      - 'analysis/stage2_aircraft/run_stage2_accepted_modal_matching_reproduction.m'
+      - '.github/workflows/stage2-accepted-modal-matching-reproduction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  accepted-modal-matching-reproduction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2021a
+      - name: Reproduce frozen B15 B75 eigenvalue plus MAC matching
+        uses: matlab-actions/run-command@v3
+        with:
+          command: >-
+            startup;
+            addpath(fullfile(pwd,'analysis','stage2_aircraft'));
+            outDir=fullfile(pwd,'ci_artifacts','stage2_accepted_modal_matching_reproduction');
+            results=run_stage2_accepted_modal_matching_reproduction(outDir);
+            disp(results.summary);
+            disp(results.validation);
+            assert(results.summary.matrixElementCount(1)==324);
+            assert(height(results.reproduced)==13);
+            assert(all(results.validation.rowPass));
+      - name: Upload modal matching reproduction evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-accepted-modal-matching-reproduction
+          path: ci_artifacts/stage2_accepted_modal_matching_reproduction/
+          if-no-files-found: error
