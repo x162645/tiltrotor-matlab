@@ -1,0 +1,36 @@
+name: M1 Stage3B Large-Angle Transport
+
+on:
+  push:
+    branches:
+      - research/m1-large-angle-local-closure-20260902
+    paths:
+      - 'analysis/rotor_inflow_closure_large_angle_local.m'
+      - 'analysis/solve_xv15_m1g_large_angle_hover_point.m'
+      - 'analysis/solve_xv15_m1e_frozen_hover_point.m'
+      - 'analysis/run_m1_stage3b_large_angle_local_closure.m'
+      - 'analysis/run_m1_stage3b_large_angle_transport_validation.m'
+      - 'analysis/xv15_c81_corrigan_stall_delay.m'
+      - 'analysis/data/xv15_wadc_metal_table_a3.csv'
+      - '.github/workflows/m1-stage3b-large-angle-transport.yml'
+  workflow_dispatch:
+
+jobs:
+  matlab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: matlab-actions/setup-matlab@v2
+        with:
+          release: R2021a
+      - name: Run M1-G transport validation
+        uses: matlab-actions/run-command@v2
+        with:
+          command: startup; run_m1_stage3b_large_angle_transport_validation;
+      - name: Upload transport evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-stage3b-large-angle-transport
+          path: results/m1_stage3b_large_angle_transport_validation/
+          if-no-files-found: warn
