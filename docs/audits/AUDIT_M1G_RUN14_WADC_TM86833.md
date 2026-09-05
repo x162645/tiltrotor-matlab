@@ -168,6 +168,24 @@ NO
 
 对应字段依次为 `source`、`collective_reference`、`validation_target_parameter_fit`、`model_change_after_target_audit`、`same_campaign_as_run15`、`blind_claim`。仓库没有 `entry_date`、`entered_by` 或等价字段：`UNAVAILABLE`。
 
+当前 M1-G transport 的 `results/m1_stage3b_large_angle_transport_validation/M1_STAGE3B_TRANSPORT_METADATA.csv` 原样为：
+
+```text
+model_change_after_run15_result,NO
+parameter_fit_to_run14,NO
+parameter_fit_to_wadc,NO
+point_selection_after_targets,NO
+collective_offset_fit,NO
+gain_fit,NO
+corrigan_exponent_change,NO
+loss_factor_tuning,NO
+m1e_identity_max_abs_diff,0
+m1g_identity_max_abs_diff,0
+run14_role,SAME_OARF_CAMPAIGN_EXTERNAL_CORRELATION_NOT_INDEPENDENT_FACILITY
+wadc_role,CROSS_FACILITY_TRANSPORT_AFTER_M1G_DEFINITION_FROZEN
+scientific_boundary,ANALYSIS_ONLY_STEADY_AXIAL_LOCAL_CLOSURE_NOT_PRODUCTION_NOT_NONLOCAL_WAKE
+```
+
 #### WADC
 
 `results/m1_stage5_wadc_holdout/M1_STAGE5_WADC_METADATA.csv` 原样为：
